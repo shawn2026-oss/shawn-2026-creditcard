@@ -102,7 +102,11 @@
 <script>
     const cards = [
         { id: 'c1', name: '星展傳說對決', note: 'LinePay / 蝦皮 / Uber Eats (10%)', type: 'ceiling', limit: 11363, tier1Rate: 0.10, tier2Rate: 0.012, gradient: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)', textColor: 'white', msgDanger: '🚨 已滿 (降為 1.2%)' },
-        { id: 'c2', name: '聯邦綠卡', note: '國外 2% / 國內 1%', type: 'floor', target: 12000, tier1Rate: 0.02, tier2Rate: 0.02, gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', textColor: 'white', msgSuccess: '✅ 已達標！下月享免費停車' },
+        
+        // --- 修改的部分在這裡 ---
+        { id: 'c2', name: '聯邦綠卡', note: '國外扣除手續費後 0.5%', type: 'floor', target: 12000, tier1Rate: 0.005, tier2Rate: 0.005, gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', textColor: 'white', msgSuccess: '✅ 已達標！下月享免費停車' },
+        // ----------------------
+        
         { id: 'c3', name: '永豐 Sport', note: 'Apple Pay (5%)', type: 'ceiling', limit: 5000, tier1Rate: 0.05, tier2Rate: 0.02, gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '🚨 5% 已滿 (降為 2%)' },
         { id: 'c4', name: '將來將將', note: 'LinePay / 悠遊付 (5%)', type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '🚨 加碼已滿 (剩0.5%)' }
     ];

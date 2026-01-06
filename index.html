@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="刷卡回饋管家">
     <title>刷卡回饋管家</title>
     
-    <link rel="apple-touch-icon" href="https://fonts.gstatic.com/s/i/short-term/release/googlestandardicons/credit_card/v14/192.png">
-    <link rel="icon" type="image/png" href="https://fonts.gstatic.com/s/i/short-term/release/googlestandardicons/credit_card/v14/48.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="icon-48.png">
+    <link rel="shortcut icon" href="icon-48.png">
 
     <style>
         :root { --bg-color: #F0F2F5; --text-primary: #1C1C1E; --text-secondary: #8E8E93; }
@@ -124,7 +126,7 @@
             <button class="btn-tool btn-donate" onclick="showDonateModal()">☕ 贊助開發者 (支持更新)</button>
             <button class="btn-reset-visible" onclick="resetAllData()">🗑️ 重置所有資料</button>
         </div>
-        <div class="footer">Ver 2026.01.06 16:00 (Precision Logic)</div>
+        <div class="footer">Ver 2026.01.06 16:30 (Local Icons)</div>
     </div>
 
     <div id="transactionModal" class="modal">
@@ -191,7 +193,7 @@
         { 
             id: 'c5', name: '聯邦賴點卡', note: 'LinePay / 偶數日指定通路', rule: '⚠️ 單筆需滿$100', 
             type: 'ceiling', limit: 3000, tier1Rate: 0.06, tier2Rate: 0.01, 
-            threshold: 100, // 設定低消門檻為 100 元
+            threshold: 100,
             gradient: 'linear-gradient(135deg, #00B900 0%, #33CC33 100%)', textColor: 'white', msgDanger: '6% 已滿',
             parking: `
                 ⚠️ <b>單筆需滿 $100</b> (回饋 6%)<br>
@@ -214,24 +216,16 @@
 
     function updateDate() { const now = new Date(); document.getElementById('dateDisplay').innerText = `${now.getMonth()+1}/${now.getDate()}`; }
 
-    // 核心計算邏輯修正：加入 threshold 判斷
     function calculateStats(cardId) {
         const card = cards.find(c => c.id === cardId);
         const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
         const relevantTx = transactions.filter(t => t.cardId === cardId && new Date(t.date) >= startDate);
-        
-        // 總支出 (顯示在卡片上的金額)
         const totalSpend = relevantTx.reduce((sum, t) => sum + parseFloat(t.amount), 0);
-        
-        // 有效支出 (用來計算回饋與進度條的金額)
-        // 只有大於等於 threshold (如 100) 的交易才算入
         const threshold = card.threshold || 0; 
         const validTx = relevantTx.filter(t => t.amount >= threshold);
         const validSpend = validTx.reduce((sum, t) => sum + parseFloat(t.amount), 0);
 
         let reward = 0, currentRate = 0;
-        
-        // 以下所有計算都改用 validSpend (有效消費)
         if (card.type === 'mixed') {
             if (validSpend < card.minSpend) { reward = validSpend * card.tier2Rate; currentRate = card.tier2Rate; }
             else if (validSpend <= card.limit) { reward = validSpend * card.tier1Rate; currentRate = card.tier1Rate; }
@@ -239,11 +233,9 @@
         } else if (card.type === 'ceiling') {
             if (validSpend <= card.limit) { reward = validSpend * card.tier1Rate; currentRate = card.tier1Rate; }
             else { reward = (card.limit * card.tier1Rate) + ((validSpend - card.limit) * card.tier2Rate); currentRate = card.tier2Rate; }
-        } else { // floor type
+        } else { 
             reward = validSpend * card.tier1Rate; currentRate = card.tier1Rate; 
         }
-        
-        // 回傳：spend (顯示總金額), validSpend (進度條用), reward (回饋金)
         return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: (currentRate * 100).toFixed(1) };
     }
 
@@ -255,7 +247,6 @@
             monthTotalReward += stats.reward;
             let percent = 0, statusText = '', msgStyle = '';
             
-            // 使用 validSpend 來計算進度條
             if (card.type === 'mixed') {
                 if (stats.validSpend < card.minSpend) { percent = (stats.validSpend / card.minSpend) * 100; statusText = `差 $${(card.minSpend - stats.validSpend).toLocaleString()} 升級`; msgStyle = 'color: #FFD700;'; }
                 else if (stats.validSpend <= card.limit) { percent = (stats.validSpend / card.limit) * 100; const remain = card.limit - stats.validSpend; statusText = `剩 $${remain.toLocaleString()} (5%)`; }
@@ -417,11 +408,3 @@
 </script>
 </body>
 </html>
-      
-         
- 
-
-  
-  
-
-   

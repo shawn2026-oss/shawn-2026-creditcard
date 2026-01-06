@@ -41,10 +41,14 @@
         .card-tile { border-radius: 16px; padding: 12px; min-height: 135px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; transition: transform 0.1s; cursor: pointer; color: white; overflow: hidden; }
         .card-tile:active { transform: scale(0.97); }
         .tile-header { display: flex; justify-content: space-between; align-items: flex-start; z-index: 2; margin-bottom: 2px;}
-        .tile-name { font-size: 14px; font-weight: 700; line-height: 1.2; text-shadow: 0 1px 2px rgba(0,0,0,0.15); }
+        .tile-name { font-size: 14px; font-weight: 700; line-height: 1.2; text-shadow: 0 1px 2px rgba(0,0,0,0.15); flex:1; margin-right: 4px; }
         .tile-note { font-size: 10px; font-weight: 500; opacity: 0.9; margin-bottom: 4px; display: block; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2; letter-spacing: -0.2px; }
         .tile-rule { font-size: 10px; font-weight: 700; background: rgba(0,0,0,0.25); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 6px; color: #FFD700; z-index: 2; }
-        .rate-badge { background: rgba(255,255,255,0.3); font-size: 10px; font-weight: 800; padding: 2px 5px; border-radius: 5px; white-space: nowrap; backdrop-filter: blur(4px); margin-left: 2px; flex-shrink: 0; }
+        
+        .header-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0; }
+        .rate-badge { background: rgba(255,255,255,0.3); font-size: 10px; font-weight: 800; padding: 2px 5px; border-radius: 5px; white-space: nowrap; backdrop-filter: blur(4px); color:black; }
+        .expiry-badge { font-size: 9px; font-weight: 600; opacity: 0.8; color: rgba(255,255,255,0.9); white-space: nowrap; background: rgba(0,0,0,0.15); padding: 1px 4px; border-radius: 4px;}
+
         .tile-body { z-index: 2; flex:1; display:flex; flex-direction:column; justify-content:center; }
         .tile-stat { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 2px;}
         .tile-earned { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.95); display: flex; align-items: center; gap: 3px;}
@@ -126,7 +130,7 @@
             <button class="btn-tool btn-donate" onclick="showDonateModal()">☕ 贊助開發者 (支持更新)</button>
             <button class="btn-reset-visible" onclick="resetAllData()">🗑️ 重置所有資料</button>
         </div>
-        <div class="footer">Ver 2026.01.06 16:45 (Update Next Bank)</div>
+        <div class="footer">Ver 2026.01.06 20:15 (Expiry Date)</div>
     </div>
 
     <div id="transactionModal" class="modal">
@@ -168,32 +172,49 @@
     </div>
 
 <script>
+    // 💡 卡片資料區：新增 expiry 欄位
     const cards = [
         { 
             id: 'c1', name: '星展傳說對決', note: 'LinePay / 蝦皮 / UberEats', rule: '', 
             type: 'ceiling', limit: 11363, tier1Rate: 0.10, tier2Rate: 0.012, 
+            expiry: '2026/06/30', // 權益到期日
             gradient: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)', textColor: 'white', msgDanger: '已滿 (1.2%)' 
         },
         { 
             id: 'c2', name: '聯邦綠卡', note: '國外2% / 國內1%', rule: '', 
             type: 'floor', target: 12000, tier1Rate: 0.02, tier2Rate: 0.02, 
+            expiry: '2026/06/30',
             gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', textColor: 'white', msgSuccess: '已達標 (免停)',
             parking: '🅿️ <b>免費停車：</b><br>台灣聯通、詮營、ViVi PARK、嘟嘟房、車麻吉<br>(需上月刷滿1.2萬)'
         },
         { 
             id: 'c3', name: '永豐 Sport', note: 'Apple Pay (5%)', rule: '', 
             type: 'ceiling', limit: 5000, tier1Rate: 0.05, tier2Rate: 0.02, 
+            expiry: '2026/06/30',
             gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '5% 已滿' 
         },
         { 
-            id: 'c4', name: '將來將將', note: 'LinePay / 悠遊付 / icash Pay', rule: '', 
+            id: 'c4', name: '將來將將', note: '指定行動支付 / 外送 / 航空', rule: '', 
             type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
-            gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '加碼已滿' 
+            expiry: '2026/06/30',
+            gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '加碼已滿',
+            parking: `
+                💡 <b>當月需消費滿 $3000</b><br>
+                <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
+                    <summary style="cursor:pointer; font-weight:700; color:#856404; font-size:12px;">點我看 5% 通路 ▼</summary>
+                    <div style="margin-top:6px; padding-left:4px; font-size:11px; line-height:1.4; color:#555; max-height:120px; overflow-y:auto; border-radius:4px; background:rgba(255,255,255,0.5); padding:6px;">
+                        <div style="margin-bottom:4px;">📱 <b>行動支付：</b><br>LINE Pay / 街口 / 悠遊付 / icash Pay / Hami Pay / Pi 錢包 / 全盈+PAY / 台灣Pay</div>
+                        <div style="margin-bottom:4px;">🛵 <b>外送平台：</b><br>Uber Eats / Foodpanda / Foodomo</div>
+                        <div style="margin-bottom:0px;">✈️ <b>航空旅遊：</b><br>華航 / 長榮 / 星宇 / 虎航 / 國泰 / 全日空 / 日本航空</div>
+                    </div>
+                </details>
+            `
         },
         { 
             id: 'c5', name: '聯邦賴點卡', note: 'LinePay / 偶數日指定通路', rule: '⚠️ 單筆需滿$100', 
             type: 'ceiling', limit: 3000, tier1Rate: 0.06, tier2Rate: 0.01, 
             threshold: 100,
+            expiry: '2026/06/30',
             gradient: 'linear-gradient(135deg, #00B900 0%, #33CC33 100%)', textColor: 'white', msgDanger: '6% 已滿',
             parking: `
                 ⚠️ <b>單筆需滿 $100</b> (回饋 6%)<br>
@@ -261,10 +282,18 @@
             }
 
             const ruleHtml = card.rule ? `<div class="tile-rule">${card.rule}</div>` : '';
+            // 新增：顯示到期日標籤
+            const expiryHtml = card.expiry ? `<span class="expiry-badge">📅 ${card.expiry} 止</span>` : '';
 
             const tile = document.createElement('div'); tile.className = 'card-tile'; tile.style.background = card.gradient; tile.style.color = card.textColor; tile.onclick = () => openQuickAdd(card.id);
             tile.innerHTML = `
-                <div class="tile-header"><span class="tile-name">${card.name}</span><span class="rate-badge" style="color:black">${stats.rate}%</span></div>
+                <div class="tile-header">
+                    <span class="tile-name">${card.name}</span>
+                    <div class="header-badges">
+                        <span class="rate-badge" style="color:black">${stats.rate}%</span>
+                        ${expiryHtml}
+                    </div>
+                </div>
                 <span class="tile-note" style="color:${card.textColor==='white'?'rgba(255,255,255,0.8)':'rgba(0,0,0,0.6)'}">${card.note}</span>
                 <div class="tile-body">
                     <div class="tile-stat">$${stats.spend.toLocaleString()}</div>

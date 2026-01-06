@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="刷卡回饋管家">
     <title>刷卡回饋管家</title>
     
-    <link rel="apple-touch-icon" href="https://fonts.gstatic.com/s/i/short-term/release/googlestandardicons/credit_card/v14/192.png">
-    <link rel="icon" type="image/png" href="https://fonts.gstatic.com/s/i/short-term/release/googlestandardicons/credit_card/v14/48.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="icon-48.png">
+    <link rel="shortcut icon" href="icon-48.png">
 
     <style>
         :root { --bg-color: #F0F2F5; --text-primary: #1C1C1E; --text-secondary: #8E8E93; }
@@ -124,7 +126,7 @@
             <button class="btn-tool btn-donate" onclick="showDonateModal()">☕ 贊助開發者 (支持更新)</button>
             <button class="btn-reset-visible" onclick="resetAllData()">🗑️ 重置所有資料</button>
         </div>
-        <div class="footer">Ver 2026.01.06 16:15 (Force Backup)</div>
+        <div class="footer">Ver 2026.01.06 16:45 (Update Next Bank)</div>
     </div>
 
     <div id="transactionModal" class="modal">
@@ -184,7 +186,7 @@
             gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '5% 已滿' 
         },
         { 
-            id: 'c4', name: '將來將將', note: 'LinePay / 悠遊付', rule: '', 
+            id: 'c4', name: '將來將將', note: 'LinePay / 悠遊付 / icash Pay', rule: '', 
             type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
             gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '加碼已滿' 
         },
@@ -241,7 +243,8 @@
         const container = document.getElementById('card-grid');
         let monthTotalReward = 0; container.innerHTML = '';
         cards.forEach(card => {
-            const stats = calculateStats(card.id); monthTotalReward += stats.reward;
+            const stats = calculateStats(card.id); 
+            monthTotalReward += stats.reward;
             let percent = 0, statusText = '', msgStyle = '';
             
             if (card.type === 'mixed') {
@@ -346,23 +349,16 @@
 
     function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
     
-    // 💡 V30.0 修正：改為建立 Blob 並觸發下載，解決手機端 navigator.share 不穩定的問題
     function exportData() {
         const dataStr = JSON.stringify(transactions);
         const blob = new Blob([dataStr], {type: "application/json"});
         const url = URL.createObjectURL(blob);
-        
-        // 建立一個隱藏的下載連結
         const a = document.createElement('a');
         a.href = url;
-        // 自動加上日期檔名，例如：backup_2026-01-06.json
         const date = new Date().toISOString().split('T')[0];
         a.download = `backup_${date}.json`;
-        
         document.body.appendChild(a);
         a.click();
-        
-        // 清理資源
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }
@@ -385,7 +381,7 @@
             } catch (err) { alert('❌ 無法讀取檔案，請確認是否為正確的備份檔'); }
         };
         reader.readAsText(file);
-        input.value = ''; // 重置 input，確保可以重複選取同一個檔案
+        input.value = ''; 
     }
 
     function showDonateModal() {

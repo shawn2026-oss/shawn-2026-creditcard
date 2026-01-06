@@ -71,10 +71,7 @@
         .settings-area { margin-top: auto; display: flex; gap: 8px; flex-direction: column; padding-top: 20px;}
         .settings-row { display: flex; gap: 8px; }
         .btn-tool { flex: 1; padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 600; border: 1px solid #eee; background: white; color: #555; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
-        
-        /* 🔴 街口支付按鈕配色 */
         .btn-donate { background: linear-gradient(135deg, #E30000, #FF5050); color: #fff; border: none; box-shadow: 0 4px 10px rgba(227, 0, 0, 0.3); font-size: 14px; }
-        
         .btn-reset-visible { width: 100%; padding: 12px; background-color: #fff5f5; border: 1px solid #ffdede; color: #FF3B30; border-radius: 12px; font-weight: 600; font-size: 12px; cursor: pointer; margin-top: 10px;}
         .footer { text-align: center; font-size: 10px; color: #ccc; margin-top: 20px; margin-bottom: 10px; font-weight: 500; }
 
@@ -127,7 +124,7 @@
             <button class="btn-tool btn-donate" onclick="showDonateModal()">☕ 贊助開發者 (支持更新)</button>
             <button class="btn-reset-visible" onclick="resetAllData()">🗑️ 重置所有資料</button>
         </div>
-        <div class="footer">Ver 2026.01.06 15:30 (Auto Link)</div>
+        <div class="footer">Ver 2026.01.06 16:00 (Precision Logic)</div>
     </div>
 
     <div id="transactionModal" class="modal">
@@ -151,25 +148,19 @@
                 歡迎請我喝杯咖啡，<br>
                 這將成為我優化功能的最大動力！💪
             </p>
-            
             <button class="btn" style="background: #E30000; color: white; width: 100%; margin-bottom: 15px; font-weight: 700; box-shadow: 0 4px 10px rgba(227,0,0,0.3); border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 6px;" 
                 onclick="window.location.href='https://www.jkopay.com/transfer?j=Transfer:901798704'">
                 🚀 開啟街口支付 (一鍵轉帳)
             </button>
-
             <div style="background: #f9f9f9; padding: 12px; border-radius: 12px; text-align: left; margin-bottom: 15px; border: 1px solid #eee;">
                 <div style="font-size: 12px; color: #888; margin-bottom: 4px; font-weight: 600;">或使用銀行轉帳 (任何網銀皆可)：</div>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div style="font-size: 14px; color: #333; font-weight: 700; font-family: monospace;">
-                        (396) 901798704
-                    </div>
+                    <div style="font-size: 14px; color: #333; font-weight: 700; font-family: monospace;">(396) 901798704</div>
                     <button onclick="copyBankInfo()" style="background: #eee; border: none; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer; color: #555; font-weight: 600;">複製</button>
                 </div>
             </div>
-            
             <div style="font-size: 11px; color: #999; margin-bottom: 8px;">或掃描下方 QR Code</div>
             <img src="jkopay.jpg" alt="Jkopay QR Code" style="width: 70%; border-radius: 10px; border: 2px solid #eee; margin-bottom: 15px;">
-            
             <button class="btn btn-cancel" style="width: 100%;" onclick="document.getElementById('donateModal').style.display='none'">關閉</button>
         </div>
     </div>
@@ -200,6 +191,7 @@
         { 
             id: 'c5', name: '聯邦賴點卡', note: 'LinePay / 偶數日指定通路', rule: '⚠️ 單筆需滿$100', 
             type: 'ceiling', limit: 3000, tier1Rate: 0.06, tier2Rate: 0.01, 
+            threshold: 100, // 設定低消門檻為 100 元
             gradient: 'linear-gradient(135deg, #00B900 0%, #33CC33 100%)', textColor: 'white', msgDanger: '6% 已滿',
             parking: `
                 ⚠️ <b>單筆需滿 $100</b> (回饋 6%)<br>
@@ -222,41 +214,59 @@
 
     function updateDate() { const now = new Date(); document.getElementById('dateDisplay').innerText = `${now.getMonth()+1}/${now.getDate()}`; }
 
+    // 核心計算邏輯修正：加入 threshold 判斷
     function calculateStats(cardId) {
         const card = cards.find(c => c.id === cardId);
         const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
         const relevantTx = transactions.filter(t => t.cardId === cardId && new Date(t.date) >= startDate);
+        
+        // 總支出 (顯示在卡片上的金額)
         const totalSpend = relevantTx.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+        
+        // 有效支出 (用來計算回饋與進度條的金額)
+        // 只有大於等於 threshold (如 100) 的交易才算入
+        const threshold = card.threshold || 0; 
+        const validTx = relevantTx.filter(t => t.amount >= threshold);
+        const validSpend = validTx.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+
         let reward = 0, currentRate = 0;
+        
+        // 以下所有計算都改用 validSpend (有效消費)
         if (card.type === 'mixed') {
-            if (totalSpend < card.minSpend) { reward = totalSpend * card.tier2Rate; currentRate = card.tier2Rate; }
-            else if (totalSpend <= card.limit) { reward = totalSpend * card.tier1Rate; currentRate = card.tier1Rate; }
-            else { reward = (card.limit * card.tier1Rate) + ((totalSpend - card.limit) * card.tier2Rate); currentRate = card.tier2Rate; }
+            if (validSpend < card.minSpend) { reward = validSpend * card.tier2Rate; currentRate = card.tier2Rate; }
+            else if (validSpend <= card.limit) { reward = validSpend * card.tier1Rate; currentRate = card.tier1Rate; }
+            else { reward = (card.limit * card.tier1Rate) + ((validSpend - card.limit) * card.tier2Rate); currentRate = card.tier2Rate; }
         } else if (card.type === 'ceiling') {
-            if (totalSpend <= card.limit) { reward = totalSpend * card.tier1Rate; currentRate = card.tier1Rate; }
-            else { reward = (card.limit * card.tier1Rate) + ((totalSpend - card.limit) * card.tier2Rate); currentRate = card.tier2Rate; }
-        } else { reward = totalSpend * card.tier1Rate; currentRate = card.tier1Rate; }
-        return { spend: totalSpend, reward: Math.round(reward), rate: (currentRate * 100).toFixed(1) };
+            if (validSpend <= card.limit) { reward = validSpend * card.tier1Rate; currentRate = card.tier1Rate; }
+            else { reward = (card.limit * card.tier1Rate) + ((validSpend - card.limit) * card.tier2Rate); currentRate = card.tier2Rate; }
+        } else { // floor type
+            reward = validSpend * card.tier1Rate; currentRate = card.tier1Rate; 
+        }
+        
+        // 回傳：spend (顯示總金額), validSpend (進度條用), reward (回饋金)
+        return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: (currentRate * 100).toFixed(1) };
     }
 
     function renderGrid() {
         const container = document.getElementById('card-grid');
         let monthTotalReward = 0; container.innerHTML = '';
         cards.forEach(card => {
-            const stats = calculateStats(card.id); monthTotalReward += stats.reward;
+            const stats = calculateStats(card.id); 
+            monthTotalReward += stats.reward;
             let percent = 0, statusText = '', msgStyle = '';
             
+            // 使用 validSpend 來計算進度條
             if (card.type === 'mixed') {
-                if (stats.spend < card.minSpend) { percent = (stats.spend / card.minSpend) * 100; statusText = `差 $${(card.minSpend - stats.spend).toLocaleString()} 升級`; msgStyle = 'color: #FFD700;'; }
-                else if (stats.spend <= card.limit) { percent = (stats.spend / card.limit) * 100; const remain = card.limit - stats.spend; statusText = `剩 $${remain.toLocaleString()} (5%)`; }
+                if (stats.validSpend < card.minSpend) { percent = (stats.validSpend / card.minSpend) * 100; statusText = `差 $${(card.minSpend - stats.validSpend).toLocaleString()} 升級`; msgStyle = 'color: #FFD700;'; }
+                else if (stats.validSpend <= card.limit) { percent = (stats.validSpend / card.limit) * 100; const remain = card.limit - stats.validSpend; statusText = `剩 $${remain.toLocaleString()} (5%)`; }
                 else { percent = 100; statusText = '已滿 (0.5%)'; msgStyle = 'color: #ffcccc;'; }
             } else if (card.type === 'ceiling') {
-                percent = (stats.spend / card.limit) * 100;
-                if (stats.spend <= card.limit) { const remain = card.limit - stats.spend; statusText = `剩 $${remain.toLocaleString()}`; if(remain < 1000) {statusText = `⚠️ 剩 $${remain.toLocaleString()}`; msgStyle='color:#FFD700;';} }
+                percent = (stats.validSpend / card.limit) * 100;
+                if (stats.validSpend <= card.limit) { const remain = card.limit - stats.validSpend; statusText = `剩 $${remain.toLocaleString()}`; if(remain < 1000) {statusText = `⚠️ 剩 $${remain.toLocaleString()}`; msgStyle='color:#FFD700;';} }
                 else { percent = 100; statusText = card.msgDanger; msgStyle = 'color: #ffcccc;'; }
             } else { 
-                percent = (stats.spend / card.target) * 100; 
-                statusText = stats.spend >= card.target ? '任務達成' : `差 $${(card.target - stats.spend).toLocaleString()}`; 
+                percent = (stats.validSpend / card.target) * 100; 
+                statusText = stats.validSpend >= card.target ? '任務達成' : `差 $${(card.target - stats.validSpend).toLocaleString()}`; 
             }
 
             const ruleHtml = card.rule ? `<div class="tile-rule">${card.rule}</div>` : '';
@@ -407,3 +417,11 @@
 </script>
 </body>
 </html>
+      
+         
+ 
+
+  
+  
+
+   

@@ -130,7 +130,7 @@
             <button class="btn-tool btn-donate" onclick="showDonateModal()">☕ 贊助開發者 (支持更新)</button>
             <button class="btn-reset-visible" onclick="resetAllData()">🗑️ 重置所有資料</button>
         </div>
-        <div class="footer">Ver 2026.01.06 17:30 (Mega List)</div>
+        <div class="footer">Ver 2026.01.06 17:45 (Official 9 Types)</div>
     </div>
 
     <div id="transactionModal" class="modal">
@@ -193,26 +193,25 @@
             gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '5% 已滿' 
         },
         { 
-            id: 'c4', name: '將來將將', note: '指定行動支付 / 外送 / 航空', rule: '', 
+            id: 'c4', name: '將來將將', note: '指定行動支付 / 餐飲 / 網購', rule: '', 
             type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
             expiry: '2026/06/30',
             gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '加碼已滿',
-            // 完整通路名單整理
+            // 修正後：嚴格對照官方圖片的 9 大類
             parking: `
                 💡 <b>當月需消費滿 $3000</b><br>
                 <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
                     <summary style="cursor:pointer; font-weight:700; color:#856404; font-size:12px;">點我看 5% 完整通路 ▼</summary>
                     <div style="margin-top:6px; padding-left:4px; font-size:11px; line-height:1.4; color:#555; max-height:150px; overflow-y:auto; border-radius:4px; background:rgba(255,255,255,0.5); padding:6px;">
-                        <div style="margin-bottom:4px;">📱 <b>行動支付：</b><br>LINE Pay / 街口 / icash Pay / 悠遊付 / 橘子 / Hami Pay / Pi / TWQR</div>
-                        <div style="margin-bottom:4px;">🍽️ <b>國內餐飲：</b><br>各類餐廳 (MCC 5811/5812/5814/5462) / 麥當勞 / 肯德基 / 星巴克</div>
-                        <div style="margin-bottom:4px;">🏪 <b>超商量販：</b><br>7-11 (限icash/街口/橘子) / 全家 (限街口) / 家樂福</div>
-                        <div style="margin-bottom:4px;">🛵 <b>外送平台：</b><br>Uber Eats / foodpanda / foodomo</div>
-                        <div style="margin-bottom:4px;">🚄 <b>交通出行：</b><br>高鐵 / 一卡通自動加值 / 車麻吉 / 台灣大車隊</div>
-                        <div style="margin-bottom:4px;">✈️ <b>航空旅遊：</b><br>華航 / 長榮 / 星宇 / 虎航 / 國泰 / 日航 / 全日空 / 華信 / 立榮</div>
-                        <div style="margin-bottom:4px;">🤖 <b>數位/AI：</b><br>ChatGPT / Canva / Netflix / Spotify / Steam / Nintendo / Apple 媒體 / Google Play</div>
+                        <div style="margin-bottom:4px;">🤖 <b>Ai工具及數位工具：</b><br>ChatGPT / Canva / Claude / Netflix / Spotify / Apple 媒體 / Google Play</div>
                         <div style="margin-bottom:4px;">📚 <b>學習平台：</b><br>Hahow / Udemy / VoiceTube / PressPlay / Readmoo</div>
-                        <div style="margin-bottom:4px;">🏠 <b>居家生活：</b><br>IKEA / 特力屋 / HOLA</div>
-                        <div style="margin-bottom:0px;">🏋️ <b>運動健身：</b><br>World Gym / 健身工廠 / Curves / BEING Fit</div>
+                        <div style="margin-bottom:4px;">🛵 <b>國內外外送平台：</b><br>Uber Eats / foodpanda</div>
+                        <div style="margin-bottom:4px;">🏠 <b>生活家居：</b><br>IKEA / 特力屋 / HOLA</div>
+                        <div style="margin-bottom:4px;">🏪 <b>指定超商超市：</b><br>7-11 (限icash/街口/橘子) / 全家 (限街口) / 家樂福</div>
+                        <div style="margin-bottom:4px;">🏋️ <b>運動健身：</b><br>World Gym / BEING Fit / Curves / 健身工廠</div>
+                        <div style="margin-bottom:4px;">🍽️ <b>國內餐廳：</b><br>各類國內餐廳 (MCC 5811/5812/5814/5462) / 麥當勞</div>
+                        <div style="margin-bottom:4px;">📱 <b>行動支付：</b><br>LINE Pay / 街口 / icash Pay / 橘子 / 悠遊付 / Hami Pay / Pi錢包 / TWQR</div>
+                        <div style="margin-bottom:0px;">🚄 <b>交通：</b><br>一卡通自動加值 / 高鐵 (含App線上刷卡)</div>
                     </div>
                 </details>
             `

@@ -4,13 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="刷卡回饋管家">
     <title>刷卡回饋管家</title>
     
-    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
-    <link rel="icon" type="image/png" sizes="48x48" href="icon-48.png">
-    <link rel="shortcut icon" href="icon-48.png">
+    <link rel="apple-touch-icon" href="https://fonts.gstatic.com/s/i/short-term/release/googlestandardicons/credit_card/v14/192.png">
+    <link rel="icon" type="image/png" href="https://fonts.gstatic.com/s/i/short-term/release/googlestandardicons/credit_card/v14/48.png">
 
     <style>
         :root { --bg-color: #F0F2F5; --text-primary: #1C1C1E; --text-secondary: #8E8E93; }
@@ -119,14 +117,14 @@
         
         <div class="settings-area">
             <div class="settings-row">
-                <button class="btn-tool" onclick="exportData()">☁️ 雲端備份</button>
+                <button class="btn-tool" onclick="exportData()">💾 備份檔案</button>
                 <button class="btn-tool" onclick="triggerImport()">📥 讀檔還原</button>
-                <input type="file" id="fileInput" style="display:none" accept=".json" onchange="importFile(this)">
+                <input type="file" id="fileInput" style="display:none" accept=".json, .txt" onchange="importFile(this)">
             </div>
             <button class="btn-tool btn-donate" onclick="showDonateModal()">☕ 贊助開發者 (支持更新)</button>
             <button class="btn-reset-visible" onclick="resetAllData()">🗑️ 重置所有資料</button>
         </div>
-        <div class="footer">Ver 2026.01.06 16:30 (Local Icons)</div>
+        <div class="footer">Ver 2026.01.06 16:15 (Force Backup)</div>
     </div>
 
     <div id="transactionModal" class="modal">
@@ -243,8 +241,7 @@
         const container = document.getElementById('card-grid');
         let monthTotalReward = 0; container.innerHTML = '';
         cards.forEach(card => {
-            const stats = calculateStats(card.id); 
-            monthTotalReward += stats.reward;
+            const stats = calculateStats(card.id); monthTotalReward += stats.reward;
             let percent = 0, statusText = '', msgStyle = '';
             
             if (card.type === 'mixed') {
@@ -349,18 +346,25 @@
 
     function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
     
+    // 💡 V30.0 修正：改為建立 Blob 並觸發下載，解決手機端 navigator.share 不穩定的問題
     function exportData() {
         const dataStr = JSON.stringify(transactions);
-        if (navigator.share && /mobile/i.test(navigator.userAgent)) {
-            const file = new File([dataStr], "backup.json", {type: "application/json"});
-            navigator.share({
-                files: [file],
-                title: '回饋管家備份',
-                text: '這是您的消費紀錄備份檔'
-            }).catch(console.error);
-        } else {
-            navigator.clipboard.writeText(dataStr).then(() => alert('✅ 資料已複製！請貼到記事本存檔。'));
-        }
+        const blob = new Blob([dataStr], {type: "application/json"});
+        const url = URL.createObjectURL(blob);
+        
+        // 建立一個隱藏的下載連結
+        const a = document.createElement('a');
+        a.href = url;
+        // 自動加上日期檔名，例如：backup_2026-01-06.json
+        const date = new Date().toISOString().split('T')[0];
+        a.download = `backup_${date}.json`;
+        
+        document.body.appendChild(a);
+        a.click();
+        
+        // 清理資源
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
 
     function triggerImport() { document.getElementById('fileInput').click(); }
@@ -376,11 +380,12 @@
                     transactions = json;
                     localStorage.setItem('transactions', JSON.stringify(transactions));
                     renderGrid();
-                    alert('✅ 雲端備份還原成功！');
-                } else { alert('❌ 檔案格式錯誤'); }
-            } catch (err) { alert('❌ 無法讀取檔案'); }
+                    alert('✅ 備份還原成功！');
+                } else { alert('❌ 檔案內容格式錯誤'); }
+            } catch (err) { alert('❌ 無法讀取檔案，請確認是否為正確的備份檔'); }
         };
         reader.readAsText(file);
+        input.value = ''; // 重置 input，確保可以重複選取同一個檔案
     }
 
     function showDonateModal() {

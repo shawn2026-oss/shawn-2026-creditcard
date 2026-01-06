@@ -206,3 +206,204 @@
                 <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
                     <summary style="cursor:pointer; font-weight:700; color:#856404; font-size:12px;">點我看完整店家名單 ▼</summary>
                     <div style="margin-top:6px; padding-left:4px; font-size:11px; line-height:1.4; color:#555; max-height:120px; overflow-y:auto; border-radius:4px; background:rgba(255,255,255,0.5); padding:6px;">
+                        <div style="margin-bottom:4px;">🍽️ <b>餐廳：</b>王品 / 三商 / 輕井澤 / 漢來 / 饗賓 / 海底撈 / 築間 / 春水堂 / 壽司郎 / 爭鮮 / 八方雲集</div>
+                        <div style="margin-bottom:4px;">🍔 <b>速食：</b>麥當勞 / 肯德基 / 摩斯 / 漢堡王</div>
+                        <div style="margin-bottom:4px;">☕ <b>咖啡：</b>星巴克 / 路易莎 / cama / 50嵐 / 得正 / 麻古 / 可不可</div>
+                        <div style="margin-bottom:4px;">💄 <b>美妝：</b>屈臣氏 / 寶雅 / 唐吉訶德 / 大樹 / 杏一 / 丁丁 / 佑全 / 躍獅</div>
+                        <div style="margin-bottom:4px;">🏠 <b>家居：</b>IKEA / Hola / 小北 / 汪喵星球 / 東森 / 咕咕G / 魚中魚 / 寵物公園</div>
+                        <div style="margin-bottom:0px;">👟 <b>運動：</b>NIKE / Adidas / NewBalance / 迪卡儂 / 鞋全家福 / 摩曼頓</div>
+                    </div>
+                </details>
+            `
+        }
+    ];
+
+    let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+    function updateDate() { const now = new Date(); document.getElementById('dateDisplay').innerText = `${now.getMonth()+1}/${now.getDate()}`; }
+
+    function calculateStats(cardId) {
+        const card = cards.find(c => c.id === cardId);
+        const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
+        const relevantTx = transactions.filter(t => t.cardId === cardId && new Date(t.date) >= startDate);
+        const totalSpend = relevantTx.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+        let reward = 0, currentRate = 0;
+        if (card.type === 'mixed') {
+            if (totalSpend < card.minSpend) { reward = totalSpend * card.tier2Rate; currentRate = card.tier2Rate; }
+            else if (totalSpend <= card.limit) { reward = totalSpend * card.tier1Rate; currentRate = card.tier1Rate; }
+            else { reward = (card.limit * card.tier1Rate) + ((totalSpend - card.limit) * card.tier2Rate); currentRate = card.tier2Rate; }
+        } else if (card.type === 'ceiling') {
+            if (totalSpend <= card.limit) { reward = totalSpend * card.tier1Rate; currentRate = card.tier1Rate; }
+            else { reward = (card.limit * card.tier1Rate) + ((totalSpend - card.limit) * card.tier2Rate); currentRate = card.tier2Rate; }
+        } else { reward = totalSpend * card.tier1Rate; currentRate = card.tier1Rate; }
+        return { spend: totalSpend, reward: Math.round(reward), rate: (currentRate * 100).toFixed(1) };
+    }
+
+    function renderGrid() {
+        const container = document.getElementById('card-grid');
+        let monthTotalReward = 0; container.innerHTML = '';
+        cards.forEach(card => {
+            const stats = calculateStats(card.id); monthTotalReward += stats.reward;
+            let percent = 0, statusText = '', msgStyle = '';
+            
+            if (card.type === 'mixed') {
+                if (stats.spend < card.minSpend) { percent = (stats.spend / card.minSpend) * 100; statusText = `差 $${(card.minSpend - stats.spend).toLocaleString()} 升級`; msgStyle = 'color: #FFD700;'; }
+                else if (stats.spend <= card.limit) { percent = (stats.spend / card.limit) * 100; const remain = card.limit - stats.spend; statusText = `剩 $${remain.toLocaleString()} (5%)`; }
+                else { percent = 100; statusText = '已滿 (0.5%)'; msgStyle = 'color: #ffcccc;'; }
+            } else if (card.type === 'ceiling') {
+                percent = (stats.spend / card.limit) * 100;
+                if (stats.spend <= card.limit) { const remain = card.limit - stats.spend; statusText = `剩 $${remain.toLocaleString()}`; if(remain < 1000) {statusText = `⚠️ 剩 $${remain.toLocaleString()}`; msgStyle='color:#FFD700;';} }
+                else { percent = 100; statusText = card.msgDanger; msgStyle = 'color: #ffcccc;'; }
+            } else { 
+                percent = (stats.spend / card.target) * 100; 
+                statusText = stats.spend >= card.target ? '任務達成' : `差 $${(card.target - stats.spend).toLocaleString()}`; 
+            }
+
+            const ruleHtml = card.rule ? `<div class="tile-rule">${card.rule}</div>` : '';
+
+            const tile = document.createElement('div'); tile.className = 'card-tile'; tile.style.background = card.gradient; tile.style.color = card.textColor; tile.onclick = () => openQuickAdd(card.id);
+            tile.innerHTML = `
+                <div class="tile-header"><span class="tile-name">${card.name}</span><span class="rate-badge" style="color:black">${stats.rate}%</span></div>
+                <span class="tile-note" style="color:${card.textColor==='white'?'rgba(255,255,255,0.8)':'rgba(0,0,0,0.6)'}">${card.note}</span>
+                <div class="tile-body">
+                    <div class="tile-stat">$${stats.spend.toLocaleString()}</div>
+                    ${ruleHtml}
+                    <div class="tile-earned">+$${stats.reward.toLocaleString()}</div>
+                </div>
+                <div class="tile-footer">
+                    <div class="progress-track"><div class="progress-fill" style="width:${Math.min(percent, 100)}%"></div></div>
+                    <div class="tile-msg" style="${msgStyle}">${statusText}</div>
+                </div>`;
+            container.appendChild(tile);
+        });
+        document.getElementById('totalRewardDisplay').innerText = `$${monthTotalReward.toLocaleString()}`;
+        checkUrgentTasks();
+        renderHistory();
+    }
+
+    function openQuickAdd(cardId) {
+        const card = cards.find(c => c.id === cardId); document.getElementById('modalTitle').innerText = card.name; document.getElementById('modalSubtitle').innerText = card.note; document.getElementById('cardIdInput').value = cardId; 
+        const parkingInfoDiv = document.getElementById('modalParkingInfo');
+        if (card.parking) { parkingInfoDiv.innerHTML = card.parking; parkingInfoDiv.style.display = 'block'; } else { parkingInfoDiv.style.display = 'none'; }
+        document.getElementById('transactionModal').style.display = 'flex'; document.getElementById('amountInput').value = ''; document.getElementById('noteInput').value = ''; setTimeout(() => document.getElementById('amountInput').focus(), 100);
+    }
+    function closeModal() { document.getElementById('transactionModal').style.display = 'none'; }
+    function addTransaction() {
+        const cardId = document.getElementById('cardIdInput').value, amount = document.getElementById('amountInput').value, note = document.getElementById('noteInput').value; if (!amount || amount <= 0) return alert('請輸入金額'); transactions.push({ id: Date.now(), cardId: cardId, amount: parseFloat(amount), note: note, date: new Date().toISOString() }); localStorage.setItem('transactions', JSON.stringify(transactions)); closeModal(); renderGrid();
+    }
+    
+    function renderHistory() {
+        const container = document.getElementById('history-container'); container.innerHTML = '';
+        const now = new Date();
+        const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+        cards.forEach(card => {
+            const cardTx = transactions.filter(t => t.cardId === card.id && new Date(t.date) >= currentMonthStart).reverse();
+            const cardTotal = cardTx.reduce((sum, t) => sum + t.amount, 0);
+            
+            const details = document.createElement('details');
+            details.className = 'card-group-details';
+            
+            const summary = document.createElement('summary');
+            summary.className = 'card-group-summary';
+            summary.innerHTML = `<span class="group-name">${card.name}</span><span class="group-total">$${cardTotal.toLocaleString()}</span>`;
+            
+            details.appendChild(summary);
+            
+            if (cardTx.length === 0) {
+                const emptyItem = document.createElement('div');
+                emptyItem.className = 'history-item';
+                emptyItem.style.color = '#ccc';
+                emptyItem.style.justifyContent = 'center';
+                emptyItem.innerText = '本月尚無消費';
+                details.appendChild(emptyItem);
+            } else {
+                cardTx.forEach(tx => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+                    item.innerHTML = `
+                        <div>
+                            <div class="h-name">${tx.note || '一般消費'}</div>
+                            <div class="h-date">${new Date(tx.date).getMonth()+1}/${new Date(tx.date).getDate()}</div>
+                        </div>
+                        <div style="display:flex;align-items:center;">
+                            <span class="h-amount">$${tx.amount.toLocaleString()}</span>
+                            <button class="btn-delete-single" onclick="deleteTransaction(${tx.id})">✕</button>
+                        </div>
+                    `;
+                    details.appendChild(item);
+                });
+            }
+            container.appendChild(details);
+        });
+    }
+
+    function deleteTransaction(id) {
+        if(confirm('刪除此筆紀錄？')) {
+            transactions = transactions.filter(t => t.id !== id);
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            renderGrid();
+        }
+    }
+
+    function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
+    
+    function exportData() {
+        const dataStr = JSON.stringify(transactions);
+        if (navigator.share && /mobile/i.test(navigator.userAgent)) {
+            const file = new File([dataStr], "backup.json", {type: "application/json"});
+            navigator.share({
+                files: [file],
+                title: '回饋管家備份',
+                text: '這是您的消費紀錄備份檔'
+            }).catch(console.error);
+        } else {
+            navigator.clipboard.writeText(dataStr).then(() => alert('✅ 資料已複製！請貼到記事本存檔。'));
+        }
+    }
+
+    function triggerImport() { document.getElementById('fileInput').click(); }
+
+    function importFile(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const json = JSON.parse(e.target.result);
+                if (Array.isArray(json)) {
+                    transactions = json;
+                    localStorage.setItem('transactions', JSON.stringify(transactions));
+                    renderGrid();
+                    alert('✅ 雲端備份還原成功！');
+                } else { alert('❌ 檔案格式錯誤'); }
+            } catch (err) { alert('❌ 無法讀取檔案'); }
+        };
+        reader.readAsText(file);
+    }
+
+    function showDonateModal() {
+        document.getElementById('donateModal').style.display = 'flex';
+    }
+
+    function copyBankInfo() {
+        navigator.clipboard.writeText("396901798704").then(() => {
+            alert("✅ 帳號已複製！(銀行代碼 396)");
+        });
+    }
+    
+    function checkUrgentTasks() {
+        const alertArea = document.getElementById('urgent-alert-area'), alertList = document.getElementById('urgent-list'); alertList.innerHTML = ''; let hasUrgent = false;
+        cards.forEach(card => {
+            const stats = calculateStats(card.id); let target = card.type === 'floor' ? card.target : (card.type === 'mixed' ? card.minSpend : 0);
+            if (target > 0 && stats.spend < target) {
+                const end = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0), diff = Math.ceil((end - new Date()) / 86400000);
+                if (diff <= 3 && diff >= 0) { hasUrgent = true; alertList.innerHTML += `<div class="urgent-item">${card.name} 缺 $${(target - stats.spend).toLocaleString()} (剩 ${diff} 天)</div>`; }
+            }
+        });
+        alertArea.style.display = hasUrgent ? 'block' : 'none';
+    }
+    updateDate(); renderGrid();
+</script>
+</body>
+</html>

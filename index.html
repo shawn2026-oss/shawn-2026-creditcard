@@ -1,490 +1,367 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FMD1PV6QZV"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-FMD1PV6QZV');
-    </script>
-
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="刷卡回饋管家">
-    <meta name="theme-color" content="#F0F2F5">
-    <title>刷卡回饋管家</title>
-    
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
-    <link rel="icon" type="image/png" sizes="48x48" href="icon-48.png">
-    <link rel="shortcut icon" href="icon-48.png">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>信用卡與額度管理 App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg-color: #F0F2F5; --text-primary: #1C1C1E; --text-secondary: #8E8E93; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; 
-            background-color: #E0E5EC; color: var(--text-primary); margin: 0; 
-            display: flex; justify-content: center; min-height: 100vh; 
-            -webkit-font-smoothing: antialiased; 
-            overscroll-behavior-y: none;
-        }
-        
-        .app-container { 
-            width: 100%; max-width: 480px; background-color: var(--bg-color); 
-            min-height: 100vh; padding: 16px 12px; 
-            padding-top: env(safe-area-inset-top, 20px); 
-            padding-bottom: env(safe-area-inset-bottom, 20px); 
-            box-shadow: 0 0 40px rgba(0,0,0,0.05); display: flex; flex-direction: column; box-sizing: border-box; 
-        }
-        @media (max-width: 480px) { body { background-color: var(--bg-color); } .app-container { box-shadow: none; width: 100%; max-width: 100%; } }
-        
-        /* --- 修改點 1：版本號置頂樣式 --- */
-        .top-version-bar {
-            text-align: center;
-            font-size: 11px;
-            color: #999;
-            background-color: #e6e8eb;
-            padding: 4px;
-            border-radius: 4px;
-            margin-bottom: 12px;
-            font-family: monospace;
+        :root {
+            --primary-color: #3b82f6;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-sub: #6b7280;
+            --danger-color: #ef4444;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
         }
 
-        .author-top { font-size: 12px; font-weight: 800; color: #007AFF; margin-bottom: 4px; letter-spacing: 0.5px; }
-        .header-section { margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-end; }
-        h1 { font-size: 22px; font-weight: 800; margin: 0; color: #333; letter-spacing: -0.5px; line-height: 1.2;}
-        .subtitle { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
-        .today-date { background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; color: #555; margin-left: 5px;}
-        
-        /* --- 修改點 2：跑馬燈樣式加強 --- */
-        .news-ticker {
-            background: #FFF9C4; color: #856404; 
-            border-radius: 8px; margin-bottom: 12px; 
-            padding: 8px 10px; font-size: 12px; font-weight: 600;
-            overflow: hidden; white-space: nowrap; position: relative;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            display: flex; align-items: center;
-            min-height: 32px;
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
-        .ticker-content {
+
+        /* 跑馬燈樣式 (已加速) */
+        .marquee-container {
+            background-color: var(--text-main);
+            color: #fff;
+            padding: 8px 0;
+            overflow: hidden;
+            position: relative;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        .marquee-content {
             display: inline-block;
-            padding-left: 100%; /* 從最右側開始 */
-            /* 時間改為 30s，確保長文字能慢慢跑完 */
-            animation: scroll-left 30s linear infinite; 
+            white-space: nowrap;
+            padding-left: 100%;
+            animation: marquee 12s linear infinite; /* 12秒較快 */
         }
-        @keyframes scroll-left {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-100%); } /* 確保完全移出畫面 */
+        @keyframes marquee {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-100%, 0); }
         }
 
-        .total-reward-card { background: #2c3e50; color: white; border-radius: 16px; padding: 14px 20px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(44, 62, 80, 0.2); }
-        .total-reward-card::after { content: ''; position: absolute; top: -50%; right: -50%; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%; pointer-events: none; }
-        .total-reward-label { font-size: 13px; font-weight: 600; opacity: 0.9; }
-        .total-reward-amount { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
-
-        #urgent-alert-area { display: none; margin-bottom: 12px; }
-        .urgent-card { background: linear-gradient(135deg, #FF3B30, #FF2D55); color: white; border-radius: 12px; padding: 10px 14px; box-shadow: 0 4px 10px rgba(255, 59, 48, 0.25); animation: pulse 2s infinite; }
-        .urgent-title { font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 6px; }
-        .urgent-item { background: rgba(255,255,255,0.25); border-radius: 8px; padding: 6px 10px; margin-top: 6px; font-size: 12px; font-weight: 600; line-height: 1.3; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.01); } 100% { transform: scale(1); } }
-
-        #card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
-
-        .card-tile { border-radius: 16px; padding: 12px; min-height: 135px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; transition: transform 0.1s; cursor: pointer; color: white; overflow: hidden; }
-        .card-tile:active { transform: scale(0.97); }
-        .tile-header { display: flex; justify-content: space-between; align-items: flex-start; z-index: 2; margin-bottom: 2px;}
-        .tile-name { font-size: 14px; font-weight: 700; line-height: 1.2; text-shadow: 0 1px 2px rgba(0,0,0,0.15); }
-        .tile-note { font-size: 10px; font-weight: 500; opacity: 0.9; margin-bottom: 4px; display: block; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2; letter-spacing: -0.2px; }
-        .tile-rule { font-size: 10px; font-weight: 700; background: rgba(0,0,0,0.25); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 6px; color: #FFD700; z-index: 2; }
-        .rate-badge { background: rgba(255,255,255,0.3); font-size: 10px; font-weight: 800; padding: 2px 5px; border-radius: 5px; white-space: nowrap; backdrop-filter: blur(4px); margin-left: 2px; flex-shrink: 0; }
-        .tile-body { z-index: 2; flex:1; display:flex; flex-direction:column; justify-content:center; }
-        .tile-stat { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 2px;}
-        .tile-earned { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.95); display: flex; align-items: center; gap: 3px;}
-        .tile-earned::before { content: '賺'; font-size: 9px; opacity: 0.8; border: 1px solid rgba(255,255,255,0.7); padding: 0 2px; border-radius: 3px;}
-        .tile-footer { z-index: 2; margin-top: 6px; position: relative; }
-        .progress-track { background: rgba(0,0,0,0.2); height: 4px; border-radius: 2px; overflow: hidden; margin-bottom: 4px; }
-        .progress-fill { height: 100%; background: rgba(255,255,255,0.95); transition: width 0.5s ease; }
-        .tile-msg { font-size: 11px; font-weight: 700; opacity: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
-
-        .history-section { flex: 1; display: flex; flex-direction: column; }
-        .history-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #555; }
-        .card-group-details { background: white; border-radius: 12px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
-        .card-group-details[open] { box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
-        .card-group-summary { padding: 12px 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 13px; color: #333; outline: none; list-style: none; background: #fff; transition: background 0.2s; }
-        .card-group-summary::-webkit-details-marker { display: none; }
-        .card-group-summary:active { background: #f9f9f9; }
-        .group-name { display: flex; align-items: center; gap: 6px; }
-        .group-total { color: #007AFF; font-family: -apple-system, monospace; font-size: 14px;}
-        .history-item { padding: 10px 16px; border-top: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; font-size: 12px; background: #fafafa; }
-        .h-name { font-weight: 600; color: #555; }
-        .h-date { font-size: 10px; color: #aaa; margin-top: 2px;}
-        .h-amount { font-weight: 700; color: #333; font-size: 13px; }
-        .btn-delete-single { background: none; border: none; color: #ccc; font-size: 14px; padding: 0 5px; cursor: pointer; margin-left: 8px;}
-        .btn-delete-single:hover { color: #FF3B30; }
-
-        .settings-area { margin-top: auto; display: flex; gap: 8px; flex-direction: column; padding-top: 20px;}
-        .settings-row { display: flex; gap: 8px; }
-        .btn-tool { flex: 1; padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 600; border: 1px solid #eee; background: white; color: #555; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
-        .btn-donate { background: linear-gradient(135deg, #E30000, #FF5050); color: #fff; border: none; box-shadow: 0 4px 10px rgba(227, 0, 0, 0.3); font-size: 14px; }
-        .btn-reset-visible { width: 100%; padding: 12px; background-color: #fff5f5; border: 1px solid #ffdede; color: #FF3B30; border-radius: 12px; font-weight: 600; font-size: 12px; cursor: pointer; margin-top: 10px;}
-        
-        /* 移除原本底部的 footer 樣式，改用上面的 top-version-bar */
-        .footer { display: none; } 
-
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 1000; align-items: center; justify-content: center; }
-        .modal-content { 
-            background: white; width: 85%; max-width: 320px; border-radius: 20px; padding: 20px; 
-            box-shadow: 0 25px 50px rgba(0,0,0,0.25); animation: modalPop 0.2s; 
-            display: flex; flex-direction: column;
-            max-height: 90vh;
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 100px;
         }
-        
-        .input-group label { display: block; font-size: 12px; font-weight: 600; color: #888; margin-bottom: 6px; margin-top: 10px; }
-        input { width: 100%; padding: 10px; border: 2px solid #f0f0f0; background: #fff; border-radius: 12px; font-size: 18px; box-sizing: border-box; outline: none; font-weight: 600; color: #333; }
-        .btn-group { display: flex; gap: 8px; margin-top: 20px; flex-shrink: 0; }
-        .btn { flex: 1; padding: 10px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; }
-        .btn-cancel { background: #f5f5f5; color: #333; }
-        .btn-confirm { background: #007AFF; color: white; }
+
+        h1 {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--text-main);
+        }
+
+        /* 卡片樣式 */
+        .card-item {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .card-name { font-size: 1.2rem; font-weight: 700; }
+
+        .btn-reset {
+            background: none;
+            border: 1px solid #d1d5db;
+            color: var(--text-sub);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .card-details {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        /* 通路標籤 */
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 6px;
+        }
+        .channel-tag {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        /* 進度條 */
+        .progress-wrapper { margin-top: 10px; }
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+            color: var(--text-sub);
+        }
+        .progress-bar-bg {
+            background-color: #e5e7eb;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--success-color);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        .progress-bar-fill.warning { background-color: var(--warning-color); }
+        .progress-bar-fill.danger { background-color: var(--danger-color); }
+
+        /* 輸入區 */
+        .action-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        input[type="number"] {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .btn-add {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* 系統工具區 (備份/還原) */
+        .system-tools {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .system-tools h3 {
+            margin-top: 0;
+            font-size: 1rem;
+            color: var(--text-sub);
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .btn-tool {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            width: 45%;
+        }
+        .btn-backup { background-color: #4b5563; color: white; }
+        .btn-restore { background-color: #6b7280; color: white; border: 1px solid #d1d5db; background: #fff; color: #374151; }
+
+        .footer-info {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #9ca3af;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        
-        <div id="footer-version" class="top-version-bar">Loading...</div>
 
-        <div class="header-section">
-            <div>
-                <div class="author-top">Designed by Shawn</div>
-                <h1>刷卡回饋管家</h1>
-            </div>
-            <div class="subtitle"><span class="today-date" id="dateDisplay"></span></div>
-        </div>
-
-        <div class="news-ticker">
-            <div class="ticker-content" id="news-text">Loading...</div>
-        </div>
-
-        <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
-        
-        <div class="total-reward-card">
-            <span class="total-reward-label">本月預估</span>
-            <span class="total-reward-amount" id="totalRewardDisplay">$0</span>
-        </div>
-        
-        <div id="card-grid"></div>
-
-        <div class="history-section">
-            <div class="history-title">消費明細 (點擊卡別展開)</div>
-            <div id="history-container"></div>
-        </div>
-        
-        <div class="settings-area">
-            <div class="settings-row">
-                <button class="btn-tool" onclick="exportData()">💾 備份檔案</button>
-                <button class="btn-tool" onclick="triggerImport()">📥 讀檔還原</button>
-                <input type="file" id="fileInput" style="display:none" accept=".json, .txt" onchange="importFile(this)">
-            </div>
-            <button class="btn-tool btn-donate" onclick="showDonateModal()">☕ 贊助開發者 (支持更新)</button>
-            <button class="btn-reset-visible" onclick="resetAllData()">🗑️ 重置所有資料</button>
-        </div>
-        
-        </div>
-
-    <div id="transactionModal" class="modal">
-        <div class="modal-content">
-            <h2 id="modalTitle" style="margin: 0 0 4px 0; font-size: 18px; font-weight: 800; color:#333;"></h2>
-            <div style="font-size:12px; color:#888; margin-bottom:10px; font-weight: 500;" id="modalSubtitle"></div>
-            <div id="modalParkingInfo" style="background:#FFF9C4; color:#856404; padding:10px; border-radius:10px; font-size:12px; margin-bottom:12px; border-left:4px solid #FFC107; display:none; line-height:1.5;"></div>
-            <input type="hidden" id="cardIdInput"> 
-            <div class="input-group" style="margin-top:0;"><input type="number" id="amountInput" placeholder="$ 金額" inputmode="numeric" style="font-size:28px; text-align:center; border:none; border-bottom:2px solid #eee; border-radius:0;"></div>
-            <div class="input-group"><input type="text" id="noteInput" placeholder="備註 (例如: 午餐)"></div>
-            <div class="btn-group"><button class="btn btn-cancel" onclick="closeModal()">取消</button><button class="btn btn-confirm" onclick="addTransaction()">確認</button></div>
+    <div class="marquee-container">
+        <div class="marquee-content">
+            📢 系統公告：請記得每月1日檢查額度歸零狀況！ | 將將卡新權益已更新 | 謹慎理財 信用至上 | 歡迎使用 App
         </div>
     </div>
 
-    <div id="donateModal" class="modal">
-        <div class="modal-content" style="text-align: center;">
-            <h2 style="margin: 0 0 10px 0; font-size: 18px; font-weight: 800; color:#E30000;">支持持續開發</h2>
-            <p style="font-size: 13px; color: #555; margin-bottom: 15px; line-height: 1.6;">
-                本 App 目前為個人開發並<b>免費分享</b>。<br>
-                如果您覺得它幫您<b>拿到各張回饋最大化</b>，<br>
-                歡迎請我喝杯咖啡，<br>
-                這將成為我優化功能的最大動力！💪
-            </p>
-            <button class="btn" style="background: #E30000; color: white; width: 100%; margin-bottom: 15px; font-weight: 700; box-shadow: 0 4px 10px rgba(227,0,0,0.3); border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 6px;" 
-                onclick="window.location.href='https://www.jkopay.com/transfer?j=Transfer:901798704'">
-                🚀 開啟街口支付 (一鍵轉帳)
-            </button>
-            <div style="background: #f9f9f9; padding: 12px; border-radius: 12px; text-align: left; margin-bottom: 15px; border: 1px solid #eee;">
-                <div style="font-size: 12px; color: #888; margin-bottom: 4px; font-weight: 600;">或使用銀行轉帳 (任何網銀皆可)：</div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div style="font-size: 14px; color: #333; font-weight: 700; font-family: monospace;">(396) 901798704</div>
-                    <button onclick="copyBankInfo()" style="background: #eee; border: none; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer; color: #555; font-weight: 600;">複製</button>
-                </div>
+    <div class="container">
+        <h1>💳 額度監控助手</h1>
+
+        <div id="card-list">
             </div>
-            <div style="font-size: 11px; color: #999; margin-bottom: 8px;">或掃描下方 QR Code</div>
-            <img src="jkopay.jpg" alt="Jkopay QR Code" style="width: 70%; border-radius: 10px; border: 2px solid #eee; margin-bottom: 15px;">
-            <button class="btn btn-cancel" style="width: 100%;" onclick="document.getElementById('donateModal').style.display='none'">關閉</button>
+
+        <div class="system-tools">
+            <h3>⚙️ 系統維護</h3>
+            <div class="btn-group">
+                <button class="btn-tool btn-backup" onclick="exportData()">⬇️ 備份資料</button>
+                <button class="btn-tool btn-restore" onclick="triggerImport()">⬆️ 還原資料</button>
+            </div>
+            <input type="file" id="import-file" style="display: none;" onchange="importData(this)">
+        </div>
+
+        <div class="footer-info">
+            Ver 2026.01.07-Fix | Designed by User
         </div>
     </div>
 
-<script>
-    // [遠端遙控核心] 讀取 config.json
-    // 使用 fetch 加上 timestamp 參數，強制瀏覽器抓最新資料，不讀快取
-    fetch('config.json?t=' + Date.now())
-        .then(response => response.json())
-        .then(data => {
-            if(data.news) document.getElementById('news-text').innerHTML = data.news;
-            if(data.version) document.getElementById('footer-version').innerText = data.version;
-        })
-        .catch(error => {
-            console.log('Config Load Error', error);
-            // 如果讀取失敗，顯示預設值
-            document.getElementById('news-text').innerText = '📢 歡迎使用刷卡回饋管家！';
-            document.getElementById('footer-version').innerText = 'Ver 2026.01.07 (Offline)';
-        });
+    <script>
+        // 1. 初始化資料
+        const initialCards = [
+            {
+                id: 'card_001', name: '富邦 J 卡', limit: 500000, used: 12500, resetDay: 1,
+                note: '日韓旅遊 3%', channels: ['日本實體', '韓國實體', '國內一般']
+            },
+            {
+                id: 'card_002', name: '國泰 Cube 卡', limit: 300000, used: 28000, resetDay: 1,
+                note: '四大權益天天切換', channels: ['玩數位', '樂饗購', '趣旅行']
+            },
+            {
+                id: 'card_003', name: '永豐 Sport 卡', limit: 7000, used: 3500, resetDay: 1,
+                note: 'Apple/Google Pay 7%', channels: ['Apple Pay', 'Google Pay']
+            },
+            {
+                id: 'card_004', name: '將將卡 (Next Bank)', limit: 20000, used: 0, resetDay: 1,
+                note: '指定通路回饋', channels: ['7-11', '全家', 'Uber Eats', 'foodpanda']
+            }
+        ];
 
-    const cards = [
-        { 
-            id: 'c1', name: '星展傳說對決', note: 'LinePay / 蝦皮 / UberEats', rule: '', 
-            type: 'ceiling', limit: 11363, tier1Rate: 0.10, tier2Rate: 0.012, 
-            gradient: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)', textColor: 'white', msgDanger: '已滿 (1.2%)' 
-        },
-        { 
-            id: 'c2', name: '聯邦綠卡', note: '國外2% / 國內1%', rule: '', 
-            type: 'floor', target: 12000, tier1Rate: 0.02, tier2Rate: 0.02, 
-            gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', textColor: 'white', msgSuccess: '已達標 (免停)',
-            parking: '🅿️ <b>免費停車：</b><br>台灣聯通、詮營、ViVi PARK、嘟嘟房、車麻吉<br>(需上月刷滿1.2萬)'
-        },
-        { 
-            id: 'c3', name: '永豐 Sport', note: 'Apple Pay (5%)', rule: '', 
-            type: 'ceiling', limit: 5000, tier1Rate: 0.05, tier2Rate: 0.02, 
-            gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '5% 已滿' 
-        },
-        { 
-            id: 'c4', name: '將來將將', note: 'LinePay / 悠遊付', rule: '', 
-            type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
-            gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '加碼已滿' 
-        },
-        { 
-            id: 'c5', name: '聯邦賴點卡', note: 'LinePay / 偶數日指定通路', rule: '⚠️ 單筆需滿$100', 
-            type: 'ceiling', limit: 3000, tier1Rate: 0.06, tier2Rate: 0.01, 
-            threshold: 100,
-            gradient: 'linear-gradient(135deg, #00B900 0%, #33CC33 100%)', textColor: 'white', msgDanger: '6% 已滿',
-            parking: `
-                ⚠️ <b>單筆需滿 $100</b> (回饋 6%)<br>
-                <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
-                    <summary style="cursor:pointer; font-weight:700; color:#856404; font-size:12px;">點我看完整店家名單 ▼</summary>
-                    <div style="margin-top:6px; padding-left:4px; font-size:11px; line-height:1.4; color:#555; max-height:120px; overflow-y:auto; border-radius:4px; background:rgba(255,255,255,0.5); padding:6px;">
-                        <div style="margin-bottom:4px;">🍽️ <b>餐廳：</b>王品 / 三商 / 輕井澤 / 漢來 / 饗賓 / 海底撈 / 築間 / 春水堂 / 壽司郎 / 爭鮮 / 八方雲集</div>
-                        <div style="margin-bottom:4px;">🍔 <b>速食：</b>麥當勞 / 肯德基 / 摩斯 / 漢堡王</div>
-                        <div style="margin-bottom:4px;">☕ <b>咖啡：</b>星巴克 / 路易莎 / cama / 50嵐 / 得正 / 麻古 / 可不可</div>
-                        <div style="margin-bottom:4px;">💄 <b>美妝：</b>屈臣氏 / 寶雅 / 唐吉訶德 / 大樹 / 杏一 / 丁丁 / 佑全 / 躍獅</div>
-                        <div style="margin-bottom:4px;">🏠 <b>家居：</b>IKEA / Hola / 小北 / 汪喵星球 / 東森 / 咕咕G / 魚中魚 / 寵物公園</div>
-                        <div style="margin-bottom:0px;">👟 <b>運動：</b>NIKE / Adidas / NewBalance / 迪卡儂 / 鞋全家福 / 摩曼頓</div>
+        // 2. 讀取或初始化
+        let cards = JSON.parse(localStorage.getItem('myCreditCards')) || initialCards;
+
+        // 3. 渲染主程式
+        function renderCards() {
+            const container = document.getElementById('card-list');
+            container.innerHTML = '';
+
+            cards.forEach((card, index) => {
+                const percentage = Math.min((card.used / card.limit) * 100, 100).toFixed(1);
+                const remaining = card.limit - card.used;
+                
+                let colorClass = '';
+                if (percentage >= 90) colorClass = 'danger';
+                else if (percentage >= 70) colorClass = 'warning';
+
+                let tagsHtml = '';
+                if(card.channels) {
+                    tagsHtml = `<div class="tag-container">` + 
+                        card.channels.map(ch => `<span class="channel-tag">${ch}</span>`).join('') + 
+                        `</div>`;
+                }
+
+                container.innerHTML += `
+                    <div class="card-item">
+                        <div class="card-header">
+                            <div class="card-name">${card.name}</div>
+                            <button class="btn-reset" onclick="resetCard(${index})">歸零</button>
+                        </div>
+                        <div class="card-details">
+                            <span>📝 ${card.note}</span>
+                            <span>📅 結帳日：${card.resetDay} 號</span>
+                            ${tagsHtml}
+                        </div>
+                        <div class="progress-wrapper">
+                            <div class="progress-labels">
+                                <span>已用 $${card.used.toLocaleString()}</span>
+                                <strong>剩 $${remaining.toLocaleString()}</strong>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill ${colorClass}" style="width: ${percentage}%"></div>
+                            </div>
+                        </div>
+                        <div class="action-row">
+                            <input type="number" id="input-${index}" placeholder="金額">
+                            <button class="btn-add" onclick="addExpense(${index})">記帳</button>
+                        </div>
                     </div>
-                </details>
-            `
+                `;
+            });
         }
-    ];
 
-    let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-
-    function updateDate() { const now = new Date(); document.getElementById('dateDisplay').innerText = `${now.getMonth()+1}/${now.getDate()}`; }
-
-    function calculateStats(cardId) {
-        const card = cards.find(c => c.id === cardId);
-        const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
-        const relevantTx = transactions.filter(t => t.cardId === cardId && new Date(t.date) >= startDate);
-        const totalSpend = relevantTx.reduce((sum, t) => sum + parseFloat(t.amount), 0);
-        const threshold = card.threshold || 0; 
-        const validTx = relevantTx.filter(t => t.amount >= threshold);
-        const validSpend = validTx.reduce((sum, t) => sum + parseFloat(t.amount), 0);
-
-        let reward = 0, currentRate = 0;
-        if (card.type === 'mixed') {
-            if (validSpend < card.minSpend) { reward = validSpend * card.tier2Rate; currentRate = card.tier2Rate; }
-            else if (validSpend <= card.limit) { reward = validSpend * card.tier1Rate; currentRate = card.tier1Rate; }
-            else { reward = (card.limit * card.tier1Rate) + ((validSpend - card.limit) * card.tier2Rate); currentRate = card.tier2Rate; }
-        } else if (card.type === 'ceiling') {
-            if (validSpend <= card.limit) { reward = validSpend * card.tier1Rate; currentRate = card.tier1Rate; }
-            else { reward = (card.limit * card.tier1Rate) + ((validSpend - card.limit) * card.tier2Rate); currentRate = card.tier2Rate; }
-        } else { 
-            reward = validSpend * card.tier1Rate; currentRate = card.tier1Rate; 
+        // 4. 核心邏輯
+        function addExpense(index) {
+            const val = parseInt(document.getElementById(`input-${index}`).value);
+            if (val > 0) {
+                cards[index].used += val;
+                saveAndRender();
+            }
         }
-        return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: (currentRate * 100).toFixed(1) };
-    }
 
-    function renderGrid() {
-        const container = document.getElementById('card-grid');
-        let monthTotalReward = 0; container.innerHTML = '';
-        cards.forEach(card => {
-            const stats = calculateStats(card.id); 
-            monthTotalReward += stats.reward;
-            let percent = 0, statusText = '', msgStyle = '';
-            
-            if (card.type === 'mixed') {
-                if (stats.validSpend < card.minSpend) { percent = (stats.validSpend / card.minSpend) * 100; statusText = `差 $${(card.minSpend - stats.validSpend).toLocaleString()} 升級`; msgStyle = 'color: #FFD700;'; }
-                else if (stats.validSpend <= card.limit) { percent = (stats.validSpend / card.limit) * 100; const remain = card.limit - stats.validSpend; statusText = `剩 $${remain.toLocaleString()} (5%)`; }
-                else { percent = 100; statusText = '已滿 (0.5%)'; msgStyle = 'color: #ffcccc;'; }
-            } else if (card.type === 'ceiling') {
-                percent = (stats.validSpend / card.limit) * 100;
-                if (stats.validSpend <= card.limit) { const remain = card.limit - stats.validSpend; statusText = `剩 $${remain.toLocaleString()}`; if(remain < 1000) {statusText = `⚠️ 剩 $${remain.toLocaleString()}`; msgStyle='color:#FFD700;';} }
-                else { percent = 100; statusText = card.msgDanger; msgStyle = 'color: #ffcccc;'; }
-            } else { 
-                percent = (stats.validSpend / card.target) * 100; 
-                statusText = stats.validSpend >= card.target ? '任務達成' : `差 $${(card.target - stats.validSpend).toLocaleString()}`; 
+        function resetCard(index) {
+            if(confirm('確認歸零？')) {
+                cards[index].used = 0;
+                saveAndRender();
             }
-
-            const ruleHtml = card.rule ? `<div class="tile-rule">${card.rule}</div>` : '';
-
-            const tile = document.createElement('div'); tile.className = 'card-tile'; tile.style.background = card.gradient; tile.style.color = card.textColor; tile.onclick = () => openQuickAdd(card.id);
-            tile.innerHTML = `
-                <div class="tile-header"><span class="tile-name">${card.name}</span><span class="rate-badge" style="color:black">${stats.rate}%</span></div>
-                <span class="tile-note" style="color:${card.textColor==='white'?'rgba(255,255,255,0.8)':'rgba(0,0,0,0.6)'}">${card.note}</span>
-                <div class="tile-body">
-                    <div class="tile-stat">$${stats.spend.toLocaleString()}</div>
-                    ${ruleHtml}
-                    <div class="tile-earned">+$${stats.reward.toLocaleString()}</div>
-                </div>
-                <div class="tile-footer">
-                    <div class="progress-track"><div class="progress-fill" style="width:${Math.min(percent, 100)}%"></div></div>
-                    <div class="tile-msg" style="${msgStyle}">${statusText}</div>
-                </div>`;
-            container.appendChild(tile);
-        });
-        document.getElementById('totalRewardDisplay').innerText = `$${monthTotalReward.toLocaleString()}`;
-        checkUrgentTasks();
-        renderHistory();
-    }
-
-    function openQuickAdd(cardId) {
-        const card = cards.find(c => c.id === cardId); document.getElementById('modalTitle').innerText = card.name; document.getElementById('modalSubtitle').innerText = card.note; document.getElementById('cardIdInput').value = cardId; 
-        const parkingInfoDiv = document.getElementById('modalParkingInfo');
-        if (card.parking) { parkingInfoDiv.innerHTML = card.parking; parkingInfoDiv.style.display = 'block'; } else { parkingInfoDiv.style.display = 'none'; }
-        document.getElementById('transactionModal').style.display = 'flex'; document.getElementById('amountInput').value = ''; document.getElementById('noteInput').value = ''; setTimeout(() => document.getElementById('amountInput').focus(), 100);
-    }
-    function closeModal() { document.getElementById('transactionModal').style.display = 'none'; }
-    function addTransaction() {
-        const cardId = document.getElementById('cardIdInput').value, amount = document.getElementById('amountInput').value, note = document.getElementById('noteInput').value; if (!amount || amount <= 0) return alert('請輸入金額'); transactions.push({ id: Date.now(), cardId: cardId, amount: parseFloat(amount), note: note, date: new Date().toISOString() }); localStorage.setItem('transactions', JSON.stringify(transactions)); closeModal(); renderGrid();
-    }
-    
-    function renderHistory() {
-        const container = document.getElementById('history-container'); container.innerHTML = '';
-        const now = new Date();
-        const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-
-        cards.forEach(card => {
-            const cardTx = transactions.filter(t => t.cardId === card.id && new Date(t.date) >= currentMonthStart).reverse();
-            const cardTotal = cardTx.reduce((sum, t) => sum + t.amount, 0);
-            
-            const details = document.createElement('details');
-            details.className = 'card-group-details';
-            
-            const summary = document.createElement('summary');
-            summary.className = 'card-group-summary';
-            summary.innerHTML = `<span class="group-name">${card.name}</span><span class="group-total">$${cardTotal.toLocaleString()}</span>`;
-            
-            details.appendChild(summary);
-            
-            if (cardTx.length === 0) {
-                const emptyItem = document.createElement('div');
-                emptyItem.className = 'history-item';
-                emptyItem.style.color = '#ccc';
-                emptyItem.style.justifyContent = 'center';
-                emptyItem.innerText = '本月尚無消費';
-                details.appendChild(emptyItem);
-            } else {
-                cardTx.forEach(tx => {
-                    const item = document.createElement('div');
-                    item.className = 'history-item';
-                    item.innerHTML = `
-                        <div>
-                            <div class="h-name">${tx.note || '一般消費'}</div>
-                            <div class="h-date">${new Date(tx.date).getMonth()+1}/${new Date(tx.date).getDate()}</div>
-                        </div>
-                        <div style="display:flex;align-items:center;">
-                            <span class="h-amount">$${tx.amount.toLocaleString()}</span>
-                            <button class="btn-delete-single" onclick="deleteTransaction(${tx.id})">✕</button>
-                        </div>
-                    `;
-                    details.appendChild(item);
-                });
-            }
-            container.appendChild(details);
-        });
-    }
-
-    function deleteTransaction(id) {
-        if(confirm('刪除此筆紀錄？')) {
-            transactions = transactions.filter(t => t.id !== id);
-            localStorage.setItem('transactions', JSON.stringify(transactions));
-            renderGrid();
         }
-    }
 
-    function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
-    
-    function exportData() {
-        const dataStr = JSON.stringify(transactions);
-        const blob = new Blob([dataStr], {type: "application/json"});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        const date = new Date().toISOString().split('T')[0];
-        a.download = `backup_${date}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    }
+        function saveAndRender() {
+            localStorage.setItem('myCreditCards', JSON.stringify(cards));
+            renderCards();
+        }
 
-    function triggerImport() { document.getElementById('fileInput').click(); }
+        // 5. 備份與還原功能 (修復重點)
+        function exportData() {
+            const dataStr = JSON.stringify(cards, null, 2);
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `credit_card_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            alert('✅ 備份檔案已下載！');
+        }
 
-    function importFile(input) {
-        const file = input.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const json = JSON.parse(e.target.result);
-                if (Array.isArray(json)) {
-                    transactions = json;
-                    localStorage.setItem('transactions', JSON.stringify(transactions));
-                    renderGrid();
-                    alert('✅ 備份還原成功！');
-                } else { alert('❌ 檔案內容格式錯誤'); }
-            } catch (err) { alert('❌ 無法讀取檔案，請確認是否為正確的備份檔'); }
-        };
-        reader.readAsText(file);
-        input.value = '';
-    }
+        function triggerImport() {
+            document.getElementById('import-file').click();
+        }
 
-    function showDonateModal() {
-        document.getElementById('donateModal').style.display = 'flex';
-    }
+        function importData(input) {
+            const file = input.files[0];
+            if (!file) return;
 
-    function copyBankInfo() {
-        navigator.clipboard.writeText("396901798704").then(() => {
-            alert("✅ 帳號已複製！(銀行代碼 396)");
-        });
-    }
-    
-    function checkUrgentTasks() {
-        const alertArea = document.getElementById('urgent-alert-area'), alertList = document.getElementById('urgent-list'); alertList.innerHTML = ''; let hasUrgent = false;
-        cards.forEach(card => {
-            const stats = calculateStats(card.id); let target = card.type === 'floor' ? card.target : (card.type === 'mixed' ? card.minSpend : 0);
-            if (target > 0 && stats.spend < target) {
-                const end = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0), diff = Math.ceil((end - new Date()) / 86400000);
-                if (diff <= 3 && diff >= 0) { hasUrgent = true; alertList.innerHTML += `<div class="urgent-item">${card.name} 缺 $${(target - stats.spend).toLocaleString()} (剩 ${diff} 天)</div>`; }
-            }
-        });
-        alertArea.style.display = hasUrgent ? 'block' : 'none';
-    }
-    updateDate(); renderGrid();
-</script>
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (Array.isArray(importedData)) {
+                        cards = importedData;
+                        saveAndRender();
+                        alert('✅ 資料還原成功！');
+                    } else {
+                        alert('❌ 檔案格式錯誤');
+                    }
+                } catch (err) {
+                    alert('❌ 無法讀取檔案');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // 啟動
+        renderCards();
+
+    </script>
 </body>
 </html>

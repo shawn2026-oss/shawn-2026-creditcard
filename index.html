@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-FMD1PV6QZV"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -31,6 +33,7 @@
             min-height: 100vh; 
             -webkit-font-smoothing: antialiased; 
             overscroll-behavior-y: none;
+            overscroll-behavior-x: none;
         }
         
         .app-container { 
@@ -99,8 +102,19 @@
 
         #card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
 
-        .card-tile { border-radius: 16px; padding: 12px; min-height: 135px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; transition: transform 0.1s; cursor: pointer; color: white; overflow: hidden; }
+        .card-tile { 
+            border-radius: 16px; padding: 12px; min-height: 135px; 
+            display: flex; flex-direction: column; justify-content: space-between; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; 
+            transition: transform 0.1s; cursor: pointer; color: white; overflow: hidden; 
+            user-select: none;
+            -webkit-user-select: none;
+        }
         .card-tile:active { transform: scale(0.97); }
+        
+        .sortable-ghost { opacity: 0.4; transform: scale(0.95); }
+        .sortable-drag { cursor: grabbing; }
+
         .tile-header { display: flex; justify-content: space-between; align-items: flex-start; z-index: 2; margin-bottom: 2px;}
         .tile-name { font-size: 14px; font-weight: 700; line-height: 1.2; text-shadow: 0 1px 2px rgba(0,0,0,0.15); }
         .tile-note { font-size: 10px; font-weight: 500; opacity: 0.9; margin-bottom: 4px; display: block; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2; letter-spacing: -0.2px; }
@@ -161,9 +175,8 @@
             margin-top: 12px; 
             min-height: 20px; 
             background: #E3F2FD; 
-            padding: 10px; 
-            border-radius: 10px; 
-            /* 改為預設顯示但為空，避免跳動，或輸入後顯示 */
+            padding: 8px; 
+            border-radius: 8px; 
             display: none; 
         }
         
@@ -187,7 +200,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V45.0</div>
+            <div class="version-tag" id="top-version-tag">V47.0</div>
         </div>
 
         <div class="header-section">
@@ -314,12 +327,12 @@
     });
 
     // 【歷史記錄導航支援】
-    // 當按下手機「返回鍵」時，如果視窗開著，就關閉視窗，而不是離開網頁
     window.addEventListener('popstate', function(event) {
         document.getElementById('transactionModal').style.display = 'none';
     });
 
-    const cards = [
+    // 【拖曳排序邏輯】
+    const defaultCards = [
         { 
             id: 'c6', name: '台新街口豬富卡', note: '自選回饋 (最高13.5%)', rule: '', 
             type: 'ceiling', limit: 8000, tier1Rate: 0.135, tier2Rate: 0.035, 
@@ -414,11 +427,42 @@
         }
     ];
 
+    let savedOrder = JSON.parse(localStorage.getItem('cardOrder'));
+    let cards = [...defaultCards];
+
+    if (savedOrder && Array.isArray(savedOrder)) {
+        cards.sort((a, b) => {
+            let indexA = savedOrder.indexOf(a.id);
+            let indexB = savedOrder.indexOf(b.id);
+            if (indexA === -1) indexA = 999;
+            if (indexB === -1) indexB = 999;
+            return indexA - indexB;
+        });
+    }
+
+    function initSortable() {
+        var el = document.getElementById('card-grid');
+        new Sortable(el, {
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            dragClass: 'sortable-drag',
+            delay: 200,
+            delayOnTouchOnly: true,
+            onEnd: function (evt) {
+                const newOrder = Array.from(evt.to.children).map(el => {
+                    return el.getAttribute('data-card-id');
+                });
+                localStorage.setItem('cardOrder', JSON.stringify(newOrder));
+                cards.sort((a, b) => newOrder.indexOf(a.id) - newOrder.indexOf(b.id));
+            }
+        });
+    }
+
     let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
 
     function updateDate() { const now = new Date(); document.getElementById('dateDisplay').innerText = `${now.getMonth()+1}/${now.getDate()}`; }
 
-    // --- 核心計算邏輯 (通用版) ---
+    // --- 核心計算邏輯 ---
     function calculateStats(cardId, addedAmount = 0) {
         const card = cards.find(c => c.id === cardId);
         const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
@@ -443,7 +487,7 @@
         return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: (currentRate * 100).toFixed(1) };
     }
 
-    // --- 豬富卡防呆互斥邏輯 ---
+    // --- 豬富卡防呆 ---
     function toggleBillLogic() {
         const isBill = document.getElementById('checkIsBill').checked;
         if (isBill) {
@@ -460,12 +504,12 @@
         const cardId = document.getElementById('cardIdInput').value;
 
         if (!amount || amount <= 0) {
-            previewDiv.style.display = 'none'; // 沒金額時隱藏
+            previewDiv.style.display = 'none'; 
             previewDiv.innerHTML = '';
             return;
         }
 
-        previewDiv.style.display = 'block'; // 有金額時顯示
+        previewDiv.style.display = 'block'; 
 
         let thisTransactionReward = 0;
         let effectiveRate = 0;
@@ -475,16 +519,13 @@
             const hasBonus25 = document.getElementById('checkBonus25').checked;
             const isBill = document.getElementById('checkIsBill').checked;
             
-            // 1. 基底回饋 (繳費0.15%，一般1%)
             let baseRate = isBill ? 0.0015 : 0.01;
             let reward = amount * baseRate;
 
-            // 2. 精選通路 2.5%
             if (hasBonus25) {
                 reward += amount * 0.025;
             }
 
-            // 3. 加碼 10% (需檢查 8000 額度)
             if (hasBonus10) {
                 const card = cards.find(c => c.id === 'c6');
                 const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
@@ -533,7 +574,13 @@
 
             const ruleHtml = card.rule ? `<div class="tile-rule">${card.rule}</div>` : '';
 
-            const tile = document.createElement('div'); tile.className = 'card-tile'; tile.style.background = card.gradient; tile.style.color = card.textColor; tile.onclick = () => openQuickAdd(card.id);
+            const tile = document.createElement('div'); 
+            tile.className = 'card-tile'; 
+            tile.setAttribute('data-card-id', card.id);
+            tile.style.background = card.gradient; 
+            tile.style.color = card.textColor; 
+            tile.onclick = () => openQuickAdd(card.id);
+            
             tile.innerHTML = `
                 <div class="tile-header"><span class="tile-name">${card.name}</span><span class="rate-badge" style="color:black">${stats.rate}%</span></div>
                 <span class="tile-note" style="color:${card.textColor==='white'?'rgba(255,255,255,0.8)':'rgba(0,0,0,0.6)'}">${card.note}</span>
@@ -551,6 +598,7 @@
         document.getElementById('totalRewardDisplay').innerText = `$${monthTotalReward.toLocaleString()}`;
         checkUrgentTasks();
         renderHistory();
+        initSortable();
     }
 
     function openQuickAdd(cardId) {
@@ -559,7 +607,6 @@
         document.getElementById('modalSubtitle').innerText = card.note; 
         document.getElementById('cardIdInput').value = cardId; 
         
-        // Push history state to support back button closing
         history.pushState({modalOpen: true}, "", "#modal");
 
         const pigRichOptions = document.getElementById('pigRichOptions');
@@ -567,7 +614,7 @@
             pigRichOptions.style.display = 'block';
             document.getElementById('checkBonus10').checked = true;
             document.getElementById('checkBonus25').checked = true;
-            document.getElementById('checkIsBill').checked = false; // 預設不勾繳費
+            document.getElementById('checkIsBill').checked = false; 
         } else {
             pigRichOptions.style.display = 'none';
         }
@@ -583,14 +630,13 @@
         setTimeout(() => document.getElementById('amountInput').focus(), 100);
     }
 
-    // Close Modal: Just go back in history
     function closeModal() {
         history.back();
     }
 
     function addTransaction() {
         const cardId = document.getElementById('cardIdInput').value, amount = document.getElementById('amountInput').value, note = document.getElementById('noteInput').value; if (!amount || amount <= 0) return alert('請輸入金額'); transactions.push({ id: Date.now(), cardId: cardId, amount: parseFloat(amount), note: note, date: new Date().toISOString() }); localStorage.setItem('transactions', JSON.stringify(transactions)); 
-        history.back(); // Close modal via history
+        history.back(); 
         renderGrid();
     }
     
@@ -650,9 +696,17 @@
 
     function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
     
+    // 【備份功能：本地時間修正版】
     async function exportData() {
         const dataStr = JSON.stringify(transactions);
-        const fileName = `backup_${new Date().toISOString().split('T')[0]}.json`;
+        
+        // 使用本地時間產生日期，避免時區差異導致日期少一天
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const fileName = `backup_${year}-${month}-${day}.json`;
+        
         const file = new File([dataStr], fileName, { type: "application/json" });
         
         if (navigator.share && navigator.canShare({ files: [file] })) {

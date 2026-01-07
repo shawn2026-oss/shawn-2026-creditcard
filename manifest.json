@@ -1,6 +1,6 @@
 {
   "name": "刷卡回饋管家",
-  "short_name": "回饋管家",
+  "short_name": "刷卡回饋管家",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#F0F2F5",

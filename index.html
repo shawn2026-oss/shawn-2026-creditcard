@@ -27,7 +27,6 @@
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; 
             background-color: #E0E5EC; color: var(--text-primary); margin: 0; 
-            /* 修正：恢復置中，讓它看起來像電腦上的手機模擬器 */
             display: flex; justify-content: center; 
             min-height: 100vh; 
             -webkit-font-smoothing: antialiased; 
@@ -36,7 +35,6 @@
         
         .app-container { 
             width: 100%; 
-            /* 修正：改回 480px，這才是手機 App 該有的樣子 */
             max-width: 480px; 
             background-color: var(--bg-color); 
             min-height: 100vh; 
@@ -57,7 +55,7 @@
         .subtitle { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
         .today-date { background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; color: #555; margin-left: 5px;}
         
-        /* 跑馬燈樣式 (Keyframes動畫) */
+        /* 跑馬燈樣式 */
         .news-ticker {
             background: #FFF9C4; color: #856404; 
             border-radius: 8px; margin-bottom: 12px; 
@@ -70,7 +68,6 @@
         .ticker-content {
             display: inline-block;
             padding-left: 100%;
-            /* 20秒慢速滾動 */
             animation: scroll-left 20s linear infinite; 
         }
         @keyframes scroll-left {
@@ -89,7 +86,6 @@
         .urgent-item { background: rgba(255,255,255,0.25); border-radius: 8px; padding: 6px 10px; margin-top: 6px; font-size: 12px; font-weight: 600; line-height: 1.3; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.01); } 100% { transform: scale(1); } }
 
-        /* 修正：拿掉剛剛的三欄設定，維持最原始的雙欄 */
         #card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
 
         .card-tile { border-radius: 16px; padding: 12px; min-height: 135px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; transition: transform 0.1s; cursor: pointer; color: white; overflow: hidden; }
@@ -229,7 +225,7 @@
     </div>
 
 <script>
-    // 遠端更新跑馬燈邏輯 (維持不變)
+    // 遠端更新跑馬燈邏輯
     fetch('config.json?t=' + Date.now())
         .then(response => response.json())
         .then(data => {
@@ -238,7 +234,6 @@
         })
         .catch(error => {
             console.log('Config Load Error or Local Mode');
-            // 修正：這裡改為友善的歡迎詞，不再顯示 config.json 錯誤
             document.getElementById('news-text').innerHTML = '🎉 歡迎使用刷卡回饋管家！系統將自動計算您的最佳刷卡組合。';
         });
 
@@ -263,7 +258,6 @@
             id: 'c4', name: '將來將將', note: '行動支付 / 外送 / 網購', rule: '', 
             type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
             gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '加碼已滿',
-            // ✅ 美化修正：將 (5) 替換為 🏪，其餘文字完全保留
             parking: `
                 💡 <b>需當月滿 $3,000</b> (回饋 4.5%)<br>
                 <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
@@ -440,29 +434,12 @@
 
     function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
     
-    // 【手機備份功能：修復「取消」時跳出怪訊息的問題】
-    async function exportData() {
+    // 【備份功能：極簡化，強制只做下載】
+    function exportData() {
         const dataStr = JSON.stringify(transactions);
         const fileName = `backup_${new Date().toISOString().split('T')[0]}.json`;
         
-        try {
-            const file = new File([dataStr], fileName, { type: "application/json" });
-            
-            if (navigator.share && navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                    files: [file],
-                    title: '刷卡回饋管家備份',
-                    text: '這是您的消費紀錄備份檔'
-                });
-                return; // 分享成功，正常結束
-            }
-        } catch (error) {
-            // ✅ 修正點：如果使用者是按「取消/關閉」，不執行任何動作
-            if (error.name === 'AbortError') return; 
-            console.log("分享失敗", error);
-        }
-
-        // 僅在不支援 Share API 時才執行傳統下載
+        // 直接建立下載連結並點擊
         const blob = new Blob([dataStr], {type: "application/json"});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');

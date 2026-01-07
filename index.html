@@ -55,24 +55,27 @@
         .subtitle { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
         .today-date { background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; color: #555; margin-left: 5px;}
         
-        /* 跑馬燈樣式 */
+        /* 跑馬燈樣式 (修正版) */
         .news-ticker {
             background: #FFF9C4; color: #856404; 
             border-radius: 8px; margin-bottom: 12px; 
-            padding: 8px 10px; font-size: 12px; font-weight: 600;
+            /* 這裡拿掉 flex，改用 height + line-height 垂直置中，避免切字 */
+            height: 36px;
+            line-height: 36px;
+            padding: 0 10px; 
+            font-size: 12px; font-weight: 600;
             overflow: hidden; white-space: nowrap; position: relative;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            display: flex; align-items: center;
-            min-height: 32px;
         }
         .ticker-content {
             display: inline-block;
             padding-left: 100%;
-            animation: scroll-left 20s linear infinite; 
+            /* 速度調快回 12s */
+            animation: scroll-left 12s linear infinite; 
         }
         @keyframes scroll-left {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
         }
 
         .total-reward-card { background: #2c3e50; color: white; border-radius: 16px; padding: 14px 20px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(44, 62, 80, 0.2); }

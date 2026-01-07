@@ -47,7 +47,7 @@
         .subtitle { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
         .today-date { background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; color: #555; margin-left: 5px;}
         
-        /* 跑馬燈 (維持加速後的速度) */
+        /* 📢 跑馬燈樣式 */
         .news-ticker {
             background: #FFF9C4; color: #856404; 
             border-radius: 8px; margin-bottom: 12px; 
@@ -55,12 +55,12 @@
             overflow: hidden; white-space: nowrap; position: relative;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             display: flex; align-items: center;
-            min-height: 32px; 
+            min-height: 32px;
         }
         .ticker-content {
             display: inline-block;
             padding-left: 100%;
-            animation: scroll-left 12s linear infinite;
+            animation: scroll-left 15s linear infinite;
         }
         @keyframes scroll-left {
             0% { transform: translateX(0); }
@@ -173,14 +173,16 @@
             <button class="btn-reset-visible" onclick="resetAllData()">🗑️ 重置所有資料</button>
         </div>
         
-        <div class="footer" id="footer-version">Loading...</div>
+        <div class="footer" id="footer-version">Ver 2026.01.07 (Remote)</div>
     </div>
 
     <div id="transactionModal" class="modal">
         <div class="modal-content">
             <h2 id="modalTitle" style="margin: 0 0 4px 0; font-size: 18px; font-weight: 800; color:#333;"></h2>
             <div style="font-size:12px; color:#888; margin-bottom:10px; font-weight: 500;" id="modalSubtitle"></div>
+            
             <div id="modalParkingInfo" style="background:#FFF9C4; color:#856404; padding:10px; border-radius:10px; font-size:12px; margin-bottom:12px; border-left:4px solid #FFC107; display:none; line-height:1.5;"></div>
+            
             <input type="hidden" id="cardIdInput"> 
             <div class="input-group" style="margin-top:0;"><input type="number" id="amountInput" placeholder="$ 金額" inputmode="numeric" style="font-size:28px; text-align:center; border:none; border-bottom:2px solid #eee; border-radius:0;"></div>
             <div class="input-group"><input type="text" id="noteInput" placeholder="備註 (例如: 午餐)"></div>
@@ -217,18 +219,18 @@
 <script>
     // [遠端遙控核心] 讀取 config.json
     // 使用 fetch 加上 timestamp 參數，強制瀏覽器抓最新資料，不讀快取
-    fetch('config.json?t=' + Date.now())
+    fetch('config.json?t=' + new Date().getTime())
         .then(response => response.json())
         .then(data => {
-            if(data.news) document.getElementById('news-text').innerHTML = data.news;
-            if(data.version) document.getElementById('footer-version').innerText = data.version;
+            // 如果讀取成功，更新跑馬燈
+            if(data.news) {
+                document.getElementById('news-text').innerHTML = data.news;
+            }
         })
         .catch(error => {
             console.log('Config Load Error', error);
-            // 修改：跑馬燈預設文字 (移除贊助相關字眼)
-            document.getElementById('news-text').innerText = '📢 Ver 2026.01.07 更新完成！ | 新增將將卡與指定通路 | 修正跑馬燈顯示 | 歡迎使用';
-            // 修改：強制顯示版本號
-            document.getElementById('footer-version').innerText = 'Ver 2026.01.07';
+            // 如果讀取失敗 (例如檔案還沒建立)，顯示預設值
+            document.getElementById('news-text').innerText = '📢 歡迎使用刷卡回饋管家！請將此網頁加入主畫面以獲得最佳體驗。';
         });
 
     const cards = [
@@ -249,18 +251,21 @@
             gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '5% 已滿' 
         },
         { 
-            id: 'c4', name: '將來將將', note: '四大超商 / 外送 / 行動支付', rule: '', 
+            id: 'c4', name: '將來將將', note: '行動支付 / 餐飲 / 外送', rule: '', 
             type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
             gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '加碼已滿',
-            // 修改：加入指定通路清單
             parking: `
-                🛒 <b>指定通路 5% 回饋：</b><br>
-                <div style="margin-top:4px; font-size:11px; line-height:1.4; color:#666;">
-                🏪 <b>超商：</b>7-11、全家、萊爾富、OK<br>
-                🛵 <b>外送：</b>Uber Eats、Foodpanda<br>
-                🚖 <b>車隊：</b>台灣大車隊、yoxi
-                </div>
-                <div style="margin-top:6px; font-size:10px; color:#E30000;">⚠️ 需當月累積刷滿 3000 元才啟動</div>
+                💡 <b>需當月滿 $3000</b> (回饋 4.5%)<br>
+                <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
+                    <summary style="cursor:pointer; font-weight:700; color:#856404; font-size:12px;">點我看指定通路 ▼</summary>
+                    <div style="margin-top:6px; padding-left:4px; font-size:11px; line-height:1.5; color:#555; max-height:150px; overflow-y:auto;">
+                        📱 <b>行動支付：</b>LINE Pay、街口、icash Pay、橘子支付、悠遊付、Hami Pay、Pi錢包、TWQR<br>
+                        🍽️ <b>餐飲外送：</b>Uber Eats、Foodpanda、國內餐廳、麥當勞<br>
+                        🏪 <b>超商超市：</b>7-11、全家、家樂福 (需搭配指定支付)<br>
+                        🚄 <b>交通/其他：</b>自動加值、高鐵、World Gym、IKEA、HOLA<br>
+                        💻 <b>數位/學習：</b>Google Play、Apple服務、ChatGPT、Udemy
+                    </div>
+                </details>
             `
         },
         { 
@@ -422,6 +427,7 @@
 
     function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
     
+    // 強制檔案下載備份
     function exportData() {
         const dataStr = JSON.stringify(transactions);
         const blob = new Blob([dataStr], {type: "application/json"});

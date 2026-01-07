@@ -200,7 +200,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V47.0</div>
+            <div class="version-tag" id="top-version-tag">V48.0</div>
         </div>
 
         <div class="header-section">
@@ -356,14 +356,14 @@
                 <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
                     <summary style="cursor:pointer; font-weight:700; color:#8B0000; font-size:12px;">▼ 點我看 10% 適用範圍</summary>
                     <div style="margin-top:6px; padding:8px; font-size:11px; line-height:1.6; color:#333; background:rgba(255,255,255,0.9); border-radius:6px;">
-                        📱 <b>行動支付：</b>街口支付 APP 內消費 (不含繳費/稅)<br>
-                        🌍 <b>海外消費：</b>國外實體商店、國外網站 (Amazon, Agoda...)<br>
-                        ✈️ <b>機票：</b>航空公司官網購票<br>
+                        📱 <b>行動支付：</b>LINE Pay、街口支付、icash Pay，含APP內繳費<br>
+                        🌍 <b>海外：</b>含實體及線上交易<br>
+                        ✈️ <b>機票：</b>國內外航空公司 (限透過航空公司購買之機票消費)<br>
                     </div>
                 </details>
 
                 <div style="margin-top:10px; font-size:11px; color:#5d4037;">
-                    🧾 <b>繳費 10.15%：</b>需勾選上方「是APP繳費」+「新戶加碼」。<br>
+                    🧾 <b>繳費攻略：</b>需勾選上方「是APP繳費」+「新戶加碼」。<br>
                     ⚠️ 10%加碼上限800元(刷$8000)
                 </div>
             `
@@ -696,11 +696,9 @@
 
     function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
     
-    // 【備份功能：本地時間修正版】
     async function exportData() {
         const dataStr = JSON.stringify(transactions);
         
-        // 使用本地時間產生日期，避免時區差異導致日期少一天
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');

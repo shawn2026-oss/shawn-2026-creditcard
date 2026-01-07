@@ -47,7 +47,7 @@
         .subtitle { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
         .today-date { background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; color: #555; margin-left: 5px;}
         
-        /* 跑馬燈 */
+        /* 跑馬燈 (維持加速後的速度) */
         .news-ticker {
             background: #FFF9C4; color: #856404; 
             border-radius: 8px; margin-bottom: 12px; 
@@ -55,12 +55,12 @@
             overflow: hidden; white-space: nowrap; position: relative;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             display: flex; align-items: center;
-            min-height: 32px; /* 預留高度避免跳動 */
+            min-height: 32px; 
         }
         .ticker-content {
             display: inline-block;
             padding-left: 100%;
-            animation: scroll-left 15s linear infinite;
+            animation: scroll-left 12s linear infinite;
         }
         @keyframes scroll-left {
             0% { transform: translateX(0); }
@@ -225,9 +225,10 @@
         })
         .catch(error => {
             console.log('Config Load Error', error);
-            // 如果讀取失敗，顯示預設值
-            document.getElementById('news-text').innerText = '📢 歡迎使用刷卡回饋管家！';
-            document.getElementById('footer-version').innerText = 'Ver 2026.01.07 (Offline)';
+            // 修改：跑馬燈預設文字 (移除贊助相關字眼)
+            document.getElementById('news-text').innerText = '📢 Ver 2026.01.07 更新完成！ | 新增將將卡與指定通路 | 修正跑馬燈顯示 | 歡迎使用';
+            // 修改：強制顯示版本號
+            document.getElementById('footer-version').innerText = 'Ver 2026.01.07';
         });
 
     const cards = [
@@ -248,9 +249,19 @@
             gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '5% 已滿' 
         },
         { 
-            id: 'c4', name: '將來將將', note: 'LinePay / 悠遊付', rule: '', 
+            id: 'c4', name: '將來將將', note: '四大超商 / 外送 / 行動支付', rule: '', 
             type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
-            gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '加碼已滿' 
+            gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '加碼已滿',
+            // 修改：加入指定通路清單
+            parking: `
+                🛒 <b>指定通路 5% 回饋：</b><br>
+                <div style="margin-top:4px; font-size:11px; line-height:1.4; color:#666;">
+                🏪 <b>超商：</b>7-11、全家、萊爾富、OK<br>
+                🛵 <b>外送：</b>Uber Eats、Foodpanda<br>
+                🚖 <b>車隊：</b>台灣大車隊、yoxi
+                </div>
+                <div style="margin-top:6px; font-size:10px; color:#E30000;">⚠️ 需當月累積刷滿 3000 元才啟動</div>
+            `
         },
         { 
             id: 'c5', name: '聯邦賴點卡', note: 'LinePay / 偶數日指定通路', rule: '⚠️ 單筆需滿$100', 

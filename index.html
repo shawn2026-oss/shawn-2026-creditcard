@@ -29,15 +29,14 @@
             background-color: #E0E5EC; color: var(--text-primary); margin: 0; 
             display: flex; justify-content: center; min-height: 100vh; 
             -webkit-font-smoothing: antialiased; 
-            /* 防止 iOS 橡皮筋回彈效果 */
             overscroll-behavior-y: none;
         }
         
         .app-container { 
             width: 100%; max-width: 480px; background-color: var(--bg-color); 
             min-height: 100vh; padding: 16px 12px; 
-            padding-top: env(safe-area-inset-top, 20px); /* 避開瀏海 */
-            padding-bottom: env(safe-area-inset-bottom, 20px); /* 避開底部橫條 */
+            padding-top: env(safe-area-inset-top, 20px); 
+            padding-bottom: env(safe-area-inset-bottom, 20px); 
             box-shadow: 0 0 40px rgba(0,0,0,0.05); display: flex; flex-direction: column; box-sizing: border-box; 
         }
         @media (max-width: 480px) { body { background-color: var(--bg-color); } .app-container { box-shadow: none; width: 100%; max-width: 100%; } }
@@ -48,6 +47,25 @@
         .subtitle { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
         .today-date { background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; color: #555; margin-left: 5px;}
         
+        /* 📢 跑馬燈樣式 */
+        .news-ticker {
+            background: #FFF9C4; color: #856404; 
+            border-radius: 8px; margin-bottom: 12px; 
+            padding: 8px 10px; font-size: 12px; font-weight: 600;
+            overflow: hidden; white-space: nowrap; position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex; align-items: center;
+        }
+        .ticker-content {
+            display: inline-block;
+            padding-left: 100%;
+            animation: scroll-left 15s linear infinite;
+        }
+        @keyframes scroll-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
         .total-reward-card { background: #2c3e50; color: white; border-radius: 16px; padding: 14px 20px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(44, 62, 80, 0.2); }
         .total-reward-card::after { content: ''; position: absolute; top: -50%; right: -50%; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%; pointer-events: none; }
         .total-reward-label { font-size: 13px; font-weight: 600; opacity: 0.9; }
@@ -126,6 +144,10 @@
             <div class="subtitle"><span class="today-date" id="dateDisplay"></span></div>
         </div>
 
+        <div class="news-ticker">
+            <div class="ticker-content">📢 目前最新版本：Ver 2026.01.07 (News Ticker)｜若下方版本號不符，請刪除主畫面捷徑，重新加入以獲得最新功能！</div>
+        </div>
+
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
         
         <div class="total-reward-card">
@@ -150,7 +172,7 @@
             <button class="btn-reset-visible" onclick="resetAllData()">🗑️ 重置所有資料</button>
         </div>
         
-        <div class="footer">Ver 2026.01.07 (PWA Ready)</div>
+        <div class="footer">Ver 2026.01.07 12:00 (News Ticker)</div>
     </div>
 
     <div id="transactionModal" class="modal">

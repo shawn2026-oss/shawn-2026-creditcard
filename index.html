@@ -50,7 +50,7 @@
         .subtitle { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
         .today-date { background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; color: #555; margin-left: 5px;}
         
-        /* 跑馬燈樣式 */
+        /* 跑馬燈樣式 (Keyframes動畫) */
         .news-ticker {
             background: #FFF9C4; color: #856404; 
             border-radius: 8px; margin-bottom: 12px; 
@@ -141,7 +141,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag">V38.2 (Final)</div>
+            <div class="version-tag" id="top-version-tag">V39.0</div>
         </div>
 
         <div class="header-section">
@@ -220,21 +220,18 @@
     </div>
 
 <script>
-    // 🔥 【在此處修改跑馬燈文字】 🔥
-    // 請在引號內填入您想要的文字，手機版也能顯示！
-    const CUSTOM_MARQUEE_TEXT = "📢 系統公告：請在這裡輸入您想要的跑馬燈文字，手機版也能正確顯示！";
-
-    // --- 以下程式碼請勿更動 ---
-    
-    // 優先使用自訂文字，如果 config.json 讀不到就用這裡的
-    document.getElementById('news-text').innerHTML = CUSTOM_MARQUEE_TEXT;
-
-    // 嘗試讀取 config.json (僅電腦/伺服器有效)，失敗則忽略
+    // ✅ 恢復：讀取 config.json (遠端更新跑馬燈)
     fetch('config.json?t=' + Date.now())
         .then(response => response.json())
         .then(data => {
             if(data.news) document.getElementById('news-text').innerHTML = data.news;
-        }).catch(e => { /* 忽略錯誤，維持上方設定的自訂文字 */ });
+            if(data.version) document.getElementById('top-version-tag').innerText = data.version;
+        })
+        .catch(error => {
+            // 如果讀取失敗 (例如離線或沒檔案)，顯示此預設文字
+            console.log('Config Load Error or Local Mode');
+            document.getElementById('news-text').innerHTML = '📢 歡迎使用刷卡回饋管家！(如需更新跑馬燈請檢查 config.json)';
+        });
 
     const cards = [
         { 

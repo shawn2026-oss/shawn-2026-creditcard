@@ -55,7 +55,7 @@
         .subtitle { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
         .today-date { background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; color: #555; margin-left: 5px;}
         
-        /* --- 跑馬燈強力優化版 --- */
+        /* 跑馬燈強力優化版 */
         .news-ticker {
             background: #FFF9C4; color: #856404; 
             border-radius: 8px; margin-bottom: 12px; 
@@ -66,7 +66,6 @@
             position: relative;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             width: 100%;
-            /* 硬體加速層 */
             transform: translate3d(0,0,0);
         }
         
@@ -74,14 +73,11 @@
             display: inline-block;
             height: 36px;
             line-height: 36px;
-            padding-left: 100%; /* 從螢幕最右邊外開始 */
+            padding-left: 100%; 
             min-width: 100%;
             box-sizing: content-box;
-            /* 15秒適中速度 */
             animation: scroll-left 15s linear infinite;
-            /* 關鍵：告訴瀏覽器這個元件會變動，請用 GPU 渲染 */
             will-change: transform;
-            /* 預設啟用 3D 加速 */
             transform: translate3d(0, 0, 0);
         }
 
@@ -89,7 +85,6 @@
             0% { transform: translate3d(0, 0, 0); }
             100% { transform: translate3d(-100%, 0, 0); }
         }
-        /* ------------------------ */
 
         .total-reward-card { background: #2c3e50; color: white; border-radius: 16px; padding: 14px 20px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(44, 62, 80, 0.2); }
         .total-reward-card::after { content: ''; position: absolute; top: -50%; right: -50%; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%; pointer-events: none; }
@@ -156,13 +151,43 @@
         .btn { flex: 1; padding: 10px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; }
         .btn-cancel { background: #f5f5f5; color: #333; }
         .btn-confirm { background: #007AFF; color: white; }
+        
+        /* 即時試算顯示 (顯眼藍色方塊) */
+        #liveRewardCalc { 
+            text-align: center; 
+            font-size: 16px; 
+            color: #0056b3; 
+            font-weight: 700; 
+            margin-top: 12px; 
+            min-height: 20px; 
+            background: #E3F2FD; 
+            padding: 10px; 
+            border-radius: 10px; 
+            /* 改為預設顯示但為空，避免跳動，或輸入後顯示 */
+            display: none; 
+        }
+        
+        /* 豬富卡專屬開關 */
+        #pigRichOptions {
+            display: none;
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 10px;
+            border: 1px dashed #ddd;
+        }
+        .option-row {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #555;
+        }
+        .option-row input[type="checkbox"] { width: 20px; height: 20px; margin: 0; }
     </style>
 </head>
 <body>
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V39.1</div>
+            <div class="version-tag" id="top-version-tag">V45.0</div>
         </div>
 
         <div class="header-section">
@@ -200,7 +225,7 @@
         
         <div style="height:20px;"></div> </div>
 
-    <div id="transactionModal" class="modal">
+    <div id="transactionModal" class="modal" onclick="if(event.target===this) closeModal()">
         <div class="modal-content">
             <h2 id="modalTitle" style="margin: 0 0 4px 0; font-size: 18px; font-weight: 800; color:#333;"></h2>
             <div style="font-size:12px; color:#888; margin-bottom:10px; font-weight: 500;" id="modalSubtitle"></div>
@@ -208,13 +233,38 @@
             <div id="modalParkingInfo" style="background:#FFF9C4; color:#856404; padding:10px; border-radius:10px; font-size:12px; margin-bottom:12px; border-left:4px solid #FFC107; display:none; line-height:1.5;"></div>
             
             <input type="hidden" id="cardIdInput"> 
-            <div class="input-group" style="margin-top:0;"><input type="number" id="amountInput" placeholder="$ 金額" inputmode="numeric" style="font-size:28px; text-align:center; border:none; border-bottom:2px solid #eee; border-radius:0;"></div>
+            
+            <div class="input-group" style="margin-top:0;">
+                <input type="number" id="amountInput" placeholder="$ 金額" inputmode="numeric" style="font-size:28px; text-align:center; border:none; border-bottom:2px solid #eee; border-radius:0;" 
+                       oninput="updateRewardPreview()" onkeyup="updateRewardPreview()" onpaste="updateRewardPreview()">
+            </div>
+            
+            <div id="pigRichOptions">
+                <div class="option-row">
+                    <label for="checkBonus10">⚡ 新戶加碼10% (上限8千)</label>
+                    <input type="checkbox" id="checkBonus10" checked onchange="updateRewardPreview()">
+                </div>
+                <div class="option-row">
+                    <label for="checkBonus25">🌟 精選通路2.5% (超商/百貨)</label>
+                    <input type="checkbox" id="checkBonus25" checked onchange="updateRewardPreview()">
+                </div>
+                <div class="option-row" style="margin-bottom:0; border-top:1px dashed #ddd; padding-top:6px;">
+                    <label for="checkIsBill">🧾 是APP繳費 (底1%→0.15%)</label>
+                    <input type="checkbox" id="checkIsBill" onchange="toggleBillLogic()">
+                </div>
+            </div>
+            
+            <div id="liveRewardCalc"></div>
+
             <div class="input-group"><input type="text" id="noteInput" placeholder="備註 (例如: 午餐)"></div>
-            <div class="btn-group"><button class="btn btn-cancel" onclick="closeModal()">取消</button><button class="btn btn-confirm" onclick="addTransaction()">確認</button></div>
+            <div class="btn-group">
+                <button class="btn btn-cancel" onclick="closeModal()">取消</button>
+                <button class="btn btn-confirm" onclick="addTransaction()">確認</button>
+            </div>
         </div>
     </div>
 
-    <div id="donateModal" class="modal">
+    <div id="donateModal" class="modal" onclick="if(event.target===this) document.getElementById('donateModal').style.display='none'">
         <div class="modal-content" style="text-align: center;">
             <h2 style="margin: 0 0 10px 0; font-size: 18px; font-weight: 800; color:#E30000;">支持持續開發</h2>
             <p style="font-size: 13px; color: #555; margin-bottom: 15px; line-height: 1.6;">
@@ -241,7 +291,6 @@
     </div>
 
 <script>
-    // 遠端更新跑馬燈邏輯
     fetch('config.json?t=' + Date.now())
         .then(response => response.json())
         .then(data => {
@@ -253,29 +302,83 @@
             document.getElementById('news-text').innerHTML = '🎉 歡迎使用刷卡回饋管家！系統將自動計算您的最佳刷卡組合。';
         });
 
-    // 【跑馬燈強力喚醒】強制瀏覽器重繪，解決冷啟動卡頓
     window.addEventListener('load', () => {
         setTimeout(() => {
             const ticker = document.querySelector('.ticker-content');
             if(ticker) {
                 ticker.style.animation = 'none';
-                void ticker.offsetWidth; // 觸發 Reflow
+                void ticker.offsetWidth; 
                 ticker.style.animation = 'scroll-left 15s linear infinite';
             }
         }, 100);
     });
 
+    // 【歷史記錄導航支援】
+    // 當按下手機「返回鍵」時，如果視窗開著，就關閉視窗，而不是離開網頁
+    window.addEventListener('popstate', function(event) {
+        document.getElementById('transactionModal').style.display = 'none';
+    });
+
     const cards = [
+        { 
+            id: 'c6', name: '台新街口豬富卡', note: '自選回饋 (最高13.5%)', rule: '', 
+            type: 'ceiling', limit: 8000, tier1Rate: 0.135, tier2Rate: 0.035, 
+            gradient: 'linear-gradient(135deg, #e60012 0%, #FFD700 100%)', 
+            textColor: 'white', msgDanger: '10%已滿 (變3.5%)',
+            parking: `
+                🐷 <b>新戶限定神卡 (加碼至 2026/12/31)</b><br>
+                <hr style="opacity:0.3; margin:8px 0;">
+                
+                <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
+                    <summary style="cursor:pointer; font-weight:700; color:#8B0000; font-size:12px;">▼ 點我看 2.5% 精選通路</summary>
+                    <div style="margin-top:6px; padding:8px; font-size:11px; line-height:1.6; color:#333; background:rgba(255,255,255,0.9); border-radius:6px;">
+                        🏬 <b>百貨：</b>新光三越、SOGO、微風、台北101、遠東百貨、漢神百貨...<br>
+                        🛒 <b>超市/量販：</b>全聯、家樂福、大潤發、愛買、美廉社...<br>
+                        🏪 <b>超商：</b>7-ELEVEN、全家便利商店...<br>
+                        🚕 <b>交通：</b>台灣大車隊、Uber、yoxi、大都會...<br>
+                        ☕ <b>餐飲：</b>星巴克、路易莎、麥當勞、肯德基、王品集團...<br>
+                    </div>
+                </details>
+
+                <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
+                    <summary style="cursor:pointer; font-weight:700; color:#8B0000; font-size:12px;">▼ 點我看 10% 適用範圍</summary>
+                    <div style="margin-top:6px; padding:8px; font-size:11px; line-height:1.6; color:#333; background:rgba(255,255,255,0.9); border-radius:6px;">
+                        📱 <b>行動支付：</b>街口支付 APP 內消費 (不含繳費/稅)<br>
+                        🌍 <b>海外消費：</b>國外實體商店、國外網站 (Amazon, Agoda...)<br>
+                        ✈️ <b>機票：</b>航空公司官網購票<br>
+                    </div>
+                </details>
+
+                <div style="margin-top:10px; font-size:11px; color:#5d4037;">
+                    🧾 <b>繳費 10.15%：</b>需勾選上方「是APP繳費」+「新戶加碼」。<br>
+                    ⚠️ 10%加碼上限800元(刷$8000)
+                </div>
+            `
+        },
         { 
             id: 'c1', name: '星展傳說對決', note: 'LinePay / 蝦皮 / UberEats', rule: '', 
             type: 'ceiling', limit: 11363, tier1Rate: 0.10, tier2Rate: 0.012, 
             gradient: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)', textColor: 'white', msgDanger: '已滿 (1.2%)' 
         },
         { 
-            id: 'c2', name: '聯邦綠卡', note: '國外2% / 國內1%', rule: '', 
-            type: 'floor', target: 12000, tier1Rate: 0.02, tier2Rate: 0.02, 
-            gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', textColor: 'white', msgSuccess: '已達標 (免停)',
-            parking: '🅿️ <b>免費停車：</b><br>台灣聯通、詮營、ViVi PARK、嘟嘟房、車麻吉<br>(需上月刷滿1.2萬)'
+            id: 'c5', name: '聯邦賴點卡', note: 'LinePay / 偶數日指定通路', rule: '⚠️ 單筆需滿$100', 
+            type: 'ceiling', limit: 3000, tier1Rate: 0.06, tier2Rate: 0.01, 
+            threshold: 100,
+            gradient: 'linear-gradient(135deg, #00B900 0%, #33CC33 100%)', textColor: 'white', msgDanger: '6% 已滿',
+            parking: `
+                ⚠️ <b>單筆需滿 $100</b> (回饋 6%)<br>
+                <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
+                    <summary style="cursor:pointer; font-weight:700; color:#856404; font-size:12px;">點我看完整店家名單 ▼</summary>
+                    <div style="margin-top:6px; padding-left:4px; font-size:11px; line-height:1.4; color:#555; max-height:120px; overflow-y:auto; border-radius:4px; background:rgba(255,255,255,0.5); padding:6px;">
+                        <div style="margin-bottom:4px;">🍽️ <b>餐廳：</b>王品 / 三商 / 輕井澤 / 漢來 / 饗賓 / 海底撈 / 築間 / 春水堂 / 壽司郎 / 爭鮮 / 八方雲集</div>
+                        <div style="margin-bottom:4px;">🍔 <b>速食：</b>麥當勞 / 肯德基 / 摩斯 / 漢堡王</div>
+                        <div style="margin-bottom:4px;">☕ <b>咖啡：</b>星巴克 / 路易莎 / cama / 50嵐 / 得正 / 麻古 / 可不可</div>
+                        <div style="margin-bottom:4px;">💄 <b>美妝：</b>屈臣氏 / 寶雅 / 唐吉訶德 / 大樹 / 杏一 / 丁丁 / 佑全 / 躍獅</div>
+                        <div style="margin-bottom:4px;">🏠 <b>家居：</b>IKEA / Hola / 小北 / 汪喵星球 / 東森 / 咕咕G / 魚中魚 / 寵物公園</div>
+                        <div style="margin-bottom:0px;">👟 <b>運動：</b>NIKE / Adidas / NewBalance / 迪卡儂 / 鞋全家福 / 摩曼頓</div>
+                    </div>
+                </details>
+            `
         },
         { 
             id: 'c3', name: '永豐 Sport', note: 'Apple Pay (5%)', rule: '', 
@@ -304,24 +407,10 @@
             `
         },
         { 
-            id: 'c5', name: '聯邦賴點卡', note: 'LinePay / 偶數日指定通路', rule: '⚠️ 單筆需滿$100', 
-            type: 'ceiling', limit: 3000, tier1Rate: 0.06, tier2Rate: 0.01, 
-            threshold: 100,
-            gradient: 'linear-gradient(135deg, #00B900 0%, #33CC33 100%)', textColor: 'white', msgDanger: '6% 已滿',
-            parking: `
-                ⚠️ <b>單筆需滿 $100</b> (回饋 6%)<br>
-                <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
-                    <summary style="cursor:pointer; font-weight:700; color:#856404; font-size:12px;">點我看完整店家名單 ▼</summary>
-                    <div style="margin-top:6px; padding-left:4px; font-size:11px; line-height:1.4; color:#555; max-height:120px; overflow-y:auto; border-radius:4px; background:rgba(255,255,255,0.5); padding:6px;">
-                        <div style="margin-bottom:4px;">🍽️ <b>餐廳：</b>王品 / 三商 / 輕井澤 / 漢來 / 饗賓 / 海底撈 / 築間 / 春水堂 / 壽司郎 / 爭鮮 / 八方雲集</div>
-                        <div style="margin-bottom:4px;">🍔 <b>速食：</b>麥當勞 / 肯德基 / 摩斯 / 漢堡王</div>
-                        <div style="margin-bottom:4px;">☕ <b>咖啡：</b>星巴克 / 路易莎 / cama / 50嵐 / 得正 / 麻古 / 可不可</div>
-                        <div style="margin-bottom:4px;">💄 <b>美妝：</b>屈臣氏 / 寶雅 / 唐吉訶德 / 大樹 / 杏一 / 丁丁 / 佑全 / 躍獅</div>
-                        <div style="margin-bottom:4px;">🏠 <b>家居：</b>IKEA / Hola / 小北 / 汪喵星球 / 東森 / 咕咕G / 魚中魚 / 寵物公園</div>
-                        <div style="margin-bottom:0px;">👟 <b>運動：</b>NIKE / Adidas / NewBalance / 迪卡儂 / 鞋全家福 / 摩曼頓</div>
-                    </div>
-                </details>
-            `
+            id: 'c2', name: '聯邦綠卡', note: '國外2% / 國內1%', rule: '', 
+            type: 'floor', target: 12000, tier1Rate: 0.02, tier2Rate: 0.02, 
+            gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', textColor: 'white', msgSuccess: '已達標 (免停)',
+            parking: '🅿️ <b>免費停車：</b><br>台灣聯通、詮營、ViVi PARK、嘟嘟房、車麻吉<br>(需上月刷滿1.2萬)'
         }
     ];
 
@@ -329,14 +418,16 @@
 
     function updateDate() { const now = new Date(); document.getElementById('dateDisplay').innerText = `${now.getMonth()+1}/${now.getDate()}`; }
 
-    function calculateStats(cardId) {
+    // --- 核心計算邏輯 (通用版) ---
+    function calculateStats(cardId, addedAmount = 0) {
         const card = cards.find(c => c.id === cardId);
         const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
         const relevantTx = transactions.filter(t => t.cardId === cardId && new Date(t.date) >= startDate);
-        const totalSpend = relevantTx.reduce((sum, t) => sum + parseFloat(t.amount), 0);
-        const threshold = card.threshold || 0; 
-        const validTx = relevantTx.filter(t => t.amount >= threshold);
-        const validSpend = validTx.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+        let totalSpend = relevantTx.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+        totalSpend += addedAmount;
+
+        const threshold = card.threshold || 0;
+        const validSpend = relevantTx.filter(t => t.amount >= threshold).reduce((sum, t) => sum + t.amount, 0) + (addedAmount >= threshold ? addedAmount : 0);
 
         let reward = 0, currentRate = 0;
         if (card.type === 'mixed') {
@@ -350,6 +441,73 @@
             reward = validSpend * card.tier1Rate; currentRate = card.tier1Rate; 
         }
         return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: (currentRate * 100).toFixed(1) };
+    }
+
+    // --- 豬富卡防呆互斥邏輯 ---
+    function toggleBillLogic() {
+        const isBill = document.getElementById('checkIsBill').checked;
+        if (isBill) {
+            document.getElementById('checkBonus25').checked = false;
+        }
+        updateRewardPreview();
+    }
+
+    // --- 即時回饋試算 ---
+    function updateRewardPreview() {
+        const inputVal = document.getElementById('amountInput').value;
+        const amount = parseFloat(inputVal);
+        const previewDiv = document.getElementById('liveRewardCalc');
+        const cardId = document.getElementById('cardIdInput').value;
+
+        if (!amount || amount <= 0) {
+            previewDiv.style.display = 'none'; // 沒金額時隱藏
+            previewDiv.innerHTML = '';
+            return;
+        }
+
+        previewDiv.style.display = 'block'; // 有金額時顯示
+
+        let thisTransactionReward = 0;
+        let effectiveRate = 0;
+
+        if (cardId === 'c6') {
+            const hasBonus10 = document.getElementById('checkBonus10').checked;
+            const hasBonus25 = document.getElementById('checkBonus25').checked;
+            const isBill = document.getElementById('checkIsBill').checked;
+            
+            // 1. 基底回饋 (繳費0.15%，一般1%)
+            let baseRate = isBill ? 0.0015 : 0.01;
+            let reward = amount * baseRate;
+
+            // 2. 精選通路 2.5%
+            if (hasBonus25) {
+                reward += amount * 0.025;
+            }
+
+            // 3. 加碼 10% (需檢查 8000 額度)
+            if (hasBonus10) {
+                const card = cards.find(c => c.id === 'c6');
+                const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
+                const currentMonthSpend = transactions
+                    .filter(t => t.cardId === 'c6' && new Date(t.date) >= startDate)
+                    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+                
+                const remainingQuota = Math.max(0, 8000 - currentMonthSpend);
+                const eligibleFor10 = Math.min(amount, remainingQuota);
+                reward += eligibleFor10 * 0.10;
+            }
+
+            thisTransactionReward = Math.round(reward);
+            effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(2);
+
+        } else {
+            const currentStats = calculateStats(cardId, 0);
+            const newStats = calculateStats(cardId, amount);
+            thisTransactionReward = newStats.reward - currentStats.reward;
+            effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(1);
+        }
+
+        previewDiv.innerHTML = `✨ 預計回饋：$${thisTransactionReward} (${effectiveRate}%)`;
     }
 
     function renderGrid() {
@@ -396,14 +554,44 @@
     }
 
     function openQuickAdd(cardId) {
-        const card = cards.find(c => c.id === cardId); document.getElementById('modalTitle').innerText = card.name; document.getElementById('modalSubtitle').innerText = card.note; document.getElementById('cardIdInput').value = cardId; 
+        const card = cards.find(c => c.id === cardId); 
+        document.getElementById('modalTitle').innerText = card.name; 
+        document.getElementById('modalSubtitle').innerText = card.note; 
+        document.getElementById('cardIdInput').value = cardId; 
+        
+        // Push history state to support back button closing
+        history.pushState({modalOpen: true}, "", "#modal");
+
+        const pigRichOptions = document.getElementById('pigRichOptions');
+        if (cardId === 'c6') {
+            pigRichOptions.style.display = 'block';
+            document.getElementById('checkBonus10').checked = true;
+            document.getElementById('checkBonus25').checked = true;
+            document.getElementById('checkIsBill').checked = false; // 預設不勾繳費
+        } else {
+            pigRichOptions.style.display = 'none';
+        }
+
+        document.getElementById('liveRewardCalc').style.display = 'none';
+        document.getElementById('liveRewardCalc').innerHTML = '';
+        
         const parkingInfoDiv = document.getElementById('modalParkingInfo');
         if (card.parking) { parkingInfoDiv.innerHTML = card.parking; parkingInfoDiv.style.display = 'block'; } else { parkingInfoDiv.style.display = 'none'; }
-        document.getElementById('transactionModal').style.display = 'flex'; document.getElementById('amountInput').value = ''; document.getElementById('noteInput').value = ''; setTimeout(() => document.getElementById('amountInput').focus(), 100);
+        document.getElementById('transactionModal').style.display = 'flex'; 
+        document.getElementById('amountInput').value = ''; 
+        document.getElementById('noteInput').value = ''; 
+        setTimeout(() => document.getElementById('amountInput').focus(), 100);
     }
-    function closeModal() { document.getElementById('transactionModal').style.display = 'none'; }
+
+    // Close Modal: Just go back in history
+    function closeModal() {
+        history.back();
+    }
+
     function addTransaction() {
-        const cardId = document.getElementById('cardIdInput').value, amount = document.getElementById('amountInput').value, note = document.getElementById('noteInput').value; if (!amount || amount <= 0) return alert('請輸入金額'); transactions.push({ id: Date.now(), cardId: cardId, amount: parseFloat(amount), note: note, date: new Date().toISOString() }); localStorage.setItem('transactions', JSON.stringify(transactions)); closeModal(); renderGrid();
+        const cardId = document.getElementById('cardIdInput').value, amount = document.getElementById('amountInput').value, note = document.getElementById('noteInput').value; if (!amount || amount <= 0) return alert('請輸入金額'); transactions.push({ id: Date.now(), cardId: cardId, amount: parseFloat(amount), note: note, date: new Date().toISOString() }); localStorage.setItem('transactions', JSON.stringify(transactions)); 
+        history.back(); // Close modal via history
+        renderGrid();
     }
     
     function renderHistory() {
@@ -462,18 +650,15 @@
 
     function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
     
-    // 【備份功能：極簡化單一檔案版】
     async function exportData() {
         const dataStr = JSON.stringify(transactions);
         const fileName = `backup_${new Date().toISOString().split('T')[0]}.json`;
         const file = new File([dataStr], fileName, { type: "application/json" });
         
-        // 1. 手機版優先：呼叫原生分享 (純檔案模式，無多餘文字)
         if (navigator.share && navigator.canShare({ files: [file] })) {
             try {
                 await navigator.share({
                     files: [file]
-                    // title 和 text 都不放，避免 iOS 產生第二個項目
                 });
                 return; 
             } catch (error) {
@@ -481,7 +666,6 @@
             }
         }
 
-        // 2. 電腦版/失敗備案：自動轉下載
         const blob = new Blob([dataStr], {type: "application/json"});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');

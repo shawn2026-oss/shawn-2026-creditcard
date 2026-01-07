@@ -27,17 +27,24 @@
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; 
             background-color: #E0E5EC; color: var(--text-primary); margin: 0; 
-            display: flex; justify-content: center; min-height: 100vh; 
+            /* 修正：恢復置中，讓它看起來像電腦上的手機模擬器 */
+            display: flex; justify-content: center; 
+            min-height: 100vh; 
             -webkit-font-smoothing: antialiased; 
             overscroll-behavior-y: none;
         }
         
         .app-container { 
-            width: 100%; max-width: 480px; background-color: var(--bg-color); 
-            min-height: 100vh; padding: 16px 12px; 
+            width: 100%; 
+            /* 修正：改回 480px，這才是手機 App 該有的樣子 */
+            max-width: 480px; 
+            background-color: var(--bg-color); 
+            min-height: 100vh; 
+            padding: 16px 12px; 
             padding-top: env(safe-area-inset-top, 20px); 
             padding-bottom: env(safe-area-inset-bottom, 20px); 
-            box-shadow: 0 0 40px rgba(0,0,0,0.05); display: flex; flex-direction: column; box-sizing: border-box; 
+            box-shadow: 0 0 40px rgba(0,0,0,0.05); 
+            display: flex; flex-direction: column; box-sizing: border-box; 
         }
         @media (max-width: 480px) { body { background-color: var(--bg-color); } .app-container { box-shadow: none; width: 100%; max-width: 100%; } }
         
@@ -63,7 +70,8 @@
         .ticker-content {
             display: inline-block;
             padding-left: 100%;
-            animation: scroll-left 12s linear infinite; 
+            /* 20秒慢速滾動 */
+            animation: scroll-left 20s linear infinite; 
         }
         @keyframes scroll-left {
             0% { transform: translateX(0); }
@@ -81,6 +89,7 @@
         .urgent-item { background: rgba(255,255,255,0.25); border-radius: 8px; padding: 6px 10px; margin-top: 6px; font-size: 12px; font-weight: 600; line-height: 1.3; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.01); } 100% { transform: scale(1); } }
 
+        /* 修正：拿掉剛剛的三欄設定，維持最原始的雙欄 */
         #card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
 
         .card-tile { border-radius: 16px; padding: 12px; min-height: 135px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; transition: transform 0.1s; cursor: pointer; color: white; overflow: hidden; }
@@ -229,7 +238,8 @@
         })
         .catch(error => {
             console.log('Config Load Error or Local Mode');
-            document.getElementById('news-text').innerHTML = '📢 歡迎使用刷卡回饋管家！(如需更新跑馬燈請檢查 config.json)';
+            // 修正：這裡改為友善的歡迎詞，不再顯示 config.json 錯誤
+            document.getElementById('news-text').innerHTML = '🎉 歡迎使用刷卡回饋管家！系統將自動計算您的最佳刷卡組合。';
         });
 
     const cards = [

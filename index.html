@@ -141,7 +141,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V39.0</div>
+            <div class="version-tag" id="top-version-tag">V39.1</div>
         </div>
 
         <div class="header-section">
@@ -220,7 +220,7 @@
     </div>
 
 <script>
-    // ✅ 恢復：讀取 config.json (遠端更新跑馬燈)
+    // 遠端更新跑馬燈邏輯 (維持不變)
     fetch('config.json?t=' + Date.now())
         .then(response => response.json())
         .then(data => {
@@ -228,7 +228,6 @@
             if(data.version) document.getElementById('top-version-tag').innerText = data.version;
         })
         .catch(error => {
-            // 如果讀取失敗 (例如離線或沒檔案)，顯示此預設文字
             console.log('Config Load Error or Local Mode');
             document.getElementById('news-text').innerHTML = '📢 歡迎使用刷卡回饋管家！(如需更新跑馬燈請檢查 config.json)';
         });
@@ -254,7 +253,7 @@
             id: 'c4', name: '將來將將', note: '行動支付 / 外送 / 網購', rule: '', 
             type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
             gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '加碼已滿',
-            // ✅ 已修正為您指定的超商內容
+            // ✅ 美化修正：將 (5) 替換為 🏪，其餘文字完全保留
             parking: `
                 💡 <b>需當月滿 $3,000</b> (回饋 4.5%)<br>
                 <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
@@ -262,7 +261,7 @@
                     <div style="margin-top:6px; padding-left:4px; font-size:11px; line-height:1.5; color:#555; max-height:200px; overflow-y:auto;">
                         📱 <b>行動支付：</b>LINE Pay、街口、icash Pay、橘子支付、悠遊付、Hami Pay、Pi錢包、TWQR<br>
                         🍽️ <b>外送餐飲：</b>Uber Eats、Foodpanda、國內餐廳、麥當勞<br>
-                        (5) 指定超商超市：7-ELEVEN 實體門市(icash pay、街口支付、橘子支付)、全家便利商店(街口支付)、家樂福<br>
+                        🏪 <b>指定超商超市：</b>7-ELEVEN 實體門市(icash pay、街口支付、橘子支付)、全家便利商店(街口支付)、家樂福<br>
                         🤖 <b>AI / 數位：</b>ChatGPT、Claude、Google Play、Apple服務<br>
                         🏠 <b>生活家居：</b>IKEA、特力屋、HOLA<br>
                         🚄 <b>交通：</b>高鐵 (含App)、一卡通自動加值<br>

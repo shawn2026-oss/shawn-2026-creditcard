@@ -434,12 +434,28 @@
 
     function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
     
-    // 【備份功能：極簡化，強制只做下載】
-    function exportData() {
+    // 【備份功能修正版】
+    async function exportData() {
         const dataStr = JSON.stringify(transactions);
         const fileName = `backup_${new Date().toISOString().split('T')[0]}.json`;
+        const file = new File([dataStr], fileName, { type: "application/json" });
         
-        // 直接建立下載連結並點擊
+        // 1. 手機版優先：呼叫原生分享 (可選儲存到檔案)
+        if (navigator.share && navigator.canShare({ files: [file] })) {
+            try {
+                await navigator.share({
+                    files: [file],
+                    title: '刷卡回饋管家備份',
+                    text: '請選擇「儲存到檔案」以備份至 iCloud'
+                });
+                return; // 分享成功或使用者取消，都結束，不執行下載
+            } catch (error) {
+                // 如果使用者手動取消，就不跳下載
+                if (error.name === 'AbortError') return;
+            }
+        }
+
+        // 2. 電腦版/失敗備案：如果環境不支援分享，就自動轉下載
         const blob = new Blob([dataStr], {type: "application/json"});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');

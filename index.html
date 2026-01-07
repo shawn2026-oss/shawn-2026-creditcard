@@ -47,7 +47,7 @@
         .subtitle { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
         .today-date { background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; color: #555; margin-left: 5px;}
         
-        /* 📢 跑馬燈樣式 */
+        /* 跑馬燈 */
         .news-ticker {
             background: #FFF9C4; color: #856404; 
             border-radius: 8px; margin-bottom: 12px; 
@@ -55,6 +55,7 @@
             overflow: hidden; white-space: nowrap; position: relative;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             display: flex; align-items: center;
+            min-height: 32px; /* 預留高度避免跳動 */
         }
         .ticker-content {
             display: inline-block;
@@ -145,7 +146,7 @@
         </div>
 
         <div class="news-ticker">
-            <div class="ticker-content">📢 目前最新版本：Ver 2026.01.07 (News Ticker)｜若下方版本號不符，請刪除主畫面捷徑，重新加入以獲得最新功能！</div>
+            <div class="ticker-content" id="news-text">Loading...</div>
         </div>
 
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
@@ -172,7 +173,7 @@
             <button class="btn-reset-visible" onclick="resetAllData()">🗑️ 重置所有資料</button>
         </div>
         
-        <div class="footer">Ver 2026.01.07 12:00 (News Ticker)</div>
+        <div class="footer" id="footer-version">Loading...</div>
     </div>
 
     <div id="transactionModal" class="modal">
@@ -214,6 +215,21 @@
     </div>
 
 <script>
+    // [遠端遙控核心] 讀取 config.json
+    // 使用 fetch 加上 timestamp 參數，強制瀏覽器抓最新資料，不讀快取
+    fetch('config.json?t=' + Date.now())
+        .then(response => response.json())
+        .then(data => {
+            if(data.news) document.getElementById('news-text').innerHTML = data.news;
+            if(data.version) document.getElementById('footer-version').innerText = data.version;
+        })
+        .catch(error => {
+            console.log('Config Load Error', error);
+            // 如果讀取失敗，顯示預設值
+            document.getElementById('news-text').innerText = '📢 歡迎使用刷卡回饋管家！';
+            document.getElementById('footer-version').innerText = 'Ver 2026.01.07 (Offline)';
+        });
+
     const cards = [
         { 
             id: 'c1', name: '星展傳說對決', note: 'LinePay / 蝦皮 / UberEats', rule: '', 

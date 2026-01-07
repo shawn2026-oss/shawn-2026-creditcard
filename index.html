@@ -84,7 +84,17 @@
         .btn-tool { flex: 1; padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 600; border: 1px solid #eee; background: white; color: #555; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
         .btn-donate { background: linear-gradient(135deg, #E30000, #FF5050); color: #fff; border: none; box-shadow: 0 4px 10px rgba(227, 0, 0, 0.3); font-size: 14px; }
         .btn-reset-visible { width: 100%; padding: 12px; background-color: #fff5f5; border: 1px solid #ffdede; color: #FF3B30; border-radius: 12px; font-weight: 600; font-size: 12px; cursor: pointer; margin-top: 10px;}
-        .footer { text-align: center; font-size: 10px; color: #ccc; margin-top: 20px; margin-bottom: 10px; font-weight: 500; }
+        
+        /* 🎨 修改：頁尾樣式增強 */
+        .footer { 
+            text-align: center; 
+            font-size: 12px; /* 字體放大 */
+            color: #555; /* 顏色加深 */
+            font-weight: 600; /* 字體加粗 */
+            margin-top: 20px; 
+            margin-bottom: 20px; 
+            opacity: 0.8;
+        }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 1000; align-items: center; justify-content: center; }
         .modal-content { 
@@ -135,7 +145,8 @@
             <button class="btn-tool btn-donate" onclick="showDonateModal()">☕ 贊助開發者 (支持更新)</button>
             <button class="btn-reset-visible" onclick="resetAllData()">🗑️ 重置所有資料</button>
         </div>
-        <div class="footer">Ver 2026.01.07 11:00 (Official Release)</div>
+        
+        <div class="footer">Ver 2026.01.07 (Official Release)</div>
     </div>
 
     <div id="transactionModal" class="modal">

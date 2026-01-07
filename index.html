@@ -434,24 +434,25 @@
 
     function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
     
-    // 【備份功能修正版】
+    // 【備份功能修正：自動判斷環境】
     async function exportData() {
         const dataStr = JSON.stringify(transactions);
         const fileName = `backup_${new Date().toISOString().split('T')[0]}.json`;
         const file = new File([dataStr], fileName, { type: "application/json" });
         
-        // 1. 手機版優先：呼叫原生分享 (可選儲存到檔案)
+        // 1. 手機版優先：呼叫原生分享 (可選儲存到檔案/iCloud)
+        // 修正：這裡移除 "text" 參數，避免 iOS 顯示「2個項目」
         if (navigator.share && navigator.canShare({ files: [file] })) {
             try {
                 await navigator.share({
                     files: [file],
-                    title: '刷卡回饋管家備份',
-                    text: '請選擇「儲存到檔案」以備份至 iCloud'
+                    title: '刷卡回饋管家備份'
                 });
                 return; // 分享成功或使用者取消，都結束，不執行下載
             } catch (error) {
                 // 如果使用者手動取消，就不跳下載
                 if (error.name === 'AbortError') return;
+                // 其他錯誤繼續往下執行下載
             }
         }
 

@@ -50,7 +50,7 @@
         .subtitle { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
         .today-date { background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; color: #555; margin-left: 5px;}
         
-        /* 跑馬燈樣式 (Keyframes動畫) */
+        /* 跑馬燈樣式 */
         .news-ticker {
             background: #FFF9C4; color: #856404; 
             border-radius: 8px; margin-bottom: 12px; 
@@ -141,7 +141,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag">V38.1 (Fix)</div>
+            <div class="version-tag">V38.2 (Final)</div>
         </div>
 
         <div class="header-section">
@@ -150,9 +150,7 @@
         </div>
 
         <div class="news-ticker">
-            <div class="ticker-content" id="news-text">
-                📢 系統公告：星展卡10%回饋已更新！ | 將將卡通路更新 | 備份功能已優化，請點擊使用系統分享選單存檔。
-            </div>
+            <div class="ticker-content" id="news-text">Loading...</div>
         </div>
 
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
@@ -222,6 +220,22 @@
     </div>
 
 <script>
+    // 🔥 【在此處修改跑馬燈文字】 🔥
+    // 請在引號內填入您想要的文字，手機版也能顯示！
+    const CUSTOM_MARQUEE_TEXT = "📢 系統公告：請在這裡輸入您想要的跑馬燈文字，手機版也能正確顯示！";
+
+    // --- 以下程式碼請勿更動 ---
+    
+    // 優先使用自訂文字，如果 config.json 讀不到就用這裡的
+    document.getElementById('news-text').innerHTML = CUSTOM_MARQUEE_TEXT;
+
+    // 嘗試讀取 config.json (僅電腦/伺服器有效)，失敗則忽略
+    fetch('config.json?t=' + Date.now())
+        .then(response => response.json())
+        .then(data => {
+            if(data.news) document.getElementById('news-text').innerHTML = data.news;
+        }).catch(e => { /* 忽略錯誤，維持上方設定的自訂文字 */ });
+
     const cards = [
         { 
             id: 'c1', name: '星展傳說對決', note: 'LinePay / 蝦皮 / UberEats', rule: '', 
@@ -243,6 +257,7 @@
             id: 'c4', name: '將來將將', note: '行動支付 / 外送 / 網購', rule: '', 
             type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
             gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '加碼已滿',
+            // ✅ 已修正為您指定的超商內容
             parking: `
                 💡 <b>需當月滿 $3,000</b> (回饋 4.5%)<br>
                 <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
@@ -419,12 +434,11 @@
 
     function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
     
-    // 【手機備份功能：使用原生 Share】
+    // 【手機備份功能：修復「取消」時跳出怪訊息的問題】
     async function exportData() {
         const dataStr = JSON.stringify(transactions);
         const fileName = `backup_${new Date().toISOString().split('T')[0]}.json`;
         
-        // 1. 嘗試使用手機原生分享選單 (Share Sheet)
         try {
             const file = new File([dataStr], fileName, { type: "application/json" });
             
@@ -434,13 +448,15 @@
                     title: '刷卡回饋管家備份',
                     text: '這是您的消費紀錄備份檔'
                 });
-                return; // 分享成功就結束
+                return; // 分享成功，正常結束
             }
         } catch (error) {
-            console.log("分享失敗或取消，改用傳統下載", error);
+            // ✅ 修正點：如果使用者是按「取消/關閉」，不執行任何動作
+            if (error.name === 'AbortError') return; 
+            console.log("分享失敗", error);
         }
 
-        // 2. 電腦版/不支援分享時的替代方案 (傳統下載)
+        // 僅在不支援 Share API 時才執行傳統下載
         const blob = new Blob([dataStr], {type: "application/json"});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');

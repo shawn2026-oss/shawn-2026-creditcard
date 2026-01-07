@@ -41,7 +41,6 @@
         }
         @media (max-width: 480px) { body { background-color: var(--bg-color); } .app-container { box-shadow: none; width: 100%; max-width: 100%; } }
         
-        /* 頂部資訊列調整 */
         .header-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
         .author-top { font-size: 12px; font-weight: 800; color: #007AFF; letter-spacing: 0.5px; }
         .version-tag { font-size: 10px; color: #888; font-weight: 600; background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; }
@@ -51,7 +50,7 @@
         .subtitle { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
         .today-date { background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; color: #555; margin-left: 5px;}
         
-        /* 跑馬燈修復版 */
+        /* 跑馬燈樣式 (Keyframes動畫) */
         .news-ticker {
             background: #FFF9C4; color: #856404; 
             border-radius: 8px; margin-bottom: 12px; 
@@ -63,14 +62,12 @@
         }
         .ticker-content {
             display: inline-block;
-            padding-left: 100%; /* 從容器最右側開始 */
-            /* 修改速度為 10s (原本15s太慢)，linear 確保等速 */
-            animation: scroll-left 10s linear infinite;
+            padding-left: 100%;
+            animation: scroll-left 12s linear infinite; 
         }
-        /* 確保文字從最右移到最左 */
         @keyframes scroll-left {
-            0% { transform: translate3d(0, 0, 0); }
-            100% { transform: translate3d(-100%, 0, 0); }
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
         }
 
         .total-reward-card { background: #2c3e50; color: white; border-radius: 16px; padding: 14px 20px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(44, 62, 80, 0.2); }
@@ -144,7 +141,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">Loading...</div>
+            <div class="version-tag">V38.1 (Fix)</div>
         </div>
 
         <div class="header-section">
@@ -153,7 +150,9 @@
         </div>
 
         <div class="news-ticker">
-            <div class="ticker-content" id="news-text">Loading...</div>
+            <div class="ticker-content" id="news-text">
+                📢 系統公告：星展卡10%回饋已更新！ | 將將卡通路更新 | 備份功能已優化，請點擊使用系統分享選單存檔。
+            </div>
         </div>
 
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
@@ -223,20 +222,6 @@
     </div>
 
 <script>
-    // [遠端遙控核心] 讀取 config.json
-    fetch('config.json?t=' + Date.now())
-        .then(response => response.json())
-        .then(data => {
-            if(data.news) document.getElementById('news-text').innerHTML = data.news;
-            // 💡 修改：將版本號顯示在左上角
-            if(data.version) document.getElementById('top-version-tag').innerText = data.version;
-        })
-        .catch(error => {
-            console.log('Config Load Error', error);
-            document.getElementById('news-text').innerText = '📢 歡迎使用刷卡回饋管家！';
-            document.getElementById('top-version-tag').innerText = 'V37.0 (Local)';
-        });
-
     const cards = [
         { 
             id: 'c1', name: '星展傳說對決', note: 'LinePay / 蝦皮 / UberEats', rule: '', 
@@ -258,7 +243,6 @@
             id: 'c4', name: '將來將將', note: '行動支付 / 外送 / 網購', rule: '', 
             type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
             gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '加碼已滿',
-            // 📝 新增：依據截圖補完將將卡完整通路
             parking: `
                 💡 <b>需當月滿 $3,000</b> (回饋 4.5%)<br>
                 <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
@@ -266,7 +250,7 @@
                     <div style="margin-top:6px; padding-left:4px; font-size:11px; line-height:1.5; color:#555; max-height:200px; overflow-y:auto;">
                         📱 <b>行動支付：</b>LINE Pay、街口、icash Pay、橘子支付、悠遊付、Hami Pay、Pi錢包、TWQR<br>
                         🍽️ <b>外送餐飲：</b>Uber Eats、Foodpanda、國內餐廳、麥當勞<br>
-                        🏪 <b>超商超市：</b>7-11、全家 (限指定支付)、家樂福<br>
+                        (5) 指定超商超市：7-ELEVEN 實體門市(icash pay、街口支付、橘子支付)、全家便利商店(街口支付)、家樂福<br>
                         🤖 <b>AI / 數位：</b>ChatGPT、Claude、Google Play、Apple服務<br>
                         🏠 <b>生活家居：</b>IKEA、特力屋、HOLA<br>
                         🚄 <b>交通：</b>高鐵 (含App)、一卡通自動加值<br>
@@ -435,14 +419,33 @@
 
     function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
     
-    function exportData() {
+    // 【手機備份功能：使用原生 Share】
+    async function exportData() {
         const dataStr = JSON.stringify(transactions);
+        const fileName = `backup_${new Date().toISOString().split('T')[0]}.json`;
+        
+        // 1. 嘗試使用手機原生分享選單 (Share Sheet)
+        try {
+            const file = new File([dataStr], fileName, { type: "application/json" });
+            
+            if (navigator.share && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    files: [file],
+                    title: '刷卡回饋管家備份',
+                    text: '這是您的消費紀錄備份檔'
+                });
+                return; // 分享成功就結束
+            }
+        } catch (error) {
+            console.log("分享失敗或取消，改用傳統下載", error);
+        }
+
+        // 2. 電腦版/不支援分享時的替代方案 (傳統下載)
         const blob = new Blob([dataStr], {type: "application/json"});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        const date = new Date().toISOString().split('T')[0];
-        a.download = `backup_${date}.json`;
+        a.download = fileName;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -462,7 +465,7 @@
                     transactions = json;
                     localStorage.setItem('transactions', JSON.stringify(transactions));
                     alert('✅ 備份還原成功！(頁面將自動重整)');
-                    location.reload(); // 讓頁面重整以確保讀取最新資料
+                    location.reload(); 
                 } else { alert('❌ 檔案內容格式錯誤'); }
             } catch (err) { alert('❌ 無法讀取檔案，請確認是否為正確的備份檔'); }
         };

@@ -55,28 +55,41 @@
         .subtitle { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
         .today-date { background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; color: #555; margin-left: 5px;}
         
-        /* 跑馬燈樣式 (修正版) */
+        /* --- 跑馬燈強力優化版 --- */
         .news-ticker {
             background: #FFF9C4; color: #856404; 
             border-radius: 8px; margin-bottom: 12px; 
-            /* 這裡拿掉 flex，改用 height + line-height 垂直置中，避免切字 */
             height: 36px;
-            line-height: 36px;
-            padding: 0 10px; 
-            font-size: 12px; font-weight: 600;
-            overflow: hidden; white-space: nowrap; position: relative;
+            display: block;
+            overflow: hidden; 
+            white-space: nowrap; 
+            position: relative;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            width: 100%;
+            /* 硬體加速層 */
+            transform: translate3d(0,0,0);
         }
+        
         .ticker-content {
             display: inline-block;
-            padding-left: 100%;
-            /* 速度調快回 12s */
-            animation: scroll-left 12s linear infinite; 
+            height: 36px;
+            line-height: 36px;
+            padding-left: 100%; /* 從螢幕最右邊外開始 */
+            min-width: 100%;
+            box-sizing: content-box;
+            /* 15秒適中速度 */
+            animation: scroll-left 15s linear infinite;
+            /* 關鍵：告訴瀏覽器這個元件會變動，請用 GPU 渲染 */
+            will-change: transform;
+            /* 預設啟用 3D 加速 */
+            transform: translate3d(0, 0, 0);
         }
+
         @keyframes scroll-left {
             0% { transform: translate3d(0, 0, 0); }
             100% { transform: translate3d(-100%, 0, 0); }
         }
+        /* ------------------------ */
 
         .total-reward-card { background: #2c3e50; color: white; border-radius: 16px; padding: 14px 20px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(44, 62, 80, 0.2); }
         .total-reward-card::after { content: ''; position: absolute; top: -50%; right: -50%; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%; pointer-events: none; }
@@ -239,6 +252,18 @@
             console.log('Config Load Error or Local Mode');
             document.getElementById('news-text').innerHTML = '🎉 歡迎使用刷卡回饋管家！系統將自動計算您的最佳刷卡組合。';
         });
+
+    // 【跑馬燈強力喚醒】強制瀏覽器重繪，解決冷啟動卡頓
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            const ticker = document.querySelector('.ticker-content');
+            if(ticker) {
+                ticker.style.animation = 'none';
+                void ticker.offsetWidth; // 觸發 Reflow
+                ticker.style.animation = 'scroll-left 15s linear infinite';
+            }
+        }, 100);
+    });
 
     const cards = [
         { 
@@ -437,20 +462,20 @@
 
     function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
     
-    // 【備份功能修正：去除所有文字，只保留檔案】
+    // 【備份功能：極簡化單一檔案版】
     async function exportData() {
         const dataStr = JSON.stringify(transactions);
         const fileName = `backup_${new Date().toISOString().split('T')[0]}.json`;
         const file = new File([dataStr], fileName, { type: "application/json" });
         
-        // 1. 手機版優先：呼叫原生分享 (純檔案模式)
-        // 修正：完全拿掉 title 和 text，只傳 files
+        // 1. 手機版優先：呼叫原生分享 (純檔案模式，無多餘文字)
         if (navigator.share && navigator.canShare({ files: [file] })) {
             try {
                 await navigator.share({
                     files: [file]
+                    // title 和 text 都不放，避免 iOS 產生第二個項目
                 });
-                return; // 分享成功或取消，結束
+                return; 
             } catch (error) {
                 if (error.name === 'AbortError') return;
             }

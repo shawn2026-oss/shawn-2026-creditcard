@@ -434,29 +434,26 @@
 
     function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
     
-    // 【備份功能修正：自動判斷環境】
+    // 【備份功能修正：去除所有文字，只保留檔案】
     async function exportData() {
         const dataStr = JSON.stringify(transactions);
         const fileName = `backup_${new Date().toISOString().split('T')[0]}.json`;
         const file = new File([dataStr], fileName, { type: "application/json" });
         
-        // 1. 手機版優先：呼叫原生分享 (可選儲存到檔案/iCloud)
-        // 修正：這裡移除 "text" 參數，避免 iOS 顯示「2個項目」
+        // 1. 手機版優先：呼叫原生分享 (純檔案模式)
+        // 修正：完全拿掉 title 和 text，只傳 files
         if (navigator.share && navigator.canShare({ files: [file] })) {
             try {
                 await navigator.share({
-                    files: [file],
-                    title: '刷卡回饋管家備份'
+                    files: [file]
                 });
-                return; // 分享成功或使用者取消，都結束，不執行下載
+                return; // 分享成功或取消，結束
             } catch (error) {
-                // 如果使用者手動取消，就不跳下載
                 if (error.name === 'AbortError') return;
-                // 其他錯誤繼續往下執行下載
             }
         }
 
-        // 2. 電腦版/失敗備案：如果環境不支援分享，就自動轉下載
+        // 2. 電腦版/失敗備案：自動轉下載
         const blob = new Blob([dataStr], {type: "application/json"});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');

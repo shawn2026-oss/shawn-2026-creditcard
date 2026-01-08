@@ -117,6 +117,20 @@
 
         .tile-header { display: flex; justify-content: space-between; align-items: flex-start; z-index: 2; margin-bottom: 2px;}
         .tile-name { font-size: 14px; font-weight: 700; line-height: 1.2; text-shadow: 0 1px 2px rgba(0,0,0,0.15); }
+        
+        /* 外號標籤樣式 */
+        .tile-nickname {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 800;
+            background: rgba(0,0,0,0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            color: #FFD700; /* 金色字體 */
+            text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+        }
+
         .tile-note { font-size: 10px; font-weight: 500; opacity: 0.9; margin-bottom: 4px; display: block; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2; letter-spacing: -0.2px; }
         .tile-rule { font-size: 10px; font-weight: 700; background: rgba(0,0,0,0.25); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 6px; color: #FFD700; z-index: 2; }
         .rate-badge { background: rgba(255,255,255,0.3); font-size: 10px; font-weight: 800; padding: 2px 5px; border-radius: 5px; white-space: nowrap; backdrop-filter: blur(4px); margin-left: 2px; flex-shrink: 0; }
@@ -150,6 +164,7 @@
         .btn-tool { flex: 1; padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 600; border: 1px solid #eee; background: white; color: #555; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
         .btn-donate { background: linear-gradient(135deg, #E30000, #FF5050); color: #fff; border: none; box-shadow: 0 4px 10px rgba(227, 0, 0, 0.3); font-size: 14px; }
         .btn-reset-visible { width: 100%; padding: 12px; background-color: #fff5f5; border: 1px solid #ffdede; color: #FF3B30; border-radius: 12px; font-weight: 600; font-size: 12px; cursor: pointer; margin-top: 10px;}
+        .btn-manage { background: #E0E5EC; border: 1px solid #ccc; color: #333; }
         
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 1000; align-items: center; justify-content: center; }
         .modal-content { 
@@ -200,7 +215,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V48.0</div>
+            <div class="version-tag" id="top-version-tag">V54.0</div>
         </div>
 
         <div class="header-section">
@@ -227,6 +242,8 @@
         </div>
         
         <div class="settings-area">
+            <button class="btn-tool btn-manage" onclick="openCardManager()">⚙️ 管理我的卡片 (自選最多6張)</button>
+            
             <div class="settings-row">
                 <button class="btn-tool" onclick="exportData()">💾 備份檔案</button>
                 <button class="btn-tool" onclick="triggerImport()">📥 讀檔還原</button>
@@ -237,6 +254,18 @@
         </div>
         
         <div style="height:20px;"></div> </div>
+
+    <div id="cardSelectionModal" class="modal" onclick="if(event.target===this) closeModal()">
+        <div class="modal-content" style="max-height: 80vh; overflow: hidden;">
+            <h2 style="margin: 0 0 10px 0; font-size: 18px; font-weight: 800; color:#333; text-align: center;">選擇顯示卡片</h2>
+            <div id="selectionCount" style="display:none">已選擇: 0/6</div>
+            <div id="cardListContainer" style="overflow-y: auto; flex: 1; border: 1px solid #eee; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 20px;">
+                </div>
+            <div class="btn-group">
+                <button class="btn btn-cancel" style="width:100%" onclick="closeModal()">關閉</button>
+            </div>
+        </div>
+    </div>
 
     <div id="transactionModal" class="modal" onclick="if(event.target===this) closeModal()">
         <div class="modal-content">
@@ -328,13 +357,15 @@
 
     // 【歷史記錄導航支援】
     window.addEventListener('popstate', function(event) {
-        document.getElementById('transactionModal').style.display = 'none';
+        // 關閉所有 Modal
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(m => m.style.display = 'none');
     });
 
-    // 【拖曳排序邏輯】
+    // 【核心資料庫 & 稱號】
     const defaultCards = [
         { 
-            id: 'c6', name: '台新街口豬富卡', note: '自選回饋 (最高13.5%)', rule: '', 
+            id: 'c6', name: '台新街口豬富卡', nickname: '🐷 行支/繳費神卡', note: '自選回饋 (最高13.5%)', rule: '', 
             type: 'ceiling', limit: 8000, tier1Rate: 0.135, tier2Rate: 0.035, 
             gradient: 'linear-gradient(135deg, #e60012 0%, #FFD700 100%)', 
             textColor: 'white', msgDanger: '10%已滿 (變3.5%)',
@@ -363,18 +394,18 @@
                 </details>
 
                 <div style="margin-top:10px; font-size:11px; color:#5d4037;">
-                    🧾 <b>繳費攻略：</b>需勾選上方「是APP繳費」+「新戶加碼」。<br>
+                    🧾 <b>繳費 10.15%：</b>需勾選上方「是APP繳費」+「新戶加碼」。<br>
                     ⚠️ 10%加碼上限800元(刷$8000)
                 </div>
             `
         },
         { 
-            id: 'c1', name: '星展傳說對決', note: 'LinePay / 蝦皮 / UberEats', rule: '', 
+            id: 'c1', name: '星展傳說對決', nickname: 'linepay神卡', note: 'LinePay / 蝦皮 / UberEats', rule: '', 
             type: 'ceiling', limit: 11363, tier1Rate: 0.10, tier2Rate: 0.012, 
             gradient: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)', textColor: 'white', msgDanger: '已滿 (1.2%)' 
         },
         { 
-            id: 'c5', name: '聯邦賴點卡', note: 'LinePay / 偶數日指定通路', rule: '⚠️ 單筆需滿$100', 
+            id: 'c5', name: '聯邦賴點卡', nickname: 'line pay優等生', note: 'LinePay / 偶數日指定通路', rule: '⚠️ 單筆需滿$100', 
             type: 'ceiling', limit: 3000, tier1Rate: 0.06, tier2Rate: 0.01, 
             threshold: 100,
             gradient: 'linear-gradient(135deg, #00B900 0%, #33CC33 100%)', textColor: 'white', msgDanger: '6% 已滿',
@@ -394,12 +425,12 @@
             `
         },
         { 
-            id: 'c3', name: '永豐 Sport', note: 'Apple Pay (5%)', rule: '', 
+            id: 'c3', name: '永豐 Sport', nickname: 'apple pay優等生', note: 'Apple Pay (5%)', rule: '', 
             type: 'ceiling', limit: 5000, tier1Rate: 0.05, tier2Rate: 0.02, 
             gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '5% 已滿' 
         },
         { 
-            id: 'c4', name: '將來將將', note: '行動支付 / 外送 / 網購', rule: '', 
+            id: 'c4', name: '將來將將', nickname: '行支泛用', note: '行動支付 / 外送 / 網購', rule: '', 
             type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
             gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '加碼已滿',
             parking: `
@@ -420,7 +451,7 @@
             `
         },
         { 
-            id: 'c2', name: '聯邦綠卡', note: '國外2% / 國內1%', rule: '', 
+            id: 'c2', name: '聯邦綠卡', nickname: '🅿️ 市區停車免費', note: '國外2% / 國內1%', rule: '', 
             type: 'floor', target: 12000, tier1Rate: 0.02, tier2Rate: 0.02, 
             gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', textColor: 'white', msgSuccess: '已達標 (免停)',
             parking: '🅿️ <b>免費停車：</b><br>台灣聯通、詮營、ViVi PARK、嘟嘟房、車麻吉<br>(需上月刷滿1.2萬)'
@@ -462,7 +493,7 @@
 
     function updateDate() { const now = new Date(); document.getElementById('dateDisplay').innerText = `${now.getMonth()+1}/${now.getDate()}`; }
 
-    // --- 核心計算邏輯 ---
+    // --- 核心計算邏輯 (通用版) ---
     function calculateStats(cardId, addedAmount = 0) {
         const card = cards.find(c => c.id === cardId);
         const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
@@ -487,7 +518,7 @@
         return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: (currentRate * 100).toFixed(1) };
     }
 
-    // --- 豬富卡防呆 ---
+    // --- 豬富卡防呆互斥邏輯 ---
     function toggleBillLogic() {
         const isBill = document.getElementById('checkIsBill').checked;
         if (isBill) {
@@ -527,7 +558,6 @@
             }
 
             if (hasBonus10) {
-                const card = cards.find(c => c.id === 'c6');
                 const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
                 const currentMonthSpend = transactions
                     .filter(t => t.cardId === 'c6' && new Date(t.date) >= startDate)
@@ -581,8 +611,12 @@
             tile.style.color = card.textColor; 
             tile.onclick = () => openQuickAdd(card.id);
             
+            // 新增 nickname 顯示
+            let nicknameHtml = card.nickname ? `<div class="tile-nickname">${card.nickname}</div>` : '';
+
             tile.innerHTML = `
                 <div class="tile-header"><span class="tile-name">${card.name}</span><span class="rate-badge" style="color:black">${stats.rate}%</span></div>
+                ${nicknameHtml}
                 <span class="tile-note" style="color:${card.textColor==='white'?'rgba(255,255,255,0.8)':'rgba(0,0,0,0.6)'}">${card.note}</span>
                 <div class="tile-body">
                     <div class="tile-stat">$${stats.spend.toLocaleString()}</div>
@@ -696,6 +730,29 @@
 
     function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
     
+    // --- 卡片管理功能 (許願池版) ---
+    function openCardManager() {
+        const modal = document.getElementById('cardSelectionModal');
+        const container = document.getElementById('cardListContainer');
+        container.innerHTML = '';
+        
+        // 故意不放入任何卡片選項，直接顯示許願文字
+        const feedbackDiv = document.createElement('div');
+        feedbackDiv.style.cssText = "padding: 20px; text-align: center; color: #555; font-size: 14px; line-height: 1.6;";
+        feedbackDiv.innerHTML = "💡 <b>你還想要新增什麼卡呢？</b><br>請留言告訴我們，我們會盡快加入！<br><br><span style='font-size:12px; color:#999'>(目前僅開放內建 6 張精選神卡)</span>";
+        container.appendChild(feedbackDiv);
+        
+        document.getElementById('selectionCount').style.display = 'none'; // 隱藏計數器
+        
+        history.pushState({modalOpen: true}, "", "#manage");
+        modal.style.display = 'flex';
+    }
+
+    // 假的儲存函數 (因為沒有選項可存，其實只要關閉即可)
+    function saveCardSelection() {
+        history.back();
+    }
+    
     async function exportData() {
         const dataStr = JSON.stringify(transactions);
         
@@ -751,6 +808,7 @@
     }
 
     function showDonateModal() {
+        history.pushState({modalOpen: true}, "", "#donate");
         document.getElementById('donateModal').style.display = 'flex';
     }
 

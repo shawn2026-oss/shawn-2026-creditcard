@@ -209,13 +209,23 @@
             margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #555;
         }
         .option-row input[type="checkbox"] { width: 20px; height: 20px; margin: 0; }
+
+        /* 卡片管理清單樣式 */
+        .card-select-item {
+            display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #f0f0f0;
+        }
+        .card-select-item:last-child { border-bottom: none; }
+        .card-select-info { flex: 1; margin-left: 10px; }
+        .cs-name { font-size: 14px; font-weight: 700; color: #333; }
+        .cs-desc { font-size: 11px; color: #888; }
+        #selectionCount { font-size: 12px; color: #007AFF; font-weight: 700; margin-bottom: 10px; text-align: center; }
     </style>
 </head>
 <body>
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V54.0</div>
+            <div class="version-tag" id="top-version-tag">V55.0</div>
         </div>
 
         <div class="header-section">
@@ -230,7 +240,7 @@
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
         
         <div class="total-reward-card">
-            <span class="total-reward-label">本月預估</span>
+            <span class="total-reward-label">本月總回饋預估</span>
             <span class="total-reward-amount" id="totalRewardDisplay">$0</span>
         </div>
         
@@ -400,12 +410,12 @@
             `
         },
         { 
-            id: 'c1', name: '星展傳說對決', nickname: 'linepay神卡', note: 'LinePay / 蝦皮 / UberEats', rule: '', 
+            id: 'c1', name: '星展傳說對決', nickname: '⚔️ linepay神卡', note: 'LinePay / 蝦皮 / UberEats', rule: '', 
             type: 'ceiling', limit: 11363, tier1Rate: 0.10, tier2Rate: 0.012, 
             gradient: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)', textColor: 'white', msgDanger: '已滿 (1.2%)' 
         },
         { 
-            id: 'c5', name: '聯邦賴點卡', nickname: 'line pay優等生', note: 'LinePay / 偶數日指定通路', rule: '⚠️ 單筆需滿$100', 
+            id: 'c5', name: '聯邦賴點卡', nickname: '🟢 line pay優等生', note: 'LinePay / 偶數日指定通路', rule: '⚠️ 單筆需滿$100', 
             type: 'ceiling', limit: 3000, tier1Rate: 0.06, tier2Rate: 0.01, 
             threshold: 100,
             gradient: 'linear-gradient(135deg, #00B900 0%, #33CC33 100%)', textColor: 'white', msgDanger: '6% 已滿',
@@ -425,12 +435,12 @@
             `
         },
         { 
-            id: 'c3', name: '永豐 Sport', nickname: 'apple pay優等生', note: 'Apple Pay (5%)', rule: '', 
+            id: 'c3', name: '永豐 Sport', nickname: '🍎 apple pay優等生', note: 'Apple Pay (5%)', rule: '', 
             type: 'ceiling', limit: 5000, tier1Rate: 0.05, tier2Rate: 0.02, 
             gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '5% 已滿' 
         },
         { 
-            id: 'c4', name: '將來將將', nickname: '行支泛用', note: '行動支付 / 外送 / 網購', rule: '', 
+            id: 'c4', name: '將來將將', nickname: '🟡 行支泛用', note: '行動支付 / 外送 / 網購', rule: '', 
             type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
             gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '加碼已滿',
             parking: `

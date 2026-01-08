@@ -109,6 +109,7 @@
             transition: transform 0.1s; cursor: pointer; color: white; overflow: hidden; 
             user-select: none;
             -webkit-user-select: none;
+            touch-action: pan-y; /* 關鍵修正：允許垂直滑動，解決卡頓 */
         }
         .card-tile:active { transform: scale(0.97); }
         
@@ -219,13 +220,16 @@
         .cs-name { font-size: 14px; font-weight: 700; color: #333; }
         .cs-desc { font-size: 11px; color: #888; }
         #selectionCount { font-size: 12px; color: #007AFF; font-weight: 700; margin-bottom: 10px; text-align: center; }
+        
+        /* 拖曳提示 */
+        .drag-hint { font-size: 10px; color: #999; font-weight: 400; margin-left: 4px; }
     </style>
 </head>
 <body>
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V55.0</div>
+            <div class="version-tag" id="top-version-tag">V58.0</div>
         </div>
 
         <div class="header-section">
@@ -244,6 +248,10 @@
             <span class="total-reward-amount" id="totalRewardDisplay">$0</span>
         </div>
         
+        <div style="font-size: 11px; color: #888; margin-bottom: 6px; padding-left: 4px;">
+            (長按卡片 0.5 秒即可拖曳排序)
+        </div>
+
         <div id="card-grid"></div>
 
         <div class="history-section">
@@ -372,10 +380,13 @@
         modals.forEach(m => m.style.display = 'none');
     });
 
-    // 【核心資料庫 & 稱號】
+    // 【拖曳排序邏輯】
+    let sortableInstance = null;
+
+    // 【核心資料庫 & 稱號 (V58 修復: 移除不必要圖示)】
     const defaultCards = [
         { 
-            id: 'c6', name: '台新街口豬富卡', nickname: '🐷 行支/繳費神卡', note: '自選回饋 (最高13.5%)', rule: '', 
+            id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', note: '自選回饋 (最高13.5%)', rule: '', 
             type: 'ceiling', limit: 8000, tier1Rate: 0.135, tier2Rate: 0.035, 
             gradient: 'linear-gradient(135deg, #e60012 0%, #FFD700 100%)', 
             textColor: 'white', msgDanger: '10%已滿 (變3.5%)',
@@ -404,18 +415,18 @@
                 </details>
 
                 <div style="margin-top:10px; font-size:11px; color:#5d4037;">
-                    🧾 <b>繳費 10.15%：</b>需勾選上方「是APP繳費」+「新戶加碼」。<br>
+                    🧾 <b>繳費攻略：</b>需勾選上方「是APP繳費」+「新戶加碼」。<br>
                     ⚠️ 10%加碼上限800元(刷$8000)
                 </div>
             `
         },
         { 
-            id: 'c1', name: '星展傳說對決', nickname: '⚔️ linepay神卡', note: 'LinePay / 蝦皮 / UberEats', rule: '', 
+            id: 'c1', name: '星展傳說對決', nickname: 'LinePay神卡', note: 'LinePay / 蝦皮 / UberEats', rule: '', 
             type: 'ceiling', limit: 11363, tier1Rate: 0.10, tier2Rate: 0.012, 
             gradient: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)', textColor: 'white', msgDanger: '已滿 (1.2%)' 
         },
         { 
-            id: 'c5', name: '聯邦賴點卡', nickname: '🟢 line pay優等生', note: 'LinePay / 偶數日指定通路', rule: '⚠️ 單筆需滿$100', 
+            id: 'c5', name: '聯邦賴點卡', nickname: 'Line Pay優等生', note: 'LinePay / 偶數日指定通路', rule: '⚠️ 單筆需滿$100', 
             type: 'ceiling', limit: 3000, tier1Rate: 0.06, tier2Rate: 0.01, 
             threshold: 100,
             gradient: 'linear-gradient(135deg, #00B900 0%, #33CC33 100%)', textColor: 'white', msgDanger: '6% 已滿',
@@ -435,12 +446,12 @@
             `
         },
         { 
-            id: 'c3', name: '永豐 Sport', nickname: '🍎 apple pay優等生', note: 'Apple Pay (5%)', rule: '', 
+            id: 'c3', name: '永豐 Sport', nickname: 'Apple Pay優等生', note: 'Apple Pay (5%)', rule: '', 
             type: 'ceiling', limit: 5000, tier1Rate: 0.05, tier2Rate: 0.02, 
             gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '5% 已滿' 
         },
         { 
-            id: 'c4', name: '將來將將', nickname: '🟡 行支泛用', note: '行動支付 / 外送 / 網購', rule: '', 
+            id: 'c4', name: '將來將將', nickname: '行支泛用', note: '行動支付 / 外送 / 網購', rule: '', 
             type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
             gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '加碼已滿',
             parking: `
@@ -483,7 +494,12 @@
 
     function initSortable() {
         var el = document.getElementById('card-grid');
-        new Sortable(el, {
+        
+        if (sortableInstance) {
+            sortableInstance.destroy();
+        }
+
+        sortableInstance = new Sortable(el, {
             animation: 150,
             ghostClass: 'sortable-ghost',
             dragClass: 'sortable-drag',

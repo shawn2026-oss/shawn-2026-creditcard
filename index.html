@@ -208,7 +208,6 @@
             margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #555;
         }
         .option-row input[type="checkbox"] { width: 20px; height: 20px; margin: 0; }
-        /* 讓第一行(基本回饋)看起來像標題 */
         .option-row.read-only { opacity: 0.8; pointer-events: none; }
         .option-row.read-only input { opacity: 0.6; }
     </style>
@@ -217,7 +216,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V66.0</div>
+            <div class="version-tag" id="top-version-tag">V67.0</div>
         </div>
 
         <div class="header-section">
@@ -289,9 +288,13 @@
             </div>
 
             <div id="greenCardOptions">
-                <div class="option-row" style="margin-bottom:0;">
+                <div class="option-row">
                     <label for="checkGreenChannel">🌿 是綠色通路 (6% 限刷$2500)</label>
-                    <input type="checkbox" id="checkGreenChannel" onchange="updateRewardPreview()">
+                    <input type="checkbox" id="checkGreenChannel" onchange="toggleGreenLogic()">
+                </div>
+                <div class="option-row" style="margin-bottom:0; border-top:1px dashed #ddd; padding-top:6px;">
+                    <label for="checkForeign">✈️ 是國外消費 (2% 無上限)</label>
+                    <input type="checkbox" id="checkForeign" onchange="toggleForeignLogic()">
                 </div>
             </div>
             
@@ -360,7 +363,7 @@
 
     const defaultCards = [
         { 
-            id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', note: '自選回饋 (刷 $8,000 封頂)', rule: '', 
+            id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', note: '行支/繳費神卡 (刷 $8,000 封頂)', rule: '', 
             type: 'ceiling', limit: 8000, tier1Rate: 0.135, tier2Rate: 0.035, 
             gradient: 'linear-gradient(135deg, #e60012 0%, #FFD700 100%)', 
             textColor: 'white', msgDanger: '已封頂 (變3.5%)',
@@ -513,8 +516,8 @@
 
     function updateDate() { const now = new Date(); document.getElementById('dateDisplay').innerText = `${now.getMonth()+1}/${now.getDate()}`; }
 
-    // --- 核心計算邏輯 (通用版 + 綠卡邏輯) ---
-    function calculateStats(cardId, addedAmount = 0, addedIsGreen = false) {
+    // --- 核心計算邏輯 ---
+    function calculateStats(cardId, addedAmount = 0, addedIsGreen = false, addedIsForeign = false) {
         const card = cards.find(c => c.id === cardId);
         const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
         const relevantTx = transactions.filter(t => t.cardId === cardId && new Date(t.date) >= startDate);
@@ -528,25 +531,38 @@
         
         // 綠卡專屬邏輯 (c2)
         if (cardId === 'c2') {
-            // 1. 計算綠色通路回饋 (6% 上限150元 -> 刷2500)
+            // 6% (Green)
             const currentGreenSpend = relevantTx.filter(t => t.isGreen).reduce((sum, t) => sum + t.amount, 0);
             let newGreenAmount = addedIsGreen ? addedAmount : 0;
             const totalGreenSpend = currentGreenSpend + newGreenAmount;
             const greenEligible = Math.min(totalGreenSpend, 2500);
             const greenReward = greenEligible * 0.06;
-            
             const greenOverflow = Math.max(0, totalGreenSpend - 2500);
-            const currentNormalSpend = relevantTx.filter(t => !t.isGreen).reduce((sum, t) => sum + t.amount, 0);
-            const newNormalAmount = addedIsGreen ? 0 : addedAmount;
+
+            // 2% (Foreign)
+            const currentForeignSpend = relevantTx.filter(t => t.isForeign).reduce((sum, t) => sum + t.amount, 0);
+            let newForeignAmount = addedIsForeign ? addedAmount : 0;
+            const totalForeignSpend = currentForeignSpend + newForeignAmount;
+            const foreignReward = totalForeignSpend * 0.02;
+
+            // 1% (Normal + Green Overflow)
+            const currentNormalSpend = relevantTx.filter(t => !t.isGreen && !t.isForeign).reduce((sum, t) => sum + t.amount, 0);
+            const newNormalAmount = (!addedIsGreen && !addedIsForeign) ? addedAmount : 0;
             const totalNormalSpend = currentNormalSpend + newNormalAmount;
+            
             const normalReward = (greenOverflow + totalNormalSpend) * 0.01;
             
-            reward = greenReward + normalReward;
+            reward = greenReward + foreignReward + normalReward;
             
-            return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: 'var' };
+            // 預設顯示 6.0% (最高回饋)，若開始刷則顯示混合費率
+            let actualRate = 6.0;
+            if (totalSpend > 0) {
+                 actualRate = (reward / totalSpend) * 100;
+            }
+            return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: actualRate.toFixed(1) };
         }
 
-        // 其他卡片邏輯
+        // 其他卡片
         if (card.type === 'mixed') {
             if (validSpend < card.minSpend) reward = validSpend * card.tier2Rate; 
             else if (validSpend <= card.limit) reward = validSpend * card.tier1Rate;
@@ -585,6 +601,21 @@
         if (isSelected) {
             document.getElementById('checkIsBill').checked = false;
             labelBase.innerText = "🔰 基本回饋 1% (無上限)";
+        }
+        updateRewardPreview();
+    }
+
+    // 綠卡邏輯互斥
+    function toggleGreenLogic() {
+        if(document.getElementById('checkGreenChannel').checked) {
+            document.getElementById('checkForeign').checked = false;
+        }
+        updateRewardPreview();
+    }
+
+    function toggleForeignLogic() {
+        if(document.getElementById('checkForeign').checked) {
+            document.getElementById('checkGreenChannel').checked = false;
         }
         updateRewardPreview();
     }
@@ -631,11 +662,13 @@
             thisTransactionReward = Math.round(reward);
             effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(2);
         
-        // 綠卡
+        // 綠卡 (加入國外 2% 邏輯)
         } else if (cardId === 'c2') {
             const isGreen = document.getElementById('checkGreenChannel').checked;
+            const isForeign = document.getElementById('checkForeign').checked;
+            
             const currentStats = calculateStats(cardId, 0);
-            const newStats = calculateStats(cardId, amount, isGreen);
+            const newStats = calculateStats(cardId, amount, isGreen, isForeign);
             
             thisTransactionReward = newStats.reward - currentStats.reward;
             effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(1);
@@ -676,7 +709,8 @@
             }
 
             const ruleHtml = card.rule ? `<div class="tile-rule">${card.rule}</div>` : '';
-            let displayRate = `${stats.rate}%`;
+            // 綠卡固定顯示 6.0% (除非有實際回饋率) -> 需求: 封面顯示 6% 就好
+            let displayRate = card.id === 'c2' ? '6.0%' : `${stats.rate}%`;
 
             const tile = document.createElement('div'); 
             tile.className = 'card-tile'; 
@@ -685,23 +719,19 @@
             tile.style.color = card.textColor; 
             tile.onclick = () => openQuickAdd(card.id);
             
-            // 重新復刻 V45 結構 (Header > Nickname > Note > Body > Footer)
+            // 重新復刻 V45 結構
             tile.innerHTML = `
                 <div class="tile-header">
                     <span class="tile-name">${card.name}</span>
                     <span class="rate-badge" style="color:black">${displayRate}</span>
                 </div>
-                
                 <div class="tile-nickname-badge">${card.nickname}</div>
-                
                 <span class="tile-note" style="color:${card.textColor==='white'?'rgba(255,255,255,0.8)':'rgba(0,0,0,0.6)'}">${card.note}</span>
-                
                 <div class="tile-body">
                     <div class="tile-stat">$${stats.spend.toLocaleString()}</div>
                     ${ruleHtml}
                     <div class="tile-earned">+$${stats.reward.toLocaleString()}</div>
                 </div>
-                
                 <div class="tile-footer">
                     <div class="progress-track"><div class="progress-fill" style="width:${Math.min(percent, 100)}%"></div></div>
                     <div class="tile-msg" style="${msgStyle}">${statusText}</div>
@@ -736,6 +766,7 @@
         }
         if (cardId === 'c2') {
             document.getElementById('checkGreenChannel').checked = false; 
+            document.getElementById('checkForeign').checked = false; 
         }
 
         document.getElementById('liveRewardCalc').style.display = 'none';
@@ -761,8 +792,10 @@
         if (!amount || amount <= 0) return alert('請輸入金額');
         
         let isGreen = false;
+        let isForeign = false;
         if (cardId === 'c2') {
             isGreen = document.getElementById('checkGreenChannel').checked;
+            isForeign = document.getElementById('checkForeign').checked;
         }
 
         transactions.push({ 
@@ -771,7 +804,8 @@
             amount: parseFloat(amount), 
             note: note, 
             date: new Date().toISOString(),
-            isGreen: isGreen 
+            isGreen: isGreen,
+            isForeign: isForeign
         }); 
         
         localStorage.setItem('transactions', JSON.stringify(transactions)); 
@@ -810,9 +844,8 @@
                     item.className = 'history-item';
                     
                     let noteText = tx.note || '一般消費';
-                    if (tx.isGreen) {
-                        noteText = '🌿 ' + noteText;
-                    }
+                    if (tx.isGreen) noteText = '🌿 ' + noteText;
+                    if (tx.isForeign) noteText = '✈️ ' + noteText;
 
                     item.innerHTML = `
                         <div>

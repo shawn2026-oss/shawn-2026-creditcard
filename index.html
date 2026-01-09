@@ -47,14 +47,15 @@
         }
         @media (max-width: 480px) { body { background-color: var(--bg-color); } .app-container { box-shadow: none; width: 100%; max-width: 100%; } }
         
-        .header-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
+        .header-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; width: 100%; }
         .author-top { font-size: 12px; font-weight: 800; color: #007AFF; letter-spacing: 0.5px; }
         
-        /* 修正版本號顯示問題：強制不換行、不壓縮 */
+        /* 修正：強制顯示版本號，防止被擠壓消失 */
         .version-tag { 
             font-size: 10px; color: #888; font-weight: 600; 
-            background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; 
+            background: rgba(0,0,0,0.05); padding: 2px 8px; border-radius: 4px; 
             white-space: nowrap; flex-shrink: 0; 
+            display: inline-block; min-width: 36px; text-align: center;
         }
         
         .header-section { margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-end; }
@@ -122,6 +123,7 @@
         .tile-header { display: flex; justify-content: space-between; align-items: flex-start; z-index: 2; margin-bottom: 2px;}
         .tile-name { font-size: 15px; font-weight: 800; line-height: 1.2; text-shadow: 0 1px 2px rgba(0,0,0,0.15); }
         
+        /* 暱稱標籤 (深色底+黃字) */
         .tile-nickname-badge {
             display: inline-block;
             font-size: 10px;
@@ -135,7 +137,10 @@
             width: fit-content;
         }
         
-        .tile-nickname-badge.placeholder { background: rgba(0,0,0,0.1); color: #aaa; }
+        .tile-nickname-badge.placeholder {
+             background: rgba(0,0,0,0.1);
+             color: #aaa;
+        }
 
         .tile-note { font-size: 10px; font-weight: 500; opacity: 0.9; margin-bottom: 4px; display: block; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2; letter-spacing: -0.2px; }
         .tile-rule { font-size: 10px; font-weight: 700; background: rgba(0,0,0,0.25); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 6px; color: #FFD700; z-index: 2; }
@@ -158,7 +163,7 @@
         .btn-donate { background: linear-gradient(135deg, #E30000, #FF5050); color: #fff; border: none; box-shadow: 0 4px 10px rgba(227, 0, 0, 0.3); font-size: 14px; }
         .btn-reset-visible { width: 100%; padding: 12px; background-color: #fff5f5; border: 1px solid #ffdede; color: #FF3B30; border-radius: 12px; font-weight: 600; font-size: 12px; cursor: pointer; margin-top: 10px;}
         
-        /* 管理卡片按鈕 */
+        /* 管理卡片按鈕 - 啟用 */
         .btn-manage { background: #333; color: white; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 1000; align-items: center; justify-content: center; }
@@ -166,11 +171,13 @@
             background: white; width: 85%; max-width: 320px; border-radius: 20px; padding: 20px; 
             box-shadow: 0 25px 50px rgba(0,0,0,0.25); animation: modalPop 0.2s; 
             display: flex; flex-direction: column;
-            max-height: 85vh; 
+            max-height: 85vh; /* 限制高度 */
         }
         
-        /* 彈窗內容區塊 */
-        .modal-body-input { flex-shrink: 0; }
+        /* 彈窗內容區塊：輸入與選項 */
+        .modal-body-input {
+            flex-shrink: 0; /* 不壓縮這區 */
+        }
 
         .input-group label { display: block; font-size: 12px; font-weight: 600; color: #888; margin-bottom: 6px; margin-top: 10px; }
         input { width: 100%; padding: 10px; border: 2px solid #f0f0f0; background: #fff; border-radius: 12px; font-size: 18px; box-sizing: border-box; outline: none; font-weight: 600; color: #333; }
@@ -179,17 +186,19 @@
         .btn-cancel { background: #f5f5f5; color: #333; }
         .btn-confirm { background: #007AFF; color: white; }
         
-        /* 即時試算顯示 */
+        /* 即時試算顯示 (顯眼藍色方塊) */
         #liveRewardCalc { 
             text-align: center; font-size: 16px; color: #0056b3; font-weight: 700; margin-top: 12px; min-height: 20px; background: #E3F2FD; padding: 8px; border-radius: 8px; display: none; 
         }
         
-        /* 彈窗內的歷史明細 */
+        /* 彈窗內的歷史明細 (自動長高，可捲動) */
         .modal-history-section {
             margin-top: 15px;
             border-top: 2px solid #f0f0f0;
             padding-top: 10px;
-            flex: 1; overflow-y: auto; min-height: 0; 
+            flex: 1; /* 佔據剩餘空間 */
+            overflow-y: auto; /* 超出時捲動 */
+            min-height: 0; /* 配合 flex */
         }
         .modal-history-title { 
             font-size: 12px; font-weight: 700; color: #555; margin-bottom: 8px; 
@@ -198,7 +207,8 @@
         
         /* 歷史項目樣式 */
         .history-item { 
-            padding: 10px 0; border-bottom: 1px solid #f9f9f9; 
+            padding: 10px 0; 
+            border-bottom: 1px solid #f9f9f9; 
             display: flex; justify-content: space-between; align-items: center; font-size: 12px; 
         }
         .history-item:last-child { border-bottom: none; }
@@ -219,11 +229,14 @@
         .option-row.read-only { opacity: 0.8; pointer-events: none; }
         .option-row.read-only input { opacity: 0.6; }
         
-        /* 管理卡片列表樣式 */
+        /* 管理卡片列表樣式 (iOS 風格優化) */
         .manage-item {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 16px 12px; border-bottom: 1px solid #f0f0f0;
-            background: #fff; cursor: pointer; transition: background 0.2s;
+            padding: 16px 12px; /* 增加點擊區域 */
+            border-bottom: 1px solid #f0f0f0;
+            background: #fff;
+            cursor: pointer;
+            transition: background 0.2s;
         }
         .manage-item:active { background: #f9f9f9; }
         .manage-info { display: flex; flex-direction: column; gap: 4px; }
@@ -259,15 +272,19 @@
             border-radius: 50%;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-        input:checked + .slider { background-color: #34C759; }
-        input:checked + .slider:before { transform: translateX(20px); }
+        input:checked + .slider {
+            background-color: #34C759; /* iOS Green */
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
     </style>
 </head>
 <body>
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V84.0</div>
+            <div class="version-tag" id="top-version-tag">V85.0</div>
         </div>
 
         <div class="header-section">
@@ -447,7 +464,7 @@
 
     const defaultCards = [
         { 
-            id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', note: '百貨 / 超商 / 海外 / 街口 (刷 $8,000 封頂)', rule: '', 
+            id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', note: '行支/繳費神卡 (刷 $8,000 封頂)', rule: '', 
             type: 'ceiling', limit: 8000, tier1Rate: 0.135, tier2Rate: 0.035, 
             gradient: 'linear-gradient(135deg, #e60012 0%, #FFD700 100%)', 
             textColor: 'white', msgDanger: '已封頂 (變3.5%)',
@@ -497,7 +514,7 @@
                     <summary style="cursor:pointer; font-weight:700; color:#856404; font-size:12px;">點我看完整店家名單 ▼</summary>
                     <div style="margin-top:6px; padding-left:4px; font-size:11px; line-height:1.4; color:#555; max-height:120px; overflow-y:auto; border-radius:4px; background:rgba(255,255,255,0.5); padding:6px;">
                         <div style="margin-bottom:4px;">🍽️ <b>餐廳：</b>王品 / 三商 / 輕井澤 / 漢來 / 饗賓 / 海底撈 / 築間 / 春水堂 / 壽司郎 / 爭鮮 / 八方雲集</div>
-                        <div style="margin-bottom:4px;">🍔 <b>速食：</b>麥當勞 / 肯德基 /摩斯 / 漢堡王</div>
+                        <div style="margin-bottom:4px;">🍔 <b>速食：</b>麥當勞 / 肯德基 / 摩斯 / 漢堡王</div>
                         <div style="margin-bottom:4px;">☕ <b>咖啡：</b>星巴克 / 路易莎 / cama / 50嵐 / 得正 / 麻古 / 可不可</div>
                         <div style="margin-bottom:4px;">💄 <b>美妝：</b>屈臣氏 / 寶雅 / 唐吉訶德 / 大樹 / 杏一 / 丁丁 / 佑全 / 躍獅</div>
                         <div style="margin-bottom:4px;">🏠 <b>家居：</b>IKEA / Hola / 小北 / 汪喵星球 / 東森 / 咕咕G / 魚中魚 / 寵物公園</div>
@@ -545,6 +562,7 @@
                 🅿️ <b>免費停車：</b><br>台灣聯通、詮營、ViVi PARK、嘟嘟房、車麻吉<br>(需上月刷滿1.2萬)<br>
                 ⚠️ 國內1% / 國外2% (無上限)<br>
                 <hr style="opacity:0.3; margin:8px 0;">
+                
                 <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
                     <summary style="cursor:pointer; font-weight:700; color:#8B0000; font-size:12px;">▼ 點我看 6% 綠色通路</summary>
                     <div style="margin-top:6px; padding:8px; font-size:11px; line-height:1.6; color:#333; background:rgba(255,255,255,0.9); border-radius:6px;">
@@ -554,6 +572,7 @@
                         🌍 <b>綠色捐贈：</b>荒野保護、千里步道、齊柏林、主婦聯盟基金會...<br>
                     </div>
                 </details>
+                
                 <div style="margin-top:10px; font-size:11px; color:#1b5e20;">
                     🌿 <b>6% 回饋攻略：</b>勾選上方「是綠色通路」。<br>
                     ⚠️ 6%加碼：刷$2,500封頂<br>
@@ -678,14 +697,7 @@
             
             if (isUpMonth) {
                 baseRate = 0.045;
-                baseCap = 142857; // 5000 / 0.035(基本) vs 5000 / 0.045(UP) ? 
-                // 修正：UP 選是加碼 1%，基本 3.5% + 1% = 4.5%。
-                // 這裡的 Cap 是「UP選加碼上限」嗎？
-                // 根據官網，UP 選是每月「額外加碼」部分有上限。
-                // 假設：基本回饋無上限，加碼部分有上限。
-                // 為了簡化，這裡暫時沿用 V83 的邏輯：
-                // UP選：4.5% (上限 142,857) -> 推算自 5000 點 / (4.5% - 1%?) = 142857
-                // 實際上可能更複雜，但先維持您要求的 V83 邏輯。
+                baseCap = 142857;
             }
 
             // 計算基本回饋
@@ -760,7 +772,6 @@
     function toggleBillLogic() {
         const isBill = document.getElementById('checkIsBill').checked;
         const labelBase = document.getElementById('labelBaseRate');
-        
         if (isBill) {
             document.getElementById('checkBonus25').checked = false;
             labelBase.innerText = "🔰 基本回饋 0.15% (無上限)";
@@ -773,7 +784,6 @@
     function toggleSelectedLogic() {
         const isSelected = document.getElementById('checkBonus25').checked;
         const labelBase = document.getElementById('labelBaseRate');
-
         if (isSelected) {
             document.getElementById('checkIsBill').checked = false;
             labelBase.innerText = "🔰 基本回饋 1% (無上限)";
@@ -985,6 +995,7 @@
         renderGrid(); 
     }
 
+    // ... (其餘函式保持不變) ...
     function openQuickAdd(cardId) {
         const card = cards.find(c => c.id === cardId); 
         document.getElementById('modalTitle').innerText = card.name; 

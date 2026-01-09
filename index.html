@@ -166,6 +166,7 @@
         .btn-cancel { background: #f5f5f5; color: #333; }
         .btn-confirm { background: #007AFF; color: white; }
         
+        /* 即時試算顯示 */
         #liveRewardCalc { 
             text-align: center; 
             font-size: 16px; 
@@ -199,7 +200,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V49.0</div>
+            <div class="version-tag" id="top-version-tag">V51.0</div>
         </div>
 
         <div class="header-section">
@@ -258,7 +259,7 @@
                 </div>
                 <div class="option-row">
                     <label for="checkBonus25">🌟 精選通路2.5% (超商/百貨)</label>
-                    <input type="checkbox" id="checkBonus25" checked onchange="updateRewardPreview()">
+                    <input type="checkbox" id="checkBonus25" checked onchange="toggleSelectedLogic()">
                 </div>
                 <div class="option-row" style="margin-bottom:0; border-top:1px dashed #ddd; padding-top:6px;">
                     <label for="checkIsBill">🧾 是APP繳費 (底1%→0.15%)</label>
@@ -351,7 +352,7 @@
                     <div style="margin-top:6px; padding:8px; font-size:11px; line-height:1.6; color:#333; background:rgba(255,255,255,0.9); border-radius:6px;">
                         🏬 <b>百貨：</b>新光三越、SOGO、微風、台北101、遠東百貨、漢神百貨...<br>
                         🛒 <b>超市/量販：</b>全聯、家樂福、大潤發、愛買、美廉社...<br>
-                        🏪 <b>超商：</b>7-ELEVEN、全家便利商店...<br>
+                        🏪 <b>超商：</b>7-11(限街口/icash Pay)、全家(限街口/LINE Pay)...<br>
                         🚕 <b>交通：</b>台灣大車隊、Uber、yoxi、大都會...<br>
                         ☕ <b>餐飲：</b>星巴克、路易莎、麥當勞、肯德基、王品集團...<br>
                     </div>
@@ -403,7 +404,7 @@
             gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '5% 已滿' 
         },
         { 
-            id: 'c4', name: '將來將將', note: '行動支付 / 外送 / 網購', rule: '', 
+            id: 'c4', name: '將來將將', note: '行動支付 / 外送 /網購', rule: '', 
             type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
             gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '加碼已滿',
             parking: `
@@ -485,7 +486,7 @@
 
     function updateDate() { const now = new Date(); document.getElementById('dateDisplay').innerText = `${now.getMonth()+1}/${now.getDate()}`; }
 
-    // --- 核心計算邏輯 (通用版 + 綠卡邏輯) ---
+    // --- 核心計算邏輯 ---
     function calculateStats(cardId, addedAmount = 0, addedIsGreen = false) {
         const card = cards.find(c => c.id === cardId);
         const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
@@ -498,29 +499,18 @@
 
         let reward = 0;
         
-        // 綠卡專屬邏輯 (c2)
+        // 綠卡專屬邏輯
         if (cardId === 'c2') {
-            // 1. 計算綠色通路回饋 (6% 上限150元 -> 刷2500)
-            // 先加總本月已刷的綠色通路
             const currentGreenSpend = relevantTx.filter(t => t.isGreen).reduce((sum, t) => sum + t.amount, 0);
-            
-            // 本次新增是否為綠色
             let newGreenAmount = addedIsGreen ? addedAmount : 0;
-            
-            // 計算 6% 部分 (總綠色消費 vs 2500)
             const totalGreenSpend = currentGreenSpend + newGreenAmount;
             const greenEligible = Math.min(totalGreenSpend, 2500);
             const greenReward = greenEligible * 0.06;
             
-            // 超出綠色上限的部分，以及非綠色消費，都算 1% (假設一般消費)
-            // 綠色溢出部分
             const greenOverflow = Math.max(0, totalGreenSpend - 2500);
-            
-            // 非綠色消費總額
             const currentNormalSpend = relevantTx.filter(t => !t.isGreen).reduce((sum, t) => sum + t.amount, 0);
             const newNormalAmount = addedIsGreen ? 0 : addedAmount;
             const totalNormalSpend = currentNormalSpend + newNormalAmount;
-            
             const normalReward = (greenOverflow + totalNormalSpend) * 0.01;
             
             reward = greenReward + normalReward;
@@ -547,14 +537,24 @@
         return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: currentRate.toFixed(1) };
     }
 
+    // --- 豬富卡防呆互斥邏輯 (雙向) ---
     function toggleBillLogic() {
         const isBill = document.getElementById('checkIsBill').checked;
         if (isBill) {
-            document.getElementById('checkBonus25').checked = false;
+            document.getElementById('checkBonus25').checked = false; // 勾繳費 -> 取消精選
         }
         updateRewardPreview();
     }
 
+    function toggleSelectedLogic() {
+        const isSelected = document.getElementById('checkBonus25').checked;
+        if (isSelected) {
+            document.getElementById('checkIsBill').checked = false; // 勾精選 -> 取消繳費
+        }
+        updateRewardPreview();
+    }
+
+    // --- 即時回饋試算 ---
     function updateRewardPreview() {
         const inputVal = document.getElementById('amountInput').value;
         const amount = parseFloat(inputVal);
@@ -600,11 +600,7 @@
         // 綠卡
         } else if (cardId === 'c2') {
             const isGreen = document.getElementById('checkGreenChannel').checked;
-            
-            // 呼叫 calculateStats 進行模擬計算
-            // 先算還沒加這筆的總回饋
             const currentStats = calculateStats(cardId, 0);
-            // 再算加了這筆後的總回饋
             const newStats = calculateStats(cardId, amount, isGreen);
             
             thisTransactionReward = newStats.reward - currentStats.reward;
@@ -628,8 +624,7 @@
             monthTotalReward += stats.reward;
             let percent = 0, statusText = '', msgStyle = '';
             
-            // 顯示邏輯
-            if (card.id === 'c2') { // 綠卡特殊顯示
+            if (card.id === 'c2') { 
                 percent = (stats.validSpend / card.target) * 100;
                 statusText = stats.validSpend >= card.target ? '任務達成 (免停)' : `差 $${(card.target - stats.validSpend).toLocaleString()}`;
             } else if (card.type === 'mixed') {
@@ -646,7 +641,6 @@
             }
 
             const ruleHtml = card.rule ? `<div class="tile-rule">${card.rule}</div>` : '';
-            // 綠卡顯示 Rate 時若為 var 則顯示 1%~6%
             let displayRate = stats.rate === 'var' ? '1~6%' : `${stats.rate}%`;
 
             const tile = document.createElement('div'); 
@@ -684,18 +678,19 @@
         
         history.pushState({modalOpen: true}, "", "#modal");
 
-        // 控制專屬選項顯示
-        document.getElementById('pigRichOptions').style.display = (cardId === 'c6') ? 'block' : 'none';
-        document.getElementById('greenCardOptions').style.display = (cardId === 'c2') ? 'block' : 'none';
+        const pigRichOptions = document.getElementById('pigRichOptions');
+        const greenCardOptions = document.getElementById('greenCardOptions');
+        
+        pigRichOptions.style.display = (cardId === 'c6') ? 'block' : 'none';
+        greenCardOptions.style.display = (cardId === 'c2') ? 'block' : 'none';
 
-        // 重置勾選狀態
         if (cardId === 'c6') {
             document.getElementById('checkBonus10').checked = true;
             document.getElementById('checkBonus25').checked = true;
             document.getElementById('checkIsBill').checked = false; 
         }
         if (cardId === 'c2') {
-            document.getElementById('checkGreenChannel').checked = false; // 預設不勾
+            document.getElementById('checkGreenChannel').checked = false; 
         }
 
         document.getElementById('liveRewardCalc').style.display = 'none';
@@ -720,7 +715,6 @@
         
         if (!amount || amount <= 0) return alert('請輸入金額');
         
-        // 儲存特殊狀態 (綠卡 GreenChannel)
         let isGreen = false;
         if (cardId === 'c2') {
             isGreen = document.getElementById('checkGreenChannel').checked;
@@ -732,7 +726,7 @@
             amount: parseFloat(amount), 
             note: note, 
             date: new Date().toISOString(),
-            isGreen: isGreen // 存入資料庫
+            isGreen: isGreen 
         }); 
         
         localStorage.setItem('transactions', JSON.stringify(transactions)); 
@@ -770,7 +764,6 @@
                     const item = document.createElement('div');
                     item.className = 'history-item';
                     
-                    // 顯示綠色通路標記
                     let noteText = tx.note || '一般消費';
                     if (tx.isGreen) {
                         noteText = '🌿 ' + noteText;

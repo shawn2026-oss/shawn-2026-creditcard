@@ -32,8 +32,7 @@
             display: flex; justify-content: center; 
             min-height: 100vh; 
             -webkit-font-smoothing: antialiased; 
-            overscroll-behavior-y: none;
-            overscroll-behavior-x: none;
+            /* 移除 overscroll-behavior 限制，恢復原生滑動彈性 */
         }
         
         .app-container { 
@@ -109,14 +108,12 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; 
             transition: transform 0.1s; cursor: pointer; color: white; overflow: hidden; 
             user-select: none; -webkit-user-select: none;
-            /* 關鍵修復：確保觸控事件不被攔截 */
-            touch-action: none; 
+            /* 移除 touch-action: none; 讓滑動順暢 */
+            touch-action: pan-y; 
         }
         .card-tile:active { transform: scale(0.97); }
-        
-        /* 懸浮樣式強化 */
-        .sortable-ghost { opacity: 0.4; transform: scale(0.95); background: rgba(255,255,255,0.8); }
-        .sortable-drag { cursor: grabbing; transform: scale(1.05); z-index: 1000; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .sortable-ghost { opacity: 0.4; transform: scale(0.95); }
+        .sortable-drag { cursor: grabbing; }
 
         .tile-header { display: flex; justify-content: space-between; align-items: flex-start; z-index: 2; margin-bottom: 2px;}
         .tile-name { font-size: 15px; font-weight: 800; line-height: 1.2; text-shadow: 0 1px 2px rgba(0,0,0,0.15); }
@@ -282,7 +279,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V79.0</div>
+            <div class="version-tag" id="top-version-tag">V80.0</div>
         </div>
 
         <div class="header-section">
@@ -567,7 +564,7 @@
                 </div>
             `
         },
-        // 預留卡片
+        // 預留卡片 (可於管理介面開啟)
         { 
             id: 'add1', name: '新增卡片 (預留)', nickname: '即將推出', note: '自定義功能開發中', 
             type: 'placeholder', 

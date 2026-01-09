@@ -32,7 +32,6 @@
             display: flex; justify-content: center; 
             min-height: 100vh; 
             -webkit-font-smoothing: antialiased; 
-            /* 移除 overscroll-behavior 限制，恢復原生滑動彈性 */
         }
         
         .app-container { 
@@ -108,7 +107,6 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; 
             transition: transform 0.1s; cursor: pointer; color: white; overflow: hidden; 
             user-select: none; -webkit-user-select: none;
-            /* 移除 touch-action: none; 讓滑動順暢 */
             touch-action: pan-y; 
         }
         .card-tile:active { transform: scale(0.97); }
@@ -118,7 +116,6 @@
         .tile-header { display: flex; justify-content: space-between; align-items: flex-start; z-index: 2; margin-bottom: 2px;}
         .tile-name { font-size: 15px; font-weight: 800; line-height: 1.2; text-shadow: 0 1px 2px rgba(0,0,0,0.15); }
         
-        /* 暱稱標籤 (深色底+黃字) */
         .tile-nickname-badge {
             display: inline-block;
             font-size: 10px;
@@ -132,10 +129,7 @@
             width: fit-content;
         }
         
-        .tile-nickname-badge.placeholder {
-             background: rgba(0,0,0,0.1);
-             color: #aaa;
-        }
+        .tile-nickname-badge.placeholder { background: rgba(0,0,0,0.1); color: #aaa; }
 
         .tile-note { font-size: 10px; font-weight: 500; opacity: 0.9; margin-bottom: 4px; display: block; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2; letter-spacing: -0.2px; }
         .tile-rule { font-size: 10px; font-weight: 700; background: rgba(0,0,0,0.25); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 6px; color: #FFD700; z-index: 2; }
@@ -158,7 +152,6 @@
         .btn-donate { background: linear-gradient(135deg, #E30000, #FF5050); color: #fff; border: none; box-shadow: 0 4px 10px rgba(227, 0, 0, 0.3); font-size: 14px; }
         .btn-reset-visible { width: 100%; padding: 12px; background-color: #fff5f5; border: 1px solid #ffdede; color: #FF3B30; border-radius: 12px; font-weight: 600; font-size: 12px; cursor: pointer; margin-top: 10px;}
         
-        /* 管理卡片按鈕 - 啟用 */
         .btn-manage { background: #333; color: white; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 1000; align-items: center; justify-content: center; }
@@ -166,13 +159,10 @@
             background: white; width: 85%; max-width: 320px; border-radius: 20px; padding: 20px; 
             box-shadow: 0 25px 50px rgba(0,0,0,0.25); animation: modalPop 0.2s; 
             display: flex; flex-direction: column;
-            max-height: 85vh; /* 限制高度 */
+            max-height: 85vh; 
         }
         
-        /* 彈窗內容區塊：輸入與選項 */
-        .modal-body-input {
-            flex-shrink: 0; /* 不壓縮這區 */
-        }
+        .modal-body-input { flex-shrink: 0; }
 
         .input-group label { display: block; font-size: 12px; font-weight: 600; color: #888; margin-bottom: 6px; margin-top: 10px; }
         input { width: 100%; padding: 10px; border: 2px solid #f0f0f0; background: #fff; border-radius: 12px; font-size: 18px; box-sizing: border-box; outline: none; font-weight: 600; color: #333; }
@@ -181,31 +171,12 @@
         .btn-cancel { background: #f5f5f5; color: #333; }
         .btn-confirm { background: #007AFF; color: white; }
         
-        /* 即時試算顯示 (顯眼藍色方塊) */
-        #liveRewardCalc { 
-            text-align: center; font-size: 16px; color: #0056b3; font-weight: 700; margin-top: 12px; min-height: 20px; background: #E3F2FD; padding: 8px; border-radius: 8px; display: none; 
-        }
+        #liveRewardCalc { text-align: center; font-size: 16px; color: #0056b3; font-weight: 700; margin-top: 12px; min-height: 20px; background: #E3F2FD; padding: 8px; border-radius: 8px; display: none; }
         
-        /* 彈窗內的歷史明細 (自動長高，可捲動) */
-        .modal-history-section {
-            margin-top: 15px;
-            border-top: 2px solid #f0f0f0;
-            padding-top: 10px;
-            flex: 1; /* 佔據剩餘空間 */
-            overflow-y: auto; /* 超出時捲動 */
-            min-height: 0; /* 配合 flex */
-        }
-        .modal-history-title { 
-            font-size: 12px; font-weight: 700; color: #555; margin-bottom: 8px; 
-            display: flex; justify-content: space-between; align-items: center;
-        }
+        .modal-history-section { margin-top: 15px; border-top: 2px solid #f0f0f0; padding-top: 10px; flex: 1; overflow-y: auto; min-height: 0; }
+        .modal-history-title { font-size: 12px; font-weight: 700; color: #555; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
         
-        /* 歷史項目樣式 */
-        .history-item { 
-            padding: 10px 0; 
-            border-bottom: 1px solid #f9f9f9; 
-            display: flex; justify-content: space-between; align-items: center; font-size: 12px; 
-        }
+        .history-item { padding: 10px 0; border-bottom: 1px solid #f9f9f9; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
         .history-item:last-child { border-bottom: none; }
         .h-name { font-weight: 600; color: #555; }
         .h-date { font-size: 10px; color: #aaa; margin-top: 2px;}
@@ -214,72 +185,32 @@
         .btn-delete-single:hover { color: #FF3B30; }
 
         /* 選項開關區 */
-        #pigRichOptions, #greenCardOptions {
-            display: none; background: #f9f9f9; padding: 10px; border-radius: 10px; margin-top: 10px; border: 1px dashed #ddd;
-        }
-        .option-row {
-            display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #555;
-        }
+        #pigRichOptions, #greenCardOptions, #uniOptions { display: none; background: #f9f9f9; padding: 10px; border-radius: 10px; margin-top: 10px; border: 1px dashed #ddd; }
+        .option-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #555; }
         .option-row input[type="checkbox"] { width: 20px; height: 20px; margin: 0; }
         .option-row.read-only { opacity: 0.8; pointer-events: none; }
         .option-row.read-only input { opacity: 0.6; }
         
-        /* 管理卡片列表樣式 (iOS 風格優化) */
-        .manage-item {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 16px 12px; /* 增加點擊區域 */
-            border-bottom: 1px solid #f0f0f0;
-            background: #fff;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
+        /* 管理卡片列表樣式 */
+        .manage-item { display: flex; align-items: center; justify-content: space-between; padding: 16px 12px; border-bottom: 1px solid #f0f0f0; background: #fff; cursor: pointer; transition: background 0.2s; }
         .manage-item:active { background: #f9f9f9; }
         .manage-info { display: flex; flex-direction: column; gap: 4px; }
         .manage-name { font-size: 15px; font-weight: 700; color: #333; }
         .manage-desc { font-size: 12px; color: #999; }
         
-        /* iOS 風格 Toggle Switch */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 44px;
-            height: 24px;
-            flex-shrink: 0;
-        }
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 2px;
-            bottom: 2px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        input:checked + .slider {
-            background-color: #34C759; /* iOS Green */
-        }
-        input:checked + .slider:before {
-            transform: translateX(20px);
-        }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        input:checked + .slider { background-color: #34C759; }
+        input:checked + .slider:before { transform: translateX(20px); }
     </style>
 </head>
 <body>
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V80.0</div>
+            <div class="version-tag" id="top-version-tag">V83.0</div>
         </div>
 
         <div class="header-section">
@@ -359,6 +290,17 @@
                     <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;">
                         <label for="checkForeign">✈️ 是國外消費 (2% 無上限)</label>
                         <input type="checkbox" id="checkForeign" onchange="toggleForeignLogic()">
+                    </div>
+                </div>
+
+                <div id="uniOptions">
+                    <div class="option-row">
+                        <label for="checkUniUp">🆙 訂閱 UP 選 (4.5% 限刷14萬)</label>
+                        <input type="checkbox" id="checkUniUp" onchange="updateRewardPreview()">
+                    </div>
+                    <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;">
+                        <label for="checkUniBonus">🔥 統一時代任務 (+3% 限刷1.6萬)</label>
+                        <input type="checkbox" id="checkUniBonus" onchange="updateRewardPreview()">
                     </div>
                 </div>
                 
@@ -448,14 +390,13 @@
 
     const defaultCards = [
         { 
-            id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', note: '百貨 / 超商 / 海外 / 街口 (刷 $8,000 封頂)', rule: '', 
+            id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', note: '行支/繳費神卡 (刷 $8,000 封頂)', rule: '', 
             type: 'ceiling', limit: 8000, tier1Rate: 0.135, tier2Rate: 0.035, 
             gradient: 'linear-gradient(135deg, #e60012 0%, #FFD700 100%)', 
             textColor: 'white', msgDanger: '已封頂 (變3.5%)',
             parking: `
                 🐷 <b>新戶限定神卡 (加碼至 2026/12/31)</b><br>
                 <hr style="opacity:0.3; margin:8px 0;">
-                
                 <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
                     <summary style="cursor:pointer; font-weight:700; color:#8B0000; font-size:12px;">▼ 點我看 2.5% 精選通路</summary>
                     <div style="margin-top:6px; padding:8px; font-size:11px; line-height:1.6; color:#333; background:rgba(255,255,255,0.9); border-radius:6px;">
@@ -466,7 +407,6 @@
                         ☕ <b>餐飲：</b>星巴克、路易莎、麥當勞、肯德基、王品集團...<br>
                     </div>
                 </details>
-
                 <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
                     <summary style="cursor:pointer; font-weight:700; color:#8B0000; font-size:12px;">▼ 點我看 10% 適用範圍</summary>
                     <div style="margin-top:6px; padding:8px; font-size:11px; line-height:1.6; color:#333; background:rgba(255,255,255,0.9); border-radius:6px;">
@@ -475,7 +415,6 @@
                         ✈️ <b>機票：</b>國內外航空公司 (限透過航空公司購買之機票消費)<br>
                     </div>
                 </details>
-
                 <div style="margin-top:10px; font-size:11px; color:#5d4037;">
                     🧾 <b>繳費 10.15%：</b>需勾選上方「是APP繳費」+「新戶加碼」。<br>
                     ⚠️ 10%加碼：刷$8,000封頂
@@ -546,7 +485,6 @@
                 🅿️ <b>免費停車：</b><br>台灣聯通、詮營、ViVi PARK、嘟嘟房、車麻吉<br>(需上月刷滿1.2萬)<br>
                 ⚠️ 國內1% / 國外2% (無上限)<br>
                 <hr style="opacity:0.3; margin:8px 0;">
-                
                 <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
                     <summary style="cursor:pointer; font-weight:700; color:#8B0000; font-size:12px;">▼ 點我看 6% 綠色通路</summary>
                     <div style="margin-top:6px; padding:8px; font-size:11px; line-height:1.6; color:#333; background:rgba(255,255,255,0.9); border-radius:6px;">
@@ -556,7 +494,6 @@
                         🌍 <b>綠色捐贈：</b>荒野保護、千里步道、齊柏林、主婦聯盟基金會...<br>
                     </div>
                 </details>
-                
                 <div style="margin-top:10px; font-size:11px; color:#1b5e20;">
                     🌿 <b>6% 回饋攻略：</b>勾選上方「是綠色通路」。<br>
                     ⚠️ 6%加碼：刷$2,500封頂<br>
@@ -564,15 +501,24 @@
                 </div>
             `
         },
+        {
+            id: 'c7', name: '玉山 UNI 卡', nickname: '行支優等生', note: '任意3.5% / UP 4.5% (刷 4~14萬 封頂)',
+            type: 'ceiling', limit: 40000, tier1Rate: 0.035, tier2Rate: 0.01,
+            gradient: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
+            textColor: 'white', msgDanger: '已封頂 (變1%)',
+            parking: `
+                🔥 <b>任意選 3.5% (無腦刷$40,000)</b><br>
+                需於 App 設定「任意選8項」<br>
+                <hr style="opacity:0.3; margin:8px 0;">
+                🦄 <b>統一時代任務 +3% (刷$16,666)</b><br>
+                (2025/12/15 ~ 2026/2/28)<br>
+                需持有「玉山統一時代聯名卡」且完成登錄<br>
+                通路：統一時代百貨台北店、DREAM PLAZA、新光三越、icash Pay、悠遊付、蝦皮購物
+            `
+        },
         // 預留卡片 (可於管理介面開啟)
         { 
-            id: 'add1', name: '新增卡片 (預留)', nickname: '即將推出', note: '自定義功能開發中', 
-            type: 'placeholder', 
-            gradient: 'linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%)', 
-            textColor: '#999', msgDanger: '' 
-        },
-        { 
-            id: 'add2', name: '新增卡片 (預留)', nickname: '即將推出', note: '自定義功能開發中', 
+            id: 'add1', name: '新增卡片 (預留)', nickname: '即將推出', note: '新卡片建置中', 
             type: 'placeholder', 
             gradient: 'linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%)', 
             textColor: '#999', msgDanger: '' 
@@ -582,13 +528,19 @@
     // 初始化顯示狀態
     let visibleCards = JSON.parse(localStorage.getItem('visibleCards'));
     if (!visibleCards) {
-        visibleCards = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2']; // 預設顯示ID (隱藏預留卡)
+        visibleCards = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'add1']; // 預設顯示 8 張
+        localStorage.setItem('visibleCards', JSON.stringify(visibleCards));
+    } else {
+        // 舊用戶自動補上 c7 和 add1，移除 add2
+        if (!visibleCards.includes('c7')) visibleCards.push('c7');
+        if (!visibleCards.includes('add1')) visibleCards.push('add1');
+        visibleCards = visibleCards.filter(id => id !== 'add2');
         localStorage.setItem('visibleCards', JSON.stringify(visibleCards));
     }
 
     let savedOrder = JSON.parse(localStorage.getItem('cardOrder'));
     let cards = [...defaultCards];
-    let sortableInstance = null; // 全局變數儲存 Sortable 實例
+    let sortableInstance = null;
 
     function getSortedCards() {
         let displayCards = cards.filter(c => visibleCards.includes(c.id));
@@ -606,31 +558,17 @@
 
     function initSortable() {
         var el = document.getElementById('card-grid');
-        
-        // 關鍵修復：銷毀舊實例，避免重複綁定導致衝突
-        if (sortableInstance) {
-            sortableInstance.destroy();
-        }
-
+        if (sortableInstance) { sortableInstance.destroy(); }
         sortableInstance = new Sortable(el, {
-            animation: 150,
-            ghostClass: 'sortable-ghost',
-            dragClass: 'sortable-drag',
-            delay: 200,
-            delayOnTouchOnly: true,
-            forceFallback: true, // 關鍵修復：強制使用 Fallback 讓懸浮樣式更穩定
+            animation: 150, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag',
+            delay: 200, delayOnTouchOnly: true, forceFallback: true, 
             onEnd: function (evt) {
-                const visibleOrder = Array.from(evt.to.children).map(el => {
-                    return el.getAttribute('data-card-id');
-                });
-                
-                // 邏輯優化：將隱藏的卡片補在最後，避免遺失
+                const visibleOrder = Array.from(evt.to.children).map(el => el.getAttribute('data-card-id'));
                 const allCardIds = cards.map(c => c.id);
                 const hiddenCards = allCardIds.filter(id => !visibleOrder.includes(id));
                 const finalOrder = [...visibleOrder, ...hiddenCards];
-
                 localStorage.setItem('cardOrder', JSON.stringify(finalOrder));
-                savedOrder = finalOrder; // 更新內存變數
+                savedOrder = finalOrder;
             }
         });
     }
@@ -640,12 +578,10 @@
     function updateDate() { const now = new Date(); document.getElementById('dateDisplay').innerText = `${now.getMonth()+1}/${now.getDate()}`; }
 
     // --- 核心計算邏輯 ---
-    function calculateStats(cardId, addedAmount = 0, addedIsGreen = false, addedIsForeign = false) {
+    function calculateStats(cardId, addedAmount = 0, addedIsGreen = false, addedIsForeign = false, addedIsUniBonus = false, addedIsUniUp = false) {
         const card = cards.find(c => c.id === cardId);
-        
         if (card.type === 'placeholder') return { spend: 0, validSpend: 0, reward: 0, rate: '0.0' };
 
-        // 統一採用日曆月 (每月1號歸零)
         const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
         const relevantTx = transactions.filter(t => t.cardId === cardId && new Date(t.date) >= startDate);
         let totalSpend = relevantTx.reduce((sum, t) => sum + parseFloat(t.amount), 0);
@@ -655,16 +591,70 @@
         const validSpend = relevantTx.filter(t => t.amount >= threshold).reduce((sum, t) => sum + t.amount, 0) + (addedAmount >= threshold ? addedAmount : 0);
 
         let reward = 0;
+
+        // 玉山 UNI (c7)
+        if (cardId === 'c7') {
+            // 基本盤
+            let currentIsUp = relevantTx.some(t => t.isUniUp); // 只要有一筆是UP選，當月就視為UP選(簡化邏輯)
+            // 但這樣不準，應該看當下勾選。不過為了單筆試算，我們假設切換方案是全月生效
+            // 這裡採用: 如果勾選 UP選，則當月所有消費都套用 UP 選費率 (符合玉山規則: 月底最後一天方案為準)
+            // 若 addedIsUniUp 為 true，則模擬整個月都是 UP 選
+            
+            // 判斷當月是否為 UP 選狀態 (若新交易勾選，或舊交易有勾選)
+            // 修正：簡單點，只看當下操作的開關決定「預覽」費率。
+            // 但統計時，我們假設使用者會去管理那個開關。
+            // 這裡為了讓「即時試算」準確，我們用 addedIsUniUp 來決定全月費率
+            
+            // 實際邏輯：讀取設定檔或假設當下勾選代表全月
+            // 這裡我們用一個簡單的假設：如果勾選 UP，則 Base Rate = 4.5% Cap 142857
+            
+            let baseRate = 0.035;
+            let baseCap = 40000;
+            
+            // 檢查是否有勾選 UP (從傳入參數判斷，這代表使用者當下的意圖)
+            // 注意：這裡我們需要一個全域變數或從 DOM 讀取狀態來決定「本月方案」，但為了保持函式純粹，我們依賴傳入參數。
+            // 對於歷史交易統計，我們可能需要一個「全月設定」。
+            // 暫時解法：若任一筆交易標記為 UP，或新增時勾選 UP，則全月視為 UP。
+            const isUpMonth = addedIsUniUp || relevantTx.some(t => t.isUniUp);
+            
+            if (isUpMonth) {
+                baseRate = 0.045;
+                baseCap = 142857;
+            }
+
+            // 計算基本回饋
+            const baseEligible = Math.min(totalSpend, baseCap);
+            const baseReward = baseEligible * baseRate;
+            
+            // 超出部分
+            const overflow = Math.max(0, totalSpend - baseCap);
+            const overflowReward = overflow * 0.01;
+
+            // 計算任務加碼 (獨立計算)
+            const currentBonusSpend = relevantTx.filter(t => t.isUniBonus).reduce((sum, t) => sum + t.amount, 0);
+            let newBonusAmount = addedIsUniBonus ? addedAmount : 0;
+            const totalBonusSpend = currentBonusSpend + newBonusAmount;
+            
+            const bonusEligible = Math.min(totalBonusSpend, 16666);
+            const bonusReward = bonusEligible * 0.03;
+
+            reward = baseReward + overflowReward + bonusReward;
+            
+            let actualRate = (baseRate * 100);
+            if (totalSpend > 0) actualRate = (reward / totalSpend) * 100;
+            
+            return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: actualRate.toFixed(1) };
+        }
         
-        // 綠卡專屬邏輯 (c2)
+        // 綠卡 (c2)
         if (cardId === 'c2') {
             const currentGreenSpend = relevantTx.filter(t => t.isGreen).reduce((sum, t) => sum + t.amount, 0);
             let newGreenAmount = addedIsGreen ? addedAmount : 0;
             const totalGreenSpend = currentGreenSpend + newGreenAmount;
             const greenEligible = Math.min(totalGreenSpend, 2500);
             const greenReward = greenEligible * 0.06;
-            
             const greenOverflow = Math.max(0, totalGreenSpend - 2500);
+
             const currentForeignSpend = relevantTx.filter(t => t.isForeign).reduce((sum, t) => sum + t.amount, 0);
             let newForeignAmount = addedIsForeign ? addedAmount : 0;
             const totalForeignSpend = currentForeignSpend + newForeignAmount;
@@ -677,12 +667,12 @@
             const normalReward = (greenOverflow + totalNormalSpend) * 0.01;
             reward = greenReward + foreignReward + normalReward;
             
-            // 修正：綠卡固定顯示 6.0% (代表最高戰力)
             let actualRate = 6.0;
+            if (totalSpend > 0) actualRate = (reward / totalSpend) * 100;
             return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: actualRate.toFixed(1) };
         }
 
-        // 其他卡片邏輯
+        // 其他卡片 (c6, c1, c5, c3, c4)
         if (card.type === 'mixed') {
             if (validSpend < card.minSpend) reward = validSpend * card.tier2Rate; 
             else if (validSpend <= card.limit) reward = validSpend * card.tier1Rate;
@@ -704,7 +694,6 @@
     function toggleBillLogic() {
         const isBill = document.getElementById('checkIsBill').checked;
         const labelBase = document.getElementById('labelBaseRate');
-        
         if (isBill) {
             document.getElementById('checkBonus25').checked = false;
             labelBase.innerText = "🔰 基本回饋 0.15% (無上限)";
@@ -717,7 +706,6 @@
     function toggleSelectedLogic() {
         const isSelected = document.getElementById('checkBonus25').checked;
         const labelBase = document.getElementById('labelBaseRate');
-
         if (isSelected) {
             document.getElementById('checkIsBill').checked = false;
             labelBase.innerText = "🔰 基本回饋 1% (無上限)";
@@ -786,6 +774,15 @@
             thisTransactionReward = newStats.reward - currentStats.reward;
             effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(1);
 
+        } else if (cardId === 'c7') { // UNI
+            const isUniUp = document.getElementById('checkUniUp').checked;
+            const isUniBonus = document.getElementById('checkUniBonus').checked;
+            const currentStats = calculateStats(cardId, 0);
+            // 傳入 isUniUp 讓 calculateStats 判斷是否升級
+            const newStats = calculateStats(cardId, amount, false, false, isUniBonus, isUniUp);
+            thisTransactionReward = newStats.reward - currentStats.reward;
+            effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(1);
+
         } else {
             const currentStats = calculateStats(cardId, 0);
             const newStats = calculateStats(cardId, amount);
@@ -800,9 +797,10 @@
         const container = document.getElementById('card-grid');
         let monthTotalReward = 0; container.innerHTML = '';
         
-        // 修正：總金額計算包含所有卡片（含隱藏）
         cards.forEach(card => {
              if (card.type === 'placeholder') return;
+             // 渲染時，如果該卡有被設定為 UP 選 (歷史紀錄中有)，則用 UP 選費率計算總額
+             // 這裡稍微簡化，直接呼叫 calculateStats，它會去檢查交易紀錄
              const stats = calculateStats(card.id);
              monthTotalReward += stats.reward;
         });
@@ -836,7 +834,7 @@
             }
 
             const ruleHtml = card.rule ? `<div class="tile-rule">${card.rule}</div>` : '';
-            let displayRate = card.id === 'c2' ? '6.0%' : `${stats.rate}%`;
+            let displayRate = `${stats.rate}%`;
             if (card.type === 'placeholder') displayRate = '--%';
 
             let tileClass = 'card-tile';
@@ -849,7 +847,6 @@
             tile.style.background = card.gradient; 
             tile.style.color = card.textColor; 
             
-            // 佔位卡點擊事件不同 - 修改為「新卡片建置中」
             if (card.type === 'placeholder') {
                 tile.onclick = () => alert('新卡片建置中');
             } else {
@@ -879,22 +876,17 @@
         initSortable();
     }
     
-    // 開啟管理卡片視窗
     function openManageModal() {
         const list = document.getElementById('manageCardList');
         list.innerHTML = '';
         
         cards.forEach(card => {
             const isVisible = visibleCards.includes(card.id);
-            // 點擊整行觸發切換
             const item = document.createElement('div');
             item.className = 'manage-item';
-            // 將 onclick 綁在整個 div 上
             item.onclick = function() {
-                // 找到內部的 checkbox 並切換狀態
                 const checkbox = this.querySelector('input[type="checkbox"]');
                 checkbox.checked = !checkbox.checked;
-                // 觸發切換邏輯
                 toggleCardVisibility(card.id);
             };
 
@@ -921,20 +913,25 @@
             visibleCards.push(cardId);
         }
         localStorage.setItem('visibleCards', JSON.stringify(visibleCards));
-        renderGrid(); // 即時刷新背景
+        renderGrid(); 
     }
 
-    // ... (其餘函式保持不變) ...
     function openQuickAdd(cardId) {
         const card = cards.find(c => c.id === cardId); 
         document.getElementById('modalTitle').innerText = card.name; 
         document.getElementById('modalSubtitle').innerText = card.note; 
         document.getElementById('cardIdInput').value = cardId; 
+        
         history.pushState({modalOpen: true}, "", "#modal");
+
         const pigRichOptions = document.getElementById('pigRichOptions');
         const greenCardOptions = document.getElementById('greenCardOptions');
+        const uniOptions = document.getElementById('uniOptions');
+        
         pigRichOptions.style.display = (cardId === 'c6') ? 'block' : 'none';
         greenCardOptions.style.display = (cardId === 'c2') ? 'block' : 'none';
+        uniOptions.style.display = (cardId === 'c7') ? 'block' : 'none';
+
         if (cardId === 'c6') {
             document.getElementById('checkBonus10').checked = true;
             document.getElementById('checkBonus25').checked = true;
@@ -945,73 +942,138 @@
             document.getElementById('checkGreenChannel').checked = false; 
             document.getElementById('checkForeign').checked = false; 
         }
+        if (cardId === 'c7') {
+            // 檢查本月是否有過 UP 選交易，若有則預設勾選
+            const now = new Date();
+            const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            const hasUpTx = transactions.some(t => t.cardId === 'c7' && t.isUniUp && new Date(t.date) >= currentMonthStart);
+            document.getElementById('checkUniUp').checked = hasUpTx;
+            document.getElementById('checkUniBonus').checked = false; 
+        }
+
         document.getElementById('liveRewardCalc').style.display = 'none';
         document.getElementById('liveRewardCalc').innerHTML = '';
+        
         const parkingInfoDiv = document.getElementById('modalParkingInfo');
         if (card.parking) { parkingInfoDiv.innerHTML = card.parking; parkingInfoDiv.style.display = 'block'; } else { parkingInfoDiv.style.display = 'none'; }
         document.getElementById('transactionModal').style.display = 'flex'; 
         document.getElementById('amountInput').value = ''; 
         document.getElementById('noteInput').value = ''; 
+        
         renderModalHistory(cardId);
+        
         setTimeout(() => document.getElementById('amountInput').focus(), 100);
     }
+    
     function renderModalHistory(cardId) {
         const container = document.getElementById('modalHistoryList');
         const titleDiv = document.getElementById('modalHistoryTitle');
         container.innerHTML = '';
+        
         const now = new Date();
         const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
         const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
         const dateRange = `${now.getMonth() + 1}/1 - ${now.getMonth() + 1}/${lastDay}`;
+        
         titleDiv.innerHTML = `<span>📅 本月 (${dateRange}) 消費紀錄</span><span style="font-weight:normal; font-size:10px; color:#aaa;">(點 ✕ 刪除)</span>`;
+
         const cardTx = transactions.filter(t => t.cardId === cardId && new Date(t.date) >= currentMonthStart).reverse();
+        
         if (cardTx.length === 0) {
             container.innerHTML = '<div style="text-align:center; color:#ccc; font-size:12px; margin-top:10px;">本月尚無消費紀錄</div>';
             return;
         }
+
         cardTx.forEach(tx => {
             const item = document.createElement('div');
             item.className = 'history-item'; 
             item.style.background = 'white'; 
             item.style.borderBottom = '1px solid #f0f0f0';
+            
             let noteText = tx.note || '一般消費';
             if (tx.isGreen) noteText = '🌿 ' + noteText;
             if (tx.isForeign) noteText = '✈️ ' + noteText;
-            item.innerHTML = `<div><div class="h-name">${noteText}</div><div class="h-date">${new Date(tx.date).getMonth()+1}/${new Date(tx.date).getDate()}</div></div><div style="display:flex;align-items:center;"><span class="h-amount">$${tx.amount.toLocaleString()}</span><button class="btn-delete-single" onclick="deleteTransaction(${tx.id}, true)">✕</button></div>`;
+            if (tx.isUniBonus) noteText = '🔥 ' + noteText;
+            // 顯示 UP 選狀態 (雖然通常整月都是，但標記一下也不錯)
+            // if (tx.isUniUp) noteText = '🆙 ' + noteText; 
+
+            item.innerHTML = `
+                <div>
+                    <div class="h-name">${noteText}</div>
+                    <div class="h-date">${new Date(tx.date).getMonth()+1}/${new Date(tx.date).getDate()}</div>
+                </div>
+                <div style="display:flex;align-items:center;">
+                    <span class="h-amount">$${tx.amount.toLocaleString()}</span>
+                    <button class="btn-delete-single" onclick="deleteTransaction(${tx.id}, true)">✕</button>
+                </div>
+            `;
             container.appendChild(item);
         });
     }
-    function closeModal() { history.back(); }
+
+    function closeModal() {
+        history.back();
+    }
+
     function addTransaction() {
         const cardId = document.getElementById('cardIdInput').value;
         const amount = document.getElementById('amountInput').value;
         const note = document.getElementById('noteInput').value;
+        
         if (!amount || amount <= 0) return alert('請輸入金額');
-        let isGreen = false; let isForeign = false;
+        
+        let isGreen = false;
+        let isForeign = false;
+        let isUniBonus = false;
+        let isUniUp = false;
+
         if (cardId === 'c2') {
             isGreen = document.getElementById('checkGreenChannel').checked;
             isForeign = document.getElementById('checkForeign').checked;
         }
-        transactions.push({ id: Date.now(), cardId: cardId, amount: parseFloat(amount), note: note, date: new Date().toISOString(), isGreen: isGreen, isForeign: isForeign }); 
+        if (cardId === 'c7') {
+            isUniBonus = document.getElementById('checkUniBonus').checked;
+            isUniUp = document.getElementById('checkUniUp').checked;
+        }
+
+        transactions.push({ 
+            id: Date.now(), 
+            cardId: cardId, 
+            amount: parseFloat(amount), 
+            note: note, 
+            date: new Date().toISOString(),
+            isGreen: isGreen,
+            isForeign: isForeign,
+            isUniBonus: isUniBonus,
+            isUniUp: isUniUp
+        }); 
+        
         localStorage.setItem('transactions', JSON.stringify(transactions)); 
+        
         document.getElementById('amountInput').value = '';
         document.getElementById('noteInput').value = '';
         document.getElementById('liveRewardCalc').style.display = 'none';
+        
         renderModalHistory(cardId); 
         renderGrid(); 
     }
+
     function deleteTransaction(id, fromModal = false) {
         if(confirm('刪除此筆紀錄？')) {
             transactions = transactions.filter(t => t.id !== id);
             localStorage.setItem('transactions', JSON.stringify(transactions));
+            
             renderGrid(); 
+            
             if (fromModal) {
                 const cardId = document.getElementById('cardIdInput').value;
                 renderModalHistory(cardId);
             }
         }
     }
+
     function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
+    
     async function exportData() {
         const dataStr = JSON.stringify(transactions);
         const now = new Date();
@@ -1033,7 +1095,9 @@
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }
+    
     function triggerImport() { document.getElementById('fileInput').click(); }
+    
     function importFile(input) {
         const file = input.files[0];
         if (!file) return;
@@ -1052,8 +1116,10 @@
         reader.readAsText(file);
         input.value = '';
     }
+    
     function showDonateModal() { document.getElementById('donateModal').style.display = 'flex'; }
     function copyBankInfo() { navigator.clipboard.writeText("396901798704").then(() => { alert("✅ 帳號已複製！(銀行代碼 396)"); }); }
+    
     function checkUrgentTasks() {
         const alertArea = document.getElementById('urgent-alert-area'), alertList = document.getElementById('urgent-list'); alertList.innerHTML = ''; let hasUrgent = false;
         cards.forEach(card => {

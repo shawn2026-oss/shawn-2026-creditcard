@@ -102,22 +102,35 @@
 
         #card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
 
-        /* 還原 V45 風格的卡片樣式 */
+        /* 卡片樣式 - V45 風格還原 */
         .card-tile { 
             border-radius: 16px; padding: 12px; min-height: 135px; 
             display: flex; flex-direction: column; justify-content: space-between; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; 
             transition: transform 0.1s; cursor: pointer; color: white; overflow: hidden; 
-            user-select: none;
-            -webkit-user-select: none;
+            user-select: none; -webkit-user-select: none;
         }
         .card-tile:active { transform: scale(0.97); }
-        
         .sortable-ghost { opacity: 0.4; transform: scale(0.95); }
         .sortable-drag { cursor: grabbing; }
 
         .tile-header { display: flex; justify-content: space-between; align-items: flex-start; z-index: 2; margin-bottom: 2px;}
-        .tile-name { font-size: 14px; font-weight: 700; line-height: 1.2; text-shadow: 0 1px 2px rgba(0,0,0,0.15); }
+        .tile-name { font-size: 15px; font-weight: 800; line-height: 1.2; text-shadow: 0 1px 2px rgba(0,0,0,0.15); }
+        
+        /* 核心修復：V45 風格的暱稱標籤 (深色底+黃字) */
+        .tile-nickname-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 800;
+            background: rgba(0,0,0,0.2); /* 深色半透明底 */
+            color: #FFD700; /* 金黃色文字 */
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            z-index: 2;
+            width: fit-content;
+        }
+
         .tile-note { font-size: 10px; font-weight: 500; opacity: 0.9; margin-bottom: 4px; display: block; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2; letter-spacing: -0.2px; }
         .tile-rule { font-size: 10px; font-weight: 700; background: rgba(0,0,0,0.25); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 6px; color: #FFD700; z-index: 2; }
         .rate-badge { background: rgba(255,255,255,0.3); font-size: 10px; font-weight: 800; padding: 2px 5px; border-radius: 5px; white-space: nowrap; backdrop-filter: blur(4px); margin-left: 2px; flex-shrink: 0; }
@@ -167,32 +180,17 @@
         .btn-cancel { background: #f5f5f5; color: #333; }
         .btn-confirm { background: #007AFF; color: white; }
         
-        /* 即時試算顯示 (顯眼藍色方塊) */
+        /* 即時試算顯示 */
         #liveRewardCalc { 
-            text-align: center; 
-            font-size: 16px; 
-            color: #0056b3; 
-            font-weight: 700; 
-            margin-top: 12px; 
-            min-height: 20px; 
-            background: #E3F2FD; 
-            padding: 8px; 
-            border-radius: 8px; 
-            display: none; 
+            text-align: center; font-size: 16px; color: #0056b3; font-weight: 700; margin-top: 12px; min-height: 20px; background: #E3F2FD; padding: 8px; border-radius: 8px; display: none; 
         }
         
         /* 選項開關區 */
         #pigRichOptions, #greenCardOptions {
-            display: none;
-            background: #f9f9f9;
-            padding: 10px;
-            border-radius: 10px;
-            margin-top: 10px;
-            border: 1px dashed #ddd;
+            display: none; background: #f9f9f9; padding: 10px; border-radius: 10px; margin-top: 10px; border: 1px dashed #ddd;
         }
         .option-row {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #555;
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #555;
         }
         .option-row input[type="checkbox"] { width: 20px; height: 20px; margin: 0; }
         .option-row.read-only { opacity: 0.8; pointer-events: none; }
@@ -203,7 +201,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V61.0</div>
+            <div class="version-tag" id="top-version-tag">V62.0</div>
         </div>
 
         <div class="header-section">
@@ -346,7 +344,7 @@
 
     const defaultCards = [
         { 
-            id: 'c6', name: '台新街口豬富卡', note: '行支繳費神卡 (限刷$8000)', rule: '', 
+            id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', note: '自選回饋 (刷 $8,000 封頂)', rule: '', 
             type: 'ceiling', limit: 8000, tier1Rate: 0.135, tier2Rate: 0.035, 
             gradient: 'linear-gradient(135deg, #e60012 0%, #FFD700 100%)', 
             textColor: 'white', msgDanger: '已封頂 (變3.5%)',
@@ -381,12 +379,12 @@
             `
         },
         { 
-            id: 'c1', name: '星展傳說對決卡', note: 'Line Pay神卡 (限刷$11363)', rule: '', 
+            id: 'c1', name: '星展傳說對決卡', nickname: 'Line Pay神卡', note: 'LinePay / 蝦皮 (刷 $11,363 封頂)', rule: '', 
             type: 'ceiling', limit: 11363, tier1Rate: 0.10, tier2Rate: 0.012, 
             gradient: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)', textColor: 'white', msgDanger: '已封頂 (變1.2%)' 
         },
         { 
-            id: 'c5', name: '聯邦賴點卡', note: 'Line Pay優等生 / 偶數日 (限刷$3000)', rule: '⚠️ 單筆需滿$100', 
+            id: 'c5', name: '聯邦賴點卡', nickname: 'Line Pay優等生', note: 'Line Pay / 偶數日 (刷 $3,000 封頂)', rule: '⚠️ 單筆需滿$100', 
             type: 'ceiling', limit: 3000, tier1Rate: 0.06, tier2Rate: 0.01, 
             threshold: 100,
             gradient: 'linear-gradient(135deg, #00B900 0%, #33CC33 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)',
@@ -406,12 +404,12 @@
             `
         },
         { 
-            id: 'c3', name: '永豐 Sport 卡', note: 'Apple Pay優等生 (限刷$5000)', rule: '', 
+            id: 'c3', name: '永豐 Sport 卡', nickname: 'Apple Pay優等生', note: 'Apple Pay 5% (刷 $5,000 封頂)', rule: '', 
             type: 'ceiling', limit: 5000, tier1Rate: 0.05, tier2Rate: 0.02, 
             gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)' 
         },
         { 
-            id: 'c4', name: '將來將將卡', note: '行支泛用 (限刷$6666)', rule: '', 
+            id: 'c4', name: '將來將將卡', nickname: '行支泛用', note: '行動支付 / 外送 (刷 $6,666 封頂)', rule: '', 
             type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
             gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '已封頂 (變0.5%)',
             parking: `
@@ -432,7 +430,7 @@
             `
         },
         { 
-            id: 'c2', name: '聯邦綠卡', note: '免費市區停車 (低消 $12,000)', rule: '', 
+            id: 'c2', name: '聯邦綠卡', nickname: '🅿️ 市區停車免費', note: '低消 $12,000 免停 (綠色刷 $2,500 封頂)', rule: '', 
             type: 'floor', target: 12000, tier1Rate: 0.02, tier2Rate: 0.02, 
             gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', textColor: 'white', msgSuccess: '已達標 (免停)',
             parking: `
@@ -452,8 +450,7 @@
                 <div style="margin-top:10px; font-size:11px; color:#1b5e20;">
                     🌿 <b>6% 回饋攻略：</b>勾選上方「是綠色通路」。<br>
                     ⚠️ 6%加碼：刷$2,500封頂<br>
-                    ⚠️ 此消費可計入 $12,000 停車門檻<br>
-                    ⚠️ 一般消費：國內1% / 國外2% (無上限)
+                    ⚠️ 此消費可計入 $12,000 停車門檻
                 </div>
             `
         }
@@ -665,14 +662,23 @@
             tile.style.color = card.textColor; 
             tile.onclick = () => openQuickAdd(card.id);
             
+            // 重新復刻 V45 結構 (Header > Nickname > Note > Body > Footer)
             tile.innerHTML = `
-                <div class="tile-header"><span class="tile-name">${card.name}</span><span class="rate-badge" style="color:black">${displayRate}</span></div>
+                <div class="tile-header">
+                    <span class="tile-name">${card.name}</span>
+                    <span class="rate-badge" style="color:black">${displayRate}</span>
+                </div>
+                
+                <div class="tile-nickname-badge">${card.nickname}</div>
+                
                 <span class="tile-note" style="color:${card.textColor==='white'?'rgba(255,255,255,0.8)':'rgba(0,0,0,0.6)'}">${card.note}</span>
+                
                 <div class="tile-body">
                     <div class="tile-stat">$${stats.spend.toLocaleString()}</div>
                     ${ruleHtml}
                     <div class="tile-earned">+$${stats.reward.toLocaleString()}</div>
                 </div>
+                
                 <div class="tile-footer">
                     <div class="progress-track"><div class="progress-fill" style="width:${Math.min(percent, 100)}%"></div></div>
                     <div class="tile-msg" style="${msgStyle}">${statusText}</div>

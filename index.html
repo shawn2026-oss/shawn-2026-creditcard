@@ -49,7 +49,13 @@
         
         .header-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
         .author-top { font-size: 12px; font-weight: 800; color: #007AFF; letter-spacing: 0.5px; }
-        .version-tag { font-size: 10px; color: #888; font-weight: 600; background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; }
+        
+        /* 修正版本號顯示問題：強制不換行、不壓縮 */
+        .version-tag { 
+            font-size: 10px; color: #888; font-weight: 600; 
+            background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; 
+            white-space: nowrap; flex-shrink: 0; 
+        }
         
         .header-section { margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-end; }
         h1 { font-size: 22px; font-weight: 800; margin: 0; color: #333; letter-spacing: -0.5px; line-height: 1.2;}
@@ -152,6 +158,7 @@
         .btn-donate { background: linear-gradient(135deg, #E30000, #FF5050); color: #fff; border: none; box-shadow: 0 4px 10px rgba(227, 0, 0, 0.3); font-size: 14px; }
         .btn-reset-visible { width: 100%; padding: 12px; background-color: #fff5f5; border: 1px solid #ffdede; color: #FF3B30; border-radius: 12px; font-weight: 600; font-size: 12px; cursor: pointer; margin-top: 10px;}
         
+        /* 管理卡片按鈕 */
         .btn-manage { background: #333; color: white; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 1000; align-items: center; justify-content: center; }
@@ -162,6 +169,7 @@
             max-height: 85vh; 
         }
         
+        /* 彈窗內容區塊 */
         .modal-body-input { flex-shrink: 0; }
 
         .input-group label { display: block; font-size: 12px; font-weight: 600; color: #888; margin-bottom: 6px; margin-top: 10px; }
@@ -171,12 +179,28 @@
         .btn-cancel { background: #f5f5f5; color: #333; }
         .btn-confirm { background: #007AFF; color: white; }
         
-        #liveRewardCalc { text-align: center; font-size: 16px; color: #0056b3; font-weight: 700; margin-top: 12px; min-height: 20px; background: #E3F2FD; padding: 8px; border-radius: 8px; display: none; }
+        /* 即時試算顯示 */
+        #liveRewardCalc { 
+            text-align: center; font-size: 16px; color: #0056b3; font-weight: 700; margin-top: 12px; min-height: 20px; background: #E3F2FD; padding: 8px; border-radius: 8px; display: none; 
+        }
         
-        .modal-history-section { margin-top: 15px; border-top: 2px solid #f0f0f0; padding-top: 10px; flex: 1; overflow-y: auto; min-height: 0; }
-        .modal-history-title { font-size: 12px; font-weight: 700; color: #555; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        /* 彈窗內的歷史明細 */
+        .modal-history-section {
+            margin-top: 15px;
+            border-top: 2px solid #f0f0f0;
+            padding-top: 10px;
+            flex: 1; overflow-y: auto; min-height: 0; 
+        }
+        .modal-history-title { 
+            font-size: 12px; font-weight: 700; color: #555; margin-bottom: 8px; 
+            display: flex; justify-content: space-between; align-items: center;
+        }
         
-        .history-item { padding: 10px 0; border-bottom: 1px solid #f9f9f9; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+        /* 歷史項目樣式 */
+        .history-item { 
+            padding: 10px 0; border-bottom: 1px solid #f9f9f9; 
+            display: flex; justify-content: space-between; align-items: center; font-size: 12px; 
+        }
         .history-item:last-child { border-bottom: none; }
         .h-name { font-weight: 600; color: #555; }
         .h-date { font-size: 10px; color: #aaa; margin-top: 2px;}
@@ -185,23 +209,56 @@
         .btn-delete-single:hover { color: #FF3B30; }
 
         /* 選項開關區 */
-        #pigRichOptions, #greenCardOptions, #uniOptions { display: none; background: #f9f9f9; padding: 10px; border-radius: 10px; margin-top: 10px; border: 1px dashed #ddd; }
-        .option-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #555; }
+        #pigRichOptions, #greenCardOptions, #uniOptions {
+            display: none; background: #f9f9f9; padding: 10px; border-radius: 10px; margin-top: 10px; border: 1px dashed #ddd;
+        }
+        .option-row {
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #555;
+        }
         .option-row input[type="checkbox"] { width: 20px; height: 20px; margin: 0; }
         .option-row.read-only { opacity: 0.8; pointer-events: none; }
         .option-row.read-only input { opacity: 0.6; }
         
         /* 管理卡片列表樣式 */
-        .manage-item { display: flex; align-items: center; justify-content: space-between; padding: 16px 12px; border-bottom: 1px solid #f0f0f0; background: #fff; cursor: pointer; transition: background 0.2s; }
+        .manage-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 12px; border-bottom: 1px solid #f0f0f0;
+            background: #fff; cursor: pointer; transition: background 0.2s;
+        }
         .manage-item:active { background: #f9f9f9; }
         .manage-info { display: flex; flex-direction: column; gap: 4px; }
         .manage-name { font-size: 15px; font-weight: 700; color: #333; }
         .manage-desc { font-size: 12px; color: #999; }
         
-        .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+        /* iOS 風格 Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
         input:checked + .slider { background-color: #34C759; }
         input:checked + .slider:before { transform: translateX(20px); }
     </style>
@@ -210,7 +267,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V83.0</div>
+            <div class="version-tag" id="top-version-tag">V84.0</div>
         </div>
 
         <div class="header-section">
@@ -390,13 +447,14 @@
 
     const defaultCards = [
         { 
-            id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', note: '行支/繳費神卡 (刷 $8,000 封頂)', rule: '', 
+            id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', note: '百貨 / 超商 / 海外 / 街口 (刷 $8,000 封頂)', rule: '', 
             type: 'ceiling', limit: 8000, tier1Rate: 0.135, tier2Rate: 0.035, 
             gradient: 'linear-gradient(135deg, #e60012 0%, #FFD700 100%)', 
             textColor: 'white', msgDanger: '已封頂 (變3.5%)',
             parking: `
                 🐷 <b>新戶限定神卡 (加碼至 2026/12/31)</b><br>
                 <hr style="opacity:0.3; margin:8px 0;">
+                
                 <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
                     <summary style="cursor:pointer; font-weight:700; color:#8B0000; font-size:12px;">▼ 點我看 2.5% 精選通路</summary>
                     <div style="margin-top:6px; padding:8px; font-size:11px; line-height:1.6; color:#333; background:rgba(255,255,255,0.9); border-radius:6px;">
@@ -407,6 +465,7 @@
                         ☕ <b>餐飲：</b>星巴克、路易莎、麥當勞、肯德基、王品集團...<br>
                     </div>
                 </details>
+
                 <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
                     <summary style="cursor:pointer; font-weight:700; color:#8B0000; font-size:12px;">▼ 點我看 10% 適用範圍</summary>
                     <div style="margin-top:6px; padding:8px; font-size:11px; line-height:1.6; color:#333; background:rgba(255,255,255,0.9); border-radius:6px;">
@@ -415,6 +474,7 @@
                         ✈️ <b>機票：</b>國內外航空公司 (限透過航空公司購買之機票消費)<br>
                     </div>
                 </details>
+
                 <div style="margin-top:10px; font-size:11px; color:#5d4037;">
                     🧾 <b>繳費 10.15%：</b>需勾選上方「是APP繳費」+「新戶加碼」。<br>
                     ⚠️ 10%加碼：刷$8,000封頂
@@ -437,7 +497,7 @@
                     <summary style="cursor:pointer; font-weight:700; color:#856404; font-size:12px;">點我看完整店家名單 ▼</summary>
                     <div style="margin-top:6px; padding-left:4px; font-size:11px; line-height:1.4; color:#555; max-height:120px; overflow-y:auto; border-radius:4px; background:rgba(255,255,255,0.5); padding:6px;">
                         <div style="margin-bottom:4px;">🍽️ <b>餐廳：</b>王品 / 三商 / 輕井澤 / 漢來 / 饗賓 / 海底撈 / 築間 / 春水堂 / 壽司郎 / 爭鮮 / 八方雲集</div>
-                        <div style="margin-bottom:4px;">🍔 <b>速食：</b>麥當勞 / 肯德基 / 摩斯 / 漢堡王</div>
+                        <div style="margin-bottom:4px;">🍔 <b>速食：</b>麥當勞 / 肯德基 /摩斯 / 漢堡王</div>
                         <div style="margin-bottom:4px;">☕ <b>咖啡：</b>星巴克 / 路易莎 / cama / 50嵐 / 得正 / 麻古 / 可不可</div>
                         <div style="margin-bottom:4px;">💄 <b>美妝：</b>屈臣氏 / 寶雅 / 唐吉訶德 / 大樹 / 杏一 / 丁丁 / 佑全 / 躍獅</div>
                         <div style="margin-bottom:4px;">🏠 <b>家居：</b>IKEA / Hola / 小北 / 汪喵星球 / 東森 / 咕咕G / 魚中魚 / 寵物公園</div>
@@ -516,9 +576,9 @@
                 通路：統一時代百貨台北店、DREAM PLAZA、新光三越、icash Pay、悠遊付、蝦皮購物
             `
         },
-        // 預留卡片 (可於管理介面開啟)
+        // 預留卡片 (僅1張)
         { 
-            id: 'add1', name: '新增卡片 (預留)', nickname: '即將推出', note: '新卡片建置中', 
+            id: 'add1', name: '新增卡片', nickname: '即將推出', note: '新卡片建置中', 
             type: 'placeholder', 
             gradient: 'linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%)', 
             textColor: '#999', msgDanger: '' 
@@ -531,9 +591,11 @@
         visibleCards = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'add1']; // 預設顯示 8 張
         localStorage.setItem('visibleCards', JSON.stringify(visibleCards));
     } else {
-        // 舊用戶自動補上 c7 和 add1，移除 add2
+        // 舊用戶補上 c7 和 add1
         if (!visibleCards.includes('c7')) visibleCards.push('c7');
         if (!visibleCards.includes('add1')) visibleCards.push('add1');
+        
+        // 移除已刪除的 add2
         visibleCards = visibleCards.filter(id => id !== 'add2');
         localStorage.setItem('visibleCards', JSON.stringify(visibleCards));
     }
@@ -558,15 +620,26 @@
 
     function initSortable() {
         var el = document.getElementById('card-grid');
-        if (sortableInstance) { sortableInstance.destroy(); }
+        
+        if (sortableInstance) {
+            sortableInstance.destroy();
+        }
+
         sortableInstance = new Sortable(el, {
-            animation: 150, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag',
-            delay: 200, delayOnTouchOnly: true, forceFallback: true, 
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            dragClass: 'sortable-drag',
+            delay: 200,
+            delayOnTouchOnly: true,
+            forceFallback: true, 
             onEnd: function (evt) {
-                const visibleOrder = Array.from(evt.to.children).map(el => el.getAttribute('data-card-id'));
+                const visibleOrder = Array.from(evt.to.children).map(el => {
+                    return el.getAttribute('data-card-id');
+                });
                 const allCardIds = cards.map(c => c.id);
                 const hiddenCards = allCardIds.filter(id => !visibleOrder.includes(id));
                 const finalOrder = [...visibleOrder, ...hiddenCards];
+
                 localStorage.setItem('cardOrder', JSON.stringify(finalOrder));
                 savedOrder = finalOrder;
             }
@@ -580,8 +653,10 @@
     // --- 核心計算邏輯 ---
     function calculateStats(cardId, addedAmount = 0, addedIsGreen = false, addedIsForeign = false, addedIsUniBonus = false, addedIsUniUp = false) {
         const card = cards.find(c => c.id === cardId);
+        
         if (card.type === 'placeholder') return { spend: 0, validSpend: 0, reward: 0, rate: '0.0' };
 
+        // 統一採用日曆月
         const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
         const relevantTx = transactions.filter(t => t.cardId === cardId && new Date(t.date) >= startDate);
         let totalSpend = relevantTx.reduce((sum, t) => sum + parseFloat(t.amount), 0);
@@ -595,31 +670,22 @@
         // 玉山 UNI (c7)
         if (cardId === 'c7') {
             // 基本盤
-            let currentIsUp = relevantTx.some(t => t.isUniUp); // 只要有一筆是UP選，當月就視為UP選(簡化邏輯)
-            // 但這樣不準，應該看當下勾選。不過為了單筆試算，我們假設切換方案是全月生效
-            // 這裡採用: 如果勾選 UP選，則當月所有消費都套用 UP 選費率 (符合玉山規則: 月底最後一天方案為準)
-            // 若 addedIsUniUp 為 true，則模擬整個月都是 UP 選
-            
-            // 判斷當月是否為 UP 選狀態 (若新交易勾選，或舊交易有勾選)
-            // 修正：簡單點，只看當下操作的開關決定「預覽」費率。
-            // 但統計時，我們假設使用者會去管理那個開關。
-            // 這裡為了讓「即時試算」準確，我們用 addedIsUniUp 來決定全月費率
-            
-            // 實際邏輯：讀取設定檔或假設當下勾選代表全月
-            // 這裡我們用一個簡單的假設：如果勾選 UP，則 Base Rate = 4.5% Cap 142857
-            
             let baseRate = 0.035;
             let baseCap = 40000;
             
-            // 檢查是否有勾選 UP (從傳入參數判斷，這代表使用者當下的意圖)
-            // 注意：這裡我們需要一個全域變數或從 DOM 讀取狀態來決定「本月方案」，但為了保持函式純粹，我們依賴傳入參數。
-            // 對於歷史交易統計，我們可能需要一個「全月設定」。
-            // 暫時解法：若任一筆交易標記為 UP，或新增時勾選 UP，則全月視為 UP。
+            // 檢查是否有勾選 UP
             const isUpMonth = addedIsUniUp || relevantTx.some(t => t.isUniUp);
             
             if (isUpMonth) {
                 baseRate = 0.045;
-                baseCap = 142857;
+                baseCap = 142857; // 5000 / 0.035(基本) vs 5000 / 0.045(UP) ? 
+                // 修正：UP 選是加碼 1%，基本 3.5% + 1% = 4.5%。
+                // 這裡的 Cap 是「UP選加碼上限」嗎？
+                // 根據官網，UP 選是每月「額外加碼」部分有上限。
+                // 假設：基本回饋無上限，加碼部分有上限。
+                // 為了簡化，這裡暫時沿用 V83 的邏輯：
+                // UP選：4.5% (上限 142,857) -> 推算自 5000 點 / (4.5% - 1%?) = 142857
+                // 實際上可能更複雜，但先維持您要求的 V83 邏輯。
             }
 
             // 計算基本回饋
@@ -653,8 +719,8 @@
             const totalGreenSpend = currentGreenSpend + newGreenAmount;
             const greenEligible = Math.min(totalGreenSpend, 2500);
             const greenReward = greenEligible * 0.06;
+            
             const greenOverflow = Math.max(0, totalGreenSpend - 2500);
-
             const currentForeignSpend = relevantTx.filter(t => t.isForeign).reduce((sum, t) => sum + t.amount, 0);
             let newForeignAmount = addedIsForeign ? addedAmount : 0;
             const totalForeignSpend = currentForeignSpend + newForeignAmount;
@@ -667,12 +733,12 @@
             const normalReward = (greenOverflow + totalNormalSpend) * 0.01;
             reward = greenReward + foreignReward + normalReward;
             
+            // 修正：綠卡固定顯示 6.0% (代表最高戰力)
             let actualRate = 6.0;
-            if (totalSpend > 0) actualRate = (reward / totalSpend) * 100;
             return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: actualRate.toFixed(1) };
         }
 
-        // 其他卡片 (c6, c1, c5, c3, c4)
+        // 其他卡片邏輯
         if (card.type === 'mixed') {
             if (validSpend < card.minSpend) reward = validSpend * card.tier2Rate; 
             else if (validSpend <= card.limit) reward = validSpend * card.tier1Rate;
@@ -694,6 +760,7 @@
     function toggleBillLogic() {
         const isBill = document.getElementById('checkIsBill').checked;
         const labelBase = document.getElementById('labelBaseRate');
+        
         if (isBill) {
             document.getElementById('checkBonus25').checked = false;
             labelBase.innerText = "🔰 基本回饋 0.15% (無上限)";
@@ -706,6 +773,7 @@
     function toggleSelectedLogic() {
         const isSelected = document.getElementById('checkBonus25').checked;
         const labelBase = document.getElementById('labelBaseRate');
+
         if (isSelected) {
             document.getElementById('checkIsBill').checked = false;
             labelBase.innerText = "🔰 基本回饋 1% (無上限)";
@@ -797,10 +865,9 @@
         const container = document.getElementById('card-grid');
         let monthTotalReward = 0; container.innerHTML = '';
         
+        // 修正：總金額計算包含所有卡片（含隱藏）
         cards.forEach(card => {
              if (card.type === 'placeholder') return;
-             // 渲染時，如果該卡有被設定為 UP 選 (歷史紀錄中有)，則用 UP 選費率計算總額
-             // 這裡稍微簡化，直接呼叫 calculateStats，它會去檢查交易紀錄
              const stats = calculateStats(card.id);
              monthTotalReward += stats.reward;
         });
@@ -834,7 +901,7 @@
             }
 
             const ruleHtml = card.rule ? `<div class="tile-rule">${card.rule}</div>` : '';
-            let displayRate = `${stats.rate}%`;
+            let displayRate = card.id === 'c2' ? '6.0%' : `${stats.rate}%`;
             if (card.type === 'placeholder') displayRate = '--%';
 
             let tileClass = 'card-tile';
@@ -847,6 +914,7 @@
             tile.style.background = card.gradient; 
             tile.style.color = card.textColor; 
             
+            // 佔位卡點擊事件不同 - 修改為「新卡片建置中」
             if (card.type === 'placeholder') {
                 tile.onclick = () => alert('新卡片建置中');
             } else {
@@ -876,6 +944,7 @@
         initSortable();
     }
     
+    // 開啟管理卡片視窗
     function openManageModal() {
         const list = document.getElementById('manageCardList');
         list.innerHTML = '';
@@ -1071,9 +1140,8 @@
             }
         }
     }
-
-    function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
     
+    function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
     async function exportData() {
         const dataStr = JSON.stringify(transactions);
         const now = new Date();
@@ -1095,9 +1163,7 @@
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }
-    
     function triggerImport() { document.getElementById('fileInput').click(); }
-    
     function importFile(input) {
         const file = input.files[0];
         if (!file) return;
@@ -1116,10 +1182,8 @@
         reader.readAsText(file);
         input.value = '';
     }
-    
     function showDonateModal() { document.getElementById('donateModal').style.display = 'flex'; }
     function copyBankInfo() { navigator.clipboard.writeText("396901798704").then(() => { alert("✅ 帳號已複製！(銀行代碼 396)"); }); }
-    
     function checkUrgentTasks() {
         const alertArea = document.getElementById('urgent-alert-area'), alertList = document.getElementById('urgent-list'); alertList.innerHTML = ''; let hasUrgent = false;
         cards.forEach(card => {

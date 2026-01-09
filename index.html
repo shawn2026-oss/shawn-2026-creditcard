@@ -216,7 +216,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V64.0</div>
+            <div class="version-tag" id="top-version-tag">V65.0</div>
         </div>
 
         <div class="header-section">
@@ -359,7 +359,7 @@
 
     const defaultCards = [
         { 
-            id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', note: '自選回饋 (刷 $8,000 封頂)', rule: '', 
+            id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', note: '行支/繳費神卡 (限刷$8000)', rule: '', 
             type: 'ceiling', limit: 8000, tier1Rate: 0.135, tier2Rate: 0.035, 
             gradient: 'linear-gradient(135deg, #e60012 0%, #FFD700 100%)', 
             textColor: 'white', msgDanger: '已封頂 (變3.5%)',
@@ -394,12 +394,12 @@
             `
         },
         { 
-            id: 'c1', name: '星展傳說對決卡', nickname: 'Line Pay神卡', note: 'LinePay / 蝦皮 (刷 $11,363 封頂)', rule: '', 
+            id: 'c1', name: '星展傳說對決卡', nickname: 'Line Pay神卡', note: 'LinePay / 蝦皮 / 外送 (限刷$11363)', rule: '', 
             type: 'ceiling', limit: 11363, tier1Rate: 0.10, tier2Rate: 0.012, 
             gradient: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)', textColor: 'white', msgDanger: '已封頂 (變1.2%)' 
         },
         { 
-            id: 'c5', name: '聯邦賴點卡', nickname: 'Line Pay優等生', note: 'Line Pay / 偶數日指定通路 (刷 $3,000 封頂)', rule: '⚠️ 單筆需滿$100', 
+            id: 'c5', name: '聯邦賴點卡', nickname: 'Line Pay優等生', note: 'Line Pay / 偶數日指定通路 (限刷$3000)', rule: '⚠️ 單筆需滿$100', 
             type: 'ceiling', limit: 3000, tier1Rate: 0.06, tier2Rate: 0.01, 
             threshold: 100,
             gradient: 'linear-gradient(135deg, #00B900 0%, #33CC33 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)',
@@ -419,12 +419,12 @@
             `
         },
         { 
-            id: 'c3', name: '永豐 Sport 卡', nickname: 'Apple Pay優等生', note: 'Apple Pay 5% (刷 $5,000 封頂)', rule: '', 
+            id: 'c3', name: '永豐 Sport 卡', nickname: 'Apple Pay優等生', note: 'Apple Pay 5% (限刷$5000)', rule: '', 
             type: 'ceiling', limit: 5000, tier1Rate: 0.05, tier2Rate: 0.02, 
             gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)' 
         },
         { 
-            id: 'c4', name: '將來將將卡', nickname: '行支泛用', note: '行動支付 / 外送 (刷 $6,666 封頂)', rule: '', 
+            id: 'c4', name: '將來將將卡', nickname: '行支泛用', note: '行動支付 / 外送 (限刷$6666)', rule: '', 
             type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
             gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '已封頂 (變0.5%)',
             parking: `
@@ -512,7 +512,7 @@
 
     function updateDate() { const now = new Date(); document.getElementById('dateDisplay').innerText = `${now.getMonth()+1}/${now.getDate()}`; }
 
-    // --- 核心計算邏輯 (通用版 + 綠卡邏輯) ---
+    // --- 核心計算邏輯 ---
     function calculateStats(cardId, addedAmount = 0, addedIsGreen = false) {
         const card = cards.find(c => c.id === cardId);
         const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
@@ -545,12 +545,11 @@
             if (totalSpend > 0) {
                  actualRate = (reward / totalSpend) * 100;
             } else {
-                 actualRate = 6.0; // 預設顯示最高回饋
+                 actualRate = 6.0; 
             }
             return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: actualRate.toFixed(1) };
         }
 
-        // 其他卡片邏輯
         if (card.type === 'mixed') {
             if (validSpend < card.minSpend) reward = validSpend * card.tier2Rate; 
             else if (validSpend <= card.limit) reward = validSpend * card.tier1Rate;

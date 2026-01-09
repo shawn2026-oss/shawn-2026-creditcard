@@ -50,7 +50,7 @@
         .header-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; width: 100%; }
         .author-top { font-size: 12px; font-weight: 800; color: #007AFF; letter-spacing: 0.5px; }
         
-        /* 修正：強制顯示版本號，防止被擠壓消失 */
+        /* 修正：強制顯示版本號 */
         .version-tag { 
             font-size: 10px; color: #888; font-weight: 600; 
             background: rgba(0,0,0,0.05); padding: 2px 8px; border-radius: 4px; 
@@ -284,7 +284,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V85.0</div>
+            <div class="version-tag" id="top-version-tag">V86.0</div>
         </div>
 
         <div class="header-section">
@@ -562,7 +562,6 @@
                 🅿️ <b>免費停車：</b><br>台灣聯通、詮營、ViVi PARK、嘟嘟房、車麻吉<br>(需上月刷滿1.2萬)<br>
                 ⚠️ 國內1% / 國外2% (無上限)<br>
                 <hr style="opacity:0.3; margin:8px 0;">
-                
                 <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
                     <summary style="cursor:pointer; font-weight:700; color:#8B0000; font-size:12px;">▼ 點我看 6% 綠色通路</summary>
                     <div style="margin-top:6px; padding:8px; font-size:11px; line-height:1.6; color:#333; background:rgba(255,255,255,0.9); border-radius:6px;">
@@ -572,7 +571,6 @@
                         🌍 <b>綠色捐贈：</b>荒野保護、千里步道、齊柏林、主婦聯盟基金會...<br>
                     </div>
                 </details>
-                
                 <div style="margin-top:10px; font-size:11px; color:#1b5e20;">
                     🌿 <b>6% 回饋攻略：</b>勾選上方「是綠色通路」。<br>
                     ⚠️ 6%加碼：刷$2,500封頂<br>
@@ -607,14 +605,12 @@
     // 初始化顯示狀態
     let visibleCards = JSON.parse(localStorage.getItem('visibleCards'));
     if (!visibleCards) {
-        visibleCards = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'add1']; // 預設顯示 8 張
+        visibleCards = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'add1']; 
         localStorage.setItem('visibleCards', JSON.stringify(visibleCards));
     } else {
-        // 舊用戶補上 c7 和 add1
+        // 舊用戶補上 c7 和 add1，移除 add2
         if (!visibleCards.includes('c7')) visibleCards.push('c7');
         if (!visibleCards.includes('add1')) visibleCards.push('add1');
-        
-        // 移除已刪除的 add2
         visibleCards = visibleCards.filter(id => id !== 'add2');
         localStorage.setItem('visibleCards', JSON.stringify(visibleCards));
     }
@@ -697,7 +693,8 @@
             
             if (isUpMonth) {
                 baseRate = 0.045;
-                baseCap = 142857;
+                baseCap = 142857; // 推算自 5000 / (4.5% - 1%?) = 142857 (假設基本1%不計入上限)
+                // 這裡簡化處理：假設UP選加碼後總回饋4.5%，總上限約14萬
             }
 
             // 計算基本回饋
@@ -784,6 +781,7 @@
     function toggleSelectedLogic() {
         const isSelected = document.getElementById('checkBonus25').checked;
         const labelBase = document.getElementById('labelBaseRate');
+
         if (isSelected) {
             document.getElementById('checkIsBill').checked = false;
             labelBase.innerText = "🔰 基本回饋 1% (無上限)";
@@ -961,11 +959,15 @@
         
         cards.forEach(card => {
             const isVisible = visibleCards.includes(card.id);
+            // 點擊整行觸發切換
             const item = document.createElement('div');
             item.className = 'manage-item';
+            // 將 onclick 綁在整個 div 上
             item.onclick = function() {
+                // 找到內部的 checkbox 並切換狀態
                 const checkbox = this.querySelector('input[type="checkbox"]');
                 checkbox.checked = !checkbox.checked;
+                // 觸發切換邏輯
                 toggleCardVisibility(card.id);
             };
 
@@ -992,7 +994,7 @@
             visibleCards.push(cardId);
         }
         localStorage.setItem('visibleCards', JSON.stringify(visibleCards));
-        renderGrid(); 
+        renderGrid(); // 即時刷新背景
     }
 
     // ... (其餘函式保持不變) ...

@@ -166,7 +166,7 @@
         .btn-cancel { background: #f5f5f5; color: #333; }
         .btn-confirm { background: #007AFF; color: white; }
         
-        /* 即時試算顯示 (顯眼藍色方塊) */
+        /* 即時試算顯示 */
         #liveRewardCalc { 
             text-align: center; 
             font-size: 16px; 
@@ -194,13 +194,16 @@
             margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #555;
         }
         .option-row input[type="checkbox"] { width: 20px; height: 20px; margin: 0; }
+        /* 讓第一行(基本回饋)看起來像標題 */
+        .option-row.read-only { opacity: 0.8; pointer-events: none; }
+        .option-row.read-only input { opacity: 0.6; }
     </style>
 </head>
 <body>
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V52.0</div>
+            <div class="version-tag" id="top-version-tag">V54.0</div>
         </div>
 
         <div class="header-section">
@@ -215,7 +218,7 @@
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
         
         <div class="total-reward-card">
-            <span class="total-reward-label">本月預估</span>
+            <span class="total-reward-label">本月總回饋預估</span>
             <span class="total-reward-amount" id="totalRewardDisplay">$0</span>
         </div>
         
@@ -253,13 +256,17 @@
             </div>
             
             <div id="pigRichOptions">
+                <div class="option-row read-only">
+                    <label id="labelBaseRate">🔰 基本回饋 1% (無上限)</label>
+                    <input type="checkbox" checked disabled>
+                </div>
                 <div class="option-row">
-                    <label for="checkBonus10">⚡ 新戶加碼10% (上限8千)</label>
+                    <label for="checkBonus10">⚡ 新戶加碼10% (限刷$8000)</label>
                     <input type="checkbox" id="checkBonus10" checked onchange="updateRewardPreview()">
                 </div>
                 <div class="option-row">
                     <label for="checkBonus25">🌟 精選通路2.5% (超商/百貨)</label>
-                    <input type="checkbox" id="checkBonus25" checked onchange="toggleSelectedLogic()">
+                    <input type="checkbox" id="checkBonus25" checked onchange="updateRewardPreview()">
                 </div>
                 <div class="option-row" style="margin-bottom:0; border-top:1px dashed #ddd; padding-top:6px;">
                     <label for="checkIsBill">🧾 是APP繳費 (底1%→0.15%)</label>
@@ -269,7 +276,7 @@
 
             <div id="greenCardOptions">
                 <div class="option-row" style="margin-bottom:0;">
-                    <label for="checkGreenChannel">🌿 是綠色通路 (6% 上限$150)</label>
+                    <label for="checkGreenChannel">🌿 是綠色通路 (6% 限刷$2500)</label>
                     <input type="checkbox" id="checkGreenChannel" onchange="updateRewardPreview()">
                 </div>
             </div>
@@ -339,10 +346,10 @@
 
     const defaultCards = [
         { 
-            id: 'c6', name: '台新街口豬富卡', note: '自選回饋 (最高13.5%)', rule: '', 
+            id: 'c6', name: '台新街口豬富卡', note: '自選回饋 (刷 $8,000 封頂)', rule: '', 
             type: 'ceiling', limit: 8000, tier1Rate: 0.135, tier2Rate: 0.035, 
             gradient: 'linear-gradient(135deg, #e60012 0%, #FFD700 100%)', 
-            textColor: 'white', msgDanger: '10%已滿 (變3.5%)',
+            textColor: 'white', msgDanger: '已封頂 (變3.5%)',
             parking: `
                 🐷 <b>新戶限定神卡 (加碼至 2026/12/31)</b><br>
                 <hr style="opacity:0.3; margin:8px 0;">
@@ -369,20 +376,20 @@
 
                 <div style="margin-top:10px; font-size:11px; color:#5d4037;">
                     🧾 <b>繳費 10.15%：</b>需勾選上方「是APP繳費」+「新戶加碼」。<br>
-                    ⚠️ 10%加碼上限800元(刷$8000)
+                    ⚠️ 10%加碼：刷$8,000封頂
                 </div>
             `
         },
         { 
-            id: 'c1', name: '星展傳說對決', note: 'LinePay / 蝦皮 / UberEats', rule: '', 
+            id: 'c1', name: '星展傳說對決', note: 'LinePay / 蝦皮 (刷 $11,363 封頂)', rule: '', 
             type: 'ceiling', limit: 11363, tier1Rate: 0.10, tier2Rate: 0.012, 
-            gradient: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)', textColor: 'white', msgDanger: '已滿 (1.2%)' 
+            gradient: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)', textColor: 'white', msgDanger: '已封頂 (變1.2%)' 
         },
         { 
-            id: 'c5', name: '聯邦賴點卡', note: 'LinePay / 偶數日指定通路', rule: '⚠️ 單筆需滿$100', 
+            id: 'c5', name: '聯邦賴點卡', note: '指定通路 6% (刷 $3,000 封頂)', rule: '⚠️ 單筆需滿$100', 
             type: 'ceiling', limit: 3000, tier1Rate: 0.06, tier2Rate: 0.01, 
             threshold: 100,
-            gradient: 'linear-gradient(135deg, #00B900 0%, #33CC33 100%)', textColor: 'white', msgDanger: '6% 已滿',
+            gradient: 'linear-gradient(135deg, #00B900 0%, #33CC33 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)',
             parking: `
                 ⚠️ <b>單筆需滿 $100</b> (回饋 6%)<br>
                 <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
@@ -399,14 +406,14 @@
             `
         },
         { 
-            id: 'c3', name: '永豐 Sport', note: 'Apple Pay (5%)', rule: '', 
+            id: 'c3', name: '永豐 Sport', note: 'Apple Pay 5% (刷 $5,000 封頂)', rule: '', 
             type: 'ceiling', limit: 5000, tier1Rate: 0.05, tier2Rate: 0.02, 
-            gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '5% 已滿' 
+            gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)' 
         },
         { 
-            id: 'c4', name: '將來將將', note: '行動支付 / 外送 / 網購', rule: '', 
+            id: 'c4', name: '將來將將', note: '指定通路 5% (刷 $6,666 封頂)', rule: '', 
             type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
-            gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '加碼已滿',
+            gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '已封頂 (變0.5%)',
             parking: `
                 💡 <b>需當月滿 $3,000</b> (回饋 4.5%)<br>
                 <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
@@ -425,7 +432,7 @@
             `
         },
         { 
-            id: 'c2', name: '聯邦綠卡', note: '綠色6% / 國外2% / 國內1%', rule: '', 
+            id: 'c2', name: '聯邦綠卡', note: '湊 $12,000 免停 (綠色刷 $2,500 封頂)', rule: '', 
             type: 'floor', target: 12000, tier1Rate: 0.02, tier2Rate: 0.02, 
             gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', textColor: 'white', msgSuccess: '已達標 (免停)',
             parking: `
@@ -444,7 +451,7 @@
                 
                 <div style="margin-top:10px; font-size:11px; color:#1b5e20;">
                     🌿 <b>6% 回饋攻略：</b>勾選上方「是綠色通路」。<br>
-                    ⚠️ 6%加碼上限150元(刷$2500)<br>
+                    ⚠️ 6%加碼：刷$2,500封頂<br>
                     ⚠️ 此消費可計入 $12,000 停車門檻
                 </div>
             `
@@ -486,7 +493,7 @@
 
     function updateDate() { const now = new Date(); document.getElementById('dateDisplay').innerText = `${now.getMonth()+1}/${now.getDate()}`; }
 
-    // --- 核心計算邏輯 ---
+    // --- 核心計算邏輯 (通用版 + 綠卡邏輯) ---
     function calculateStats(cardId, addedAmount = 0, addedIsGreen = false) {
         const card = cards.find(c => c.id === cardId);
         const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
@@ -499,8 +506,9 @@
 
         let reward = 0;
         
-        // 綠卡專屬邏輯
+        // 綠卡專屬邏輯 (c2)
         if (cardId === 'c2') {
+            // 1. 計算綠色通路回饋 (6% 上限150元 -> 刷2500)
             const currentGreenSpend = relevantTx.filter(t => t.isGreen).reduce((sum, t) => sum + t.amount, 0);
             let newGreenAmount = addedIsGreen ? addedAmount : 0;
             const totalGreenSpend = currentGreenSpend + newGreenAmount;
@@ -537,24 +545,19 @@
         return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: currentRate.toFixed(1) };
     }
 
-    // --- 豬富卡防呆互斥邏輯 (雙向) ---
     function toggleBillLogic() {
         const isBill = document.getElementById('checkIsBill').checked;
+        const labelBase = document.getElementById('labelBaseRate');
+        
         if (isBill) {
-            document.getElementById('checkBonus25').checked = false; // 勾繳費 -> 取消精選
+            document.getElementById('checkBonus25').checked = false;
+            labelBase.innerText = "🔰 基本回饋 0.15% (無上限)";
+        } else {
+            labelBase.innerText = "🔰 基本回饋 1% (無上限)";
         }
         updateRewardPreview();
     }
 
-    function toggleSelectedLogic() {
-        const isSelected = document.getElementById('checkBonus25').checked;
-        if (isSelected) {
-            document.getElementById('checkIsBill').checked = false; // 勾精選 -> 取消繳費
-        }
-        updateRewardPreview();
-    }
-
-    // --- 即時回饋試算 ---
     function updateRewardPreview() {
         const inputVal = document.getElementById('amountInput').value;
         const amount = parseFloat(inputVal);
@@ -624,13 +627,14 @@
             monthTotalReward += stats.reward;
             let percent = 0, statusText = '', msgStyle = '';
             
-            if (card.id === 'c2') { 
+            // 顯示邏輯
+            if (card.id === 'c2') { // 綠卡特殊顯示
                 percent = (stats.validSpend / card.target) * 100;
                 statusText = stats.validSpend >= card.target ? '任務達成 (免停)' : `差 $${(card.target - stats.validSpend).toLocaleString()}`;
             } else if (card.type === 'mixed') {
                 if (stats.validSpend < card.minSpend) { percent = (stats.validSpend / card.minSpend) * 100; statusText = `差 $${(card.minSpend - stats.validSpend).toLocaleString()} 升級`; msgStyle = 'color: #FFD700;'; }
                 else if (stats.validSpend <= card.limit) { percent = (stats.validSpend / card.limit) * 100; const remain = card.limit - stats.validSpend; statusText = `剩 $${remain.toLocaleString()} (5%)`; }
-                else { percent = 100; statusText = '已滿 (0.5%)'; msgStyle = 'color: #ffcccc;'; }
+                else { percent = 100; statusText = '已封頂 (變0.5%)'; msgStyle = 'color: #ffcccc;'; }
             } else if (card.type === 'ceiling') {
                 percent = (stats.validSpend / card.limit) * 100;
                 if (stats.validSpend <= card.limit) { const remain = card.limit - stats.validSpend; statusText = `剩 $${remain.toLocaleString()}`; if(remain < 1000) {statusText = `⚠️ 剩 $${remain.toLocaleString()}`; msgStyle='color:#FFD700;';} }
@@ -688,6 +692,7 @@
             document.getElementById('checkBonus10').checked = true;
             document.getElementById('checkBonus25').checked = true;
             document.getElementById('checkIsBill').checked = false; 
+            document.getElementById('labelBaseRate').innerText = "🔰 基本回饋 1% (無上限)";
         }
         if (cardId === 'c2') {
             document.getElementById('checkGreenChannel').checked = false; 

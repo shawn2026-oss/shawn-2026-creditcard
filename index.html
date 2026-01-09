@@ -166,7 +166,7 @@
         .btn-cancel { background: #f5f5f5; color: #333; }
         .btn-confirm { background: #007AFF; color: white; }
         
-        /* 即時試算顯示 */
+        /* 即時試算顯示 (顯眼藍色方塊) */
         #liveRewardCalc { 
             text-align: center; 
             font-size: 16px; 
@@ -200,7 +200,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V51.0</div>
+            <div class="version-tag" id="top-version-tag">V52.0</div>
         </div>
 
         <div class="header-section">
@@ -404,7 +404,7 @@
             gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '5% 已滿' 
         },
         { 
-            id: 'c4', name: '將來將將', note: '行動支付 / 外送 /網購', rule: '', 
+            id: 'c4', name: '將來將將', note: '行動支付 / 外送 / 網購', rule: '', 
             type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
             gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '加碼已滿',
             parking: `
@@ -425,7 +425,7 @@
             `
         },
         { 
-            id: 'c2', name: '聯邦綠卡', note: '國外2% / 國內1%', rule: '', 
+            id: 'c2', name: '聯邦綠卡', note: '綠色6% / 國外2% / 國內1%', rule: '', 
             type: 'floor', target: 12000, tier1Rate: 0.02, tier2Rate: 0.02, 
             gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', textColor: 'white', msgSuccess: '已達標 (免停)',
             parking: `

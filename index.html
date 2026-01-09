@@ -166,7 +166,7 @@
         .btn-cancel { background: #f5f5f5; color: #333; }
         .btn-confirm { background: #007AFF; color: white; }
         
-        /* 即時試算顯示 */
+        /* 即時試算顯示 (顯眼藍色方塊) */
         #liveRewardCalc { 
             text-align: center; 
             font-size: 16px; 
@@ -203,7 +203,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V54.0</div>
+            <div class="version-tag" id="top-version-tag">V55.0</div>
         </div>
 
         <div class="header-section">
@@ -266,7 +266,7 @@
                 </div>
                 <div class="option-row">
                     <label for="checkBonus25">🌟 精選通路2.5% (超商/百貨)</label>
-                    <input type="checkbox" id="checkBonus25" checked onchange="updateRewardPreview()">
+                    <input type="checkbox" id="checkBonus25" checked onchange="toggleSelectedLogic()">
                 </div>
                 <div class="option-row" style="margin-bottom:0; border-top:1px dashed #ddd; padding-top:6px;">
                     <label for="checkIsBill">🧾 是APP繳費 (底1%→0.15%)</label>
@@ -508,7 +508,6 @@
         
         // 綠卡專屬邏輯 (c2)
         if (cardId === 'c2') {
-            // 1. 計算綠色通路回饋 (6% 上限150元 -> 刷2500)
             const currentGreenSpend = relevantTx.filter(t => t.isGreen).reduce((sum, t) => sum + t.amount, 0);
             let newGreenAmount = addedIsGreen ? addedAmount : 0;
             const totalGreenSpend = currentGreenSpend + newGreenAmount;
@@ -553,6 +552,17 @@
             document.getElementById('checkBonus25').checked = false;
             labelBase.innerText = "🔰 基本回饋 0.15% (無上限)";
         } else {
+            labelBase.innerText = "🔰 基本回饋 1% (無上限)";
+        }
+        updateRewardPreview();
+    }
+    
+    function toggleSelectedLogic() {
+        const isSelected = document.getElementById('checkBonus25').checked;
+        const labelBase = document.getElementById('labelBaseRate');
+
+        if (isSelected) {
+            document.getElementById('checkIsBill').checked = false;
             labelBase.innerText = "🔰 基本回饋 1% (無上限)";
         }
         updateRewardPreview();

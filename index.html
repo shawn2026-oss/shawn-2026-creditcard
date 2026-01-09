@@ -203,7 +203,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V55.0</div>
+            <div class="version-tag" id="top-version-tag">V61.0</div>
         </div>
 
         <div class="header-section">
@@ -266,7 +266,7 @@
                 </div>
                 <div class="option-row">
                     <label for="checkBonus25">🌟 精選通路2.5% (超商/百貨)</label>
-                    <input type="checkbox" id="checkBonus25" checked onchange="toggleSelectedLogic()">
+                    <input type="checkbox" id="checkBonus25" checked onchange="updateRewardPreview()">
                 </div>
                 <div class="option-row" style="margin-bottom:0; border-top:1px dashed #ddd; padding-top:6px;">
                     <label for="checkIsBill">🧾 是APP繳費 (底1%→0.15%)</label>
@@ -346,7 +346,7 @@
 
     const defaultCards = [
         { 
-            id: 'c6', name: '台新街口豬富卡', note: '自選回饋 (刷 $8,000 封頂)', rule: '', 
+            id: 'c6', name: '台新街口豬富卡', note: '行支繳費神卡 (限刷$8000)', rule: '', 
             type: 'ceiling', limit: 8000, tier1Rate: 0.135, tier2Rate: 0.035, 
             gradient: 'linear-gradient(135deg, #e60012 0%, #FFD700 100%)', 
             textColor: 'white', msgDanger: '已封頂 (變3.5%)',
@@ -381,12 +381,12 @@
             `
         },
         { 
-            id: 'c1', name: '星展傳說對決', note: 'LinePay / 蝦皮 (刷 $11,363 封頂)', rule: '', 
+            id: 'c1', name: '星展傳說對決卡', note: 'Line Pay神卡 (限刷$11363)', rule: '', 
             type: 'ceiling', limit: 11363, tier1Rate: 0.10, tier2Rate: 0.012, 
             gradient: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)', textColor: 'white', msgDanger: '已封頂 (變1.2%)' 
         },
         { 
-            id: 'c5', name: '聯邦賴點卡', note: '指定通路 6% (刷 $3,000 封頂)', rule: '⚠️ 單筆需滿$100', 
+            id: 'c5', name: '聯邦賴點卡', note: 'Line Pay優等生 / 偶數日 (限刷$3000)', rule: '⚠️ 單筆需滿$100', 
             type: 'ceiling', limit: 3000, tier1Rate: 0.06, tier2Rate: 0.01, 
             threshold: 100,
             gradient: 'linear-gradient(135deg, #00B900 0%, #33CC33 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)',
@@ -406,12 +406,12 @@
             `
         },
         { 
-            id: 'c3', name: '永豐 Sport', note: 'Apple Pay 5% (刷 $5,000 封頂)', rule: '', 
+            id: 'c3', name: '永豐 Sport 卡', note: 'Apple Pay優等生 (限刷$5000)', rule: '', 
             type: 'ceiling', limit: 5000, tier1Rate: 0.05, tier2Rate: 0.02, 
             gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)' 
         },
         { 
-            id: 'c4', name: '將來將將', note: '指定通路 5% (刷 $6,666 封頂)', rule: '', 
+            id: 'c4', name: '將來將將卡', note: '行支泛用 (限刷$6666)', rule: '', 
             type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
             gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '已封頂 (變0.5%)',
             parking: `
@@ -432,7 +432,7 @@
             `
         },
         { 
-            id: 'c2', name: '聯邦綠卡', note: '湊 $12,000 免停 (綠色刷 $2,500 封頂)', rule: '', 
+            id: 'c2', name: '聯邦綠卡', note: '國內1% / 國外2% / 綠色6% (湊$12000)', rule: '', 
             type: 'floor', target: 12000, tier1Rate: 0.02, tier2Rate: 0.02, 
             gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', textColor: 'white', msgSuccess: '已達標 (免停)',
             parking: `
@@ -452,7 +452,8 @@
                 <div style="margin-top:10px; font-size:11px; color:#1b5e20;">
                     🌿 <b>6% 回饋攻略：</b>勾選上方「是綠色通路」。<br>
                     ⚠️ 6%加碼：刷$2,500封頂<br>
-                    ⚠️ 此消費可計入 $12,000 停車門檻
+                    ⚠️ 此消費可計入 $12,000 停車門檻<br>
+                    ⚠️ 一般消費：國內1% / 國外2% (無上限)
                 </div>
             `
         }

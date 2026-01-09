@@ -109,10 +109,14 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; 
             transition: transform 0.1s; cursor: pointer; color: white; overflow: hidden; 
             user-select: none; -webkit-user-select: none;
+            /* 關鍵修復：確保觸控事件不被攔截 */
+            touch-action: none; 
         }
         .card-tile:active { transform: scale(0.97); }
-        .sortable-ghost { opacity: 0.4; transform: scale(0.95); }
-        .sortable-drag { cursor: grabbing; }
+        
+        /* 懸浮樣式強化 */
+        .sortable-ghost { opacity: 0.4; transform: scale(0.95); background: rgba(255,255,255,0.8); }
+        .sortable-drag { cursor: grabbing; transform: scale(1.05); z-index: 1000; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
 
         .tile-header { display: flex; justify-content: space-between; align-items: flex-start; z-index: 2; margin-bottom: 2px;}
         .tile-name { font-size: 15px; font-weight: 800; line-height: 1.2; text-shadow: 0 1px 2px rgba(0,0,0,0.15); }
@@ -223,22 +227,62 @@
         .option-row.read-only { opacity: 0.8; pointer-events: none; }
         .option-row.read-only input { opacity: 0.6; }
         
-        /* 管理卡片列表樣式 (極簡版) */
+        /* 管理卡片列表樣式 (iOS 風格優化) */
         .manage-item {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 12px; border-bottom: 1px solid #eee;
+            padding: 16px 12px; /* 增加點擊區域 */
+            border-bottom: 1px solid #f0f0f0;
+            background: #fff;
+            cursor: pointer;
+            transition: background 0.2s;
         }
-        .manage-item:last-child { border-bottom: none; }
-        .manage-info { display: flex; flex-direction: column; }
-        .manage-name { font-size: 14px; font-weight: 700; color: #333; }
-        .manage-desc { font-size: 11px; color: #888; }
+        .manage-item:active { background: #f9f9f9; }
+        .manage-info { display: flex; flex-direction: column; gap: 4px; }
+        .manage-name { font-size: 15px; font-weight: 700; color: #333; }
+        .manage-desc { font-size: 12px; color: #999; }
+        
+        /* iOS 風格 Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        input:checked + .slider {
+            background-color: #34C759; /* iOS Green */
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
     </style>
 </head>
 <body>
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V77.0</div>
+            <div class="version-tag" id="top-version-tag">V79.0</div>
         </div>
 
         <div class="header-section">
@@ -342,9 +386,11 @@
 
     <div id="manageModal" class="modal" onclick="if(event.target===this) document.getElementById('manageModal').style.display='none'">
         <div class="modal-content" style="max-height:80vh; overflow-y:auto;">
-            <h2 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 800; color:#333;">管理我的卡片</h2>
-            <div style="font-size:12px; color:#888; margin-bottom:12px;">勾選以顯示卡片：</div>
-            <div id="manageCardList"></div>
+            <h2 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 800; color:#333;">管理我的卡片</h2>
+            <div style="font-size:12px; color:#888; margin-bottom:12px;">開啟 / 隱藏您的卡片 (即時生效)</div>
+            
+            <div id="manageCardList" style="border-top:1px solid #eee;"></div>
+            
             <button class="btn btn-confirm" style="width:100%; margin-top:20px;" onclick="document.getElementById('manageModal').style.display='none'">完成</button>
         </div>
     </div>
@@ -539,12 +585,13 @@
     // 初始化顯示狀態
     let visibleCards = JSON.parse(localStorage.getItem('visibleCards'));
     if (!visibleCards) {
-        visibleCards = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2']; 
+        visibleCards = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2']; // 預設顯示ID (隱藏預留卡)
         localStorage.setItem('visibleCards', JSON.stringify(visibleCards));
     }
 
     let savedOrder = JSON.parse(localStorage.getItem('cardOrder'));
     let cards = [...defaultCards];
+    let sortableInstance = null; // 全局變數儲存 Sortable 實例
 
     function getSortedCards() {
         let displayCards = cards.filter(c => visibleCards.includes(c.id));
@@ -562,17 +609,31 @@
 
     function initSortable() {
         var el = document.getElementById('card-grid');
-        new Sortable(el, {
+        
+        // 關鍵修復：銷毀舊實例，避免重複綁定導致衝突
+        if (sortableInstance) {
+            sortableInstance.destroy();
+        }
+
+        sortableInstance = new Sortable(el, {
             animation: 150,
             ghostClass: 'sortable-ghost',
             dragClass: 'sortable-drag',
             delay: 200,
             delayOnTouchOnly: true,
+            forceFallback: true, // 關鍵修復：強制使用 Fallback 讓懸浮樣式更穩定
             onEnd: function (evt) {
-                const newOrder = Array.from(evt.to.children).map(el => {
+                const visibleOrder = Array.from(evt.to.children).map(el => {
                     return el.getAttribute('data-card-id');
                 });
-                localStorage.setItem('cardOrder', JSON.stringify(newOrder));
+                
+                // 邏輯優化：將隱藏的卡片補在最後，避免遺失
+                const allCardIds = cards.map(c => c.id);
+                const hiddenCards = allCardIds.filter(id => !visibleOrder.includes(id));
+                const finalOrder = [...visibleOrder, ...hiddenCards];
+
+                localStorage.setItem('cardOrder', JSON.stringify(finalOrder));
+                savedOrder = finalOrder; // 更新內存變數
             }
         });
     }
@@ -619,13 +680,12 @@
             const normalReward = (greenOverflow + totalNormalSpend) * 0.01;
             reward = greenReward + foreignReward + normalReward;
             
+            // 修正：綠卡固定顯示 6.0% (代表最高戰力)
             let actualRate = 6.0;
-            if (totalSpend > 0) {
-                 actualRate = (reward / totalSpend) * 100;
-            }
             return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: actualRate.toFixed(1) };
         }
 
+        // 其他卡片邏輯
         if (card.type === 'mixed') {
             if (validSpend < card.minSpend) reward = validSpend * card.tier2Rate; 
             else if (validSpend <= card.limit) reward = validSpend * card.tier1Rate;
@@ -647,6 +707,7 @@
     function toggleBillLogic() {
         const isBill = document.getElementById('checkIsBill').checked;
         const labelBase = document.getElementById('labelBaseRate');
+        
         if (isBill) {
             document.getElementById('checkBonus25').checked = false;
             labelBase.innerText = "🔰 基本回饋 0.15% (無上限)";
@@ -742,7 +803,7 @@
         const container = document.getElementById('card-grid');
         let monthTotalReward = 0; container.innerHTML = '';
         
-        // 總回饋計算包含所有卡片（含隱藏）
+        // 修正：總金額計算包含所有卡片（含隱藏）
         cards.forEach(card => {
              if (card.type === 'placeholder') return;
              const stats = calculateStats(card.id);
@@ -791,7 +852,7 @@
             tile.style.background = card.gradient; 
             tile.style.color = card.textColor; 
             
-            // 佔位卡點擊事件不同
+            // 佔位卡點擊事件不同 - 修改為「新卡片建置中」
             if (card.type === 'placeholder') {
                 tile.onclick = () => alert('新卡片建置中');
             } else {
@@ -828,14 +889,27 @@
         
         cards.forEach(card => {
             const isVisible = visibleCards.includes(card.id);
+            // 點擊整行觸發切換
             const item = document.createElement('div');
             item.className = 'manage-item';
+            // 將 onclick 綁在整個 div 上
+            item.onclick = function() {
+                // 找到內部的 checkbox 並切換狀態
+                const checkbox = this.querySelector('input[type="checkbox"]');
+                checkbox.checked = !checkbox.checked;
+                // 觸發切換邏輯
+                toggleCardVisibility(card.id);
+            };
+
             item.innerHTML = `
                 <div class="manage-info">
                     <div class="manage-name">${card.name}</div>
                     <div class="manage-desc">${card.nickname}</div>
                 </div>
-                <input type="checkbox" ${isVisible ? 'checked' : ''} onchange="toggleCardVisibility('${card.id}')">
+                <label class="switch" onclick="event.stopPropagation()">
+                    <input type="checkbox" ${isVisible ? 'checked' : ''} onchange="toggleCardVisibility('${card.id}')">
+                    <span class="slider"></span>
+                </label>
             `;
             list.appendChild(item);
         });
@@ -850,23 +924,20 @@
             visibleCards.push(cardId);
         }
         localStorage.setItem('visibleCards', JSON.stringify(visibleCards));
-        renderGrid(); 
+        renderGrid(); // 即時刷新背景
     }
 
+    // ... (其餘函式保持不變) ...
     function openQuickAdd(cardId) {
         const card = cards.find(c => c.id === cardId); 
         document.getElementById('modalTitle').innerText = card.name; 
         document.getElementById('modalSubtitle').innerText = card.note; 
         document.getElementById('cardIdInput').value = cardId; 
-        
         history.pushState({modalOpen: true}, "", "#modal");
-
         const pigRichOptions = document.getElementById('pigRichOptions');
         const greenCardOptions = document.getElementById('greenCardOptions');
-        
         pigRichOptions.style.display = (cardId === 'c6') ? 'block' : 'none';
         greenCardOptions.style.display = (cardId === 'c2') ? 'block' : 'none';
-
         if (cardId === 'c6') {
             document.getElementById('checkBonus10').checked = true;
             document.getElementById('checkBonus25').checked = true;
@@ -877,33 +948,25 @@
             document.getElementById('checkGreenChannel').checked = false; 
             document.getElementById('checkForeign').checked = false; 
         }
-
         document.getElementById('liveRewardCalc').style.display = 'none';
         document.getElementById('liveRewardCalc').innerHTML = '';
-        
         const parkingInfoDiv = document.getElementById('modalParkingInfo');
         if (card.parking) { parkingInfoDiv.innerHTML = card.parking; parkingInfoDiv.style.display = 'block'; } else { parkingInfoDiv.style.display = 'none'; }
         document.getElementById('transactionModal').style.display = 'flex'; 
         document.getElementById('amountInput').value = ''; 
         document.getElementById('noteInput').value = ''; 
-        
         renderModalHistory(cardId);
-        
         setTimeout(() => document.getElementById('amountInput').focus(), 100);
     }
-    
     function renderModalHistory(cardId) {
         const container = document.getElementById('modalHistoryList');
         const titleDiv = document.getElementById('modalHistoryTitle');
         container.innerHTML = '';
-        
         const now = new Date();
         const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
         const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
         const dateRange = `${now.getMonth() + 1}/1 - ${now.getMonth() + 1}/${lastDay}`;
-        
         titleDiv.innerHTML = `<span>📅 本月 (${dateRange}) 消費紀錄</span><span style="font-weight:normal; font-size:10px; color:#aaa;">(點 ✕ 刪除)</span>`;
-
         const cardTx = transactions.filter(t => t.cardId === cardId && new Date(t.date) >= currentMonthStart).reverse();
         if (cardTx.length === 0) {
             container.innerHTML = '<div style="text-align:center; color:#ccc; font-size:12px; margin-top:10px;">本月尚無消費紀錄</div>';
@@ -921,11 +984,7 @@
             container.appendChild(item);
         });
     }
-
-    function closeModal() {
-        history.back();
-    }
-
+    function closeModal() { history.back(); }
     function addTransaction() {
         const cardId = document.getElementById('cardIdInput').value;
         const amount = document.getElementById('amountInput').value;
@@ -944,7 +1003,6 @@
         renderModalHistory(cardId); 
         renderGrid(); 
     }
-
     function deleteTransaction(id, fromModal = false) {
         if(confirm('刪除此筆紀錄？')) {
             transactions = transactions.filter(t => t.id !== id);
@@ -956,7 +1014,6 @@
             }
         }
     }
-    
     function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
     async function exportData() {
         const dataStr = JSON.stringify(transactions);

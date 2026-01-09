@@ -100,7 +100,7 @@
         .urgent-item { background: rgba(255,255,255,0.25); border-radius: 8px; padding: 6px 10px; margin-top: 6px; font-size: 12px; font-weight: 600; line-height: 1.3; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.01); } 100% { transform: scale(1); } }
 
-        #card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+        #card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; flex: 1; align-content: start;}
 
         /* 卡片樣式 */
         .card-tile { 
@@ -130,6 +130,11 @@
             z-index: 2;
             width: fit-content;
         }
+        
+        .tile-nickname-badge.placeholder {
+             background: rgba(0,0,0,0.1);
+             color: #aaa;
+        }
 
         .tile-note { font-size: 10px; font-weight: 500; opacity: 0.9; margin-bottom: 4px; display: block; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2; letter-spacing: -0.2px; }
         .tile-rule { font-size: 10px; font-weight: 700; background: rgba(0,0,0,0.25); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 6px; color: #FFD700; z-index: 2; }
@@ -145,34 +150,29 @@
 
         .history-section { flex: 1; display: flex; flex-direction: column; }
         .history-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #555; }
-        .card-group-details { background: white; border-radius: 12px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
-        .card-group-details[open] { box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
-        .card-group-summary { padding: 12px 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 13px; color: #333; outline: none; list-style: none; background: #fff; transition: background 0.2s; }
-        .card-group-summary::-webkit-details-marker { display: none; }
-        .card-group-summary:active { background: #f9f9f9; }
-        .group-name { display: flex; align-items: center; gap: 6px; }
-        .group-total { color: #007AFF; font-family: -apple-system, monospace; font-size: 14px;}
-        .history-item { padding: 10px 16px; border-top: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; font-size: 12px; background: #fafafa; }
-        .h-name { font-weight: 600; color: #555; }
-        .h-date { font-size: 10px; color: #aaa; margin-top: 2px;}
-        .h-amount { font-weight: 700; color: #333; font-size: 13px; }
-        .btn-delete-single { background: none; border: none; color: #ccc; font-size: 14px; padding: 0 5px; cursor: pointer; margin-left: 8px;}
-        .btn-delete-single:hover { color: #FF3B30; }
-
+        
         .settings-area { margin-top: auto; display: flex; gap: 8px; flex-direction: column; padding-top: 20px;}
         .settings-row { display: flex; gap: 8px; }
         .btn-tool { flex: 1; padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 600; border: 1px solid #eee; background: white; color: #555; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
         .btn-donate { background: linear-gradient(135deg, #E30000, #FF5050); color: #fff; border: none; box-shadow: 0 4px 10px rgba(227, 0, 0, 0.3); font-size: 14px; }
         .btn-reset-visible { width: 100%; padding: 12px; background-color: #fff5f5; border: 1px solid #ffdede; color: #FF3B30; border-radius: 12px; font-weight: 600; font-size: 12px; cursor: pointer; margin-top: 10px;}
         
+        /* 管理卡片按鈕 - 啟用 */
+        .btn-manage { background: #333; color: white; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 1000; align-items: center; justify-content: center; }
         .modal-content { 
             background: white; width: 85%; max-width: 320px; border-radius: 20px; padding: 20px; 
             box-shadow: 0 25px 50px rgba(0,0,0,0.25); animation: modalPop 0.2s; 
             display: flex; flex-direction: column;
-            max-height: 90vh;
+            max-height: 85vh; /* 限制高度 */
         }
         
+        /* 彈窗內容區塊：輸入與選項 */
+        .modal-body-input {
+            flex-shrink: 0; /* 不壓縮這區 */
+        }
+
         .input-group label { display: block; font-size: 12px; font-weight: 600; color: #888; margin-bottom: 6px; margin-top: 10px; }
         input { width: 100%; padding: 10px; border: 2px solid #f0f0f0; background: #fff; border-radius: 12px; font-size: 18px; box-sizing: border-box; outline: none; font-weight: 600; color: #333; }
         .btn-group { display: flex; gap: 8px; margin-top: 20px; flex-shrink: 0; }
@@ -182,41 +182,63 @@
         
         /* 即時試算顯示 (顯眼藍色方塊) */
         #liveRewardCalc { 
-            text-align: center; 
-            font-size: 16px; 
-            color: #0056b3; 
-            font-weight: 700; 
-            margin-top: 12px; 
-            min-height: 20px; 
-            background: #E3F2FD; 
-            padding: 8px; 
-            border-radius: 8px; 
-            display: none; 
+            text-align: center; font-size: 16px; color: #0056b3; font-weight: 700; margin-top: 12px; min-height: 20px; background: #E3F2FD; padding: 8px; border-radius: 8px; display: none; 
         }
         
+        /* 彈窗內的歷史明細 (自動長高，可捲動) */
+        .modal-history-section {
+            margin-top: 15px;
+            border-top: 2px solid #f0f0f0;
+            padding-top: 10px;
+            flex: 1; /* 佔據剩餘空間 */
+            overflow-y: auto; /* 超出時捲動 */
+            min-height: 0; /* 配合 flex */
+        }
+        .modal-history-title { 
+            font-size: 12px; font-weight: 700; color: #555; margin-bottom: 8px; 
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        
+        /* 歷史項目樣式 */
+        .history-item { 
+            padding: 10px 0; 
+            border-bottom: 1px solid #f9f9f9; 
+            display: flex; justify-content: space-between; align-items: center; font-size: 12px; 
+        }
+        .history-item:last-child { border-bottom: none; }
+        .h-name { font-weight: 600; color: #555; }
+        .h-date { font-size: 10px; color: #aaa; margin-top: 2px;}
+        .h-amount { font-weight: 700; color: #333; font-size: 13px; }
+        .btn-delete-single { background: none; border: none; color: #ccc; font-size: 14px; padding: 0 5px; cursor: pointer; margin-left: 8px;}
+        .btn-delete-single:hover { color: #FF3B30; }
+
         /* 選項開關區 */
         #pigRichOptions, #greenCardOptions {
-            display: none;
-            background: #f9f9f9;
-            padding: 10px;
-            border-radius: 10px;
-            margin-top: 10px;
-            border: 1px dashed #ddd;
+            display: none; background: #f9f9f9; padding: 10px; border-radius: 10px; margin-top: 10px; border: 1px dashed #ddd;
         }
         .option-row {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #555;
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #555;
         }
         .option-row input[type="checkbox"] { width: 20px; height: 20px; margin: 0; }
         .option-row.read-only { opacity: 0.8; pointer-events: none; }
         .option-row.read-only input { opacity: 0.6; }
+        
+        /* 管理卡片列表樣式 (極簡版) */
+        .manage-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px; border-bottom: 1px solid #eee;
+        }
+        .manage-item:last-child { border-bottom: none; }
+        .manage-info { display: flex; flex-direction: column; }
+        .manage-name { font-size: 14px; font-weight: 700; color: #333; }
+        .manage-desc { font-size: 11px; color: #888; }
     </style>
 </head>
 <body>
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V67.0</div>
+            <div class="version-tag" id="top-version-tag">V77.0</div>
         </div>
 
         <div class="header-section">
@@ -237,12 +259,12 @@
         
         <div id="card-grid"></div>
 
-        <div class="history-section">
-            <div class="history-title">消費明細 (點擊卡別展開)</div>
-            <div id="history-container"></div>
-        </div>
+        <div style="flex:1;"></div>
         
         <div class="settings-area">
+            <div class="settings-row">
+                <button class="btn-tool btn-manage" onclick="openManageModal()">💳 管理我的卡片</button>
+            </div>
             <div class="settings-row">
                 <button class="btn-tool" onclick="exportData()">💾 備份檔案</button>
                 <button class="btn-tool" onclick="triggerImport()">📥 讀檔還原</button>
@@ -256,55 +278,74 @@
 
     <div id="transactionModal" class="modal" onclick="if(event.target===this) closeModal()">
         <div class="modal-content">
-            <h2 id="modalTitle" style="margin: 0 0 4px 0; font-size: 18px; font-weight: 800; color:#333;"></h2>
-            <div style="font-size:12px; color:#888; margin-bottom:10px; font-weight: 500;" id="modalSubtitle"></div>
-            
-            <div id="modalParkingInfo" style="background:#FFF9C4; color:#856404; padding:10px; border-radius:10px; font-size:12px; margin-bottom:12px; border-left:4px solid #FFC107; display:none; line-height:1.5;"></div>
-            
-            <input type="hidden" id="cardIdInput"> 
-            
-            <div class="input-group" style="margin-top:0;">
-                <input type="number" id="amountInput" placeholder="$ 金額" inputmode="numeric" style="font-size:28px; text-align:center; border:none; border-bottom:2px solid #eee; border-radius:0;" 
-                       oninput="updateRewardPreview()" onkeyup="updateRewardPreview()" onpaste="updateRewardPreview()">
-            </div>
-            
-            <div id="pigRichOptions">
-                <div class="option-row read-only">
-                    <label id="labelBaseRate">🔰 基本回饋 1% (無上限)</label>
-                    <input type="checkbox" checked disabled>
+            <div class="modal-body-input">
+                <h2 id="modalTitle" style="margin: 0 0 4px 0; font-size: 18px; font-weight: 800; color:#333;"></h2>
+                <div style="font-size:12px; color:#888; margin-bottom:10px; font-weight: 500;" id="modalSubtitle"></div>
+                
+                <div id="modalParkingInfo" style="background:#FFF9C4; color:#856404; padding:10px; border-radius:10px; font-size:12px; margin-bottom:12px; border-left:4px solid #FFC107; display:none; line-height:1.5;"></div>
+                
+                <input type="hidden" id="cardIdInput"> 
+                
+                <div class="input-group" style="margin-top:0;">
+                    <input type="number" id="amountInput" placeholder="$ 金額" inputmode="numeric" style="font-size:28px; text-align:center; border:none; border-bottom:2px solid #eee; border-radius:0;" 
+                           oninput="updateRewardPreview()" onkeyup="updateRewardPreview()" onpaste="updateRewardPreview()">
                 </div>
-                <div class="option-row">
-                    <label for="checkBonus10">⚡ 新戶加碼10% (限刷$8000)</label>
-                    <input type="checkbox" id="checkBonus10" checked onchange="updateRewardPreview()">
+                
+                <div id="pigRichOptions">
+                    <div class="option-row read-only">
+                        <label id="labelBaseRate">🔰 基本回饋 1% (無上限)</label>
+                        <input type="checkbox" checked disabled>
+                    </div>
+                    <div class="option-row">
+                        <label for="checkBonus10">⚡ 新戶加碼10% (限刷$8000)</label>
+                        <input type="checkbox" id="checkBonus10" checked onchange="updateRewardPreview()">
+                    </div>
+                    <div class="option-row">
+                        <label for="checkBonus25">🌟 精選通路2.5% (超商/百貨)</label>
+                        <input type="checkbox" id="checkBonus25" checked onchange="toggleSelectedLogic()">
+                    </div>
+                    <div class="option-row" style="margin-bottom:0; border-top:1px dashed #ddd; padding-top:6px;">
+                        <label for="checkIsBill">🧾 是APP繳費 (底1%→0.15%)</label>
+                        <input type="checkbox" id="checkIsBill" onchange="toggleBillLogic()">
+                    </div>
                 </div>
-                <div class="option-row">
-                    <label for="checkBonus25">🌟 精選通路2.5% (超商/百貨)</label>
-                    <input type="checkbox" id="checkBonus25" checked onchange="toggleSelectedLogic()">
+
+                <div id="greenCardOptions">
+                    <div class="option-row" style="margin-bottom:0;">
+                        <label for="checkGreenChannel">🌿 是綠色通路 (6% 限刷$2500)</label>
+                        <input type="checkbox" id="checkGreenChannel" onchange="toggleGreenLogic()">
+                    </div>
+                    <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;">
+                        <label for="checkForeign">✈️ 是國外消費 (2% 無上限)</label>
+                        <input type="checkbox" id="checkForeign" onchange="toggleForeignLogic()">
+                    </div>
                 </div>
-                <div class="option-row" style="margin-bottom:0; border-top:1px dashed #ddd; padding-top:6px;">
-                    <label for="checkIsBill">🧾 是APP繳費 (底1%→0.15%)</label>
-                    <input type="checkbox" id="checkIsBill" onchange="toggleBillLogic()">
+                
+                <div id="liveRewardCalc"></div>
+
+                <div class="input-group"><input type="text" id="noteInput" placeholder="備註 (例如: 午餐)"></div>
+                <div class="btn-group">
+                    <button class="btn btn-cancel" onclick="closeModal()">取消</button>
+                    <button class="btn btn-confirm" onclick="addTransaction()">確認</button>
                 </div>
             </div>
 
-            <div id="greenCardOptions">
-                <div class="option-row">
-                    <label for="checkGreenChannel">🌿 是綠色通路 (6% 限刷$2500)</label>
-                    <input type="checkbox" id="checkGreenChannel" onchange="toggleGreenLogic()">
+            <div class="modal-history-section">
+                <div class="modal-history-title" id="modalHistoryTitle">
+                    <span>📅 本月消費紀錄</span>
+                    <span style="font-weight:normal; font-size:10px; color:#aaa;">(點 ✕ 刪除)</span>
                 </div>
-                <div class="option-row" style="margin-bottom:0; border-top:1px dashed #ddd; padding-top:6px;">
-                    <label for="checkForeign">✈️ 是國外消費 (2% 無上限)</label>
-                    <input type="checkbox" id="checkForeign" onchange="toggleForeignLogic()">
-                </div>
+                <div id="modalHistoryList"></div>
             </div>
-            
-            <div id="liveRewardCalc"></div>
+        </div>
+    </div>
 
-            <div class="input-group"><input type="text" id="noteInput" placeholder="備註 (例如: 午餐)"></div>
-            <div class="btn-group">
-                <button class="btn btn-cancel" onclick="closeModal()">取消</button>
-                <button class="btn btn-confirm" onclick="addTransaction()">確認</button>
-            </div>
+    <div id="manageModal" class="modal" onclick="if(event.target===this) document.getElementById('manageModal').style.display='none'">
+        <div class="modal-content" style="max-height:80vh; overflow-y:auto;">
+            <h2 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 800; color:#333;">管理我的卡片</h2>
+            <div style="font-size:12px; color:#888; margin-bottom:12px;">勾選以顯示卡片：</div>
+            <div id="manageCardList"></div>
+            <button class="btn btn-confirm" style="width:100%; margin-top:20px;" onclick="document.getElementById('manageModal').style.display='none'">完成</button>
         </div>
     </div>
 
@@ -359,11 +400,12 @@
 
     window.addEventListener('popstate', function(event) {
         document.getElementById('transactionModal').style.display = 'none';
+        document.getElementById('manageModal').style.display = 'none';
     });
 
     const defaultCards = [
         { 
-            id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', note: '行支/繳費神卡 (刷 $8,000 封頂)', rule: '', 
+            id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', note: '百貨 / 超商 / 海外 / 街口 (刷 $8,000 封頂)', rule: '', 
             type: 'ceiling', limit: 8000, tier1Rate: 0.135, tier2Rate: 0.035, 
             gradient: 'linear-gradient(135deg, #e60012 0%, #FFD700 100%)', 
             textColor: 'white', msgDanger: '已封頂 (變3.5%)',
@@ -478,20 +520,44 @@
                     ⚠️ 此消費可計入 $12,000 停車門檻
                 </div>
             `
+        },
+        // 預留卡片
+        { 
+            id: 'add1', name: '新增卡片 (預留)', nickname: '即將推出', note: '自定義功能開發中', 
+            type: 'placeholder', 
+            gradient: 'linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%)', 
+            textColor: '#999', msgDanger: '' 
+        },
+        { 
+            id: 'add2', name: '新增卡片 (預留)', nickname: '即將推出', note: '自定義功能開發中', 
+            type: 'placeholder', 
+            gradient: 'linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%)', 
+            textColor: '#999', msgDanger: '' 
         }
     ];
+
+    // 初始化顯示狀態
+    let visibleCards = JSON.parse(localStorage.getItem('visibleCards'));
+    if (!visibleCards) {
+        visibleCards = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2']; 
+        localStorage.setItem('visibleCards', JSON.stringify(visibleCards));
+    }
 
     let savedOrder = JSON.parse(localStorage.getItem('cardOrder'));
     let cards = [...defaultCards];
 
-    if (savedOrder && Array.isArray(savedOrder)) {
-        cards.sort((a, b) => {
-            let indexA = savedOrder.indexOf(a.id);
-            let indexB = savedOrder.indexOf(b.id);
-            if (indexA === -1) indexA = 999;
-            if (indexB === -1) indexB = 999;
-            return indexA - indexB;
-        });
+    function getSortedCards() {
+        let displayCards = cards.filter(c => visibleCards.includes(c.id));
+        if (savedOrder && Array.isArray(savedOrder)) {
+            displayCards.sort((a, b) => {
+                let indexA = savedOrder.indexOf(a.id);
+                let indexB = savedOrder.indexOf(b.id);
+                if (indexA === -1) indexA = 999;
+                if (indexB === -1) indexB = 999;
+                return indexA - indexB;
+            });
+        }
+        return displayCards;
     }
 
     function initSortable() {
@@ -507,7 +573,6 @@
                     return el.getAttribute('data-card-id');
                 });
                 localStorage.setItem('cardOrder', JSON.stringify(newOrder));
-                cards.sort((a, b) => newOrder.indexOf(a.id) - newOrder.indexOf(b.id));
             }
         });
     }
@@ -519,6 +584,10 @@
     // --- 核心計算邏輯 ---
     function calculateStats(cardId, addedAmount = 0, addedIsGreen = false, addedIsForeign = false) {
         const card = cards.find(c => c.id === cardId);
+        
+        if (card.type === 'placeholder') return { spend: 0, validSpend: 0, reward: 0, rate: '0.0' };
+
+        // 統一採用日曆月 (每月1號歸零)
         const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
         const relevantTx = transactions.filter(t => t.cardId === cardId && new Date(t.date) >= startDate);
         let totalSpend = relevantTx.reduce((sum, t) => sum + parseFloat(t.amount), 0);
@@ -531,30 +600,25 @@
         
         // 綠卡專屬邏輯 (c2)
         if (cardId === 'c2') {
-            // 6% (Green)
             const currentGreenSpend = relevantTx.filter(t => t.isGreen).reduce((sum, t) => sum + t.amount, 0);
             let newGreenAmount = addedIsGreen ? addedAmount : 0;
             const totalGreenSpend = currentGreenSpend + newGreenAmount;
             const greenEligible = Math.min(totalGreenSpend, 2500);
             const greenReward = greenEligible * 0.06;
+            
             const greenOverflow = Math.max(0, totalGreenSpend - 2500);
-
-            // 2% (Foreign)
             const currentForeignSpend = relevantTx.filter(t => t.isForeign).reduce((sum, t) => sum + t.amount, 0);
             let newForeignAmount = addedIsForeign ? addedAmount : 0;
             const totalForeignSpend = currentForeignSpend + newForeignAmount;
             const foreignReward = totalForeignSpend * 0.02;
 
-            // 1% (Normal + Green Overflow)
             const currentNormalSpend = relevantTx.filter(t => !t.isGreen && !t.isForeign).reduce((sum, t) => sum + t.amount, 0);
             const newNormalAmount = (!addedIsGreen && !addedIsForeign) ? addedAmount : 0;
             const totalNormalSpend = currentNormalSpend + newNormalAmount;
             
             const normalReward = (greenOverflow + totalNormalSpend) * 0.01;
-            
             reward = greenReward + foreignReward + normalReward;
             
-            // 預設顯示 6.0% (最高回饋)，若開始刷則顯示混合費率
             let actualRate = 6.0;
             if (totalSpend > 0) {
                  actualRate = (reward / totalSpend) * 100;
@@ -562,7 +626,6 @@
             return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: actualRate.toFixed(1) };
         }
 
-        // 其他卡片
         if (card.type === 'mixed') {
             if (validSpend < card.minSpend) reward = validSpend * card.tier2Rate; 
             else if (validSpend <= card.limit) reward = validSpend * card.tier1Rate;
@@ -584,7 +647,6 @@
     function toggleBillLogic() {
         const isBill = document.getElementById('checkIsBill').checked;
         const labelBase = document.getElementById('labelBaseRate');
-        
         if (isBill) {
             document.getElementById('checkBonus25').checked = false;
             labelBase.innerText = "🔰 基本回饋 0.15% (無上限)";
@@ -605,7 +667,6 @@
         updateRewardPreview();
     }
 
-    // 綠卡邏輯互斥
     function toggleGreenLogic() {
         if(document.getElementById('checkGreenChannel').checked) {
             document.getElementById('checkForeign').checked = false;
@@ -633,16 +694,13 @@
         }
 
         previewDiv.style.display = 'block'; 
-
         let thisTransactionReward = 0;
         let effectiveRate = 0;
 
-        // 豬富卡
         if (cardId === 'c6') {
             const hasBonus10 = document.getElementById('checkBonus10').checked;
             const hasBonus25 = document.getElementById('checkBonus25').checked;
             const isBill = document.getElementById('checkIsBill').checked;
-            
             let baseRate = isBill ? 0.0015 : 0.01;
             let reward = amount * baseRate;
 
@@ -662,14 +720,11 @@
             thisTransactionReward = Math.round(reward);
             effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(2);
         
-        // 綠卡 (加入國外 2% 邏輯)
         } else if (cardId === 'c2') {
             const isGreen = document.getElementById('checkGreenChannel').checked;
             const isForeign = document.getElementById('checkForeign').checked;
-            
             const currentStats = calculateStats(cardId, 0);
             const newStats = calculateStats(cardId, amount, isGreen, isForeign);
-            
             thisTransactionReward = newStats.reward - currentStats.reward;
             effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(1);
 
@@ -686,13 +741,27 @@
     function renderGrid() {
         const container = document.getElementById('card-grid');
         let monthTotalReward = 0; container.innerHTML = '';
+        
+        // 總回饋計算包含所有卡片（含隱藏）
         cards.forEach(card => {
+             if (card.type === 'placeholder') return;
+             const stats = calculateStats(card.id);
+             monthTotalReward += stats.reward;
+        });
+        
+        document.getElementById('totalRewardDisplay').innerText = `$${monthTotalReward.toLocaleString()}`;
+
+        const displayCards = getSortedCards();
+
+        displayCards.forEach(card => {
             const stats = calculateStats(card.id); 
-            monthTotalReward += stats.reward;
+            
             let percent = 0, statusText = '', msgStyle = '';
             
-            // 顯示邏輯
-            if (card.id === 'c2') { // 綠卡特殊顯示
+            if (card.type === 'placeholder') {
+                percent = 0;
+                statusText = '尚未啟用';
+            } else if (card.id === 'c2') { 
                 percent = (stats.validSpend / card.target) * 100;
                 statusText = stats.validSpend >= card.target ? '任務達成 (免停)' : `差 $${(card.target - stats.validSpend).toLocaleString()}`;
             } else if (card.type === 'mixed') {
@@ -709,23 +778,32 @@
             }
 
             const ruleHtml = card.rule ? `<div class="tile-rule">${card.rule}</div>` : '';
-            // 綠卡固定顯示 6.0% (除非有實際回饋率) -> 需求: 封面顯示 6% 就好
             let displayRate = card.id === 'c2' ? '6.0%' : `${stats.rate}%`;
+            if (card.type === 'placeholder') displayRate = '--%';
+
+            let tileClass = 'card-tile';
+            let nickClass = 'tile-nickname-badge';
+            if (card.type === 'placeholder') nickClass += ' placeholder';
 
             const tile = document.createElement('div'); 
-            tile.className = 'card-tile'; 
+            tile.className = tileClass; 
             tile.setAttribute('data-card-id', card.id);
             tile.style.background = card.gradient; 
             tile.style.color = card.textColor; 
-            tile.onclick = () => openQuickAdd(card.id);
             
-            // 重新復刻 V45 結構
+            // 佔位卡點擊事件不同
+            if (card.type === 'placeholder') {
+                tile.onclick = () => alert('新卡片建置中');
+            } else {
+                tile.onclick = () => openQuickAdd(card.id);
+            }
+            
             tile.innerHTML = `
                 <div class="tile-header">
                     <span class="tile-name">${card.name}</span>
                     <span class="rate-badge" style="color:black">${displayRate}</span>
                 </div>
-                <div class="tile-nickname-badge">${card.nickname}</div>
+                <div class="${nickClass}">${card.nickname}</div>
                 <span class="tile-note" style="color:${card.textColor==='white'?'rgba(255,255,255,0.8)':'rgba(0,0,0,0.6)'}">${card.note}</span>
                 <div class="tile-body">
                     <div class="tile-stat">$${stats.spend.toLocaleString()}</div>
@@ -738,10 +816,41 @@
                 </div>`;
             container.appendChild(tile);
         });
-        document.getElementById('totalRewardDisplay').innerText = `$${monthTotalReward.toLocaleString()}`;
+        
         checkUrgentTasks();
-        renderHistory();
         initSortable();
+    }
+    
+    // 開啟管理卡片視窗
+    function openManageModal() {
+        const list = document.getElementById('manageCardList');
+        list.innerHTML = '';
+        
+        cards.forEach(card => {
+            const isVisible = visibleCards.includes(card.id);
+            const item = document.createElement('div');
+            item.className = 'manage-item';
+            item.innerHTML = `
+                <div class="manage-info">
+                    <div class="manage-name">${card.name}</div>
+                    <div class="manage-desc">${card.nickname}</div>
+                </div>
+                <input type="checkbox" ${isVisible ? 'checked' : ''} onchange="toggleCardVisibility('${card.id}')">
+            `;
+            list.appendChild(item);
+        });
+        
+        document.getElementById('manageModal').style.display = 'flex';
+    }
+    
+    function toggleCardVisibility(cardId) {
+        if (visibleCards.includes(cardId)) {
+            visibleCards = visibleCards.filter(id => id !== cardId);
+        } else {
+            visibleCards.push(cardId);
+        }
+        localStorage.setItem('visibleCards', JSON.stringify(visibleCards));
+        renderGrid(); 
     }
 
     function openQuickAdd(cardId) {
@@ -777,7 +886,40 @@
         document.getElementById('transactionModal').style.display = 'flex'; 
         document.getElementById('amountInput').value = ''; 
         document.getElementById('noteInput').value = ''; 
+        
+        renderModalHistory(cardId);
+        
         setTimeout(() => document.getElementById('amountInput').focus(), 100);
+    }
+    
+    function renderModalHistory(cardId) {
+        const container = document.getElementById('modalHistoryList');
+        const titleDiv = document.getElementById('modalHistoryTitle');
+        container.innerHTML = '';
+        
+        const now = new Date();
+        const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+        const dateRange = `${now.getMonth() + 1}/1 - ${now.getMonth() + 1}/${lastDay}`;
+        
+        titleDiv.innerHTML = `<span>📅 本月 (${dateRange}) 消費紀錄</span><span style="font-weight:normal; font-size:10px; color:#aaa;">(點 ✕ 刪除)</span>`;
+
+        const cardTx = transactions.filter(t => t.cardId === cardId && new Date(t.date) >= currentMonthStart).reverse();
+        if (cardTx.length === 0) {
+            container.innerHTML = '<div style="text-align:center; color:#ccc; font-size:12px; margin-top:10px;">本月尚無消費紀錄</div>';
+            return;
+        }
+        cardTx.forEach(tx => {
+            const item = document.createElement('div');
+            item.className = 'history-item'; 
+            item.style.background = 'white'; 
+            item.style.borderBottom = '1px solid #f0f0f0';
+            let noteText = tx.note || '一般消費';
+            if (tx.isGreen) noteText = '🌿 ' + noteText;
+            if (tx.isForeign) noteText = '✈️ ' + noteText;
+            item.innerHTML = `<div><div class="h-name">${noteText}</div><div class="h-date">${new Date(tx.date).getMonth()+1}/${new Date(tx.date).getDate()}</div></div><div style="display:flex;align-items:center;"><span class="h-amount">$${tx.amount.toLocaleString()}</span><button class="btn-delete-single" onclick="deleteTransaction(${tx.id}, true)">✕</button></div>`;
+            container.appendChild(item);
+        });
     }
 
     function closeModal() {
@@ -788,114 +930,45 @@
         const cardId = document.getElementById('cardIdInput').value;
         const amount = document.getElementById('amountInput').value;
         const note = document.getElementById('noteInput').value;
-        
         if (!amount || amount <= 0) return alert('請輸入金額');
-        
-        let isGreen = false;
-        let isForeign = false;
+        let isGreen = false; let isForeign = false;
         if (cardId === 'c2') {
             isGreen = document.getElementById('checkGreenChannel').checked;
             isForeign = document.getElementById('checkForeign').checked;
         }
-
-        transactions.push({ 
-            id: Date.now(), 
-            cardId: cardId, 
-            amount: parseFloat(amount), 
-            note: note, 
-            date: new Date().toISOString(),
-            isGreen: isGreen,
-            isForeign: isForeign
-        }); 
-        
+        transactions.push({ id: Date.now(), cardId: cardId, amount: parseFloat(amount), note: note, date: new Date().toISOString(), isGreen: isGreen, isForeign: isForeign }); 
         localStorage.setItem('transactions', JSON.stringify(transactions)); 
-        history.back(); 
-        renderGrid();
-    }
-    
-    function renderHistory() {
-        const container = document.getElementById('history-container'); container.innerHTML = '';
-        const now = new Date();
-        const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-
-        cards.forEach(card => {
-            const cardTx = transactions.filter(t => t.cardId === card.id && new Date(t.date) >= currentMonthStart).reverse();
-            const cardTotal = cardTx.reduce((sum, t) => sum + t.amount, 0);
-            
-            const details = document.createElement('details');
-            details.className = 'card-group-details';
-            
-            const summary = document.createElement('summary');
-            summary.className = 'card-group-summary';
-            summary.innerHTML = `<span class="group-name">${card.name}</span><span class="group-total">$${cardTotal.toLocaleString()}</span>`;
-            
-            details.appendChild(summary);
-            
-            if (cardTx.length === 0) {
-                const emptyItem = document.createElement('div');
-                emptyItem.className = 'history-item';
-                emptyItem.style.color = '#ccc';
-                emptyItem.style.justifyContent = 'center';
-                emptyItem.innerText = '本月尚無消費';
-                details.appendChild(emptyItem);
-            } else {
-                cardTx.forEach(tx => {
-                    const item = document.createElement('div');
-                    item.className = 'history-item';
-                    
-                    let noteText = tx.note || '一般消費';
-                    if (tx.isGreen) noteText = '🌿 ' + noteText;
-                    if (tx.isForeign) noteText = '✈️ ' + noteText;
-
-                    item.innerHTML = `
-                        <div>
-                            <div class="h-name">${noteText}</div>
-                            <div class="h-date">${new Date(tx.date).getMonth()+1}/${new Date(tx.date).getDate()}</div>
-                        </div>
-                        <div style="display:flex;align-items:center;">
-                            <span class="h-amount">$${tx.amount.toLocaleString()}</span>
-                            <button class="btn-delete-single" onclick="deleteTransaction(${tx.id})">✕</button>
-                        </div>
-                    `;
-                    details.appendChild(item);
-                });
-            }
-            container.appendChild(details);
-        });
+        document.getElementById('amountInput').value = '';
+        document.getElementById('noteInput').value = '';
+        document.getElementById('liveRewardCalc').style.display = 'none';
+        renderModalHistory(cardId); 
+        renderGrid(); 
     }
 
-    function deleteTransaction(id) {
+    function deleteTransaction(id, fromModal = false) {
         if(confirm('刪除此筆紀錄？')) {
             transactions = transactions.filter(t => t.id !== id);
             localStorage.setItem('transactions', JSON.stringify(transactions));
-            renderGrid();
+            renderGrid(); 
+            if (fromModal) {
+                const cardId = document.getElementById('cardIdInput').value;
+                renderModalHistory(cardId);
+            }
         }
     }
-
-    function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
     
+    function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
     async function exportData() {
         const dataStr = JSON.stringify(transactions);
-        
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
         const fileName = `backup_${year}-${month}-${day}.json`;
-        
         const file = new File([dataStr], fileName, { type: "application/json" });
-        
         if (navigator.share && navigator.canShare({ files: [file] })) {
-            try {
-                await navigator.share({
-                    files: [file]
-                });
-                return; 
-            } catch (error) {
-                if (error.name === 'AbortError') return;
-            }
+            try { await navigator.share({ files: [file] }); return; } catch (error) { if (error.name === 'AbortError') return; }
         }
-
         const blob = new Blob([dataStr], {type: "application/json"});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -906,9 +979,7 @@
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }
-
     function triggerImport() { document.getElementById('fileInput').click(); }
-
     function importFile(input) {
         const file = input.files[0];
         if (!file) return;
@@ -927,20 +998,12 @@
         reader.readAsText(file);
         input.value = '';
     }
-
-    function showDonateModal() {
-        document.getElementById('donateModal').style.display = 'flex';
-    }
-
-    function copyBankInfo() {
-        navigator.clipboard.writeText("396901798704").then(() => {
-            alert("✅ 帳號已複製！(銀行代碼 396)");
-        });
-    }
-    
+    function showDonateModal() { document.getElementById('donateModal').style.display = 'flex'; }
+    function copyBankInfo() { navigator.clipboard.writeText("396901798704").then(() => { alert("✅ 帳號已複製！(銀行代碼 396)"); }); }
     function checkUrgentTasks() {
         const alertArea = document.getElementById('urgent-alert-area'), alertList = document.getElementById('urgent-list'); alertList.innerHTML = ''; let hasUrgent = false;
         cards.forEach(card => {
+            if (card.type === 'placeholder') return;
             const stats = calculateStats(card.id); let target = card.type === 'floor' ? card.target : (card.type === 'mixed' ? card.minSpend : 0);
             if (target > 0 && stats.spend < target) {
                 const end = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0), diff = Math.ceil((end - new Date()) / 86400000);

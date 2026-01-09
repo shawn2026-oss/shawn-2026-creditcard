@@ -58,7 +58,7 @@
         .subtitle { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
         .today-date { background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; color: #555; margin-left: 5px;}
         
-        /* 跑馬燈強力優化版 */
+        /* 跑馬燈 */
         .news-ticker {
             background: #FFF9C4; color: #856404; 
             border-radius: 8px; margin-bottom: 12px; 
@@ -109,7 +109,6 @@
             transition: transform 0.1s; cursor: pointer; color: white; overflow: hidden; 
             user-select: none;
             -webkit-user-select: none;
-            touch-action: pan-y; /* 關鍵修正：允許垂直滑動，解決卡頓 */
         }
         .card-tile:active { transform: scale(0.97); }
         
@@ -118,20 +117,6 @@
 
         .tile-header { display: flex; justify-content: space-between; align-items: flex-start; z-index: 2; margin-bottom: 2px;}
         .tile-name { font-size: 14px; font-weight: 700; line-height: 1.2; text-shadow: 0 1px 2px rgba(0,0,0,0.15); }
-        
-        /* 外號標籤樣式 */
-        .tile-nickname {
-            display: inline-block;
-            font-size: 10px;
-            font-weight: 800;
-            background: rgba(0,0,0,0.2);
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-bottom: 4px;
-            color: #FFD700; /* 金色字體 */
-            text-shadow: 0 1px 1px rgba(0,0,0,0.3);
-        }
-
         .tile-note { font-size: 10px; font-weight: 500; opacity: 0.9; margin-bottom: 4px; display: block; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2; letter-spacing: -0.2px; }
         .tile-rule { font-size: 10px; font-weight: 700; background: rgba(0,0,0,0.25); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 6px; color: #FFD700; z-index: 2; }
         .rate-badge { background: rgba(255,255,255,0.3); font-size: 10px; font-weight: 800; padding: 2px 5px; border-radius: 5px; white-space: nowrap; backdrop-filter: blur(4px); margin-left: 2px; flex-shrink: 0; }
@@ -165,7 +150,6 @@
         .btn-tool { flex: 1; padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 600; border: 1px solid #eee; background: white; color: #555; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
         .btn-donate { background: linear-gradient(135deg, #E30000, #FF5050); color: #fff; border: none; box-shadow: 0 4px 10px rgba(227, 0, 0, 0.3); font-size: 14px; }
         .btn-reset-visible { width: 100%; padding: 12px; background-color: #fff5f5; border: 1px solid #ffdede; color: #FF3B30; border-radius: 12px; font-weight: 600; font-size: 12px; cursor: pointer; margin-top: 10px;}
-        .btn-manage { background: #E0E5EC; border: 1px solid #ccc; color: #333; }
         
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 1000; align-items: center; justify-content: center; }
         .modal-content { 
@@ -182,7 +166,6 @@
         .btn-cancel { background: #f5f5f5; color: #333; }
         .btn-confirm { background: #007AFF; color: white; }
         
-        /* 即時試算顯示 (顯眼藍色方塊) */
         #liveRewardCalc { 
             text-align: center; 
             font-size: 16px; 
@@ -196,8 +179,8 @@
             display: none; 
         }
         
-        /* 豬富卡專屬開關 */
-        #pigRichOptions {
+        /* 選項開關區 */
+        #pigRichOptions, #greenCardOptions {
             display: none;
             background: #f9f9f9;
             padding: 10px;
@@ -210,26 +193,13 @@
             margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #555;
         }
         .option-row input[type="checkbox"] { width: 20px; height: 20px; margin: 0; }
-
-        /* 卡片管理清單樣式 */
-        .card-select-item {
-            display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #f0f0f0;
-        }
-        .card-select-item:last-child { border-bottom: none; }
-        .card-select-info { flex: 1; margin-left: 10px; }
-        .cs-name { font-size: 14px; font-weight: 700; color: #333; }
-        .cs-desc { font-size: 11px; color: #888; }
-        #selectionCount { font-size: 12px; color: #007AFF; font-weight: 700; margin-bottom: 10px; text-align: center; }
-        
-        /* 拖曳提示 */
-        .drag-hint { font-size: 10px; color: #999; font-weight: 400; margin-left: 4px; }
     </style>
 </head>
 <body>
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V58.0</div>
+            <div class="version-tag" id="top-version-tag">V49.0</div>
         </div>
 
         <div class="header-section">
@@ -244,14 +214,10 @@
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
         
         <div class="total-reward-card">
-            <span class="total-reward-label">本月總回饋預估</span>
+            <span class="total-reward-label">本月預估</span>
             <span class="total-reward-amount" id="totalRewardDisplay">$0</span>
         </div>
         
-        <div style="font-size: 11px; color: #888; margin-bottom: 6px; padding-left: 4px;">
-            (長按卡片 0.5 秒即可拖曳排序)
-        </div>
-
         <div id="card-grid"></div>
 
         <div class="history-section">
@@ -260,8 +226,6 @@
         </div>
         
         <div class="settings-area">
-            <button class="btn-tool btn-manage" onclick="openCardManager()">⚙️ 管理我的卡片 (自選最多6張)</button>
-            
             <div class="settings-row">
                 <button class="btn-tool" onclick="exportData()">💾 備份檔案</button>
                 <button class="btn-tool" onclick="triggerImport()">📥 讀檔還原</button>
@@ -272,18 +236,6 @@
         </div>
         
         <div style="height:20px;"></div> </div>
-
-    <div id="cardSelectionModal" class="modal" onclick="if(event.target===this) closeModal()">
-        <div class="modal-content" style="max-height: 80vh; overflow: hidden;">
-            <h2 style="margin: 0 0 10px 0; font-size: 18px; font-weight: 800; color:#333; text-align: center;">選擇顯示卡片</h2>
-            <div id="selectionCount" style="display:none">已選擇: 0/6</div>
-            <div id="cardListContainer" style="overflow-y: auto; flex: 1; border: 1px solid #eee; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 20px;">
-                </div>
-            <div class="btn-group">
-                <button class="btn btn-cancel" style="width:100%" onclick="closeModal()">關閉</button>
-            </div>
-        </div>
-    </div>
 
     <div id="transactionModal" class="modal" onclick="if(event.target===this) closeModal()">
         <div class="modal-content">
@@ -311,6 +263,13 @@
                 <div class="option-row" style="margin-bottom:0; border-top:1px dashed #ddd; padding-top:6px;">
                     <label for="checkIsBill">🧾 是APP繳費 (底1%→0.15%)</label>
                     <input type="checkbox" id="checkIsBill" onchange="toggleBillLogic()">
+                </div>
+            </div>
+
+            <div id="greenCardOptions">
+                <div class="option-row" style="margin-bottom:0;">
+                    <label for="checkGreenChannel">🌿 是綠色通路 (6% 上限$150)</label>
+                    <input type="checkbox" id="checkGreenChannel" onchange="updateRewardPreview()">
                 </div>
             </div>
             
@@ -373,20 +332,13 @@
         }, 100);
     });
 
-    // 【歷史記錄導航支援】
     window.addEventListener('popstate', function(event) {
-        // 關閉所有 Modal
-        const modals = document.querySelectorAll('.modal');
-        modals.forEach(m => m.style.display = 'none');
+        document.getElementById('transactionModal').style.display = 'none';
     });
 
-    // 【拖曳排序邏輯】
-    let sortableInstance = null;
-
-    // 【核心資料庫 & 稱號 (V58 修復: 移除不必要圖示)】
     const defaultCards = [
         { 
-            id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', note: '自選回饋 (最高13.5%)', rule: '', 
+            id: 'c6', name: '台新街口豬富卡', note: '自選回饋 (最高13.5%)', rule: '', 
             type: 'ceiling', limit: 8000, tier1Rate: 0.135, tier2Rate: 0.035, 
             gradient: 'linear-gradient(135deg, #e60012 0%, #FFD700 100%)', 
             textColor: 'white', msgDanger: '10%已滿 (變3.5%)',
@@ -415,18 +367,18 @@
                 </details>
 
                 <div style="margin-top:10px; font-size:11px; color:#5d4037;">
-                    🧾 <b>繳費攻略：</b>需勾選上方「是APP繳費」+「新戶加碼」。<br>
+                    🧾 <b>繳費 10.15%：</b>需勾選上方「是APP繳費」+「新戶加碼」。<br>
                     ⚠️ 10%加碼上限800元(刷$8000)
                 </div>
             `
         },
         { 
-            id: 'c1', name: '星展傳說對決', nickname: 'LinePay神卡', note: 'LinePay / 蝦皮 / UberEats', rule: '', 
+            id: 'c1', name: '星展傳說對決', note: 'LinePay / 蝦皮 / UberEats', rule: '', 
             type: 'ceiling', limit: 11363, tier1Rate: 0.10, tier2Rate: 0.012, 
             gradient: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)', textColor: 'white', msgDanger: '已滿 (1.2%)' 
         },
         { 
-            id: 'c5', name: '聯邦賴點卡', nickname: 'Line Pay優等生', note: 'LinePay / 偶數日指定通路', rule: '⚠️ 單筆需滿$100', 
+            id: 'c5', name: '聯邦賴點卡', note: 'LinePay / 偶數日指定通路', rule: '⚠️ 單筆需滿$100', 
             type: 'ceiling', limit: 3000, tier1Rate: 0.06, tier2Rate: 0.01, 
             threshold: 100,
             gradient: 'linear-gradient(135deg, #00B900 0%, #33CC33 100%)', textColor: 'white', msgDanger: '6% 已滿',
@@ -446,12 +398,12 @@
             `
         },
         { 
-            id: 'c3', name: '永豐 Sport', nickname: 'Apple Pay優等生', note: 'Apple Pay (5%)', rule: '', 
+            id: 'c3', name: '永豐 Sport', note: 'Apple Pay (5%)', rule: '', 
             type: 'ceiling', limit: 5000, tier1Rate: 0.05, tier2Rate: 0.02, 
             gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '5% 已滿' 
         },
         { 
-            id: 'c4', name: '將來將將', nickname: '行支泛用', note: '行動支付 / 外送 / 網購', rule: '', 
+            id: 'c4', name: '將來將將', note: '行動支付 / 外送 / 網購', rule: '', 
             type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
             gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '加碼已滿',
             parking: `
@@ -472,10 +424,29 @@
             `
         },
         { 
-            id: 'c2', name: '聯邦綠卡', nickname: '🅿️ 市區停車免費', note: '國外2% / 國內1%', rule: '', 
+            id: 'c2', name: '聯邦綠卡', note: '國外2% / 國內1%', rule: '', 
             type: 'floor', target: 12000, tier1Rate: 0.02, tier2Rate: 0.02, 
             gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', textColor: 'white', msgSuccess: '已達標 (免停)',
-            parking: '🅿️ <b>免費停車：</b><br>台灣聯通、詮營、ViVi PARK、嘟嘟房、車麻吉<br>(需上月刷滿1.2萬)'
+            parking: `
+                🅿️ <b>免費停車：</b><br>台灣聯通、詮營、ViVi PARK、嘟嘟房、車麻吉<br>(需上月刷滿1.2萬)<br>
+                <hr style="opacity:0.3; margin:8px 0;">
+                
+                <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
+                    <summary style="cursor:pointer; font-weight:700; color:#8B0000; font-size:12px;">▼ 點我看 6% 綠色通路</summary>
+                    <div style="margin-top:6px; padding:8px; font-size:11px; line-height:1.6; color:#333; background:rgba(255,255,255,0.9); border-radius:6px;">
+                        🔋 <b>電動車充/換電：</b>特斯拉、Gogoro、eMoving、EVOASIS、EVALUE、全國特急電<br>
+                        🛵 <b>共享交通：</b>iRent、GoShare、WeMo Scooter<br>
+                        🥦 <b>生機選品：</b>里仁、聖德科斯、棉花田、主婦聯盟、AESOP、茶籽堂、鮮乳坊...<br>
+                        🌍 <b>綠色捐贈：</b>荒野保護、千里步道、齊柏林、主婦聯盟基金會...<br>
+                    </div>
+                </details>
+                
+                <div style="margin-top:10px; font-size:11px; color:#1b5e20;">
+                    🌿 <b>6% 回饋攻略：</b>勾選上方「是綠色通路」。<br>
+                    ⚠️ 6%加碼上限150元(刷$2500)<br>
+                    ⚠️ 此消費可計入 $12,000 停車門檻
+                </div>
+            `
         }
     ];
 
@@ -494,12 +465,7 @@
 
     function initSortable() {
         var el = document.getElementById('card-grid');
-        
-        if (sortableInstance) {
-            sortableInstance.destroy();
-        }
-
-        sortableInstance = new Sortable(el, {
+        new Sortable(el, {
             animation: 150,
             ghostClass: 'sortable-ghost',
             dragClass: 'sortable-drag',
@@ -519,8 +485,8 @@
 
     function updateDate() { const now = new Date(); document.getElementById('dateDisplay').innerText = `${now.getMonth()+1}/${now.getDate()}`; }
 
-    // --- 核心計算邏輯 (通用版) ---
-    function calculateStats(cardId, addedAmount = 0) {
+    // --- 核心計算邏輯 (通用版 + 綠卡邏輯) ---
+    function calculateStats(cardId, addedAmount = 0, addedIsGreen = false) {
         const card = cards.find(c => c.id === cardId);
         const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
         const relevantTx = transactions.filter(t => t.cardId === cardId && new Date(t.date) >= startDate);
@@ -530,21 +496,57 @@
         const threshold = card.threshold || 0;
         const validSpend = relevantTx.filter(t => t.amount >= threshold).reduce((sum, t) => sum + t.amount, 0) + (addedAmount >= threshold ? addedAmount : 0);
 
-        let reward = 0, currentRate = 0;
-        if (card.type === 'mixed') {
-            if (validSpend < card.minSpend) { reward = validSpend * card.tier2Rate; currentRate = card.tier2Rate; }
-            else if (validSpend <= card.limit) { reward = validSpend * card.tier1Rate; currentRate = card.tier1Rate; }
-            else { reward = (card.limit * card.tier1Rate) + ((validSpend - card.limit) * card.tier2Rate); currentRate = card.tier2Rate; }
-        } else if (card.type === 'ceiling') {
-            if (validSpend <= card.limit) { reward = validSpend * card.tier1Rate; currentRate = card.tier1Rate; }
-            else { reward = (card.limit * card.tier1Rate) + ((validSpend - card.limit) * card.tier2Rate); currentRate = card.tier2Rate; }
-        } else { 
-            reward = validSpend * card.tier1Rate; currentRate = card.tier1Rate; 
+        let reward = 0;
+        
+        // 綠卡專屬邏輯 (c2)
+        if (cardId === 'c2') {
+            // 1. 計算綠色通路回饋 (6% 上限150元 -> 刷2500)
+            // 先加總本月已刷的綠色通路
+            const currentGreenSpend = relevantTx.filter(t => t.isGreen).reduce((sum, t) => sum + t.amount, 0);
+            
+            // 本次新增是否為綠色
+            let newGreenAmount = addedIsGreen ? addedAmount : 0;
+            
+            // 計算 6% 部分 (總綠色消費 vs 2500)
+            const totalGreenSpend = currentGreenSpend + newGreenAmount;
+            const greenEligible = Math.min(totalGreenSpend, 2500);
+            const greenReward = greenEligible * 0.06;
+            
+            // 超出綠色上限的部分，以及非綠色消費，都算 1% (假設一般消費)
+            // 綠色溢出部分
+            const greenOverflow = Math.max(0, totalGreenSpend - 2500);
+            
+            // 非綠色消費總額
+            const currentNormalSpend = relevantTx.filter(t => !t.isGreen).reduce((sum, t) => sum + t.amount, 0);
+            const newNormalAmount = addedIsGreen ? 0 : addedAmount;
+            const totalNormalSpend = currentNormalSpend + newNormalAmount;
+            
+            const normalReward = (greenOverflow + totalNormalSpend) * 0.01;
+            
+            reward = greenReward + normalReward;
+            
+            return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: 'var' };
         }
-        return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: (currentRate * 100).toFixed(1) };
+
+        // 其他卡片邏輯
+        if (card.type === 'mixed') {
+            if (validSpend < card.minSpend) reward = validSpend * card.tier2Rate; 
+            else if (validSpend <= card.limit) reward = validSpend * card.tier1Rate;
+            else reward = (card.limit * card.tier1Rate) + ((validSpend - card.limit) * card.tier2Rate);
+        } else if (card.type === 'ceiling') {
+            if (validSpend <= card.limit) reward = validSpend * card.tier1Rate;
+            else reward = (card.limit * card.tier1Rate) + ((validSpend - card.limit) * card.tier2Rate);
+        } else { 
+            reward = validSpend * card.tier1Rate; 
+        }
+        
+        let currentRate = 0;
+        if (validSpend > 0) currentRate = (reward / validSpend) * 100;
+        else currentRate = (card.tier1Rate || 0) * 100;
+
+        return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: currentRate.toFixed(1) };
     }
 
-    // --- 豬富卡防呆互斥邏輯 ---
     function toggleBillLogic() {
         const isBill = document.getElementById('checkIsBill').checked;
         if (isBill) {
@@ -553,7 +555,6 @@
         updateRewardPreview();
     }
 
-    // --- 即時回饋試算 ---
     function updateRewardPreview() {
         const inputVal = document.getElementById('amountInput').value;
         const amount = parseFloat(inputVal);
@@ -571,6 +572,7 @@
         let thisTransactionReward = 0;
         let effectiveRate = 0;
 
+        // 豬富卡
         if (cardId === 'c6') {
             const hasBonus10 = document.getElementById('checkBonus10').checked;
             const hasBonus25 = document.getElementById('checkBonus25').checked;
@@ -579,11 +581,10 @@
             let baseRate = isBill ? 0.0015 : 0.01;
             let reward = amount * baseRate;
 
-            if (hasBonus25) {
-                reward += amount * 0.025;
-            }
+            if (hasBonus25) reward += amount * 0.025;
 
             if (hasBonus10) {
+                const card = cards.find(c => c.id === 'c6');
                 const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
                 const currentMonthSpend = transactions
                     .filter(t => t.cardId === 'c6' && new Date(t.date) >= startDate)
@@ -593,9 +594,21 @@
                 const eligibleFor10 = Math.min(amount, remainingQuota);
                 reward += eligibleFor10 * 0.10;
             }
-
             thisTransactionReward = Math.round(reward);
             effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(2);
+        
+        // 綠卡
+        } else if (cardId === 'c2') {
+            const isGreen = document.getElementById('checkGreenChannel').checked;
+            
+            // 呼叫 calculateStats 進行模擬計算
+            // 先算還沒加這筆的總回饋
+            const currentStats = calculateStats(cardId, 0);
+            // 再算加了這筆後的總回饋
+            const newStats = calculateStats(cardId, amount, isGreen);
+            
+            thisTransactionReward = newStats.reward - currentStats.reward;
+            effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(1);
 
         } else {
             const currentStats = calculateStats(cardId, 0);
@@ -615,7 +628,11 @@
             monthTotalReward += stats.reward;
             let percent = 0, statusText = '', msgStyle = '';
             
-            if (card.type === 'mixed') {
+            // 顯示邏輯
+            if (card.id === 'c2') { // 綠卡特殊顯示
+                percent = (stats.validSpend / card.target) * 100;
+                statusText = stats.validSpend >= card.target ? '任務達成 (免停)' : `差 $${(card.target - stats.validSpend).toLocaleString()}`;
+            } else if (card.type === 'mixed') {
                 if (stats.validSpend < card.minSpend) { percent = (stats.validSpend / card.minSpend) * 100; statusText = `差 $${(card.minSpend - stats.validSpend).toLocaleString()} 升級`; msgStyle = 'color: #FFD700;'; }
                 else if (stats.validSpend <= card.limit) { percent = (stats.validSpend / card.limit) * 100; const remain = card.limit - stats.validSpend; statusText = `剩 $${remain.toLocaleString()} (5%)`; }
                 else { percent = 100; statusText = '已滿 (0.5%)'; msgStyle = 'color: #ffcccc;'; }
@@ -629,6 +646,8 @@
             }
 
             const ruleHtml = card.rule ? `<div class="tile-rule">${card.rule}</div>` : '';
+            // 綠卡顯示 Rate 時若為 var 則顯示 1%~6%
+            let displayRate = stats.rate === 'var' ? '1~6%' : `${stats.rate}%`;
 
             const tile = document.createElement('div'); 
             tile.className = 'card-tile'; 
@@ -637,12 +656,8 @@
             tile.style.color = card.textColor; 
             tile.onclick = () => openQuickAdd(card.id);
             
-            // 新增 nickname 顯示
-            let nicknameHtml = card.nickname ? `<div class="tile-nickname">${card.nickname}</div>` : '';
-
             tile.innerHTML = `
-                <div class="tile-header"><span class="tile-name">${card.name}</span><span class="rate-badge" style="color:black">${stats.rate}%</span></div>
-                ${nicknameHtml}
+                <div class="tile-header"><span class="tile-name">${card.name}</span><span class="rate-badge" style="color:black">${displayRate}</span></div>
                 <span class="tile-note" style="color:${card.textColor==='white'?'rgba(255,255,255,0.8)':'rgba(0,0,0,0.6)'}">${card.note}</span>
                 <div class="tile-body">
                     <div class="tile-stat">$${stats.spend.toLocaleString()}</div>
@@ -669,14 +684,18 @@
         
         history.pushState({modalOpen: true}, "", "#modal");
 
-        const pigRichOptions = document.getElementById('pigRichOptions');
+        // 控制專屬選項顯示
+        document.getElementById('pigRichOptions').style.display = (cardId === 'c6') ? 'block' : 'none';
+        document.getElementById('greenCardOptions').style.display = (cardId === 'c2') ? 'block' : 'none';
+
+        // 重置勾選狀態
         if (cardId === 'c6') {
-            pigRichOptions.style.display = 'block';
             document.getElementById('checkBonus10').checked = true;
             document.getElementById('checkBonus25').checked = true;
             document.getElementById('checkIsBill').checked = false; 
-        } else {
-            pigRichOptions.style.display = 'none';
+        }
+        if (cardId === 'c2') {
+            document.getElementById('checkGreenChannel').checked = false; // 預設不勾
         }
 
         document.getElementById('liveRewardCalc').style.display = 'none';
@@ -695,7 +714,28 @@
     }
 
     function addTransaction() {
-        const cardId = document.getElementById('cardIdInput').value, amount = document.getElementById('amountInput').value, note = document.getElementById('noteInput').value; if (!amount || amount <= 0) return alert('請輸入金額'); transactions.push({ id: Date.now(), cardId: cardId, amount: parseFloat(amount), note: note, date: new Date().toISOString() }); localStorage.setItem('transactions', JSON.stringify(transactions)); 
+        const cardId = document.getElementById('cardIdInput').value;
+        const amount = document.getElementById('amountInput').value;
+        const note = document.getElementById('noteInput').value;
+        
+        if (!amount || amount <= 0) return alert('請輸入金額');
+        
+        // 儲存特殊狀態 (綠卡 GreenChannel)
+        let isGreen = false;
+        if (cardId === 'c2') {
+            isGreen = document.getElementById('checkGreenChannel').checked;
+        }
+
+        transactions.push({ 
+            id: Date.now(), 
+            cardId: cardId, 
+            amount: parseFloat(amount), 
+            note: note, 
+            date: new Date().toISOString(),
+            isGreen: isGreen // 存入資料庫
+        }); 
+        
+        localStorage.setItem('transactions', JSON.stringify(transactions)); 
         history.back(); 
         renderGrid();
     }
@@ -729,9 +769,16 @@
                 cardTx.forEach(tx => {
                     const item = document.createElement('div');
                     item.className = 'history-item';
+                    
+                    // 顯示綠色通路標記
+                    let noteText = tx.note || '一般消費';
+                    if (tx.isGreen) {
+                        noteText = '🌿 ' + noteText;
+                    }
+
                     item.innerHTML = `
                         <div>
-                            <div class="h-name">${tx.note || '一般消費'}</div>
+                            <div class="h-name">${noteText}</div>
                             <div class="h-date">${new Date(tx.date).getMonth()+1}/${new Date(tx.date).getDate()}</div>
                         </div>
                         <div style="display:flex;align-items:center;">
@@ -755,29 +802,6 @@
     }
 
     function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
-    
-    // --- 卡片管理功能 (許願池版) ---
-    function openCardManager() {
-        const modal = document.getElementById('cardSelectionModal');
-        const container = document.getElementById('cardListContainer');
-        container.innerHTML = '';
-        
-        // 故意不放入任何卡片選項，直接顯示許願文字
-        const feedbackDiv = document.createElement('div');
-        feedbackDiv.style.cssText = "padding: 20px; text-align: center; color: #555; font-size: 14px; line-height: 1.6;";
-        feedbackDiv.innerHTML = "💡 <b>你還想要新增什麼卡呢？</b><br>請留言告訴我們，我們會盡快加入！<br><br><span style='font-size:12px; color:#999'>(目前僅開放內建 6 張精選神卡)</span>";
-        container.appendChild(feedbackDiv);
-        
-        document.getElementById('selectionCount').style.display = 'none'; // 隱藏計數器
-        
-        history.pushState({modalOpen: true}, "", "#manage");
-        modal.style.display = 'flex';
-    }
-
-    // 假的儲存函數 (因為沒有選項可存，其實只要關閉即可)
-    function saveCardSelection() {
-        history.back();
-    }
     
     async function exportData() {
         const dataStr = JSON.stringify(transactions);
@@ -834,7 +858,6 @@
     }
 
     function showDonateModal() {
-        history.pushState({modalOpen: true}, "", "#donate");
         document.getElementById('donateModal').style.display = 'flex';
     }
 

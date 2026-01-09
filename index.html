@@ -117,13 +117,13 @@
         .tile-header { display: flex; justify-content: space-between; align-items: flex-start; z-index: 2; margin-bottom: 2px;}
         .tile-name { font-size: 15px; font-weight: 800; line-height: 1.2; text-shadow: 0 1px 2px rgba(0,0,0,0.15); }
         
-        /* 核心修復：V45 風格的暱稱標籤 (深色底+黃字) */
+        /* 暱稱標籤 (V45風格) */
         .tile-nickname-badge {
             display: inline-block;
             font-size: 10px;
             font-weight: 800;
-            background: rgba(0,0,0,0.2); /* 深色半透明底 */
-            color: #FFD700; /* 金黃色文字 */
+            background: rgba(0,0,0,0.2); 
+            color: #FFD700; 
             padding: 2px 6px;
             border-radius: 4px;
             margin-bottom: 4px;
@@ -201,7 +201,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V62.0</div>
+            <div class="version-tag" id="top-version-tag">V63.0</div>
         </div>
 
         <div class="header-section">
@@ -344,7 +344,8 @@
 
     const defaultCards = [
         { 
-            id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', note: '自選回饋 (刷 $8,000 封頂)', rule: '', 
+            id: 'c6', name: '台新街口豬富卡', nickname: '行支繳費神卡', note: '國內1% / 國外2% / 綠色6% (低消$12000)', rule: '', 
+            // 預設改成 6.0% (代表最高戰力)
             type: 'ceiling', limit: 8000, tier1Rate: 0.135, tier2Rate: 0.035, 
             gradient: 'linear-gradient(135deg, #e60012 0%, #FFD700 100%)', 
             textColor: 'white', msgDanger: '已封頂 (變3.5%)',
@@ -430,7 +431,7 @@
             `
         },
         { 
-            id: 'c2', name: '聯邦綠卡', nickname: '🅿️ 市區停車免費', note: '低消 $12,000 免停 (綠色刷 $2,500 封頂)', rule: '', 
+            id: 'c2', name: '聯邦綠卡', nickname: '免費市區停車', note: '國內1% / 國外2% / 綠色6% (低消$12000)', rule: '', 
             type: 'floor', target: 12000, tier1Rate: 0.02, tier2Rate: 0.02, 
             gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', textColor: 'white', msgSuccess: '已達標 (免停)',
             parking: `
@@ -450,7 +451,8 @@
                 <div style="margin-top:10px; font-size:11px; color:#1b5e20;">
                     🌿 <b>6% 回饋攻略：</b>勾選上方「是綠色通路」。<br>
                     ⚠️ 6%加碼：刷$2,500封頂<br>
-                    ⚠️ 此消費可計入 $12,000 停車門檻
+                    ⚠️ 此消費可計入 $12,000 停車門檻<br>
+                    ⚠️ 一般消費：國內1% / 國外2% (無上限)
                 </div>
             `
         }
@@ -506,6 +508,7 @@
         
         // 綠卡專屬邏輯 (c2)
         if (cardId === 'c2') {
+            // 1. 計算綠色通路回饋 (6% 上限150元 -> 刷2500)
             const currentGreenSpend = relevantTx.filter(t => t.isGreen).reduce((sum, t) => sum + t.amount, 0);
             let newGreenAmount = addedIsGreen ? addedAmount : 0;
             const totalGreenSpend = currentGreenSpend + newGreenAmount;
@@ -520,7 +523,14 @@
             
             reward = greenReward + normalReward;
             
-            return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: 'var' };
+            // 修正：回傳實際回饋率，不再是 'var'
+            let actualRate = 0;
+            if (totalSpend > 0) {
+                 actualRate = (reward / totalSpend) * 100;
+            } else {
+                 actualRate = 6.0; // 預設顯示最高回饋
+            }
+            return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: actualRate.toFixed(1) };
         }
 
         // 其他卡片邏輯
@@ -653,7 +663,7 @@
             }
 
             const ruleHtml = card.rule ? `<div class="tile-rule">${card.rule}</div>` : '';
-            let displayRate = stats.rate === 'var' ? '1~6%' : `${stats.rate}%`;
+            let displayRate = `${stats.rate}%`; // 直接顯示計算出的數值，綠卡不再顯示 var
 
             const tile = document.createElement('div'); 
             tile.className = 'card-tile'; 

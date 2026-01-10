@@ -289,7 +289,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V118.0</div>
+            <div class="version-tag" id="top-version-tag">V120.0</div>
         </div>
 
         <div class="header-section">
@@ -321,8 +321,8 @@
                 <button class="btn-tool" onclick="triggerImport()">📥 讀檔還原</button>
                 <input type="file" id="fileInput" style="display:none" accept=".json, .txt" onchange="importFile(this)">
             </div>
-            <button class="btn-tool btn-donate" onclick="showDonateModal()">☕ 贊助開發者 (支持更新)</button>
             <button class="btn-reset-visible" onclick="resetAllData()">🗑️ 重置所有資料</button>
+            <button class="btn-tool btn-donate" onclick="showDonateModal()">☕ 贊助開發者 (支持更新)</button>
         </div>
         
         <div style="height:20px;"></div> </div>
@@ -707,12 +707,12 @@
         // 舊用戶: 補上 c8
         if (!visibleCards.includes('c8')) visibleCards.push('c8');
         
-        // 智慧補位邏輯 (強制執行8張上限)
+        // 智慧補位邏輯：
         const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9'];
         const currentRealCards = visibleCards.filter(id => realCardIds.includes(id));
         
-        // 如果實體卡 >= 8 張，移除所有佔位符
         if (currentRealCards.length >= 8) {
+            // 如果實體卡 >= 8 張，移除所有佔位符
             visibleCards = visibleCards.filter(id => id !== 'add1' && id !== 'add2');
         } else {
             // 如果實體卡 < 8 張，補上 add1
@@ -833,21 +833,7 @@
             if (addedAmount > 0 && addedIsHsbcForeign) currentMonthForeignSpend += addedAmount;
             
             if (currentMonthForeignSpend >= 50000) {
-                 // 這裡有個小問題：滿額禮是現金回饋還是哩程？
-                 // 根據匯豐規則，滿額禮通常是刷卡金。
-                 // 但為了統一顯示，我們假設它轉換成等值哩程？或者直接加在 reward 裡？
-                 // 匯豐旅人卡的滿額禮通常是 "哩程" 還是 "刷卡金" 需確認。
-                 // 假設是刷卡金 $500。
-                 // 但我們這裡 reward 單位是哩程。
-                 // 為了不混淆，我們只計算哩程。滿額禮 $500 請用戶自己記得去領。
-                 // 或者，我們可以用文字提示。
-                 // (用戶指令：若海外刷滿五萬你還是可以多給他五百) -> 這裡是指現金 $500。
-                 // 混合單位顯示會很怪 (1000哩 + $500)。
-                 // 暫時不計入 totalMiles，僅做文字提示？
-                 // 或者我們把 $500 換算成哩程？ (1哩約0.5元?) -> 不精準。
-                 // 決定：既然是「多給他五百」，這 $500 是現金。
-                 // 為了顯示方便，我們不加在 totalMiles 裡，因為單位不同。
-                 // 但我們可以在 statusText 裡提示。
+                // 不計入哩程，僅顯示提示
             }
 
             reward = totalMiles;

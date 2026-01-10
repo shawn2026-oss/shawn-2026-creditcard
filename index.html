@@ -288,7 +288,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V109.0</div>
+            <div class="version-tag" id="top-version-tag">V111.0</div>
         </div>
 
         <div class="header-section">
@@ -388,7 +388,11 @@
                         <input type="checkbox" id="checkHappyPet" onchange="toggleHappyPet()">
                     </div>
                     <div class="option-row">
-                        <label for="checkHappyLife">🏠 生活/餐廳 (4% 刷$5714)</label>
+                        <label for="checkHappyPeace">🍽️ 大小安心刷 (4% 刷$5714)</label>
+                        <input type="checkbox" id="checkHappyPeace" onchange="toggleHappyPeace()">
+                    </div>
+                     <div class="option-row">
+                        <label for="checkHappyLife">🛒 生活禮遇 (4% 刷$5714)</label>
                         <input type="checkbox" id="checkHappyLife" onchange="toggleHappyLife()">
                     </div>
                      <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;">
@@ -610,7 +614,7 @@
             `
         },
         {
-            id: 'c8', name: '遠東樂家+卡', nickname: '生活/寵物神卡', note: '寵物10% / 生活4% / 國外2.5% (需一般消費滿3千)',
+            id: 'c8', name: '遠東樂家+卡', nickname: '生活/寵物神卡', note: '寵物10% / 生活4% / 國外2.5% (各別封頂)',
             type: 'ceiling', limit: 5263, tier1Rate: 0.1, tier2Rate: 0.005,
             gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)',
             textColor: 'white', msgDanger: '已封頂 (變0.5%)',
@@ -730,7 +734,7 @@
     function updateDate() { const now = new Date(); document.getElementById('dateDisplay').innerText = `${now.getMonth()+1}/${now.getDate()}`; }
 
     // --- 核心計算邏輯 ---
-    function calculateStats(cardId, addedAmount = 0, addedIsGreen = false, addedIsForeign = false, addedIsUniBonus = false, addedIsUniUp = false, addedIsHappyPet = false, addedIsHappyLife = false, addedIsHappyForeign = false) {
+    function calculateStats(cardId, addedAmount = 0, addedIsGreen = false, addedIsForeign = false, addedIsUniBonus = false, addedIsUniUp = false, addedIsHappyPet = false, addedIsHappyLife = false, addedIsHappyForeign = false, addedIsHappyPeace = false) {
         const card = cards.find(c => c.id === cardId);
         
         if (card.type === 'placeholder') return { spend: 0, validSpend: 0, reward: 0, rate: '0.0' };
@@ -748,28 +752,39 @@
 
         // 遠東樂家+卡 (c8)
         if (cardId === 'c8') {
+            // 寵物 10%
             const petSpend = relevantTx.filter(t => t.isHappyPet).reduce((sum, t) => sum + t.amount, 0) + (addedIsHappyPet ? addedAmount : 0);
             const petEligible = Math.min(petSpend, 5263);
             const petReward = petEligible * 0.10;
             const petOverflow = Math.max(0, petSpend - 5263);
 
+            // 生活 4%
             const lifeSpend = relevantTx.filter(t => t.isHappyLife).reduce((sum, t) => sum + t.amount, 0) + (addedIsHappyLife ? addedAmount : 0);
             const lifeEligible = Math.min(lifeSpend, 5714);
             const lifeReward = lifeEligible * 0.04;
             const lifeOverflow = Math.max(0, lifeSpend - 5714);
 
+            // 安心 4%
+            const peaceSpend = relevantTx.filter(t => t.isHappyPeace).reduce((sum, t) => sum + t.amount, 0) + (addedIsHappyPeace ? addedAmount : 0);
+            const peaceEligible = Math.min(peaceSpend, 5714);
+            const peaceReward = peaceEligible * 0.04;
+            const peaceOverflow = Math.max(0, peaceSpend - 5714);
+
+            // 海外 2.5%
             const foreignSpend = relevantTx.filter(t => t.isHappyForeign).reduce((sum, t) => sum + t.amount, 0) + (addedIsHappyForeign ? addedAmount : 0);
             const foreignReward = foreignSpend * 0.025;
 
-            const normalSpend = relevantTx.filter(t => !t.isHappyPet && !t.isHappyLife && !t.isHappyForeign).reduce((sum, t) => sum + t.amount, 0) 
-                              + (!addedIsHappyPet && !addedIsHappyLife && !addedIsHappyForeign ? addedAmount : 0);
-            const totalNormalSpend = normalSpend + petOverflow + lifeOverflow;
+            // 一般消費 0.5% (含溢出)
+            const normalSpend = relevantTx.filter(t => !t.isHappyPet && !t.isHappyLife && !t.isHappyPeace && !t.isHappyForeign).reduce((sum, t) => sum + t.amount, 0) 
+                              + (!addedIsHappyPet && !addedIsHappyLife && !addedIsHappyPeace && !addedIsHappyForeign ? addedAmount : 0);
+            const totalNormalSpend = normalSpend + petOverflow + lifeOverflow + peaceOverflow;
             const normalReward = totalNormalSpend * 0.005;
 
+            // 滿額禮
             const thresholdBonus = totalSpend >= 26000 ? 400 : 0;
             const foreignThresholdBonus = foreignSpend >= 50000 ? 500 : 0;
 
-            reward = petReward + lifeReward + foreignReward + normalReward + thresholdBonus + foreignThresholdBonus;
+            reward = petReward + lifeReward + peaceReward + foreignReward + normalReward + thresholdBonus + foreignThresholdBonus;
             
             let actualRate = 10.0;
             if (totalSpend > 0) actualRate = (reward / totalSpend) * 100;
@@ -877,6 +892,16 @@
 
     function toggleHappyPet() {
         if(document.getElementById('checkHappyPet').checked) {
+            document.getElementById('checkHappyPeace').checked = false;
+            document.getElementById('checkHappyLife').checked = false;
+            document.getElementById('checkHappyForeign').checked = false;
+        }
+        updateRewardPreview();
+    }
+
+    function toggleHappyPeace() {
+        if(document.getElementById('checkHappyPeace').checked) {
+            document.getElementById('checkHappyPet').checked = false;
             document.getElementById('checkHappyLife').checked = false;
             document.getElementById('checkHappyForeign').checked = false;
         }
@@ -886,6 +911,7 @@
     function toggleHappyLife() {
         if(document.getElementById('checkHappyLife').checked) {
             document.getElementById('checkHappyPet').checked = false;
+            document.getElementById('checkHappyPeace').checked = false;
             document.getElementById('checkHappyForeign').checked = false;
         }
         updateRewardPreview();
@@ -894,6 +920,7 @@
     function toggleHappyForeign() {
         if(document.getElementById('checkHappyForeign').checked) {
             document.getElementById('checkHappyPet').checked = false;
+            document.getElementById('checkHappyPeace').checked = false;
             document.getElementById('checkHappyLife').checked = false;
         }
         updateRewardPreview();
@@ -957,10 +984,11 @@
 
         } else if (cardId === 'c8') { // Happy+
             const isPet = document.getElementById('checkHappyPet').checked;
+            const isPeace = document.getElementById('checkHappyPeace').checked;
             const isLife = document.getElementById('checkHappyLife').checked;
             const isForeign = document.getElementById('checkHappyForeign').checked;
             const currentStats = calculateStats(cardId, 0);
-            const newStats = calculateStats(cardId, amount, false, false, false, false, isPet, isLife, isForeign);
+            const newStats = calculateStats(cardId, amount, false, false, false, false, isPet, isLife, isForeign, isPeace);
             thisTransactionReward = newStats.reward - currentStats.reward;
             effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(1);
 
@@ -1163,6 +1191,7 @@
         }
         if (cardId === 'c8') {
             document.getElementById('checkHappyPet').checked = false;
+            document.getElementById('checkHappyPeace').checked = false;
             document.getElementById('checkHappyLife').checked = false;
             document.getElementById('checkHappyForeign').checked = false;
             happyDashboard.style.display = 'block';
@@ -1185,6 +1214,7 @@
         const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
         const txs = transactions.filter(t => t.cardId === 'c8' && new Date(t.date) >= startDate);
         const petSpend = txs.filter(t => t.isHappyPet).reduce((sum, t) => sum + t.amount, 0);
+        const peaceSpend = txs.filter(t => t.isHappyPeace).reduce((sum, t) => sum + t.amount, 0);
         const lifeSpend = txs.filter(t => t.isHappyLife).reduce((sum, t) => sum + t.amount, 0);
         const totalSpend = txs.reduce((sum, t) => sum + t.amount, 0);
         const createBar = (label, current, max) => {
@@ -1192,7 +1222,7 @@
             const isDanger = percent >= 100;
             return `<div class="dash-row"><div class="dash-label"><span>${label}</span><span style="color:${isDanger ? 'red' : '#555'}">$${current.toLocaleString()} / ${max.toLocaleString()}</span></div><div class="dash-bar-bg"><div class="dash-bar-fill ${isDanger ? 'danger' : ''}" style="width: ${percent}%"></div></div></div>`;
         };
-        dashboard.innerHTML = createBar('🐶 寵物額度', petSpend, 5263) + createBar('🏠 生活額度', lifeSpend, 5714) + createBar('💰 滿額門檻', totalSpend, 26000);
+        dashboard.innerHTML = createBar('🐶 寵物額度', petSpend, 5263) + createBar('🍽️ 安心刷額度', peaceSpend, 5714) + createBar('🛒 生活額度', lifeSpend, 5714) + createBar('💰 滿額門檻', totalSpend, 26000);
     }
     function renderModalHistory(cardId) {
         const container = document.getElementById('modalHistoryList');
@@ -1218,7 +1248,8 @@
             if (tx.isForeign) noteText = '✈️ ' + noteText;
             if (tx.isUniBonus) noteText = '🔥 ' + noteText;
             if (tx.isHappyPet) noteText = '🐶 ' + noteText;
-            if (tx.isHappyLife) noteText = '🏠 ' + noteText;
+            if (tx.isHappyPeace) noteText = '🍽️ ' + noteText;
+            if (tx.isHappyLife) noteText = '🛒 ' + noteText;
             if (tx.isHappyForeign) noteText = '✈️ ' + noteText;
             item.innerHTML = `<div><div class="h-name">${noteText}</div><div class="h-date">${new Date(tx.date).getMonth()+1}/${new Date(tx.date).getDate()}</div></div><div style="display:flex;align-items:center;"><span class="h-amount">$${tx.amount.toLocaleString()}</span><button class="btn-delete-single" onclick="deleteTransaction(${tx.id}, true)">✕</button></div>`;
             container.appendChild(item);
@@ -1230,7 +1261,7 @@
         const amount = document.getElementById('amountInput').value;
         const note = document.getElementById('noteInput').value;
         if (!amount || amount <= 0) return alert('請輸入金額');
-        let isGreen = false; let isForeign = false; let isUniBonus = false; let isUniUp = false; let isHappyPet = false; let isHappyLife = false; let isHappyForeign = false;
+        let isGreen = false; let isForeign = false; let isUniBonus = false; let isUniUp = false; let isHappyPet = false; let isHappyPeace = false; let isHappyLife = false; let isHappyForeign = false;
         if (cardId === 'c2') {
             isGreen = document.getElementById('checkGreenChannel').checked;
             isForeign = document.getElementById('checkForeign').checked;
@@ -1241,10 +1272,11 @@
         }
         if (cardId === 'c8') {
             isHappyPet = document.getElementById('checkHappyPet').checked;
+            isHappyPeace = document.getElementById('checkHappyPeace').checked;
             isHappyLife = document.getElementById('checkHappyLife').checked;
             isHappyForeign = document.getElementById('checkHappyForeign').checked;
         }
-        transactions.push({ id: Date.now(), cardId: cardId, amount: parseFloat(amount), note: note, date: new Date().toISOString(), isGreen: isGreen, isForeign: isForeign, isUniBonus: isUniBonus, isUniUp: isUniUp, isHappyPet: isHappyPet, isHappyLife: isHappyLife, isHappyForeign: isHappyForeign }); 
+        transactions.push({ id: Date.now(), cardId: cardId, amount: parseFloat(amount), note: note, date: new Date().toISOString(), isGreen: isGreen, isForeign: isForeign, isUniBonus: isUniBonus, isUniUp: isUniUp, isHappyPet: isHappyPet, isHappyPeace: isHappyPeace, isHappyLife: isHappyLife, isHappyForeign: isHappyForeign }); 
         localStorage.setItem('transactions', JSON.stringify(transactions)); 
         document.getElementById('amountInput').value = '';
         document.getElementById('noteInput').value = '';

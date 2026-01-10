@@ -289,7 +289,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V120.0</div>
+            <div class="version-tag" id="top-version-tag">V121.0</div>
         </div>
 
         <div class="header-section">
@@ -407,7 +407,7 @@
 
                 <div id="hsbcOptions">
                      <div class="option-row" style="border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:10px;">
-                        <span style="font-weight:700; color:#333;">💳 選擇您的卡片等級 (自動記憶)：</span>
+                        <span style="font-weight:700; color:#333;">💳 卡片等級 (自動記憶)：</span>
                         <div style="display:flex; gap:15px; margin-top:8px;">
                             <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;">
                                 <input type="radio" name="hsbcTier" value="infinite" onchange="saveHsbcTier()"> 無限卡
@@ -502,6 +502,34 @@
                 ticker.style.animation = 'scroll-left 15s linear infinite';
             }
         }, 100);
+        
+        // 🚀 初始化時，強制執行 8 張卡片鐵律
+        let currentCards = JSON.parse(localStorage.getItem('visibleCards')) || [];
+        const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9'];
+        let realCards = currentCards.filter(id => realCardIds.includes(id));
+        
+        // 如果實體卡超過 8 張，砍掉多餘的
+        if (realCards.length > 8) {
+            realCards = realCards.slice(0, 8); // 只留前 8 張
+            localStorage.setItem('visibleCards', JSON.stringify(realCards)); // 立即存檔
+        }
+        
+        // 如果實體卡 < 8 張，確保有 add1
+        if (realCards.length < 8) {
+            if (!currentCards.includes('add1')) {
+                realCards.push('add1');
+                localStorage.setItem('visibleCards', JSON.stringify(realCards));
+            }
+        } else {
+             // 如果滿 8 張，確保沒有 add1
+             if (currentCards.includes('add1')) {
+                 localStorage.setItem('visibleCards', JSON.stringify(realCards));
+             }
+        }
+        
+        // 重新渲染
+        visibleCards = JSON.parse(localStorage.getItem('visibleCards'));
+        renderGrid();
     });
 
     window.addEventListener('popstate', function(event) {
@@ -688,7 +716,7 @@
                 <div style="font-size:10px; opacity:0.8; margin-top:4px;">(卡別請於記帳時設定，系統會自動記憶)</div>
             `
         },
-        // 預留卡片 (僅1張，補足8格) - 預設隱藏
+        // 預留卡片 - 預設隱藏
         { 
             id: 'add1', name: '新增卡片', nickname: '點擊選卡', note: '前往資料庫挑選', 
             type: 'placeholder', 
@@ -697,7 +725,7 @@
         }
     ];
 
-    // 初始化顯示狀態
+    // 初始化顯示狀態 (確保 8 格)
     let visibleCards = JSON.parse(localStorage.getItem('visibleCards'));
     if (!visibleCards) {
         // 新用戶: 顯示 8 張實體卡
@@ -707,15 +735,17 @@
         // 舊用戶: 補上 c8
         if (!visibleCards.includes('c8')) visibleCards.push('c8');
         
-        // 智慧補位邏輯：
+        // --- 關鍵修正：啟動時強制修剪為 8 張 ---
         const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9'];
-        const currentRealCards = visibleCards.filter(id => realCardIds.includes(id));
+        let currentRealCards = visibleCards.filter(id => realCardIds.includes(id));
         
-        if (currentRealCards.length >= 8) {
-            // 如果實體卡 >= 8 張，移除所有佔位符
-            visibleCards = visibleCards.filter(id => id !== 'add1' && id !== 'add2');
+        if (currentRealCards.length > 8) {
+            // 超過 8 張，強制切除第 9 張以後的
+            visibleCards = currentRealCards.slice(0, 8);
+        } else if (currentRealCards.length === 8) {
+            visibleCards = currentRealCards; // 剛好 8 張，不需 add1
         } else {
-            // 如果實體卡 < 8 張，補上 add1
+            // 少於 8 張，補上 add1
             if (!visibleCards.includes('add1')) visibleCards.push('add1');
             visibleCards = visibleCards.filter(id => id !== 'add2');
         }
@@ -804,45 +834,33 @@
 
         let reward = 0;
 
-        // 匯豐旅人卡 (c9) - 哩程計算 (全歷史累積)
+        // 匯豐旅人卡 (c9)
         if (cardId === 'c9') {
             const tier = localStorage.getItem('hsbc_tier') || 'infinite';
             let rateDomestic = 18;
             let rateForeign = 10;
             if (tier === 'signature') { rateDomestic = 18; rateForeign = 15; }
             
-            // 計算初始哩程
             let totalMiles = parseInt(localStorage.getItem('hsbc_initial_miles') || 0);
 
-            // 計算所有歷史交易 (不分月份)
             const allHistoryTx = transactions.filter(t => t.cardId === 'c9');
             allHistoryTx.forEach(tx => {
                 const rate = tx.isHsbcForeign ? rateForeign : rateDomestic;
                 totalMiles += Math.floor(tx.amount / rate);
             });
 
-            // 加上預覽的新增金額 (如果有)
             if (addedAmount > 0) {
                 const currentRate = addedIsHsbcForeign ? rateForeign : rateDomestic;
                 totalMiles += Math.floor(addedAmount / currentRate);
             }
             
-            // 背景計算海外滿額禮 (每月獨立算)
-            const currentMonthHsbcTx = relevantTx.filter(t => t.cardId === 'c9');
-            let currentMonthForeignSpend = currentMonthHsbcTx.filter(t => t.isHsbcForeign).reduce((sum, t) => sum + t.amount, 0);
-            if (addedAmount > 0 && addedIsHsbcForeign) currentMonthForeignSpend += addedAmount;
-            
-            if (currentMonthForeignSpend >= 50000) {
-                // 不計入哩程，僅顯示提示
-            }
+            // 海外滿額禮提示 (不計入哩程，僅提示)
 
             reward = totalMiles;
-            
             let actualRate = 0;
             if (totalSpend > 0) {
                 actualRate = (totalSpend / totalMiles).toFixed(1); 
             }
-            
             return { spend: totalSpend, validSpend: validSpend, reward: reward, rate: actualRate };
         }
 
@@ -1063,7 +1081,15 @@
             const currentStats = calculateStats(cardId, 0);
             const newStats = calculateStats(cardId, amount, false, false, false, false, false, false, false, false, isHsbcForeign);
             thisTransactionReward = newStats.reward - currentStats.reward;
-            effectiveRate = newStats.rate; // 這裡是顯示 "xx元/哩"
+            effectiveRate = newStats.rate; 
+            
+            // 計算本筆消費的平均成本 (元/哩)
+            const tier = localStorage.getItem('hsbc_tier') || 'infinite';
+            let rate = 18;
+            if (tier === 'infinite' && isHsbcForeign) rate = 10;
+            else if (tier === 'signature' && isHsbcForeign) rate = 15;
+            effectiveRate = rate;
+
             isMiles = true;
         } else if (cardId === 'c2') {
             const isGreen = document.getElementById('checkGreenChannel').checked;
@@ -1099,7 +1125,7 @@
         }
 
         if (isMiles) {
-            previewDiv.innerHTML = `✨ 預計回饋：${thisTransactionReward} 哩 (約 ${effectiveRate}元/哩)`;
+            previewDiv.innerHTML = `✨ 預計回饋：${thisTransactionReward} 哩 (${effectiveRate}元/哩)`;
         } else {
             previewDiv.innerHTML = `✨ 預計回饋：$${thisTransactionReward} (${effectiveRate}%)`;
         }
@@ -1109,6 +1135,7 @@
         const container = document.getElementById('card-grid');
         let monthTotalReward = 0; container.innerHTML = '';
         
+        // 修正：總金額計算包含所有卡片（含隱藏）
         cards.forEach(card => {
              if (card.type === 'placeholder') return;
              const stats = calculateStats(card.id);
@@ -1303,25 +1330,23 @@
     function toggleCardVisibility(cardId) {
         if (visibleCards.includes(cardId)) {
             visibleCards = visibleCards.filter(id => id !== cardId);
-            // 關閉一張卡後，若總數 < 8，自動補上 add1
             const realCardsCount = visibleCards.filter(id => id !== 'add1').length;
             if (realCardsCount < 8 && !visibleCards.includes('add1')) {
                 visibleCards.push('add1');
             }
         } else {
             visibleCards.push(cardId);
-            // 開啟一張卡後，若總數 >= 8 且包含 add1，移除 add1
             if (visibleCards.includes('add1')) {
                 visibleCards = visibleCards.filter(id => id !== 'add1');
             }
         }
         localStorage.setItem('visibleCards', JSON.stringify(visibleCards));
-        openManageModal(); 
+        openManageModal(); // Refresh modal state
         renderGrid(); 
     }
 
     // ... (其餘函式保持不變) ...
-    // (openQuickAdd, renderModalHistory, closeModal, addTransaction, deleteTransaction, resetAllData, exportData, triggerImport, importFile, showDonateModal, copyBankInfo, checkUrgentTasks) 
+    // (openQuickAdd, renderHappyDashboard, renderModalHistory, closeModal, addTransaction, deleteTransaction, resetAllData, exportData, triggerImport, importFile, showDonateModal, copyBankInfo, checkUrgentTasks) 
     function openQuickAdd(cardId) {
         const card = cards.find(c => c.id === cardId); 
         document.getElementById('modalTitle').innerText = card.name; 

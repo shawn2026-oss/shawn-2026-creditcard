@@ -289,7 +289,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V116.0</div>
+            <div class="version-tag" id="top-version-tag">V117.0</div>
         </div>
 
         <div class="header-section">
@@ -407,7 +407,7 @@
 
                 <div id="hsbcOptions">
                      <div class="option-row" style="border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:10px;">
-                        <span style="font-weight:700; color:#333;">💳 卡片等級 (自動記憶)：</span>
+                        <span style="font-weight:700; color:#333;">💳 選擇您的卡片等級 (自動記憶)：</span>
                         <div style="display:flex; gap:15px; margin-top:8px;">
                             <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;">
                                 <input type="radio" name="hsbcTier" value="infinite" onchange="saveHsbcTier()"> 無限卡
@@ -751,378 +751,11 @@
         return displayCards;
     }
 
-    function initSortable() {
-        var el = document.getElementById('card-grid');
-        if (sortableInstance) { sortableInstance.destroy(); }
-        sortableInstance = new Sortable(el, {
-            animation: 150, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag',
-            delay: 200, delayOnTouchOnly: true, forceFallback: true, 
-            onEnd: function (evt) {
-                const visibleOrder = Array.from(evt.to.children).map(el => el.getAttribute('data-card-id'));
-                const allCardIds = cards.map(c => c.id);
-                const hiddenCards = allCardIds.filter(id => !visibleOrder.includes(id));
-                const finalOrder = [...visibleOrder, ...hiddenCards];
-                localStorage.setItem('cardOrder', JSON.stringify(finalOrder));
-                savedOrder = finalOrder;
-            }
-        });
-    }
-
-    let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-
-    function updateDate() { const now = new Date(); document.getElementById('dateDisplay').innerText = `${now.getMonth()+1}/${now.getDate()}`; }
-
-    // 儲存匯豐旅人卡等級設定
-    function saveHsbcTier() {
-        const tier = document.querySelector('input[name="hsbcTier"]:checked').value;
-        localStorage.setItem('hsbc_tier', tier);
-        renderGrid(); // 即時更新首頁卡面文字
-        updateRewardPreview();
-    }
-
-    // 儲存匯豐旅人卡起始哩程
-    function saveHsbcInitial() {
-        const initial = document.getElementById('hsbcInitialMiles').value;
-        localStorage.setItem('hsbc_initial_miles', initial);
-        renderGrid();
-    }
-
-    // --- 核心計算邏輯 ---
-    function calculateStats(cardId, addedAmount = 0, addedIsGreen = false, addedIsForeign = false, addedIsUniBonus = false, addedIsUniUp = false, addedIsHappyPet = false, addedIsHappyLife = false, addedIsHappyForeign = false, addedIsHappyPeace = false, addedIsHsbcForeign = false) {
-        const card = cards.find(c => c.id === cardId);
-        
-        if (card.type === 'placeholder') return { spend: 0, validSpend: 0, reward: 0, rate: '0.0' };
-
-        // 統一採用日曆月
-        const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
-        const relevantTx = transactions.filter(t => t.cardId === cardId && new Date(t.date) >= startDate);
-        let totalSpend = relevantTx.reduce((sum, t) => sum + parseFloat(t.amount), 0);
-        totalSpend += addedAmount;
-
-        const threshold = card.threshold || 0;
-        const validSpend = relevantTx.filter(t => t.amount >= threshold).reduce((sum, t) => sum + t.amount, 0) + (addedAmount >= threshold ? addedAmount : 0);
-
-        let reward = 0;
-
-        // 匯豐旅人卡 (c9) - 哩程計算 (全歷史累積)
-        if (cardId === 'c9') {
-            const tier = localStorage.getItem('hsbc_tier') || 'infinite';
-            let rateDomestic = 18;
-            let rateForeign = 10;
-            if (tier === 'signature') { rateDomestic = 18; rateForeign = 15; }
-            
-            // 計算初始哩程
-            let totalMiles = parseInt(localStorage.getItem('hsbc_initial_miles') || 0);
-
-            // 計算所有歷史交易 (不分月份)
-            const allHistoryTx = transactions.filter(t => t.cardId === 'c9');
-            allHistoryTx.forEach(tx => {
-                const rate = tx.isHsbcForeign ? rateForeign : rateDomestic;
-                totalMiles += Math.floor(tx.amount / rate);
-            });
-
-            // 加上預覽的新增金額 (如果有)
-            if (addedAmount > 0) {
-                const currentRate = addedIsHsbcForeign ? rateForeign : rateDomestic;
-                totalMiles += Math.floor(addedAmount / currentRate);
-            }
-            
-            // 背景計算海外滿額禮 (每月獨立算)
-            const currentMonthHsbcTx = relevantTx.filter(t => t.cardId === 'c9');
-            let currentMonthForeignSpend = currentMonthHsbcTx.filter(t => t.isHsbcForeign).reduce((sum, t) => sum + t.amount, 0);
-            if (addedAmount > 0 && addedIsHsbcForeign) currentMonthForeignSpend += addedAmount;
-            
-            if (currentMonthForeignSpend >= 50000) {
-                 // 這裡有個小問題：滿額禮是現金回饋還是哩程？
-                 // 根據匯豐規則，滿額禮通常是刷卡金。
-                 // 但為了統一顯示，我們假設它轉換成等值哩程？或者直接加在 reward 裡？
-                 // 匯豐旅人卡的滿額禮通常是 "哩程" 還是 "刷卡金" 需確認。
-                 // 假設是刷卡金 $500。
-                 // 但我們這裡 reward 單位是哩程。
-                 // 為了不混淆，我們只計算哩程。滿額禮 $500 請用戶自己記得去領。
-                 // 或者，我們可以用文字提示。
-                 // (用戶指令：若海外刷滿五萬你還是可以多給他五百) -> 這裡是指現金 $500。
-                 // 混合單位顯示會很怪 (1000哩 + $500)。
-                 // 暫時不計入 totalMiles，僅做文字提示？
-                 // 或者我們把 $500 換算成哩程？ (1哩約0.5元?) -> 不精準。
-                 // 決定：既然是「多給他五百」，這 $500 是現金。
-                 // 為了顯示方便，我們不加在 totalMiles 裡，因為單位不同。
-                 // 但我們可以在 statusText 裡提示。
-            }
-
-            reward = totalMiles;
-            
-            let actualRate = 0;
-            if (totalSpend > 0) {
-                actualRate = (totalSpend / totalMiles).toFixed(1); 
-            }
-            
-            return { spend: totalSpend, validSpend: validSpend, reward: reward, rate: actualRate };
-        }
-
-        // 遠東樂家+卡 (c8)
-        if (cardId === 'c8') {
-            const petSpend = relevantTx.filter(t => t.isHappyPet).reduce((sum, t) => sum + t.amount, 0) + (addedIsHappyPet ? addedAmount : 0);
-            const petEligible = Math.min(petSpend, 5263);
-            const petReward = petEligible * 0.10;
-            const petOverflow = Math.max(0, petSpend - 5263);
-
-            const lifeSpend = relevantTx.filter(t => t.isHappyLife).reduce((sum, t) => sum + t.amount, 0) + (addedIsHappyLife ? addedAmount : 0);
-            const lifeEligible = Math.min(lifeSpend, 5714);
-            const lifeReward = lifeEligible * 0.04;
-            const lifeOverflow = Math.max(0, lifeSpend - 5714);
-
-            const peaceSpend = relevantTx.filter(t => t.isHappyPeace).reduce((sum, t) => sum + t.amount, 0) + (addedIsHappyPeace ? addedAmount : 0);
-            const peaceEligible = Math.min(peaceSpend, 5714);
-            const peaceReward = peaceEligible * 0.04;
-            const peaceOverflow = Math.max(0, peaceSpend - 5714);
-
-            const foreignSpend = relevantTx.filter(t => t.isHappyForeign).reduce((sum, t) => sum + t.amount, 0) + (addedIsHappyForeign ? addedAmount : 0);
-            const foreignReward = foreignSpend * 0.025;
-
-            const normalSpend = relevantTx.filter(t => !t.isHappyPet && !t.isHappyLife && !t.isHappyPeace && !t.isHappyForeign).reduce((sum, t) => sum + t.amount, 0) 
-                              + (!addedIsHappyPet && !addedIsHappyLife && !addedIsHappyPeace && !addedIsHappyForeign ? addedAmount : 0);
-            const totalNormalSpend = normalSpend + petOverflow + lifeOverflow + peaceOverflow;
-            const normalReward = totalNormalSpend * 0.005;
-
-            const thresholdBonus = totalSpend >= 26000 ? 400 : 0;
-            const foreignThresholdBonus = foreignSpend >= 50000 ? 500 : 0;
-
-            reward = petReward + lifeReward + peaceReward + foreignReward + normalReward + thresholdBonus + foreignThresholdBonus;
-            
-            let actualRate = 10.0;
-            if (totalSpend > 0) actualRate = (reward / totalSpend) * 100;
-            
-            return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: actualRate.toFixed(1) };
-        }
-
-        // 玉山 UNI (c7)
-        if (cardId === 'c7') {
-            let baseRate = 0.035;
-            let baseCap = 40000;
-            const isUpMonth = addedIsUniUp || relevantTx.some(t => t.isUniUp);
-            if (isUpMonth) { baseRate = 0.045; baseCap = 142857; }
-            const baseEligible = Math.min(totalSpend, baseCap);
-            const baseReward = baseEligible * baseRate;
-            const overflow = Math.max(0, totalSpend - baseCap);
-            const overflowReward = overflow * 0.01;
-            const currentBonusSpend = relevantTx.filter(t => t.isUniBonus).reduce((sum, t) => sum + t.amount, 0);
-            let newBonusAmount = addedIsUniBonus ? addedAmount : 0;
-            const totalBonusSpend = currentBonusSpend + newBonusAmount;
-            const bonusEligible = Math.min(totalBonusSpend, 16666);
-            const bonusReward = bonusEligible * 0.03;
-            reward = baseReward + overflowReward + bonusReward;
-            let actualRate = (baseRate * 100);
-            if (totalSpend > 0) actualRate = (reward / totalSpend) * 100;
-            return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: actualRate.toFixed(1) };
-        }
-        
-        // 綠卡 (c2)
-        if (cardId === 'c2') {
-            const currentGreenSpend = relevantTx.filter(t => t.isGreen).reduce((sum, t) => sum + t.amount, 0);
-            let newGreenAmount = addedIsGreen ? addedAmount : 0;
-            const totalGreenSpend = currentGreenSpend + newGreenAmount;
-            const greenEligible = Math.min(totalGreenSpend, 2500);
-            const greenReward = greenEligible * 0.06;
-            const greenOverflow = Math.max(0, totalGreenSpend - 2500);
-            const currentForeignSpend = relevantTx.filter(t => t.isForeign).reduce((sum, t) => sum + t.amount, 0);
-            let newForeignAmount = addedIsForeign ? addedAmount : 0;
-            const totalForeignSpend = currentForeignSpend + newForeignAmount;
-            const foreignReward = totalForeignSpend * 0.02;
-            const currentNormalSpend = relevantTx.filter(t => !t.isGreen && !t.isForeign).reduce((sum, t) => sum + t.amount, 0);
-            const newNormalAmount = (!addedIsGreen && !addedIsForeign) ? addedAmount : 0;
-            const totalNormalSpend = currentNormalSpend + newNormalAmount;
-            const normalReward = (greenOverflow + totalNormalSpend) * 0.01;
-            reward = greenReward + foreignReward + normalReward;
-            let actualRate = 6.0;
-            return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: actualRate.toFixed(1) };
-        }
-
-        // 其他卡片邏輯
-        if (card.type === 'mixed') {
-            if (validSpend < card.minSpend) reward = validSpend * card.tier2Rate; 
-            else if (validSpend <= card.limit) reward = validSpend * card.tier1Rate;
-            else reward = (card.limit * card.tier1Rate) + ((validSpend - card.limit) * card.tier2Rate);
-        } else if (card.type === 'ceiling') {
-            if (validSpend <= card.limit) reward = validSpend * card.tier1Rate;
-            else reward = (card.limit * card.tier1Rate) + ((validSpend - card.limit) * card.tier2Rate);
-        } else { 
-            reward = validSpend * card.tier1Rate; 
-        }
-        
-        let currentRate = 0;
-        if (validSpend > 0) currentRate = (reward / validSpend) * 100;
-        else currentRate = (card.tier1Rate || 0) * 100;
-
-        return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: currentRate.toFixed(1) };
-    }
-
-    // ... (toggleBillLogic 等切換邏輯保持不變) ...
-    function toggleBillLogic() {
-        const isBill = document.getElementById('checkIsBill').checked;
-        const labelBase = document.getElementById('labelBaseRate');
-        if (isBill) {
-            document.getElementById('checkBonus25').checked = false;
-            labelBase.innerText = "🔰 基本回饋 0.15% (無上限)";
-        } else {
-            labelBase.innerText = "🔰 基本回饋 1% (無上限)";
-        }
-        updateRewardPreview();
-    }
-    
-    function toggleSelectedLogic() {
-        const isSelected = document.getElementById('checkBonus25').checked;
-        const labelBase = document.getElementById('labelBaseRate');
-
-        if (isSelected) {
-            document.getElementById('checkIsBill').checked = false;
-            labelBase.innerText = "🔰 基本回饋 1% (無上限)";
-        }
-        updateRewardPreview();
-    }
-
-    function toggleGreenLogic() {
-        if(document.getElementById('checkGreenChannel').checked) {
-            document.getElementById('checkForeign').checked = false;
-        }
-        updateRewardPreview();
-    }
-
-    function toggleForeignLogic() {
-        if(document.getElementById('checkForeign').checked) {
-            document.getElementById('checkGreenChannel').checked = false;
-        }
-        updateRewardPreview();
-    }
-
-    function toggleHappyPet() {
-        if(document.getElementById('checkHappyPet').checked) {
-            document.getElementById('checkHappyPeace').checked = false;
-            document.getElementById('checkHappyLife').checked = false;
-            document.getElementById('checkHappyForeign').checked = false;
-        }
-        updateRewardPreview();
-    }
-
-    function toggleHappyPeace() {
-        if(document.getElementById('checkHappyPeace').checked) {
-            document.getElementById('checkHappyPet').checked = false;
-            document.getElementById('checkHappyLife').checked = false;
-            document.getElementById('checkHappyForeign').checked = false;
-        }
-        updateRewardPreview();
-    }
-    
-    function toggleHappyLife() {
-        if(document.getElementById('checkHappyLife').checked) {
-            document.getElementById('checkHappyPet').checked = false;
-            document.getElementById('checkHappyPeace').checked = false;
-            document.getElementById('checkHappyForeign').checked = false;
-        }
-        updateRewardPreview();
-    }
-
-    function toggleHappyForeign() {
-        if(document.getElementById('checkHappyForeign').checked) {
-            document.getElementById('checkHappyPet').checked = false;
-            document.getElementById('checkHappyPeace').checked = false;
-            document.getElementById('checkHappyLife').checked = false;
-        }
-        updateRewardPreview();
-    }
-
-    function updateRewardPreview() {
-        const inputVal = document.getElementById('amountInput').value;
-        const amount = parseFloat(inputVal);
-        const previewDiv = document.getElementById('liveRewardCalc');
-        const cardId = document.getElementById('cardIdInput').value;
-
-        if (!amount || amount <= 0) {
-            previewDiv.style.display = 'none'; 
-            previewDiv.innerHTML = '';
-            return;
-        }
-
-        previewDiv.style.display = 'block'; 
-        let thisTransactionReward = 0;
-        let effectiveRate = 0;
-        let isMiles = false;
-
-        if (cardId === 'c6') {
-            const hasBonus10 = document.getElementById('checkBonus10').checked;
-            const hasBonus25 = document.getElementById('checkBonus25').checked;
-            const isBill = document.getElementById('checkIsBill').checked;
-            let baseRate = isBill ? 0.0015 : 0.01;
-            let reward = amount * baseRate;
-
-            if (hasBonus25) reward += amount * 0.025;
-
-            if (hasBonus10) {
-                const card = cards.find(c => c.id === 'c6');
-                const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
-                const currentMonthSpend = transactions
-                    .filter(t => t.cardId === 'c6' && new Date(t.date) >= startDate)
-                    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-                
-                const remainingQuota = Math.max(0, 8000 - currentMonthSpend);
-                const eligibleFor10 = Math.min(amount, remainingQuota);
-                reward += eligibleFor10 * 0.10;
-            }
-            thisTransactionReward = Math.round(reward);
-            effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(2);
-        
-        } else if (cardId === 'c9') { // 匯豐旅人
-            const isHsbcForeign = document.getElementById('checkHsbcForeign').checked;
-            // 這裡 calculateStats 的最後一個參數是 isHsbcForeign
-            const currentStats = calculateStats(cardId, 0);
-            const newStats = calculateStats(cardId, amount, false, false, false, false, false, false, false, false, isHsbcForeign);
-            thisTransactionReward = newStats.reward - currentStats.reward;
-            effectiveRate = newStats.rate; // 這裡是顯示 "xx元/哩"
-            isMiles = true;
-        } else if (cardId === 'c2') {
-            const isGreen = document.getElementById('checkGreenChannel').checked;
-            const isForeign = document.getElementById('checkForeign').checked;
-            const currentStats = calculateStats(cardId, 0);
-            const newStats = calculateStats(cardId, amount, isGreen, isForeign);
-            thisTransactionReward = newStats.reward - currentStats.reward;
-            effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(1);
-
-        } else if (cardId === 'c7') { // UNI
-            const isUniUp = document.getElementById('checkUniUp').checked;
-            const isUniBonus = document.getElementById('checkUniBonus').checked;
-            const currentStats = calculateStats(cardId, 0);
-            const newStats = calculateStats(cardId, amount, false, false, isUniBonus, isUniUp);
-            thisTransactionReward = newStats.reward - currentStats.reward;
-            effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(1);
-
-        } else if (cardId === 'c8') { // Happy+
-            const isPet = document.getElementById('checkHappyPet').checked;
-            const isPeace = document.getElementById('checkHappyPeace').checked;
-            const isLife = document.getElementById('checkHappyLife').checked;
-            const isForeign = document.getElementById('checkHappyForeign').checked;
-            const currentStats = calculateStats(cardId, 0);
-            const newStats = calculateStats(cardId, amount, false, false, false, false, isPet, isLife, isForeign, isPeace);
-            thisTransactionReward = newStats.reward - currentStats.reward;
-            effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(1);
-
-        } else {
-            const currentStats = calculateStats(cardId, 0);
-            const newStats = calculateStats(cardId, amount);
-            thisTransactionReward = newStats.reward - currentStats.reward;
-            effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(1);
-        }
-
-        if (isMiles) {
-            previewDiv.innerHTML = `✨ 預計回饋：${thisTransactionReward} 哩 (約 ${effectiveRate}元/哩)`;
-        } else {
-            previewDiv.innerHTML = `✨ 預計回饋：$${thisTransactionReward} (${effectiveRate}%)`;
-        }
-    }
-
     function renderGrid() {
         const container = document.getElementById('card-grid');
         let monthTotalReward = 0; container.innerHTML = '';
         
+        // 修正：總金額計算包含所有卡片（含隱藏）
         cards.forEach(card => {
              if (card.type === 'placeholder') return;
              const stats = calculateStats(card.id);
@@ -1134,7 +767,9 @@
         
         document.getElementById('totalRewardDisplay').innerText = `$${monthTotalReward.toLocaleString()}`;
 
-        const displayCards = getSortedCards();
+        // 暴力裁切法：只渲染前 8 張
+        let displayCards = getSortedCards();
+        displayCards = displayCards.slice(0, 8); // 強制只取前 8 個
 
         displayCards.forEach(card => {
             const stats = calculateStats(card.id); 
@@ -1211,20 +846,12 @@
             
             let earnedText = `+$${stats.reward.toLocaleString()}`;
             if (card.id === 'c9') {
-                // c9 特殊處理：中間顯示本月/本次記帳累積，下面顯示總額
-                // 為了符合邏輯，這裡 calculateStats 回傳的是 TOTAL (asset)。
-                // 但首頁卡片中間通常是顯示「賺了多少」(flow)。
-                // 如果是資產制，這裡顯示總額也合理。
-                // 為了區隔，我們讓 earnedText 顯示 "透過記帳產生的總哩程" (不含 initial)
-                // 重新計算 transaction miles only
                 const tier = localStorage.getItem('hsbc_tier') || 'infinite';
                 let rateDomestic = 18;
                 let rateForeign = 10;
                 if (tier === 'signature') { rateDomestic = 18; rateForeign = 15; }
                 
-                // 這裡需要只計算 transaction 的部分
                 let txMiles = 0;
-                // 這裡的 transactions 是全域變數，包含了所有歷史紀錄
                 const allHistoryTx = transactions.filter(t => t.cardId === 'c9');
                 allHistoryTx.forEach(tx => {
                     const rate = tx.isHsbcForeign ? rateForeign : rateDomestic;
@@ -1256,94 +883,219 @@
         checkUrgentTasks();
         initSortable();
     }
-    
-    // 開啟管理卡片視窗 (隱藏 add1)
+
+    // ... (其餘函數保持 V116 邏輯不變，以下為省略的函數清單，請確保在您的程式碼中存在)
+    function initSortable() {
+        var el = document.getElementById('card-grid');
+        if (sortableInstance) { sortableInstance.destroy(); }
+        sortableInstance = new Sortable(el, {
+            animation: 150, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag',
+            delay: 200, delayOnTouchOnly: true, forceFallback: true, 
+            onEnd: function (evt) {
+                const visibleOrder = Array.from(evt.to.children).map(el => el.getAttribute('data-card-id'));
+                const allCardIds = cards.map(c => c.id);
+                const hiddenCards = allCardIds.filter(id => !visibleOrder.includes(id));
+                const finalOrder = [...visibleOrder, ...hiddenCards];
+                localStorage.setItem('cardOrder', JSON.stringify(finalOrder));
+                savedOrder = finalOrder;
+            }
+        });
+    }
+
+    let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+    function updateDate() { const now = new Date(); document.getElementById('dateDisplay').innerText = `${now.getMonth()+1}/${now.getDate()}`; }
+    function saveHsbcTier() {
+        const tier = document.querySelector('input[name="hsbcTier"]:checked').value;
+        localStorage.setItem('hsbc_tier', tier);
+        renderGrid(); 
+        updateRewardPreview();
+    }
+    function saveHsbcInitial() {
+        const initial = document.getElementById('hsbcInitialMiles').value;
+        localStorage.setItem('hsbc_initial_miles', initial);
+        renderGrid();
+    }
+    function calculateStats(cardId, addedAmount = 0, addedIsGreen = false, addedIsForeign = false, addedIsUniBonus = false, addedIsUniUp = false, addedIsHappyPet = false, addedIsHappyLife = false, addedIsHappyForeign = false, addedIsHappyPeace = false, addedIsHsbcForeign = false) {
+        const card = cards.find(c => c.id === cardId);
+        if (card.type === 'placeholder') return { spend: 0, validSpend: 0, reward: 0, rate: '0.0' };
+        const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
+        const relevantTx = transactions.filter(t => t.cardId === cardId && new Date(t.date) >= startDate);
+        let totalSpend = relevantTx.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+        totalSpend += addedAmount;
+        const threshold = card.threshold || 0;
+        const validSpend = relevantTx.filter(t => t.amount >= threshold).reduce((sum, t) => sum + t.amount, 0) + (addedAmount >= threshold ? addedAmount : 0);
+        let reward = 0;
+        if (cardId === 'c9') {
+            const tier = localStorage.getItem('hsbc_tier') || 'infinite';
+            let rateDomestic = 18;
+            let rateForeign = 10;
+            if (tier === 'signature') { rateDomestic = 18; rateForeign = 15; }
+            let totalMiles = parseInt(localStorage.getItem('hsbc_initial_miles') || 0);
+            const allHistoryTx = transactions.filter(t => t.cardId === 'c9');
+            allHistoryTx.forEach(tx => {
+                const rate = tx.isHsbcForeign ? rateForeign : rateDomestic;
+                totalMiles += Math.floor(tx.amount / rate);
+            });
+            if (addedAmount > 0) {
+                const currentRate = addedIsHsbcForeign ? rateForeign : rateDomestic;
+                totalMiles += Math.floor(addedAmount / currentRate);
+            }
+            reward = totalMiles;
+            let actualRate = 0;
+            if (totalSpend > 0) { actualRate = (totalSpend / totalMiles).toFixed(1); }
+            return { spend: totalSpend, validSpend: validSpend, reward: reward, rate: actualRate };
+        }
+        if (cardId === 'c8') {
+            const petSpend = relevantTx.filter(t => t.isHappyPet).reduce((sum, t) => sum + t.amount, 0) + (addedIsHappyPet ? addedAmount : 0);
+            const petEligible = Math.min(petSpend, 5263);
+            const petReward = petEligible * 0.10;
+            const petOverflow = Math.max(0, petSpend - 5263);
+            const lifeSpend = relevantTx.filter(t => t.isHappyLife).reduce((sum, t) => sum + t.amount, 0) + (addedIsHappyLife ? addedAmount : 0);
+            const lifeEligible = Math.min(lifeSpend, 5714);
+            const lifeReward = lifeEligible * 0.04;
+            const lifeOverflow = Math.max(0, lifeSpend - 5714);
+            const peaceSpend = relevantTx.filter(t => t.isHappyPeace).reduce((sum, t) => sum + t.amount, 0) + (addedIsHappyPeace ? addedAmount : 0);
+            const peaceEligible = Math.min(peaceSpend, 5714);
+            const peaceReward = peaceEligible * 0.04;
+            const peaceOverflow = Math.max(0, peaceSpend - 5714);
+            const foreignSpend = relevantTx.filter(t => t.isHappyForeign).reduce((sum, t) => sum + t.amount, 0) + (addedIsHappyForeign ? addedAmount : 0);
+            const foreignReward = foreignSpend * 0.025;
+            const normalSpend = relevantTx.filter(t => !t.isHappyPet && !t.isHappyLife && !t.isHappyPeace && !t.isHappyForeign).reduce((sum, t) => sum + t.amount, 0) + (!addedIsHappyPet && !addedIsHappyLife && !addedIsHappyPeace && !addedIsHappyForeign ? addedAmount : 0);
+            const totalNormalSpend = normalSpend + petOverflow + lifeOverflow + peaceOverflow;
+            const normalReward = totalNormalSpend * 0.005;
+            const thresholdBonus = totalSpend >= 26000 ? 400 : 0;
+            const foreignThresholdBonus = foreignSpend >= 50000 ? 500 : 0;
+            reward = petReward + lifeReward + peaceReward + foreignReward + normalReward + thresholdBonus + foreignThresholdBonus;
+            let actualRate = 10.0;
+            if (totalSpend > 0) actualRate = (reward / totalSpend) * 100;
+            return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: actualRate.toFixed(1) };
+        }
+        if (cardId === 'c7') {
+            let baseRate = 0.035; let baseCap = 40000;
+            const isUpMonth = addedIsUniUp || relevantTx.some(t => t.isUniUp);
+            if (isUpMonth) { baseRate = 0.045; baseCap = 142857; }
+            const baseEligible = Math.min(totalSpend, baseCap);
+            const baseReward = baseEligible * baseRate;
+            const overflow = Math.max(0, totalSpend - baseCap);
+            const overflowReward = overflow * 0.01;
+            const currentBonusSpend = relevantTx.filter(t => t.isUniBonus).reduce((sum, t) => sum + t.amount, 0);
+            let newBonusAmount = addedIsUniBonus ? addedAmount : 0;
+            const totalBonusSpend = currentBonusSpend + newBonusAmount;
+            const bonusEligible = Math.min(totalBonusSpend, 16666);
+            const bonusReward = bonusEligible * 0.03;
+            reward = baseReward + overflowReward + bonusReward;
+            let actualRate = (baseRate * 100);
+            if (totalSpend > 0) actualRate = (reward / totalSpend) * 100;
+            return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: actualRate.toFixed(1) };
+        }
+        if (cardId === 'c2') {
+            const currentGreenSpend = relevantTx.filter(t => t.isGreen).reduce((sum, t) => sum + t.amount, 0);
+            let newGreenAmount = addedIsGreen ? addedAmount : 0;
+            const totalGreenSpend = currentGreenSpend + newGreenAmount;
+            const greenEligible = Math.min(totalGreenSpend, 2500);
+            const greenReward = greenEligible * 0.06;
+            const greenOverflow = Math.max(0, totalGreenSpend - 2500);
+            const currentForeignSpend = relevantTx.filter(t => t.isForeign).reduce((sum, t) => sum + t.amount, 0);
+            let newForeignAmount = addedIsForeign ? addedAmount : 0;
+            const totalForeignSpend = currentForeignSpend + newForeignAmount;
+            const foreignReward = totalForeignSpend * 0.02;
+            const currentNormalSpend = relevantTx.filter(t => !t.isGreen && !t.isForeign).reduce((sum, t) => sum + t.amount, 0);
+            const newNormalAmount = (!addedIsGreen && !addedIsForeign) ? addedAmount : 0;
+            const totalNormalSpend = currentNormalSpend + newNormalAmount;
+            const normalReward = (greenOverflow + totalNormalSpend) * 0.01;
+            reward = greenReward + foreignReward + normalReward;
+            let actualRate = 6.0;
+            return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: actualRate.toFixed(1) };
+        }
+        if (card.type === 'mixed') {
+            if (validSpend < card.minSpend) reward = validSpend * card.tier2Rate; 
+            else if (validSpend <= card.limit) reward = validSpend * card.tier1Rate;
+            else reward = (card.limit * card.tier1Rate) + ((validSpend - card.limit) * card.tier2Rate);
+        } else if (card.type === 'ceiling') {
+            if (validSpend <= card.limit) reward = validSpend * card.tier1Rate;
+            else reward = (card.limit * card.tier1Rate) + ((validSpend - card.limit) * card.tier2Rate);
+        } else { 
+            reward = validSpend * card.tier1Rate; 
+        }
+        let currentRate = 0;
+        if (validSpend > 0) currentRate = (reward / validSpend) * 100;
+        else currentRate = (card.tier1Rate || 0) * 100;
+        return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: currentRate.toFixed(1) };
+    }
+    function toggleBillLogic() { const isBill = document.getElementById('checkIsBill').checked; const labelBase = document.getElementById('labelBaseRate'); if (isBill) { document.getElementById('checkBonus25').checked = false; labelBase.innerText = "🔰 基本回饋 0.15% (無上限)"; } else { labelBase.innerText = "🔰 基本回饋 1% (無上限)"; } updateRewardPreview(); }
+    function toggleSelectedLogic() { const isSelected = document.getElementById('checkBonus25').checked; const labelBase = document.getElementById('labelBaseRate'); if (isSelected) { document.getElementById('checkIsBill').checked = false; labelBase.innerText = "🔰 基本回饋 1% (無上限)"; } updateRewardPreview(); }
+    function toggleGreenLogic() { if(document.getElementById('checkGreenChannel').checked) { document.getElementById('checkForeign').checked = false; } updateRewardPreview(); }
+    function toggleForeignLogic() { if(document.getElementById('checkForeign').checked) { document.getElementById('checkGreenChannel').checked = false; } updateRewardPreview(); }
+    function toggleHappyPet() { if(document.getElementById('checkHappyPet').checked) { document.getElementById('checkHappyPeace').checked = false; document.getElementById('checkHappyLife').checked = false; document.getElementById('checkHappyForeign').checked = false; } updateRewardPreview(); }
+    function toggleHappyPeace() { if(document.getElementById('checkHappyPeace').checked) { document.getElementById('checkHappyPet').checked = false; document.getElementById('checkHappyLife').checked = false; document.getElementById('checkHappyForeign').checked = false; } updateRewardPreview(); }
+    function toggleHappyLife() { if(document.getElementById('checkHappyLife').checked) { document.getElementById('checkHappyPet').checked = false; document.getElementById('checkHappyPeace').checked = false; document.getElementById('checkHappyForeign').checked = false; } updateRewardPreview(); }
+    function toggleHappyForeign() { if(document.getElementById('checkHappyForeign').checked) { document.getElementById('checkHappyPet').checked = false; document.getElementById('checkHappyPeace').checked = false; document.getElementById('checkHappyLife').checked = false; } updateRewardPreview(); }
+    function updateRewardPreview() {
+        const inputVal = document.getElementById('amountInput').value;
+        const amount = parseFloat(inputVal);
+        const previewDiv = document.getElementById('liveRewardCalc');
+        const cardId = document.getElementById('cardIdInput').value;
+        if (!amount || amount <= 0) { previewDiv.style.display = 'none'; previewDiv.innerHTML = ''; return; }
+        previewDiv.style.display = 'block'; 
+        let thisTransactionReward = 0; let effectiveRate = 0; let isMiles = false;
+        if (cardId === 'c6') {
+            const hasBonus10 = document.getElementById('checkBonus10').checked; const hasBonus25 = document.getElementById('checkBonus25').checked; const isBill = document.getElementById('checkIsBill').checked;
+            let baseRate = isBill ? 0.0015 : 0.01; let reward = amount * baseRate;
+            if (hasBonus25) reward += amount * 0.025;
+            if (hasBonus10) { const card = cards.find(c => c.id === 'c6'); const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); const currentMonthSpend = transactions.filter(t => t.cardId === 'c6' && new Date(t.date) >= startDate).reduce((sum, t) => sum + parseFloat(t.amount), 0); const remainingQuota = Math.max(0, 8000 - currentMonthSpend); const eligibleFor10 = Math.min(amount, remainingQuota); reward += eligibleFor10 * 0.10; }
+            thisTransactionReward = Math.round(reward); effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(2);
+        } else if (cardId === 'c9') {
+            const isHsbcForeign = document.getElementById('checkHsbcForeign').checked;
+            const currentStats = calculateStats(cardId, 0);
+            const newStats = calculateStats(cardId, amount, false, false, false, false, false, false, false, false, isHsbcForeign);
+            thisTransactionReward = newStats.reward - currentStats.reward;
+            effectiveRate = newStats.rate; isMiles = true;
+        } else if (cardId === 'c2') {
+            const isGreen = document.getElementById('checkGreenChannel').checked; const isForeign = document.getElementById('checkForeign').checked;
+            const currentStats = calculateStats(cardId, 0); const newStats = calculateStats(cardId, amount, isGreen, isForeign);
+            thisTransactionReward = newStats.reward - currentStats.reward; effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(1);
+        } else if (cardId === 'c7') {
+            const isUniUp = document.getElementById('checkUniUp').checked; const isUniBonus = document.getElementById('checkUniBonus').checked;
+            const currentStats = calculateStats(cardId, 0); const newStats = calculateStats(cardId, amount, false, false, isUniBonus, isUniUp);
+            thisTransactionReward = newStats.reward - currentStats.reward; effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(1);
+        } else if (cardId === 'c8') {
+            const isPet = document.getElementById('checkHappyPet').checked; const isPeace = document.getElementById('checkHappyPeace').checked; const isLife = document.getElementById('checkHappyLife').checked; const isForeign = document.getElementById('checkHappyForeign').checked;
+            const currentStats = calculateStats(cardId, 0); const newStats = calculateStats(cardId, amount, false, false, false, false, isPet, isLife, isForeign, isPeace);
+            thisTransactionReward = newStats.reward - currentStats.reward; effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(1);
+        } else {
+            const currentStats = calculateStats(cardId, 0); const newStats = calculateStats(cardId, amount);
+            thisTransactionReward = newStats.reward - currentStats.reward; effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(1);
+        }
+        if (isMiles) { previewDiv.innerHTML = `✨ 預計回饋：${thisTransactionReward} 哩 (約 ${effectiveRate}元/哩)`; } else { previewDiv.innerHTML = `✨ 預計回饋：$${thisTransactionReward} (${effectiveRate}%)`; }
+    }
     function openManageModal() {
-        const list = document.getElementById('manageCardList');
-        list.innerHTML = '';
-        
-        // 計算當前真實卡片數量（不含 add1）
+        const list = document.getElementById('manageCardList'); list.innerHTML = '';
         const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9'];
         const currentRealCardsCount = visibleCards.filter(id => realCardIds.includes(id)).length;
-
         cards.forEach(card => {
-            if (card.id === 'add1') return; // 在管理介面隱藏預留卡
-
+            if (card.id === 'add1') return;
             const isVisible = visibleCards.includes(card.id);
-            const item = document.createElement('div');
-            item.className = 'manage-item';
-            
+            const item = document.createElement('div'); item.className = 'manage-item';
             item.onclick = function(e) {
                 if (e.target.tagName === 'INPUT') return;
                 const checkbox = this.querySelector('input[type="checkbox"]');
-                
-                // 如果要開啟第 9 張卡，阻止並警告
-                if (!checkbox.checked && currentRealCardsCount >= 8) {
-                    alert('⚠️ 最多只能顯示 8 張卡片，請先隱藏一張！');
-                    return;
-                }
-                
-                checkbox.checked = !checkbox.checked;
-                toggleCardVisibility(card.id);
+                if (!checkbox.checked && currentRealCardsCount >= 8) { alert('⚠️ 最多只能顯示 8 張卡片，請先隱藏一張！'); return; }
+                checkbox.checked = !checkbox.checked; toggleCardVisibility(card.id);
             };
-
-            const label = document.createElement('label');
-            label.className = 'switch';
-            label.onclick = function(e) { e.stopPropagation(); }; 
-
-            const input = document.createElement('input');
-            input.type = 'checkbox';
-            input.checked = isVisible;
-            input.onchange = function() {
-                if (this.checked && currentRealCardsCount >= 8) {
-                    alert('⚠️ 最多只能顯示 8 張卡片，請先隱藏一張！');
-                    this.checked = false;
-                    return;
-                }
-                toggleCardVisibility(card.id);
-            };
-
-            const slider = document.createElement('span');
-            slider.className = 'slider';
-
-            label.appendChild(input);
-            label.appendChild(slider);
-
-            item.innerHTML = `
-                <div class="manage-info">
-                    <div class="manage-name">${card.name}</div>
-                    <div class="manage-desc">${card.nickname}</div>
-                </div>
-            `;
-            item.appendChild(label);
-            list.appendChild(item);
+            const label = document.createElement('label'); label.className = 'switch'; label.onclick = function(e) { e.stopPropagation(); };
+            const input = document.createElement('input'); input.type = 'checkbox'; input.checked = isVisible;
+            input.onchange = function() { if (this.checked && currentRealCardsCount >= 8) { alert('⚠️ 最多只能顯示 8 張卡片，請先隱藏一張！'); this.checked = false; return; } toggleCardVisibility(card.id); };
+            const slider = document.createElement('span'); slider.className = 'slider';
+            label.appendChild(input); label.appendChild(slider);
+            item.innerHTML = `<div class="manage-info"><div class="manage-name">${card.name}</div><div class="manage-desc">${card.nickname}</div></div>`;
+            item.appendChild(label); list.appendChild(item);
         });
-        
         document.getElementById('manageModal').style.display = 'flex';
     }
-    
     function toggleCardVisibility(cardId) {
-        if (visibleCards.includes(cardId)) {
-            visibleCards = visibleCards.filter(id => id !== cardId);
-            // 關閉一張卡後，若總數 < 8，自動補上 add1
-            const realCardsCount = visibleCards.filter(id => id !== 'add1').length;
-            if (realCardsCount < 8 && !visibleCards.includes('add1')) {
-                visibleCards.push('add1');
-            }
-        } else {
-            visibleCards.push(cardId);
-            // 開啟一張卡後，若總數 >= 8 且包含 add1，移除 add1
-            if (visibleCards.includes('add1')) {
-                visibleCards = visibleCards.filter(id => id !== 'add1');
-            }
-        }
-        localStorage.setItem('visibleCards', JSON.stringify(visibleCards));
-        openManageModal(); 
-        renderGrid(); 
+        if (visibleCards.includes(cardId)) { visibleCards = visibleCards.filter(id => id !== cardId); const realCardsCount = visibleCards.filter(id => id !== 'add1').length; if (realCardsCount < 8 && !visibleCards.includes('add1')) { visibleCards.push('add1'); } } else { visibleCards.push(cardId); if (visibleCards.includes('add1')) { visibleCards = visibleCards.filter(id => id !== 'add1'); } }
+        localStorage.setItem('visibleCards', JSON.stringify(visibleCards)); openManageModal(); renderGrid();
     }
-
-    // ... (其餘函式保持不變) ...
-    // (openQuickAdd, renderModalHistory, closeModal, addTransaction, deleteTransaction, resetAllData, exportData, triggerImport, importFile, showDonateModal, copyBankInfo, checkUrgentTasks) 
     function openQuickAdd(cardId) {
         const card = cards.find(c => c.id === cardId); 
         document.getElementById('modalTitle').innerText = card.name; 
@@ -1361,206 +1113,63 @@
         uniOptions.style.display = (cardId === 'c7') ? 'block' : 'none';
         happyOptions.style.display = (cardId === 'c8') ? 'block' : 'none';
         hsbcOptions.style.display = (cardId === 'c9') ? 'block' : 'none';
-        if (cardId === 'c6') {
-            document.getElementById('checkBonus10').checked = true;
-            document.getElementById('checkBonus25').checked = true;
-            document.getElementById('checkIsBill').checked = false; 
-            document.getElementById('labelBaseRate').innerText = "🔰 基本回饋 1% (無上限)";
-        }
-        if (cardId === 'c2') {
-            document.getElementById('checkGreenChannel').checked = false; 
-            document.getElementById('checkForeign').checked = false; 
-        }
-        if (cardId === 'c7') {
-            const now = new Date();
-            const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-            const hasUpTx = transactions.some(t => t.cardId === 'c7' && t.isUniUp && new Date(t.date) >= currentMonthStart);
-            document.getElementById('checkUniUp').checked = hasUpTx;
-            document.getElementById('checkUniBonus').checked = false; 
-        }
-        if (cardId === 'c8') {
-            document.getElementById('checkHappyPet').checked = false;
-            document.getElementById('checkHappyLife').checked = false;
-            document.getElementById('checkHappyForeign').checked = false;
-            happyDashboard.style.display = 'block';
-            renderHappyDashboard();
-        } else {
-            happyDashboard.style.display = 'none';
-        }
-        if (cardId === 'c9') {
-            const savedTier = localStorage.getItem('hsbc_tier') || 'infinite';
-            document.querySelector(`input[name="hsbcTier"][value="${savedTier}"]`).checked = true;
-            document.getElementById('checkHsbcForeign').checked = false;
-            // 讀取初始哩程
-            document.getElementById('hsbcInitialMiles').value = localStorage.getItem('hsbc_initial_miles') || '';
-        }
-        document.getElementById('liveRewardCalc').style.display = 'none';
-        document.getElementById('liveRewardCalc').innerHTML = '';
-        const parkingInfoDiv = document.getElementById('modalParkingInfo');
-        if (card.parking) { parkingInfoDiv.innerHTML = card.parking; parkingInfoDiv.style.display = 'block'; } else { parkingInfoDiv.style.display = 'none'; }
-        document.getElementById('transactionModal').style.display = 'flex'; 
-        document.getElementById('amountInput').value = ''; 
-        document.getElementById('noteInput').value = ''; 
-        renderModalHistory(cardId);
-        setTimeout(() => document.getElementById('amountInput').focus(), 100);
+        if (cardId === 'c6') { document.getElementById('checkBonus10').checked = true; document.getElementById('checkBonus25').checked = true; document.getElementById('checkIsBill').checked = false; document.getElementById('labelBaseRate').innerText = "🔰 基本回饋 1% (無上限)"; }
+        if (cardId === 'c2') { document.getElementById('checkGreenChannel').checked = false; document.getElementById('checkForeign').checked = false; }
+        if (cardId === 'c7') { const now = new Date(); const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1); const hasUpTx = transactions.some(t => t.cardId === 'c7' && t.isUniUp && new Date(t.date) >= currentMonthStart); document.getElementById('checkUniUp').checked = hasUpTx; document.getElementById('checkUniBonus').checked = false; }
+        if (cardId === 'c8') { document.getElementById('checkHappyPet').checked = false; document.getElementById('checkHappyLife').checked = false; document.getElementById('checkHappyForeign').checked = false; happyDashboard.style.display = 'block'; renderHappyDashboard(); } else { happyDashboard.style.display = 'none'; }
+        if (cardId === 'c9') { const savedTier = localStorage.getItem('hsbc_tier') || 'infinite'; document.querySelector(`input[name="hsbcTier"][value="${savedTier}"]`).checked = true; document.getElementById('checkHsbcForeign').checked = false; document.getElementById('hsbcInitialMiles').value = localStorage.getItem('hsbc_initial_miles') || ''; }
+        document.getElementById('liveRewardCalc').style.display = 'none'; document.getElementById('liveRewardCalc').innerHTML = '';
+        const parkingInfoDiv = document.getElementById('modalParkingInfo'); if (card.parking) { parkingInfoDiv.innerHTML = card.parking; parkingInfoDiv.style.display = 'block'; } else { parkingInfoDiv.style.display = 'none'; }
+        document.getElementById('transactionModal').style.display = 'flex'; document.getElementById('amountInput').value = ''; document.getElementById('noteInput').value = ''; 
+        renderModalHistory(cardId); setTimeout(() => document.getElementById('amountInput').focus(), 100);
     }
     function renderHappyDashboard() {
-        const dashboard = document.getElementById('happyDashboard');
-        const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
+        const dashboard = document.getElementById('happyDashboard'); const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
         const txs = transactions.filter(t => t.cardId === 'c8' && new Date(t.date) >= startDate);
         const petSpend = txs.filter(t => t.isHappyPet).reduce((sum, t) => sum + t.amount, 0);
         const peaceSpend = txs.filter(t => t.isHappyPeace).reduce((sum, t) => sum + t.amount, 0);
         const lifeSpend = txs.filter(t => t.isHappyLife).reduce((sum, t) => sum + t.amount, 0);
         const totalSpend = txs.reduce((sum, t) => sum + t.amount, 0);
-        const createBar = (label, current, max) => {
-            const percent = Math.min((current / max) * 100, 100);
-            const isDanger = percent >= 100;
-            return `<div class="dash-row"><div class="dash-label"><span>${label}</span><span style="color:${isDanger ? 'red' : '#555'}">$${current.toLocaleString()} / ${max.toLocaleString()}</span></div><div class="dash-bar-bg"><div class="dash-bar-fill ${isDanger ? 'danger' : ''}" style="width: ${percent}%"></div></div></div>`;
-        };
+        const createBar = (label, current, max) => { const percent = Math.min((current / max) * 100, 100); const isDanger = percent >= 100; return `<div class="dash-row"><div class="dash-label"><span>${label}</span><span style="color:${isDanger ? 'red' : '#555'}">$${current.toLocaleString()} / ${max.toLocaleString()}</span></div><div class="dash-bar-bg"><div class="dash-bar-fill ${isDanger ? 'danger' : ''}" style="width: ${percent}%"></div></div></div>`; };
         dashboard.innerHTML = createBar('🐶 寵物額度', petSpend, 5263) + createBar('🍽️ 安心刷額度', peaceSpend, 5714) + createBar('🛒 生活額度', lifeSpend, 5714) + createBar('💰 滿額門檻', totalSpend, 26000);
     }
     function renderModalHistory(cardId) {
-        const container = document.getElementById('modalHistoryList');
-        const titleDiv = document.getElementById('modalHistoryTitle');
-        container.innerHTML = '';
-        const now = new Date();
-        const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-        const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-        const dateRange = `${now.getMonth() + 1}/1 - ${now.getMonth() + 1}/${lastDay}`;
+        const container = document.getElementById('modalHistoryList'); const titleDiv = document.getElementById('modalHistoryTitle'); container.innerHTML = '';
+        const now = new Date(); const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1); const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate(); const dateRange = `${now.getMonth() + 1}/1 - ${now.getMonth() + 1}/${lastDay}`;
         titleDiv.innerHTML = `<span>📅 本月 (${dateRange}) 消費紀錄</span><span style="font-weight:normal; font-size:10px; color:#aaa;">(點 ✕ 刪除)</span>`;
         const cardTx = transactions.filter(t => t.cardId === cardId && new Date(t.date) >= currentMonthStart).reverse();
-        if (cardTx.length === 0) {
-            container.innerHTML = '<div style="text-align:center; color:#ccc; font-size:12px; margin-top:10px;">本月尚無消費紀錄</div>';
-            return;
-        }
+        if (cardTx.length === 0) { container.innerHTML = '<div style="text-align:center; color:#ccc; font-size:12px; margin-top:10px;">本月尚無消費紀錄</div>'; return; }
         cardTx.forEach(tx => {
-            const item = document.createElement('div');
-            item.className = 'history-item'; 
-            item.style.background = 'white'; 
-            item.style.borderBottom = '1px solid #f0f0f0';
-            let noteText = tx.note || '一般消費';
-            if (tx.isGreen) noteText = '🌿 ' + noteText;
-            if (tx.isForeign) noteText = '✈️ ' + noteText;
-            if (tx.isUniBonus) noteText = '🔥 ' + noteText;
-            if (tx.isHappyPet) noteText = '🐶 ' + noteText;
-            if (tx.isHappyPeace) noteText = '🍽️ ' + noteText;
-            if (tx.isHappyLife) noteText = '🛒 ' + noteText;
-            if (tx.isHappyForeign) noteText = '✈️ ' + noteText;
-            if (tx.isHsbcForeign) noteText = '✈️ ' + noteText;
-            let amountDisplay = `$${tx.amount.toLocaleString()}`;
-            if (cardId === 'c9') {
-                const tier = localStorage.getItem('hsbc_tier') || 'infinite';
-                let rate = 18;
-                if (tier === 'infinite' && tx.isHsbcForeign) rate = 10;
-                else if (tier === 'signature' && tx.isHsbcForeign) rate = 15;
-                const miles = Math.floor(tx.amount / rate);
-                amountDisplay = `${miles} 哩`;
-            }
+            const item = document.createElement('div'); item.className = 'history-item'; item.style.background = 'white'; item.style.borderBottom = '1px solid #f0f0f0';
+            let noteText = tx.note || '一般消費'; if (tx.isGreen) noteText = '🌿 ' + noteText; if (tx.isForeign) noteText = '✈️ ' + noteText; if (tx.isUniBonus) noteText = '🔥 ' + noteText; if (tx.isHappyPet) noteText = '🐶 ' + noteText; if (tx.isHappyPeace) noteText = '🍽️ ' + noteText; if (tx.isHappyLife) noteText = '🛒 ' + noteText; if (tx.isHappyForeign) noteText = '✈️ ' + noteText; if (tx.isHsbcForeign) noteText = '✈️ ' + noteText;
+            let amountDisplay = `$${tx.amount.toLocaleString()}`; if (cardId === 'c9') { const tier = localStorage.getItem('hsbc_tier') || 'infinite'; let rate = 18; if (tier === 'infinite' && tx.isHsbcForeign) rate = 10; else if (tier === 'signature' && tx.isHsbcForeign) rate = 15; const miles = Math.floor(tx.amount / rate); amountDisplay = `${miles} 哩`; }
             item.innerHTML = `<div><div class="h-name">${noteText}</div><div class="h-date">${new Date(tx.date).getMonth()+1}/${new Date(tx.date).getDate()}</div></div><div style="display:flex;align-items:center;"><span class="h-amount">${amountDisplay}</span><button class="btn-delete-single" onclick="deleteTransaction(${tx.id}, true)">✕</button></div>`;
             container.appendChild(item);
         });
     }
     function closeModal() { history.back(); }
     function addTransaction(close = true) {
-        const cardId = document.getElementById('cardIdInput').value;
-        const amount = document.getElementById('amountInput').value;
-        const note = document.getElementById('noteInput').value;
+        const cardId = document.getElementById('cardIdInput').value; const amount = document.getElementById('amountInput').value; const note = document.getElementById('noteInput').value;
         if (!amount || amount <= 0) return alert('請輸入金額');
         let isGreen = false; let isForeign = false; let isUniBonus = false; let isUniUp = false; let isHappyPet = false; let isHappyPeace = false; let isHappyLife = false; let isHappyForeign = false; let isHsbcForeign = false;
-        if (cardId === 'c2') {
-            isGreen = document.getElementById('checkGreenChannel').checked;
-            isForeign = document.getElementById('checkForeign').checked;
-        }
-        if (cardId === 'c7') {
-            isUniBonus = document.getElementById('checkUniBonus').checked;
-            isUniUp = document.getElementById('checkUniUp').checked;
-        }
-        if (cardId === 'c8') {
-            isHappyPet = document.getElementById('checkHappyPet').checked;
-            isHappyPeace = document.getElementById('checkHappyPeace').checked;
-            isHappyLife = document.getElementById('checkHappyLife').checked;
-            isHappyForeign = document.getElementById('checkHappyForeign').checked;
-        }
-        if (cardId === 'c9') {
-            isHsbcForeign = document.getElementById('checkHsbcForeign').checked;
-        }
+        if (cardId === 'c2') { isGreen = document.getElementById('checkGreenChannel').checked; isForeign = document.getElementById('checkForeign').checked; }
+        if (cardId === 'c7') { isUniBonus = document.getElementById('checkUniBonus').checked; isUniUp = document.getElementById('checkUniUp').checked; }
+        if (cardId === 'c8') { isHappyPet = document.getElementById('checkHappyPet').checked; isHappyPeace = document.getElementById('checkHappyPeace').checked; isHappyLife = document.getElementById('checkHappyLife').checked; isHappyForeign = document.getElementById('checkHappyForeign').checked; }
+        if (cardId === 'c9') { isHsbcForeign = document.getElementById('checkHsbcForeign').checked; }
         transactions.push({ id: Date.now(), cardId: cardId, amount: parseFloat(amount), note: note, date: new Date().toISOString(), isGreen: isGreen, isForeign: isForeign, isUniBonus: isUniBonus, isUniUp: isUniUp, isHappyPet: isHappyPet, isHappyPeace: isHappyPeace, isHappyLife: isHappyLife, isHappyForeign: isHappyForeign, isHsbcForeign: isHsbcForeign }); 
         localStorage.setItem('transactions', JSON.stringify(transactions)); 
-        document.getElementById('amountInput').value = '';
-        document.getElementById('noteInput').value = '';
-        document.getElementById('liveRewardCalc').style.display = 'none';
-        renderModalHistory(cardId); 
-        if(cardId === 'c8') renderHappyDashboard();
-        renderGrid(); 
+        document.getElementById('amountInput').value = ''; document.getElementById('noteInput').value = ''; document.getElementById('liveRewardCalc').style.display = 'none';
+        renderModalHistory(cardId); if(cardId === 'c8') renderHappyDashboard(); renderGrid(); 
         if(close) closeModal();
     }
-    function deleteTransaction(id, fromModal = false) {
-        if(confirm('刪除此筆紀錄？')) {
-            transactions = transactions.filter(t => t.id !== id);
-            localStorage.setItem('transactions', JSON.stringify(transactions));
-            renderGrid(); 
-            if (fromModal) {
-                const cardId = document.getElementById('cardIdInput').value;
-                renderModalHistory(cardId);
-                if(cardId === 'c8') renderHappyDashboard();
-            }
-        }
-    }
+    function deleteTransaction(id, fromModal = false) { if(confirm('刪除此筆紀錄？')) { transactions = transactions.filter(t => t.id !== id); localStorage.setItem('transactions', JSON.stringify(transactions)); renderGrid(); if (fromModal) { const cardId = document.getElementById('cardIdInput').value; renderModalHistory(cardId); if(cardId === 'c8') renderHappyDashboard(); } } }
     function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
-    async function exportData() {
-        const dataStr = JSON.stringify(transactions);
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        const fileName = `backup_${year}-${month}-${day}.json`;
-        const file = new File([dataStr], fileName, { type: "application/json" });
-        if (navigator.share && navigator.canShare({ files: [file] })) {
-            try { await navigator.share({ files: [file] }); return; } catch (error) { if (error.name === 'AbortError') return; }
-        }
-        const blob = new Blob([dataStr], {type: "application/json"});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    }
+    async function exportData() { const dataStr = JSON.stringify(transactions); const now = new Date(); const fileName = `backup_${year}-${month}-${day}.json`; const file = new File([dataStr], fileName, { type: "application/json" }); if (navigator.share && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file] }); return; } catch (error) { if (error.name === 'AbortError') return; } } const blob = new Blob([dataStr], {type: "application/json"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = fileName; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); }
     function triggerImport() { document.getElementById('fileInput').click(); }
-    function importFile(input) {
-        const file = input.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const json = JSON.parse(e.target.result);
-                if (Array.isArray(json)) {
-                    transactions = json;
-                    localStorage.setItem('transactions', JSON.stringify(transactions));
-                    alert('✅ 備份還原成功！(頁面將自動重整)');
-                    location.reload(); 
-                } else { alert('❌ 檔案內容格式錯誤'); }
-            } catch (err) { alert('❌ 無法讀取檔案，請確認是否為正確的備份檔'); }
-        };
-        reader.readAsText(file);
-        input.value = '';
-    }
+    function importFile(input) { const file = input.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { try { const json = JSON.parse(e.target.result); if (Array.isArray(json)) { transactions = json; localStorage.setItem('transactions', JSON.stringify(transactions)); alert('✅ 備份還原成功！(頁面將自動重整)'); location.reload(); } else { alert('❌ 檔案內容格式錯誤'); } } catch (err) { alert('❌ 無法讀取檔案，請確認是否為正確的備份檔'); } }; reader.readAsText(file); input.value = ''; }
     function showDonateModal() { document.getElementById('donateModal').style.display = 'flex'; }
     function copyBankInfo() { navigator.clipboard.writeText("396901798704").then(() => { alert("✅ 帳號已複製！(銀行代碼 396)"); }); }
-    function checkUrgentTasks() {
-        const alertArea = document.getElementById('urgent-alert-area'), alertList = document.getElementById('urgent-list'); alertList.innerHTML = ''; let hasUrgent = false;
-        cards.forEach(card => {
-            if (card.type === 'placeholder') return;
-            const stats = calculateStats(card.id); let target = card.type === 'floor' ? card.target : (card.type === 'mixed' ? card.minSpend : 0);
-            if (target > 0 && stats.spend < target) {
-                const end = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0), diff = Math.ceil((end - new Date()) / 86400000);
-                if (diff <= 3 && diff >= 0) { hasUrgent = true; alertList.innerHTML += `<div class="urgent-item">${card.name} 缺 $${(target - stats.spend).toLocaleString()} (剩 ${diff} 天)</div>`; }
-            }
-        });
-        alertArea.style.display = hasUrgent ? 'block' : 'none';
-    }
+    function checkUrgentTasks() { const alertArea = document.getElementById('urgent-alert-area'), alertList = document.getElementById('urgent-list'); alertList.innerHTML = ''; let hasUrgent = false; cards.forEach(card => { if (card.type === 'placeholder') return; const stats = calculateStats(card.id); let target = card.type === 'floor' ? card.target : (card.type === 'mixed' ? card.minSpend : 0); if (target > 0 && stats.spend < target) { const end = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0), diff = Math.ceil((end - new Date()) / 86400000); if (diff <= 3 && diff >= 0) { hasUrgent = true; alertList.innerHTML += `<div class="urgent-item">${card.name} 缺 $${(target - stats.spend).toLocaleString()} (剩 ${diff} 天)</div>`; } } }); alertArea.style.display = hasUrgent ? 'block' : 'none'; }
     updateDate(); renderGrid();
 </script>
 </body>

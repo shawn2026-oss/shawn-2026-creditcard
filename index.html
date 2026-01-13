@@ -308,7 +308,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V97.0</div>
+            <div class="version-tag" id="top-version-tag">V98.0</div>
         </div>
 
         <div class="header-section">
@@ -464,10 +464,10 @@
                                 <input type="radio" name="ctbcScene" value="normal" onchange="toggleCtbcScene()"> 一般 / 其他 (1%)
                             </label>
                             <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;">
-                                <input type="radio" name="ctbcScene" value="foreign" onchange="toggleCtbcScene()"> 🇯🇵 國外實體 (11%)
+                                <input type="radio" name="ctbcScene" value="foreign" onchange="toggleCtbcScene()"> ✈️ 國外實體 (11%)
                             </label>
                             <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;">
-                                <input type="radio" name="ctbcScene" value="unified" onchange="toggleCtbcScene()"> 🇹🇼 統一集團 (含家樂福)
+                                <input type="radio" name="ctbcScene" value="unified" onchange="toggleCtbcScene()"> 🏪 統一集團 (含家樂福)
                             </label>
                         </div>
                     </div>
@@ -974,10 +974,37 @@
                 let uniqueBrands = new Set();
                 transactions.filter(t => t.cardId === 'c10').forEach(t => { if(t.ctbcBrands) t.ctbcBrands.forEach(b => uniqueBrands.add(b)); });
                 const currentChecked = Array.from(document.querySelectorAll('.ctbc-brand:checked')).map(cb => cb.value);
+                // 這裡改為「合併計算」邏輯，確保取消勾選時數字會降
+                // 邏輯：歷史紀錄(扣除本筆如果是在編輯) + 當前勾選 -> 取聯集
+                // 簡單做：我們重新把所有勾選的加進 Set
                 currentChecked.forEach(b => uniqueBrands.add(b));
-                const brandCount = Math.min(uniqueBrands.size, 5);
+                
+                // 但要考慮「取消勾選」的情況。如果歷史有，但我現在不想算它(雖然這在新增模式不合理，但在編輯模式合理)
+                // 為了簡單，我們假設勾選框代表最終狀態。
+                // 在新增模式：歷史已經鎖定(disable? no just checked)，使用者取消不了歷史(因為我們沒做 disable)。
+                // 為了讓取消能即時反應，我們只計算 uniqueBrands (它已經包含了 currentChecked，因為我們上面 add 了)
+                // 等等，Set 是累加的。如果歷史沒有，但我勾了，add 進去 -> 有。如果我取消勾選 -> 怎麼從 Set 拿掉？
+                // 修正邏輯：
+                // 1. 建立 base set (歷史)
+                let baseBrands = new Set();
+                transactions.filter(t => t.cardId === 'c10').forEach(t => { if(t.ctbcBrands) t.ctbcBrands.forEach(b => baseBrands.add(b)); });
+                
+                // 2. 建立 current set (當前勾選)
+                let currentSet = new Set();
+                document.querySelectorAll('.ctbc-brand:checked').forEach(cb => currentSet.add(cb.value));
+                
+                // 3. 聯集 (但要注意，如果是「新增模式」，歷史的應該都已經被預勾選了。如果是使用者手動取消，表示他想移除？)
+                // 其實最簡單的邏輯是：直接算畫面上勾了幾個 + 畫面沒勾但歷史有的(隱藏的?)
+                // 在我們的 UI 設計裡，歷史的會被自動勾選。所以「畫面上勾選的」就等於「所有要計算的」。
+                // 唯一例外是：如果我們沒把歷史紀錄顯示在畫面上。但我們有顯示。
+                // 所以：直接計算畫面上 checked 的數量即可！(前提是我們 openQuickAdd 有把歷史勾上去)
+                
+                let totalBrands = new Set();
+                document.querySelectorAll('.ctbc-brand:checked').forEach(cb => totalBrands.add(cb.value));
+                
+                const brandCount = Math.min(totalBrands.size, 5);
                 const taskRate = [0, 0, 1, 2, 3, 4][brandCount];
-                statusEl.innerText = `(目前 ${uniqueBrands.size} 家 / 任務 +${taskRate}%)`;
+                statusEl.innerText = `(目前 ${totalBrands.size} 家 / 任務 +${taskRate}%)`;
                 if (brandCount >= 5) statusEl.style.color = '#34C759'; 
                 else statusEl.style.color = '#007AFF';
             }
@@ -1016,11 +1043,19 @@
              // Uniopen 特殊分離顯示邏輯
              let baseRate = 0.03; // 1+2
              if (options.isCtbcIcash) baseRate += 0.04;
+             
+             // 修正：這裡也要用即時勾選的數量來算 rate
              let uniqueBrands = new Set();
-             transactions.filter(t => t.cardId === 'c10').forEach(t => { if(t.ctbcBrands) t.ctbcBrands.forEach(b => uniqueBrands.add(b)); });
-             if (options.ctbcBrands) options.ctbcBrands.forEach(b => uniqueBrands.add(b));
-             const brandCount = Math.min(uniqueBrands.size, 5);
-             const taskRate = [0, 0, 0.01, 0.02, 0.03, 0.04][brandCount];
+             // transactions.filter... 不用看了，直接看 options.ctbcBrands (因為它已經包含歷史勾選，如果 openQuickAdd 正確運作)
+             // 但 calculateStats 內部是用 Union，所以這裡也要保持一致
+             // 其實 calculateStats 已經算得很準了，我們只需要正確顯示
+             // 為了顯示方便，我們重新計算一次 brandCount
+             let currentBrandCount = 0;
+             let tempSet = new Set();
+             if (options.ctbcBrands) options.ctbcBrands.forEach(b => tempSet.add(b));
+             currentBrandCount = Math.min(tempSet.size, 5);
+             
+             const taskRate = [0, 0, 0.01, 0.02, 0.03, 0.04][currentBrandCount];
              
              const thisTxRate = baseRate + taskRate;
              
@@ -1282,8 +1317,8 @@
             
             // 中信標籤
             if (tx.cardId === 'c10') {
-                if (tx.ctbcScene === 'foreign') noteText = '🇯🇵 ' + noteText;
-                if (tx.ctbcScene === 'unified') noteText = '🇹🇼 ' + noteText;
+                if (tx.ctbcScene === 'foreign') noteText = '✈️ ' + noteText;
+                if (tx.ctbcScene === 'unified') noteText = '🏪 ' + noteText;
             }
 
             let amountDisplay = `$${tx.amount.toLocaleString()}`;

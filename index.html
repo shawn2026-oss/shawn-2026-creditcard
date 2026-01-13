@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -177,10 +178,6 @@
 
         .input-group label { display: block; font-size: 12px; font-weight: 600; color: #888; margin-bottom: 6px; margin-top: 10px; }
         input { width: 100%; padding: 10px; border: 2px solid #f0f0f0; background: #fff; border-radius: 12px; font-size: 18px; box-sizing: border-box; outline: none; font-weight: 600; color: #333; }
-        
-        /* 新增：日期選擇器樣式 */
-        input[type="date"] { font-family: inherit; font-size: 14px; padding: 8px; color:#555;}
-
         .btn-group { display: flex; gap: 8px; margin-top: 20px; flex-shrink: 0; }
         .btn { flex: 1; padding: 10px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center;}
         .btn-cancel { background: #f5f5f5; color: #333; }
@@ -214,15 +211,11 @@
         .h-name { font-weight: 600; color: #555; }
         .h-date { font-size: 10px; color: #aaa; margin-top: 2px;}
         .h-amount { font-weight: 700; color: #333; font-size: 13px; }
-        
-        /* 按鈕區 */
-        .item-actions { display: flex; gap: 4px; }
-        .btn-icon { background: none; border: none; font-size: 14px; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; }
-        .btn-edit { color: #007AFF; background-color: #E3F2FD; }
-        .btn-delete { color: #FF3B30; background-color: #FFF0F0; }
+        .btn-delete-single { background: none; border: none; color: #ccc; font-size: 14px; padding: 0 5px; cursor: pointer; margin-left: 8px;}
+        .btn-delete-single:hover { color: #FF3B30; }
 
         /* 選項開關區 */
-        #pigRichOptions, #greenCardOptions, #uniOptions, #happyOptions, #hsbcOptions, #ctbcOptions {
+        #pigRichOptions, #greenCardOptions, #uniOptions, #happyOptions, #hsbcOptions {
             display: none; background: #f9f9f9; padding: 10px; border-radius: 10px; margin-top: 10px; border: 1px dashed #ddd;
         }
         .option-row {
@@ -232,17 +225,6 @@
         .option-row input[type="checkbox"], .option-row input[type="radio"] { width: 20px; height: 20px; }
         .option-row.read-only { opacity: 0.8; pointer-events: none; }
         .option-row.read-only input { opacity: 0.6; }
-        
-        /* 品牌選擇清單 (CTBC Uniopen) */
-        .brand-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
-        .brand-item {
-            display: flex; align-items: center; gap: 6px; font-size: 12px; color: #555;
-            background: white; padding: 6px; border-radius: 6px; border: 1px solid #eee;
-        }
-        /* 已踩點的樣式 (灰色+穿透) */
-        .brand-item.visited {
-            background: #f0f0f0; color: #999; border-color: #ddd;
-        }
         
         /* 管理卡片列表樣式 (iOS 風格優化) */
         .manage-item {
@@ -308,7 +290,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag" id="top-version-tag">V125.0</div>
+            <div class="version-tag" id="top-version-tag">V123.0</div>
         </div>
 
         <div class="header-section">
@@ -335,13 +317,6 @@
             <div class="settings-row">
                 <button class="btn-tool btn-manage" onclick="openManageModal()">💳 管理我的卡片</button>
             </div>
-            
-            <div class="settings-row">
-                <button class="btn-tool" style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; border: none; font-weight: bold; box-shadow: 0 4px 10px rgba(220, 39, 67, 0.3);" onclick="window.open('https://www.instagram.com/pocket_lab_tw/', '_blank')">
-                    📸 追蹤口袋實驗室 (IG)
-                </button>
-            </div>
-            
             <div class="settings-row">
                 <button class="btn-tool" onclick="exportData()">💾 備份檔案</button>
                 <button class="btn-tool" onclick="triggerImport()">📥 讀檔還原</button>
@@ -361,10 +336,6 @@
                 <div id="modalParkingInfo" style="background:#FFF9C4; color:#856404; padding:10px; border-radius:10px; font-size:12px; margin-bottom:12px; border-left:4px solid #FFC107; display:none; line-height:1.5;"></div>
                 
                 <input type="hidden" id="cardIdInput"> 
-                
-                <div class="input-group" style="margin-bottom:8px;">
-                    <input type="date" id="customDateInput">
-                </div>
                 
                 <div class="input-group" style="margin-top:0;">
                     <input type="number" id="amountInput" placeholder="$ 金額" inputmode="numeric" style="font-size:28px; text-align:center; border:none; border-bottom:2px solid #eee; border-radius:0;" 
@@ -456,47 +427,6 @@
                     </div>
                 </div>
                 
-                <div id="ctbcOptions">
-                    <div class="option-row" style="border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:10px;">
-                        <span style="font-weight:700; color:#333;">📍 消費場景 (二選一)：</span>
-                        <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
-                            <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;">
-                                <input type="radio" name="ctbcScene" value="normal" onchange="toggleCtbcScene()"> 一般 / 其他 (1%)
-                            </label>
-                            <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;">
-                                <input type="radio" name="ctbcScene" value="foreign" onchange="toggleCtbcScene()"> ✈️ 國外實體 (11%)
-                            </label>
-                            <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;">
-                                <input type="radio" name="ctbcScene" value="unified" onchange="toggleCtbcScene()"> 🏪 統一集團 (含家樂福)
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div id="ctbcUnifiedZone" style="display:none;">
-                        <div class="option-row">
-                            <label for="checkCtbcIcash">📱 使用 icash Pay (+4%)</label>
-                            <input type="checkbox" id="checkCtbcIcash" onchange="updateRewardPreview()">
-                        </div>
-                        
-                        <div style="margin-top:10px;">
-                            <label style="font-size:12px; font-weight:600; color:#555;">
-                                🔢 本月已踩點品牌 <span id="ctbcBrandStatus" style="color:#007AFF; font-weight:bold; margin-left:5px;">(0家 / +0%)</span>：
-                            </label>
-                            <div class="brand-grid">
-                                <label class="brand-item"><input type="checkbox" class="ctbc-brand" value="711" onchange="updateRewardPreview()"> 7-ELEVEN</label>
-                                <label class="brand-item"><input type="checkbox" class="ctbc-brand" value="starbucks" onchange="updateRewardPreview()"> 星巴克</label>
-                                <label class="brand-item"><input type="checkbox" class="ctbc-brand" value="cosmed" onchange="updateRewardPreview()"> 康是美</label>
-                                <label class="brand-item"><input type="checkbox" class="ctbc-brand" value="gas" onchange="updateRewardPreview()"> 速邁樂加油</label>
-                                <label class="brand-item"><input type="checkbox" class="ctbc-brand" value="dept" onchange="updateRewardPreview()"> 統一/夢時代</label>
-                                <label class="brand-item"><input type="checkbox" class="ctbc-brand" value="organic" onchange="updateRewardPreview()"> 聖德科斯</label>
-                                <label class="brand-item"><input type="checkbox" class="ctbc-brand" value="books" onchange="updateRewardPreview()"> 博客來</label>
-                                <label class="brand-item"><input type="checkbox" class="ctbc-brand" value="carrefour" onchange="updateRewardPreview()"> 家樂福</label>
-                                <label class="brand-item"><input type="checkbox" class="ctbc-brand" value="other" onchange="updateRewardPreview()"> 其他品牌</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
                 <div id="liveRewardCalc"></div>
 
                 <div class="input-group"><input type="text" id="noteInput" placeholder="備註 (例如: 午餐)"></div>
@@ -510,7 +440,7 @@
             <div class="modal-history-section">
                 <div class="modal-history-title" id="modalHistoryTitle">
                     <span>📅 本月消費紀錄</span>
-                    <span style="font-weight:normal; font-size:10px; color:#aaa;">(編輯/刪除)</span>
+                    <span style="font-weight:normal; font-size:10px; color:#aaa;">(點 ✕ 刪除)</span>
                 </div>
                 <div id="modalHistoryList"></div>
             </div>
@@ -549,7 +479,7 @@
         
         // 🚀 初始化時，強制執行 8 張卡片鐵律
         let currentCards = JSON.parse(localStorage.getItem('visibleCards')) || [];
-        const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9', 'c10'];
+        const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9'];
         let realCards = currentCards.filter(id => realCardIds.includes(id));
         
         if (realCards.length > 8) {
@@ -583,7 +513,32 @@
             type: 'ceiling', limit: 8000, tier1Rate: 0.135, tier2Rate: 0.035, 
             gradient: 'linear-gradient(135deg, #e60012 0%, #FFD700 100%)', 
             textColor: 'white', msgDanger: '已封頂 (變3.5%)',
-            parking: `... (略) ...`
+            parking: `
+                🐷 <b>新戶限定神卡 (加碼至 2026/12/31)</b><br>
+                <hr style="opacity:0.3; margin:8px 0;">
+                <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
+                    <summary style="cursor:pointer; font-weight:700; color:#8B0000; font-size:12px;">▼ 點我看 2.5% 精選通路</summary>
+                    <div style="margin-top:6px; padding:8px; font-size:11px; line-height:1.6; color:#333; background:rgba(255,255,255,0.9); border-radius:6px;">
+                        🏬 <b>百貨：</b>新光三越、SOGO、微風、台北101、遠東百貨、漢神百貨...<br>
+                        🛒 <b>超市/量販：</b>全聯、家樂福、大潤發、愛買、美廉社...<br>
+                        🏪 <b>超商：</b>7-11(限街口/icash Pay)、全家(限街口/LINE Pay)...<br>
+                        🚕 <b>交通：</b>台灣大車隊、Uber、yoxi、大都會...<br>
+                        ☕ <b>餐飲：</b>星巴克、路易莎、麥當勞、肯德基、王品集團...<br>
+                    </div>
+                </details>
+                <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
+                    <summary style="cursor:pointer; font-weight:700; color:#8B0000; font-size:12px;">▼ 點我看 10% 適用範圍</summary>
+                    <div style="margin-top:6px; padding:8px; font-size:11px; line-height:1.6; color:#333; background:rgba(255,255,255,0.9); border-radius:6px;">
+                        📱 <b>行動支付：</b>LINE Pay、街口支付、icash Pay，含APP內繳費<br>
+                        🌍 <b>海外：</b>含實體及線上交易<br>
+                        ✈️ <b>機票：</b>國內外航空公司 (限透過航空公司購買之機票消費)<br>
+                    </div>
+                </details>
+                <div style="margin-top:10px; font-size:11px; color:#5d4037;">
+                    🧾 <b>繳費 10.15%：</b>需勾選上方「APP繳費」+「新戶加碼」。<br>
+                    ⚠️ 10%加碼：刷$8,000封頂
+                </div>
+            `
         },
         { 
             id: 'c1', name: '星展傳說對決卡', nickname: 'Line Pay神卡', note: 'LinePay / 蝦皮 / 外送 (刷 $11,363 封頂)', rule: '', 
@@ -595,7 +550,20 @@
             type: 'ceiling', limit: 3000, tier1Rate: 0.06, tier2Rate: 0.01, 
             threshold: 100,
             gradient: 'linear-gradient(135deg, #00B900 0%, #33CC33 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)',
-            parking: `... (略) ...`
+            parking: `
+                ⚠️ <b>單筆需滿 $100</b> (回饋 6%)<br>
+                <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
+                    <summary style="cursor:pointer; font-weight:700; color:#856404; font-size:12px;">點我看完整店家名單 ▼</summary>
+                    <div style="margin-top:6px; padding-left:4px; font-size:11px; line-height:1.4; color:#555; max-height:120px; overflow-y:auto; border-radius:4px; background:rgba(255,255,255,0.5); padding:6px;">
+                        <div style="margin-bottom:4px;">🍽️ <b>餐廳：</b>王品 / 三商 / 輕井澤 / 漢來 / 饗賓 / 海底撈 / 築間 / 春水堂 / 壽司郎 / 爭鮮 / 八方雲集</div>
+                        <div style="margin-bottom:4px;">🍔 <b>速食：</b>麥當勞 / 肯德基 / 摩斯 / 漢堡王</div>
+                        <div style="margin-bottom:4px;">☕ <b>咖啡：</b>星巴克 / 路易莎 / cama / 50嵐 / 得正 / 麻古 / 可不可</div>
+                        <div style="margin-bottom:4px;">💄 <b>美妝：</b>屈臣氏 / 寶雅 / 唐吉訶德 / 大樹 / 杏一 / 丁丁 / 佑全 / 躍獅</div>
+                        <div style="margin-bottom:4px;">🏠 <b>家居：</b>IKEA / Hola / 小北 / 汪喵星球 / 東森 / 咕咕G / 魚中魚 / 寵物公園</div>
+                        <div style="margin-bottom:0px;">👟 <b>運動：</b>NIKE / Adidas / NewBalance / 迪卡儂 / 鞋全家福 / 摩曼頓</div>
+                    </div>
+                </details>
+            `
         },
         { 
             id: 'c3', name: '永豐 Sport 卡', nickname: 'Apple Pay優等生', note: 'Apple Pay 5% (刷 $5,000 封頂)', rule: '', 
@@ -606,50 +574,116 @@
             id: 'c4', name: '將來將將卡', nickname: '行支泛用', note: '行動支付 / 外送 (刷 $6,666 封頂)', rule: '', 
             type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
             gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '已封頂 (變0.5%)',
-            parking: `... (略) ...`
+            parking: `
+                🎯 <b>任務：</b>當月累積滿 <b>$3,000</b>，指定通路即享 <b>5%</b><br>
+                <div style="margin-top:8px; font-size:11px; opacity:0.8;">
+                    (若未滿 $3,000 僅有 0.5% 回饋)<br>
+                    ⚠️ 5%加碼上限200N點 (刷$6,666封頂)
+                </div>
+                <hr style="opacity:0.3; margin:8px 0;">
+                <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
+                    <summary style="cursor:pointer; font-weight:700; color:#856404; font-size:12px;">▼ 點我看 9 大指定通路</summary>
+                    <div style="margin-top:6px; padding-left:4px; font-size:11px; line-height:1.5; color:#555; max-height:200px; overflow-y:auto;">
+                        📱 <b>行動支付：</b>LINE Pay、街口、icash Pay、橘子支付、悠遊付、Hami Pay、Pi錢包、TWQR<br>
+                        🍽️ <b>外送餐飲：</b>Uber Eats、Foodpanda、國內餐廳、麥當勞<br>
+                        🏪 <b>指定超商超市：</b>7-ELEVEN 實體門市(icash pay、街口支付、橘子支付)、全家便利商店(街口支付)、家樂福<br>
+                        🤖 <b>AI / 數位：</b>ChatGPT、Claude、Google Play、Apple服務<br>
+                        🏠 <b>生活家居：</b>IKEA、特力屋、HOLA<br>
+                        🚄 <b>交通：</b>高鐵 (含App)、一卡通自動加值<br>
+                        💪 <b>運動健身：</b>World Gym、健身工廠、Curves<br>
+                        📚 <b>學習平台：</b>Hahow、Udemy、VoiceTube<br>
+                    </div>
+                </details>
+            `
         },
         { 
             id: 'c2', name: '聯邦綠卡', nickname: '免費市區停車', note: '國內1% / 國外2% / 綠色6% (低消$12000)', rule: '', 
             type: 'floor', target: 12000, tier1Rate: 0.02, tier2Rate: 0.02, 
             gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', textColor: 'white', msgSuccess: '已達標 (免停)',
-            parking: `... (略) ...`
+            parking: `
+                🅿️ <b>免費停車：</b><br>台灣聯通、詮營、ViVi PARK、嘟嘟房、車麻吉<br>(需上月刷滿1.2萬)<br>
+                ⚠️ 國內1% / 國外2% (無上限)<br>
+                <hr style="opacity:0.3; margin:8px 0;">
+                <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
+                    <summary style="cursor:pointer; font-weight:700; color:#8B0000; font-size:12px;">▼ 點我看 6% 綠色通路</summary>
+                    <div style="margin-top:6px; padding:8px; font-size:11px; line-height:1.6; color:#333; background:rgba(255,255,255,0.9); border-radius:6px;">
+                        🔋 <b>電動車充/換電：</b>特斯拉、Gogoro、eMoving、EVOASIS、EVALUE、全國特急電<br>
+                        🛵 <b>共享交通：</b>iRent、GoShare、WeMo Scooter<br>
+                        🥦 <b>生機選品：</b>里仁、聖德科斯、棉花田、主婦聯盟、AESOP、茶籽堂、鮮乳坊...<br>
+                        🌍 <b>綠色捐贈：</b>荒野保護、千里步道、齊柏林、主婦聯盟基金會...<br>
+                    </div>
+                </details>
+                <div style="margin-top:10px; font-size:11px; color:#1b5e20;">
+                    🌿 <b>6% 回饋攻略：</b>勾選上方「綠色通路」。<br>
+                    ⚠️ 6%加碼：刷$2,500封頂<br>
+                    ⚠️ 此消費可計入 $12,000 停車門檻
+                </div>
+            `
         },
         {
             id: 'c7', name: '玉山 UNI 卡', nickname: '行支優等生', note: '任意3.5% / UP 4.5% (刷 4~14萬 封頂)',
             type: 'ceiling', limit: 40000, tier1Rate: 0.035, tier2Rate: 0.01,
             gradient: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
             textColor: 'white', msgDanger: '已封頂 (變1%)',
-            parking: `... (略) ...`
+            parking: `
+                🔥 <b>任意選 3.5% (無腦刷$40,000)</b><br>
+                需於 App 設定「任意選8項」<br>
+                <hr style="opacity:0.3; margin:8px 0;">
+                🦄 <b>統一時代任務 +3% (刷$16,666)</b><br>
+                (2025/12/15 ~ 2026/2/28)<br>
+                需持有「玉山統一時代聯名卡」且完成登錄<br>
+                通路：統一時代百貨台北店、DREAM PLAZA、新光三越、icash Pay、悠遊付、蝦皮購物
+            `
         },
         {
             id: 'c8', name: '遠東樂家+卡', nickname: '生活/寵物神卡', note: '寵物10% / 生活4% / 國外2.5% (需一般消費滿3千)',
             type: 'ceiling', limit: 5263, tier1Rate: 0.1, tier2Rate: 0.005,
             gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)',
             textColor: 'white', msgDanger: '已封頂 (變0.5%)',
-            parking: `... (略) ...`
+            parking: `
+                🐶 <b>指定寵物 (10% 刷$5263)</b><br>
+                🏠 <b>指定生活/餐廳 (4% 刷$5714)</b><br>
+                <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
+                    <summary style="cursor:pointer; font-weight:700; color:#8B0000; font-size:12px;">▼ 點我看安心刷通路 (餐廳/電影...)</summary>
+                    <div style="margin-top:6px; padding:8px; font-size:11px; line-height:1.6; color:#333; background:rgba(255,255,255,0.9); border-radius:6px;">
+                        🍽️ <b>美食餐廳：</b>国内一般餐廳 (排除百貨/飯店/賣場內)<br>
+                        🎬 <b>電影娛樂：</b>威秀/秀泰/國賓/錢櫃/好樂迪...<br>
+                        👶 <b>母嬰百貨：</b>小丁婦幼/卡多摩...<br>
+                        🏨 <b>飯店/旅遊：</b>各大飯店/Klook/KKday
+                    </div>
+                </details>
+                <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
+                    <summary style="cursor:pointer; font-weight:700; color:#8B0000; font-size:12px;">▼ 點我看生活禮遇通路 (超市/加油...)</summary>
+                    <div style="margin-top:6px; padding:8px; font-size:11px; line-height:1.6; color:#333; background:rgba(255,255,255,0.9); border-radius:6px;">
+                        🛒 <b>超市量販：</b>全聯/家樂福/大潤發/愛買...<br>
+                        ⛽ <b>行車：</b>中油/台亞/Uber/高鐵/台鐵...<br>
+                        📱 <b>電信：</b>中華/遠傳/台哥大<br>
+                        📚 <b>教育學習：</b>地球村/巨匠電腦/TutorABC...<br>
+                        💪 <b>健身放鬆：</b>健身工廠/World Gym/BEING spa...
+                    </div>
+                </details>
+                <hr style="opacity:0.3; margin:8px 0;">
+                ⚠️ <b>需一般消費滿 $3,000 (才享加碼)</b><br>
+                💰 <b>滿額禮：</b><br>全月總刷滿 $26,000，次月5日起登錄領 $400。<br>
+                ✈️ <b>海外滿額禮：</b><br>滿5萬多領$500。<br>
+                <div style="margin-top:8px; font-size:11px; color:#d32f2f; font-weight:700;">
+                    ⚠️ 記得登錄！
+                </div>
+            `
         },
         { 
             id: 'c9', name: '匯豐旅人卡', nickname: '哩程累積', note: '無限:國內18/國外10 | 御璽:國內18/國外15', 
             type: 'miles',
             gradient: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)', 
             textColor: 'white', msgDanger: '',
-            parking: `... (略) ...`
-        },
-        // 新增：中信 Uniopen 卡
-        {
-            id: 'c10', name: '中信 Uniopen 卡', nickname: '統一集團神卡', note: '統一集團 7%~11% / 國外實體 11%',
-            type: 'ceiling', limit: 12500, tier1Rate: 0.07, tier2Rate: 0.03, // 預設顯示7%模式
-            gradient: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)',
-            textColor: 'white', msgDanger: '踩點已滿 (變3%)',
             parking: `
-                🔥 <b>國外實體 11% (刷 $6,250)</b><br>
-                需國外實體店面消費 (上限 500 點)<br>
+                ✈️ <b>哩程累積神卡</b><br>
+                最優 NT$10 = 1 哩<br>
                 <hr style="opacity:0.3; margin:8px 0;">
-                🏪 <b>統一集團 7% ~ 11%</b><br>
-                1. 綁定 icash Pay: <b>+4%</b> (刷$3,750)<br>
-                2. 踩點任務: <b>最高 +4%</b> (刷$12,500)<br>
-                3. 集團加碼: <b>+2%</b> (刷$25,000)<br>
-                4. 基本回饋: <b>1%</b> (無上限)
+                <b>無限卡：</b>國內 $18/哩、國外 $10/哩<br>
+                <b>御璽卡：</b>國內 $18/哩、國外 $15/哩<br>
+                ✈️ <b>海外滿額：</b>滿5萬多領$500<br>
+                <div style="font-size:10px; opacity:0.8; margin-top:4px;">(卡別請於記帳時設定，系統會自動記憶)</div>
             `
         },
         // 預留卡片 (僅1張，補足8格) - 預設隱藏
@@ -663,30 +697,29 @@
 
     // 初始化顯示狀態 (確保 8 格)
     let visibleCards = JSON.parse(localStorage.getItem('visibleCards'));
-    const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9', 'c10'];
-    
     if (!visibleCards) {
         // 新用戶: 顯示 8 張實體卡
         visibleCards = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8']; 
         localStorage.setItem('visibleCards', JSON.stringify(visibleCards));
     } else {
-        // 舊用戶自動補上新卡片 c10 (如果不夠位置就藏在後面)
-        if (!visibleCards.includes('c10')) {
-             // 簡單邏輯：直接加進去，反正後面會切成 8 張
-             visibleCards.push('c10');
-        }
+        // 舊用戶: 補上 c8
+        if (!visibleCards.includes('c8')) visibleCards.push('c8');
         
+        // 智慧補位邏輯：
+        const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9'];
         let currentRealCards = visibleCards.filter(id => realCardIds.includes(id));
         
         if (currentRealCards.length > 8) {
-            // 超過 8 張，強制切除
+            // 超過 8 張，強制切除第 9 張以後的
             visibleCards = currentRealCards.slice(0, 8);
         } else if (currentRealCards.length === 8) {
-            visibleCards = currentRealCards; 
+            visibleCards = currentRealCards; // 剛好 8 張，不需 add1
         } else {
+            // 少於 8 張，補上 add1
             if (!visibleCards.includes('add1')) visibleCards.push('add1');
             visibleCards = visibleCards.filter(id => id !== 'add2');
         }
+
         localStorage.setItem('visibleCards', JSON.stringify(visibleCards));
     }
 
@@ -696,6 +729,8 @@
 
     function getSortedCards() {
         let displayCards = cards.filter(c => visibleCards.includes(c.id));
+        
+        // 動態補位檢查
         const realCardCount = displayCards.filter(c => c.type !== 'placeholder').length;
         if (realCardCount < 8 && !visibleCards.includes('add1')) {
              const placeholder = cards.find(c => c.id === 'add1');
@@ -703,6 +738,7 @@
                  displayCards.push(placeholder);
              }
         }
+        
         if (savedOrder && Array.isArray(savedOrder)) {
             displayCards.sort((a, b) => {
                 let indexA = savedOrder.indexOf(a.id);
@@ -736,42 +772,28 @@
 
     function updateDate() { const now = new Date(); document.getElementById('dateDisplay').innerText = `${now.getMonth()+1}/${now.getDate()}`; }
 
-    // 儲存匯豐旅人卡設定
+    // 儲存匯豐旅人卡等級設定
     function saveHsbcTier() {
         const tier = document.querySelector('input[name="hsbcTier"]:checked').value;
         localStorage.setItem('hsbc_tier', tier);
-        renderGrid(); 
+        renderGrid(); // 即時更新首頁卡面文字
         updateRewardPreview();
     }
+
+    // 儲存匯豐旅人卡起始哩程
     function saveHsbcInitial() {
         const initial = document.getElementById('hsbcInitialMiles').value;
         localStorage.setItem('hsbc_initial_miles', initial);
         renderGrid();
     }
-    
-    // 中信 Uniopen 切換場景
-    function toggleCtbcScene() {
-        const scene = document.querySelector('input[name="ctbcScene"]:checked').value;
-        const unifiedZone = document.getElementById('ctbcUnifiedZone');
-        if (scene === 'unified') {
-            unifiedZone.style.display = 'block';
-        } else {
-            unifiedZone.style.display = 'none';
-            // 清空選擇
-            document.getElementById('checkCtbcIcash').checked = false;
-            // 修正：不要清空 brand，因為 toggle 可能只是誤按，保留 brand 選擇比較好
-            // document.querySelectorAll('.ctbc-brand').forEach(cb => cb.checked = false);
-        }
-        updateRewardPreview();
-    }
 
     // --- 核心計算邏輯 ---
-    function calculateStats(cardId, addedAmount = 0, options = {}) {
-        // options 包含預覽時的所有勾選狀態
-        
+    function calculateStats(cardId, addedAmount = 0, addedIsGreen = false, addedIsForeign = false, addedIsUniBonus = false, addedIsUniUp = false, addedIsHappyPet = false, addedIsHappyLife = false, addedIsHappyForeign = false, addedIsHappyPeace = false, addedIsHsbcForeign = false) {
         const card = cards.find(c => c.id === cardId);
+        
         if (card.type === 'placeholder') return { spend: 0, validSpend: 0, reward: 0, rate: '0.0' };
 
+        // 統一採用日曆月
         const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
         const relevantTx = transactions.filter(t => t.cardId === cardId && new Date(t.date) >= startDate);
         let totalSpend = relevantTx.reduce((sum, t) => sum + parseFloat(t.amount), 0);
@@ -782,152 +804,141 @@
 
         let reward = 0;
 
-        // --- 中信 Uniopen (c10) 複雜邏輯 ---
-        if (cardId === 'c10') {
-            // 1. 國外實體 (11% 上限 $6250)
-            const foreignTxs = relevantTx.filter(t => t.ctbcScene === 'foreign');
-            let foreignSpend = foreignTxs.reduce((sum, t) => sum + t.amount, 0);
-            if (addedAmount > 0 && options.ctbcScene === 'foreign') foreignSpend += addedAmount;
-            
-            const foreignBonusEligible = Math.min(foreignSpend, 6250);
-            const foreignBonus = foreignBonusEligible * 0.08; // 8% 加碼
-            const foreignBase = foreignSpend * 0.03; // 2%基本 + 1%實體 = 3%
-            const foreignTotalReward = foreignBase + foreignBonus;
-
-            // 2. 統一集團 (含家樂福) - 三層疊加
-            // 先計算歷史的所有「品牌數」 (包含當次預覽)
-            let uniqueBrands = new Set();
-            relevantTx.forEach(t => {
-                if (t.ctbcBrands && Array.isArray(t.ctbcBrands)) {
-                    t.ctbcBrands.forEach(b => uniqueBrands.add(b));
-                }
-            });
-            // 加上預覽的品牌
-            if (options.ctbcBrands && Array.isArray(options.ctbcBrands)) {
-                options.ctbcBrands.forEach(b => uniqueBrands.add(b));
-            }
-            const brandCount = Math.min(uniqueBrands.size, 5);
-            // 踩點費率表 (1家0%, 2家1%, 3家2%, 4家3%, 5家4%)
-            const taskRates = [0, 0, 0.01, 0.02, 0.03, 0.04];
-            const currentTaskRate = taskRates[brandCount];
-
-            // 統一集團消費池
-            const unifiedTxs = relevantTx.filter(t => t.ctbcScene === 'unified');
-            let unifiedSpend = unifiedTxs.reduce((sum, t) => sum + t.amount, 0);
-            if (addedAmount > 0 && options.ctbcScene === 'unified') unifiedSpend += addedAmount;
-
-            // icash Pay 消費池
-            const icashTxs = relevantTx.filter(t => t.ctbcScene === 'unified' && t.isCtbcIcash);
-            let icashSpend = icashTxs.reduce((sum, t) => sum + t.amount, 0);
-            if (addedAmount > 0 && options.ctbcScene === 'unified' && options.isCtbcIcash) icashSpend += addedAmount;
-
-            // 計算各層回饋
-            // L4: 基本 1%
-            const unifiedBase = unifiedSpend * 0.01;
-            
-            // L3: 集團加碼 2% (上限 500點 -> $25000)
-            const groupEligible = Math.min(unifiedSpend, 25000);
-            const groupBonus = groupEligible * 0.02;
-
-            // L2: 踩點任務 0~4% (上限 500點 -> $12500)
-            // 注意：這是回溯的，只要達標，整個月都在這個費率下 (直到上限)
-            const taskEligible = Math.min(unifiedSpend, 12500);
-            const taskBonus = taskEligible * currentTaskRate;
-
-            // L1: icash Pay 加碼 4% (上限 150點 -> $3750)
-            const icashEligible = Math.min(icashSpend, 3750);
-            const icashBonus = icashEligible * 0.04;
-
-            const unifiedTotalReward = unifiedBase + groupBonus + taskBonus + icashBonus;
-
-            // 3. 一般消費 (1%)
-            const normalTxs = relevantTx.filter(t => t.ctbcScene === 'normal' || !t.ctbcScene); // 相容舊資料
-            let normalSpend = normalTxs.reduce((sum, t) => sum + t.amount, 0);
-            if (addedAmount > 0 && (options.ctbcScene === 'normal' || !options.ctbcScene)) normalSpend += addedAmount;
-            const normalReward = normalSpend * 0.01;
-
-            reward = foreignTotalReward + unifiedTotalReward + normalReward;
-            
-            let actualRate = 7.0;
-            if (totalSpend > 0) actualRate = (reward / totalSpend) * 100;
-            
-            return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: actualRate.toFixed(1) };
-        }
-
-        // ... (其他舊卡片邏輯保持不變: c9, c8, c7, c2, mixed, ceiling) ...
-        // 匯豐旅人 (c9)
+        // 匯豐旅人卡 (c9) - 哩程計算 (全歷史累積)
         if (cardId === 'c9') {
             const tier = localStorage.getItem('hsbc_tier') || 'infinite';
-            let rateDomestic = 18; let rateForeign = 10;
+            let rateDomestic = 18;
+            let rateForeign = 10;
             if (tier === 'signature') { rateDomestic = 18; rateForeign = 15; }
+            
+            // 計算初始哩程
             let totalMiles = parseInt(localStorage.getItem('hsbc_initial_miles') || 0);
+
+            // 計算所有歷史交易 (不分月份)
             const allHistoryTx = transactions.filter(t => t.cardId === 'c9');
             allHistoryTx.forEach(tx => {
                 const rate = tx.isHsbcForeign ? rateForeign : rateDomestic;
                 totalMiles += Math.floor(tx.amount / rate);
             });
+
+            // 加上預覽的新增金額 (如果有)
             if (addedAmount > 0) {
-                const currentRate = options.isHsbcForeign ? rateForeign : rateDomestic;
+                const currentRate = addedIsHsbcForeign ? rateForeign : rateDomestic;
                 totalMiles += Math.floor(addedAmount / currentRate);
             }
+            
+            // 背景計算海外滿額禮 (每月獨立算)
+            const currentMonthHsbcTx = relevantTx.filter(t => t.cardId === 'c9');
+            let currentMonthForeignSpend = currentMonthHsbcTx.filter(t => t.isHsbcForeign).reduce((sum, t) => sum + t.amount, 0);
+            if (addedAmount > 0 && addedIsHsbcForeign) currentMonthForeignSpend += addedAmount;
+            
+            if (currentMonthForeignSpend >= 50000) {
+                 // 這裡有個小問題：滿額禮是現金回饋還是哩程？
+                 // 根據匯豐規則，滿額禮通常是刷卡金。
+                 // 但為了統一顯示，我們假設它轉換成等值哩程？或者直接加在 reward 裡？
+                 // 匯豐旅人卡的滿額禮通常是 "哩程" 還是 "刷卡金" 需確認。
+                 // 假設是刷卡金 $500。
+                 // 但我們這裡 reward 單位是哩程。
+                 // 為了不混淆，我們只計算哩程。滿額禮 $500 請用戶自己記得去領。
+                 // 或者，我們可以用文字提示。
+                 // (用戶指令：若海外刷滿五萬你還是可以多給他五百) -> 這裡是指現金 $500。
+                 // 混合單位顯示會很怪 (1000哩 + $500)。
+                 // 暫時不計入 totalMiles，僅做文字提示？
+                 // 或者我們把 $500 換算成哩程？ (1哩約0.5元?) -> 不精準。
+                 // 決定：既然是「多給他五百」，這 $500 是現金。
+                 // 為了顯示方便，我們不加在 totalMiles 裡，因為單位不同。
+                 // 但我們可以在 statusText 裡提示。
+            }
+
             reward = totalMiles;
-            let actualRate = (totalSpend > 0) ? (totalSpend / totalMiles).toFixed(1) : 0;
+            
+            let actualRate = 0;
+            if (totalSpend > 0) {
+                actualRate = (totalSpend / totalMiles).toFixed(1); 
+            }
+            
             return { spend: totalSpend, validSpend: validSpend, reward: reward, rate: actualRate };
         }
-        // 遠東 (c8)
+
+        // 遠東樂家+卡 (c8)
         if (cardId === 'c8') {
-            const petSpend = relevantTx.filter(t => t.isHappyPet).reduce((sum, t) => sum + t.amount, 0) + (options.isHappyPet ? addedAmount : 0);
-            const petReward = Math.min(petSpend, 5263) * 0.10;
+            const petSpend = relevantTx.filter(t => t.isHappyPet).reduce((sum, t) => sum + t.amount, 0) + (addedIsHappyPet ? addedAmount : 0);
+            const petEligible = Math.min(petSpend, 5263);
+            const petReward = petEligible * 0.10;
             const petOverflow = Math.max(0, petSpend - 5263);
-            const lifeSpend = relevantTx.filter(t => t.isHappyLife).reduce((sum, t) => sum + t.amount, 0) + (options.isHappyLife ? addedAmount : 0);
-            const lifeReward = Math.min(lifeSpend, 5714) * 0.04;
+
+            const lifeSpend = relevantTx.filter(t => t.isHappyLife).reduce((sum, t) => sum + t.amount, 0) + (addedIsHappyLife ? addedAmount : 0);
+            const lifeEligible = Math.min(lifeSpend, 5714);
+            const lifeReward = lifeEligible * 0.04;
             const lifeOverflow = Math.max(0, lifeSpend - 5714);
-            const peaceSpend = relevantTx.filter(t => t.isHappyPeace).reduce((sum, t) => sum + t.amount, 0) + (options.isHappyPeace ? addedAmount : 0);
-            const peaceReward = Math.min(peaceSpend, 5714) * 0.04;
+
+            const peaceSpend = relevantTx.filter(t => t.isHappyPeace).reduce((sum, t) => sum + t.amount, 0) + (addedIsHappyPeace ? addedAmount : 0);
+            const peaceEligible = Math.min(peaceSpend, 5714);
+            const peaceReward = peaceEligible * 0.04;
             const peaceOverflow = Math.max(0, peaceSpend - 5714);
-            const foreignSpend = relevantTx.filter(t => t.isHappyForeign).reduce((sum, t) => sum + t.amount, 0) + (options.isHappyForeign ? addedAmount : 0);
+
+            const foreignSpend = relevantTx.filter(t => t.isHappyForeign).reduce((sum, t) => sum + t.amount, 0) + (addedIsHappyForeign ? addedAmount : 0);
             const foreignReward = foreignSpend * 0.025;
+
             const normalSpend = relevantTx.filter(t => !t.isHappyPet && !t.isHappyLife && !t.isHappyPeace && !t.isHappyForeign).reduce((sum, t) => sum + t.amount, 0) 
-                              + (!options.isHappyPet && !options.isHappyLife && !options.isHappyPeace && !options.isHappyForeign ? addedAmount : 0);
+                              + (!addedIsHappyPet && !addedIsHappyLife && !addedIsHappyPeace && !addedIsHappyForeign ? addedAmount : 0);
             const totalNormalSpend = normalSpend + petOverflow + lifeOverflow + peaceOverflow;
             const normalReward = totalNormalSpend * 0.005;
+
             const thresholdBonus = totalSpend >= 26000 ? 400 : 0;
             const foreignThresholdBonus = foreignSpend >= 50000 ? 500 : 0;
+
             reward = petReward + lifeReward + peaceReward + foreignReward + normalReward + thresholdBonus + foreignThresholdBonus;
-            let actualRate = (totalSpend > 0) ? (reward / totalSpend) * 100 : 10.0;
+            
+            let actualRate = 10.0;
+            if (totalSpend > 0) actualRate = (reward / totalSpend) * 100;
+            
             return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: actualRate.toFixed(1) };
         }
-        // UNI (c7)
+
+        // 玉山 UNI (c7)
         if (cardId === 'c7') {
-            let baseRate = 0.035; let baseCap = 40000;
-            const isUpMonth = options.isUniUp || relevantTx.some(t => t.isUniUp);
+            let baseRate = 0.035;
+            let baseCap = 40000;
+            const isUpMonth = addedIsUniUp || relevantTx.some(t => t.isUniUp);
             if (isUpMonth) { baseRate = 0.045; baseCap = 142857; }
             const baseEligible = Math.min(totalSpend, baseCap);
             const baseReward = baseEligible * baseRate;
-            const overflowReward = Math.max(0, totalSpend - baseCap) * 0.01;
+            const overflow = Math.max(0, totalSpend - baseCap);
+            const overflowReward = overflow * 0.01;
             const currentBonusSpend = relevantTx.filter(t => t.isUniBonus).reduce((sum, t) => sum + t.amount, 0);
-            const totalBonusSpend = currentBonusSpend + (options.isUniBonus ? addedAmount : 0);
-            const bonusReward = Math.min(totalBonusSpend, 16666) * 0.03;
+            let newBonusAmount = addedIsUniBonus ? addedAmount : 0;
+            const totalBonusSpend = currentBonusSpend + newBonusAmount;
+            const bonusEligible = Math.min(totalBonusSpend, 16666);
+            const bonusReward = bonusEligible * 0.03;
             reward = baseReward + overflowReward + bonusReward;
-            let actualRate = (totalSpend > 0) ? (reward / totalSpend) * 100 : (baseRate * 100);
+            let actualRate = (baseRate * 100);
+            if (totalSpend > 0) actualRate = (reward / totalSpend) * 100;
             return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: actualRate.toFixed(1) };
         }
-        // Green (c2)
+        
+        // 綠卡 (c2)
         if (cardId === 'c2') {
             const currentGreenSpend = relevantTx.filter(t => t.isGreen).reduce((sum, t) => sum + t.amount, 0);
-            const totalGreenSpend = currentGreenSpend + (options.isGreen ? addedAmount : 0);
-            const greenReward = Math.min(totalGreenSpend, 2500) * 0.06;
+            let newGreenAmount = addedIsGreen ? addedAmount : 0;
+            const totalGreenSpend = currentGreenSpend + newGreenAmount;
+            const greenEligible = Math.min(totalGreenSpend, 2500);
+            const greenReward = greenEligible * 0.06;
             const greenOverflow = Math.max(0, totalGreenSpend - 2500);
             const currentForeignSpend = relevantTx.filter(t => t.isForeign).reduce((sum, t) => sum + t.amount, 0);
-            const totalForeignSpend = currentForeignSpend + (options.isForeign ? addedAmount : 0);
+            let newForeignAmount = addedIsForeign ? addedAmount : 0;
+            const totalForeignSpend = currentForeignSpend + newForeignAmount;
             const foreignReward = totalForeignSpend * 0.02;
             const currentNormalSpend = relevantTx.filter(t => !t.isGreen && !t.isForeign).reduce((sum, t) => sum + t.amount, 0);
-            const totalNormalSpend = currentNormalSpend + (!options.isGreen && !options.isForeign ? addedAmount : 0);
+            const newNormalAmount = (!addedIsGreen && !addedIsForeign) ? addedAmount : 0;
+            const totalNormalSpend = currentNormalSpend + newNormalAmount;
             const normalReward = (greenOverflow + totalNormalSpend) * 0.01;
             reward = greenReward + foreignReward + normalReward;
-            return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: 6.0.toFixed(1) };
+            let actualRate = 6.0;
+            return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: actualRate.toFixed(1) };
         }
-        // Others
+
+        // 其他卡片邏輯
         if (card.type === 'mixed') {
             if (validSpend < card.minSpend) reward = validSpend * card.tier2Rate; 
             else if (validSpend <= card.limit) reward = validSpend * card.tier1Rate;
@@ -938,28 +949,87 @@
         } else { 
             reward = validSpend * card.tier1Rate; 
         }
-        let currentRate = (validSpend > 0) ? (reward / validSpend) * 100 : (card.tier1Rate || 0) * 100;
+        
+        let currentRate = 0;
+        if (validSpend > 0) currentRate = (reward / validSpend) * 100;
+        else currentRate = (card.tier1Rate || 0) * 100;
+
         return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: currentRate.toFixed(1) };
     }
 
-    // Toggle Logics
+    // ... (toggleBillLogic 等切換邏輯保持不變) ...
     function toggleBillLogic() {
         const isBill = document.getElementById('checkIsBill').checked;
         const labelBase = document.getElementById('labelBaseRate');
-        if (isBill) { document.getElementById('checkBonus25').checked = false; labelBase.innerText = "🔰 基本回饋 0.15% (無上限)"; } 
-        else { labelBase.innerText = "🔰 基本回饋 1% (無上限)"; }
+        if (isBill) {
+            document.getElementById('checkBonus25').checked = false;
+            labelBase.innerText = "🔰 基本回饋 0.15% (無上限)";
+        } else {
+            labelBase.innerText = "🔰 基本回饋 1% (無上限)";
+        }
         updateRewardPreview();
     }
+    
     function toggleSelectedLogic() {
-        if (document.getElementById('checkBonus25').checked) { document.getElementById('checkIsBill').checked = false; document.getElementById('labelBaseRate').innerText = "🔰 基本回饋 1% (無上限)"; }
+        const isSelected = document.getElementById('checkBonus25').checked;
+        const labelBase = document.getElementById('labelBaseRate');
+
+        if (isSelected) {
+            document.getElementById('checkIsBill').checked = false;
+            labelBase.innerText = "🔰 基本回饋 1% (無上限)";
+        }
         updateRewardPreview();
     }
-    function toggleGreenLogic() { if(document.getElementById('checkGreenChannel').checked) document.getElementById('checkForeign').checked = false; updateRewardPreview(); }
-    function toggleForeignLogic() { if(document.getElementById('checkForeign').checked) document.getElementById('checkGreenChannel').checked = false; updateRewardPreview(); }
-    function toggleHappyPet() { if(document.getElementById('checkHappyPet').checked) { document.getElementById('checkHappyPeace').checked = false; document.getElementById('checkHappyLife').checked = false; document.getElementById('checkHappyForeign').checked = false; } updateRewardPreview(); }
-    function toggleHappyPeace() { if(document.getElementById('checkHappyPeace').checked) { document.getElementById('checkHappyPet').checked = false; document.getElementById('checkHappyLife').checked = false; document.getElementById('checkHappyForeign').checked = false; } updateRewardPreview(); }
-    function toggleHappyLife() { if(document.getElementById('checkHappyLife').checked) { document.getElementById('checkHappyPet').checked = false; document.getElementById('checkHappyPeace').checked = false; document.getElementById('checkHappyForeign').checked = false; } updateRewardPreview(); }
-    function toggleHappyForeign() { if(document.getElementById('checkHappyForeign').checked) { document.getElementById('checkHappyPet').checked = false; document.getElementById('checkHappyPeace').checked = false; document.getElementById('checkHappyLife').checked = false; } updateRewardPreview(); }
+
+    function toggleGreenLogic() {
+        if(document.getElementById('checkGreenChannel').checked) {
+            document.getElementById('checkForeign').checked = false;
+        }
+        updateRewardPreview();
+    }
+
+    function toggleForeignLogic() {
+        if(document.getElementById('checkForeign').checked) {
+            document.getElementById('checkGreenChannel').checked = false;
+        }
+        updateRewardPreview();
+    }
+
+    function toggleHappyPet() {
+        if(document.getElementById('checkHappyPet').checked) {
+            document.getElementById('checkHappyPeace').checked = false;
+            document.getElementById('checkHappyLife').checked = false;
+            document.getElementById('checkHappyForeign').checked = false;
+        }
+        updateRewardPreview();
+    }
+
+    function toggleHappyPeace() {
+        if(document.getElementById('checkHappyPeace').checked) {
+            document.getElementById('checkHappyPet').checked = false;
+            document.getElementById('checkHappyLife').checked = false;
+            document.getElementById('checkHappyForeign').checked = false;
+        }
+        updateRewardPreview();
+    }
+    
+    function toggleHappyLife() {
+        if(document.getElementById('checkHappyLife').checked) {
+            document.getElementById('checkHappyPet').checked = false;
+            document.getElementById('checkHappyPeace').checked = false;
+            document.getElementById('checkHappyForeign').checked = false;
+        }
+        updateRewardPreview();
+    }
+
+    function toggleHappyForeign() {
+        if(document.getElementById('checkHappyForeign').checked) {
+            document.getElementById('checkHappyPet').checked = false;
+            document.getElementById('checkHappyPeace').checked = false;
+            document.getElementById('checkHappyLife').checked = false;
+        }
+        updateRewardPreview();
+    }
 
     function updateRewardPreview() {
         const inputVal = document.getElementById('amountInput').value;
@@ -967,143 +1037,119 @@
         const previewDiv = document.getElementById('liveRewardCalc');
         const cardId = document.getElementById('cardIdInput').value;
 
-        // 獨立更新中信品牌狀態 (不管有無金額)
-        if (cardId === 'c10') {
-            const statusEl = document.getElementById('ctbcBrandStatus');
-            if (statusEl) {
-                let uniqueBrands = new Set();
-                transactions.filter(t => t.cardId === 'c10').forEach(t => { if(t.ctbcBrands) t.ctbcBrands.forEach(b => uniqueBrands.add(b)); });
-                const currentChecked = Array.from(document.querySelectorAll('.ctbc-brand:checked')).map(cb => cb.value);
-                // 這裡改為「合併計算」邏輯，確保取消勾選時數字會降
-                // 修正邏輯：
-                // 1. 建立 base set (歷史)
-                let baseBrands = new Set();
-                transactions.filter(t => t.cardId === 'c10').forEach(t => { if(t.ctbcBrands) t.ctbcBrands.forEach(b => baseBrands.add(b)); });
-                
-                // 2. 建立 current set (當前勾選)
-                let currentSet = new Set();
-                document.querySelectorAll('.ctbc-brand:checked').forEach(cb => currentSet.add(cb.value));
-                
-                // 3. 聯集 (但要注意，如果是「新增模式」，歷史的應該都已經被預勾選了。如果是使用者手動取消，表示他想移除？)
-                // 其實最簡單的邏輯是：直接算畫面上勾了幾個 + 畫面沒勾但歷史有的(隱藏的?)
-                // 在我們的 UI 設計裡，歷史的會被自動勾選。所以「畫面上勾選的」就等於「所有要計算的」。
-                
-                let totalBrands = new Set();
-                document.querySelectorAll('.ctbc-brand:checked').forEach(cb => totalBrands.add(cb.value));
-                
-                const brandCount = Math.min(totalBrands.size, 5);
-                const taskRate = [0, 0, 1, 2, 3, 4][brandCount];
-                statusEl.innerText = `(目前 ${totalBrands.size} 家 / 任務 +${taskRate}%)`;
-                if (brandCount >= 5) statusEl.style.color = '#34C759'; 
-                else statusEl.style.color = '#007AFF';
-            }
+        if (!amount || amount <= 0) {
+            previewDiv.style.display = 'none'; 
+            previewDiv.innerHTML = '';
+            return;
         }
 
-        if (!amount || amount <= 0) { previewDiv.style.display = 'none'; previewDiv.innerHTML = ''; return; }
         previewDiv.style.display = 'block'; 
-
-        // 收集所有可能的選項狀態
-        const options = {
-            // General
-            isGreen: document.getElementById('checkGreenChannel').checked,
-            isForeign: document.getElementById('checkForeign').checked,
-            isUniBonus: document.getElementById('checkUniBonus').checked,
-            isUniUp: document.getElementById('checkUniUp').checked,
-            isHappyPet: document.getElementById('checkHappyPet').checked,
-            isHappyPeace: document.getElementById('checkHappyPeace').checked,
-            isHappyLife: document.getElementById('checkHappyLife').checked,
-            isHappyForeign: document.getElementById('checkHappyForeign').checked,
-            isHsbcForeign: document.getElementById('checkHsbcForeign').checked,
-            // CTBC specific
-            ctbcScene: document.querySelector('input[name="ctbcScene"]:checked') ? document.querySelector('input[name="ctbcScene"]:checked').value : null,
-            isCtbcIcash: document.getElementById('checkCtbcIcash').checked,
-            ctbcBrands: Array.from(document.querySelectorAll('.ctbc-brand:checked')).map(cb => cb.value)
-        };
-
-        const currentStats = calculateStats(cardId, 0);
-        const newStats = calculateStats(cardId, amount, options);
-        
-        let totalDiff = newStats.reward - currentStats.reward;
+        let thisTransactionReward = 0;
         let effectiveRate = 0;
-        let displayHtml = '';
+        let isMiles = false;
 
-        // 針對單筆回饋率做更精確的顯示 (避免被歷史平均稀釋)
-        if (cardId === 'c10' && options.ctbcScene === 'unified') {
-             // Uniopen 特殊分離顯示邏輯
-             let baseRate = 0.03; // 1+2
-             if (options.isCtbcIcash) baseRate += 0.04;
-             
-             // 修正：這裡也要用即時勾選的數量來算 rate
-             // 但 calculateStats 內部是用 Union，所以這裡也要保持一致
-             // 其實 calculateStats 已經算得很準了，我們只需要正確顯示
-             // 為了顯示方便，我們重新計算一次 brandCount
-             let currentBrandCount = 0;
-             let tempSet = new Set();
-             if (options.ctbcBrands) options.ctbcBrands.forEach(b => tempSet.add(b));
-             currentBrandCount = Math.min(tempSet.size, 5);
-             
-             const taskRate = [0, 0, 0.01, 0.02, 0.03, 0.04][currentBrandCount];
-             
-             const thisTxRate = baseRate + taskRate;
-             
-             // 假設這筆沒爆掉，應該拿多少 (做為顯示基準)
-             // 注意：這只是預覽，若實際爆掉 calculateStats 會算準 totalDiff
-             let thisTxEarn = Math.round(amount * thisTxRate);
-             
-             // 補發 = 總差異 - 本筆應得
-             let bonusEarn = totalDiff - thisTxEarn;
-             
-             if (bonusEarn > 5) {
-                 displayHtml = `✨ 本筆 $${thisTxEarn} (${(thisTxRate*100).toFixed(0)}%) + <span style="color:#d32f2f">🔥補發 $${bonusEarn}</span>`;
-             } else {
-                 // 如果 totalDiff 比理論值小，代表爆了，顯示實際值
-                 let effectiveRate = ((totalDiff / amount) * 100).toFixed(1);
-                 displayHtml = `✨ 預計回饋：$${totalDiff} (${effectiveRate}%)`;
-             }
+        if (cardId === 'c6') {
+            const hasBonus10 = document.getElementById('checkBonus10').checked;
+            const hasBonus25 = document.getElementById('checkBonus25').checked;
+            const isBill = document.getElementById('checkIsBill').checked;
+            let baseRate = isBill ? 0.0015 : 0.01;
+            let reward = amount * baseRate;
 
-        } else if (cardId === 'c6') {
-             // 豬富卡特殊邏輯保留
-             let baseRate = document.getElementById('checkIsBill').checked ? 0.0015 : 0.01;
-             let reward = amount * baseRate;
-             if (document.getElementById('checkBonus25').checked) reward += amount * 0.025;
-             if (document.getElementById('checkBonus10').checked) {
-                 const currentMonthSpend = transactions.filter(t => t.cardId === 'c6' && new Date(t.date) >= new Date(new Date().getFullYear(), new Date().getMonth(), 1)).reduce((sum, t) => sum + t.amount, 0);
-                 const eligible = Math.min(amount, Math.max(0, 8000 - currentMonthSpend));
-                 reward += eligible * 0.10;
-             }
-             let thisTransactionReward = Math.round(reward);
-             effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(2);
-             displayHtml = `✨ 預計回饋：$${thisTransactionReward} (${effectiveRate}%)`;
+            if (hasBonus25) reward += amount * 0.025;
 
-        } else if (cardId === 'c9') {
-             const tier = localStorage.getItem('hsbc_tier') || 'infinite';
-             let rate = 18;
-             if (tier === 'infinite' && options.isHsbcForeign) rate = 10;
-             else if (tier === 'signature' && options.isHsbcForeign) rate = 15;
-             displayHtml = `✨ 預計回饋：${totalDiff} 哩 (${rate}元/哩)`;
+            if (hasBonus10) {
+                const card = cards.find(c => c.id === 'c6');
+                const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
+                const currentMonthSpend = transactions
+                    .filter(t => t.cardId === 'c6' && new Date(t.date) >= startDate)
+                    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+                
+                const remainingQuota = Math.max(0, 8000 - currentMonthSpend);
+                const eligibleFor10 = Math.min(amount, remainingQuota);
+                reward += eligibleFor10 * 0.10;
+            }
+            thisTransactionReward = Math.round(reward);
+            effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(2);
+        
+        } else if (cardId === 'c9') { // 匯豐旅人
+            const isHsbcForeign = document.getElementById('checkHsbcForeign').checked;
+            // 這裡 calculateStats 的最後一個參數是 isHsbcForeign
+            const currentStats = calculateStats(cardId, 0);
+            const newStats = calculateStats(cardId, amount, false, false, false, false, false, false, false, false, isHsbcForeign);
+            thisTransactionReward = newStats.reward - currentStats.reward;
+            effectiveRate = newStats.rate; 
+            
+            // 計算本筆消費的平均成本 (元/哩)
+            const tier = localStorage.getItem('hsbc_tier') || 'infinite';
+            let rate = 18;
+            if (tier === 'infinite' && isHsbcForeign) rate = 10;
+            else if (tier === 'signature' && isHsbcForeign) rate = 15;
+            effectiveRate = rate;
+
+            isMiles = true;
+        } else if (cardId === 'c2') {
+            const isGreen = document.getElementById('checkGreenChannel').checked;
+            const isForeign = document.getElementById('checkForeign').checked;
+            const currentStats = calculateStats(cardId, 0);
+            const newStats = calculateStats(cardId, amount, isGreen, isForeign);
+            thisTransactionReward = newStats.reward - currentStats.reward;
+            effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(1);
+
+        } else if (cardId === 'c7') { // UNI
+            const isUniUp = document.getElementById('checkUniUp').checked;
+            const isUniBonus = document.getElementById('checkUniBonus').checked;
+            const currentStats = calculateStats(cardId, 0);
+            const newStats = calculateStats(cardId, amount, false, false, isUniBonus, isUniUp);
+            thisTransactionReward = newStats.reward - currentStats.reward;
+            effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(1);
+
+        } else if (cardId === 'c8') { // Happy+
+            const isPet = document.getElementById('checkHappyPet').checked;
+            const isPeace = document.getElementById('checkHappyPeace').checked;
+            const isLife = document.getElementById('checkHappyLife').checked;
+            const isForeign = document.getElementById('checkHappyForeign').checked;
+            const currentStats = calculateStats(cardId, 0);
+            const newStats = calculateStats(cardId, amount, false, false, false, false, isPet, isLife, isForeign, isPeace);
+            thisTransactionReward = newStats.reward - currentStats.reward;
+            effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(1);
+
         } else {
-             effectiveRate = ((totalDiff / amount) * 100).toFixed(1);
-             displayHtml = `✨ 預計回饋：$${totalDiff} (${effectiveRate}%)`;
+            const currentStats = calculateStats(cardId, 0);
+            const newStats = calculateStats(cardId, amount);
+            thisTransactionReward = newStats.reward - currentStats.reward;
+            effectiveRate = ((thisTransactionReward / amount) * 100).toFixed(1);
         }
 
-        previewDiv.innerHTML = displayHtml;
+        if (isMiles) {
+            previewDiv.innerHTML = `✨ 預計回饋：${thisTransactionReward} 哩 (${effectiveRate}元/哩)`;
+        } else {
+            previewDiv.innerHTML = `✨ 預計回饋：$${thisTransactionReward} (${effectiveRate}%)`;
+        }
     }
 
     function renderGrid() {
         const container = document.getElementById('card-grid');
         let monthTotalReward = 0; container.innerHTML = '';
+        
         cards.forEach(card => {
              if (card.type === 'placeholder') return;
              const stats = calculateStats(card.id);
-             if (card.id !== 'c9') monthTotalReward += stats.reward;
+             // 哩程卡不計入總現金回饋 (因為單位不同)
+             if (card.id !== 'c9') {
+                 monthTotalReward += stats.reward;
+             }
         });
-        document.getElementById('totalRewardDisplay').innerText = `$${monthTotalReward.toLocaleString()}`;
-        const displayCards = getSortedCards();
         
+        document.getElementById('totalRewardDisplay').innerText = `$${monthTotalReward.toLocaleString()}`;
+
+        const displayCards = getSortedCards();
+
         displayCards.forEach(card => {
             const stats = calculateStats(card.id); 
+            
             let percent = 0, statusText = '', msgStyle = '';
             
+            // 動態更新匯豐卡片名稱
             if (card.id === 'c9') {
                 const tier = localStorage.getItem('hsbc_tier') || 'infinite';
                 card.name = (tier === 'infinite') ? '匯豐旅人無限卡' : '匯豐旅人御璽卡';
@@ -1111,23 +1157,29 @@
             }
             
             if (card.type === 'placeholder') {
-                percent = 0; statusText = '尚未啟用';
-            } else if (card.id === 'c9') { 
-                percent = 0; statusText = `總哩程 ${stats.reward.toLocaleString()} 哩`; msgStyle = 'color: #007AFF; font-weight:bold;';
-            } else if (card.id === 'c10') {
-                // 中信特殊進度條 (用統一集團踩點上限當基準)
-                percent = (stats.validSpend / 12500) * 100;
-                if (stats.validSpend < 3750) statusText = `icash 4% 剩 $${(3750-stats.validSpend).toLocaleString()}`;
-                else if (stats.validSpend < 12500) statusText = `踩點 4% 剩 $${(12500-stats.validSpend).toLocaleString()}`;
-                else if (stats.validSpend < 25000) statusText = `集團 2% 剩 $${(25000-stats.validSpend).toLocaleString()}`;
-                else { percent = 100; statusText = '僅剩 1% 回饋'; msgStyle = 'color: #aaa;'; }
+                percent = 0;
+                statusText = '尚未啟用';
+            } else if (card.id === 'c9') { // 匯豐旅人
+                percent = 0; // 哩程無上限，進度條不需顯示
+                statusText = `總哩程 ${stats.reward.toLocaleString()} 哩`;
+                msgStyle = 'color: #007AFF; font-weight:bold;';
             } else if (card.id === 'c2') { 
                 percent = (stats.validSpend / card.target) * 100;
                 statusText = stats.validSpend >= card.target ? '任務達成 (免停)' : `差 $${(card.target - stats.validSpend).toLocaleString()}`;
             } else if (card.id === 'c8') { 
-                if (stats.spend < 3000) { percent = (stats.spend / 3000) * 100; statusText = `差 $${(3000 - stats.spend).toLocaleString()} 啟動高回饋`; msgStyle = 'color: #FFD700;'; } 
-                else if (stats.spend < 26000) { percent = (stats.spend / 26000) * 100; statusText = `差 $${(26000 - stats.spend).toLocaleString()} 領滿額禮`; } 
-                else { percent = 100; statusText = '🎉 滿額達標 (記得登錄!)'; msgStyle = 'color: #38ef7d;'; }
+                if (stats.spend < 3000) {
+                    percent = (stats.spend / 3000) * 100;
+                    statusText = `差 $${(3000 - stats.spend).toLocaleString()} 啟動高回饋`;
+                    msgStyle = 'color: #FFD700;'; 
+                } else if (stats.spend < 26000) {
+                    percent = (stats.spend / 26000) * 100;
+                    statusText = `差 $${(26000 - stats.spend).toLocaleString()} 領滿額禮`;
+                    msgStyle = ''; 
+                } else {
+                    percent = 100;
+                    statusText = '🎉 滿額達標 (記得登錄!)';
+                    msgStyle = 'color: #38ef7d;'; 
+                }
             } else if (card.type === 'mixed') {
                 if (stats.validSpend < card.minSpend) { percent = (stats.validSpend / card.minSpend) * 100; statusText = `差 $${(card.minSpend - stats.validSpend).toLocaleString()} 升級`; msgStyle = 'color: #FFD700;'; }
                 else if (stats.validSpend <= card.limit) { percent = (stats.validSpend / card.limit) * 100; const remain = card.limit - stats.validSpend; statusText = `剩 $${remain.toLocaleString()} (5%)`; }
@@ -1143,7 +1195,10 @@
 
             const ruleHtml = card.rule ? `<div class="tile-rule">${card.rule}</div>` : '';
             let displayRate = `${stats.rate}%`;
-            if (card.id === 'c8') displayRate = '10.0%'; if (card.id === 'c2') displayRate = '6.0%'; if (card.id === 'c9') displayRate = '哩程'; if (card.id === 'c10') displayRate = '最高11%'; if (card.type === 'placeholder') displayRate = '--%';
+            if (card.id === 'c8') displayRate = '10.0%'; 
+            if (card.id === 'c2') displayRate = '6.0%'; 
+            if (card.id === 'c9') displayRate = '哩程'; 
+            if (card.type === 'placeholder') displayRate = '--%';
 
             let tileClass = 'card-tile';
             let nickClass = 'tile-nickname-badge';
@@ -1154,120 +1209,190 @@
             tile.setAttribute('data-card-id', card.id);
             tile.style.background = card.gradient; 
             tile.style.color = card.textColor; 
-            if (card.type === 'placeholder') { tile.onclick = () => openManageModal(); } else { tile.onclick = () => openQuickAdd(card.id); }
+            
+            // 修正：灰卡點擊開啟管理介面
+            if (card.type === 'placeholder') {
+                tile.onclick = () => openManageModal();
+            } else {
+                tile.onclick = () => openQuickAdd(card.id);
+            }
             
             let earnedText = `+$${stats.reward.toLocaleString()}`;
             if (card.id === 'c9') {
                 const tier = localStorage.getItem('hsbc_tier') || 'infinite';
-                let rateDomestic = 18; let rateForeign = 10;
+                let rateDomestic = 18;
+                let rateForeign = 10;
                 if (tier === 'signature') { rateDomestic = 18; rateForeign = 15; }
+                
                 let txMiles = 0;
                 const allHistoryTx = transactions.filter(t => t.cardId === 'c9');
-                allHistoryTx.forEach(tx => { const rate = tx.isHsbcForeign ? rateForeign : rateDomestic; txMiles += Math.floor(tx.amount / rate); });
+                allHistoryTx.forEach(tx => {
+                    const rate = tx.isHsbcForeign ? rateForeign : rateDomestic;
+                    txMiles += Math.floor(tx.amount / rate);
+                });
+                
                 earnedText = `+${txMiles.toLocaleString()} 哩`;
             }
 
             tile.innerHTML = `
-                <div class="tile-header"><span class="tile-name">${card.name}</span><span class="rate-badge" style="color:black">${displayRate}</span></div>
+                <div class="tile-header">
+                    <span class="tile-name">${card.name}</span>
+                    <span class="rate-badge" style="color:black">${displayRate}</span>
+                </div>
                 <div class="${nickClass}">${card.nickname}</div>
                 <span class="tile-note" style="color:${card.textColor==='white'?'rgba(255,255,255,0.8)':'rgba(0,0,0,0.6)'}">${card.note}</span>
-                <div class="tile-body"><div class="tile-stat">$${stats.spend.toLocaleString()}</div>${ruleHtml}<div class="tile-earned">${earnedText}</div></div>
-                <div class="tile-footer"><div class="progress-track"><div class="progress-fill" style="width:${Math.min(percent, 100)}%"></div></div><div class="tile-msg" style="${msgStyle}">${statusText}</div></div>`;
+                <div class="tile-body">
+                    <div class="tile-stat">$${stats.spend.toLocaleString()}</div>
+                    ${ruleHtml}
+                    <div class="tile-earned">${earnedText}</div>
+                </div>
+                <div class="tile-footer">
+                    <div class="progress-track"><div class="progress-fill" style="width:${Math.min(percent, 100)}%"></div></div>
+                    <div class="tile-msg" style="${msgStyle}">${statusText}</div>
+                </div>`;
             container.appendChild(tile);
         });
+        
         checkUrgentTasks();
         initSortable();
     }
     
+    // 開啟管理卡片視窗 (隱藏 add1)
     function openManageModal() {
         const list = document.getElementById('manageCardList');
         list.innerHTML = '';
-        const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9', 'c10'];
+        
+        // 計算當前真實卡片數量（不含 add1）
+        const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9'];
         const currentRealCardsCount = visibleCards.filter(id => realCardIds.includes(id)).length;
+
         cards.forEach(card => {
-            if (card.id === 'add1') return; 
+            if (card.id === 'add1') return; // 在管理介面隱藏預留卡
+
             const isVisible = visibleCards.includes(card.id);
             const item = document.createElement('div');
             item.className = 'manage-item';
+            
             item.onclick = function(e) {
                 if (e.target.tagName === 'INPUT') return;
                 const checkbox = this.querySelector('input[type="checkbox"]');
-                if (!checkbox.checked && currentRealCardsCount >= 8) { alert('⚠️ 最多只能顯示 8 張卡片，請先隱藏一張！'); return; }
+                
+                // 如果要開啟第 9 張卡，阻止並警告
+                if (!checkbox.checked && currentRealCardsCount >= 8) {
+                    alert('⚠️ 最多只能顯示 8 張卡片，請先隱藏一張！');
+                    return;
+                }
+                
                 checkbox.checked = !checkbox.checked;
                 toggleCardVisibility(card.id);
             };
-            const label = document.createElement('label'); label.className = 'switch'; label.onclick = function(e) { e.stopPropagation(); }; 
-            const input = document.createElement('input'); input.type = 'checkbox'; input.checked = isVisible;
-            input.onchange = function() { if (this.checked && currentRealCardsCount >= 8) { alert('⚠️ 最多只能顯示 8 張卡片，請先隱藏一張！'); this.checked = false; return; } toggleCardVisibility(card.id); };
-            const slider = document.createElement('span'); slider.className = 'slider';
-            label.appendChild(input); label.appendChild(slider);
-            item.innerHTML = `<div class="manage-info"><div class="manage-name">${card.name}</div><div class="manage-desc">${card.nickname}</div></div>`;
-            item.appendChild(label); list.appendChild(item);
+
+            const label = document.createElement('label');
+            label.className = 'switch';
+            label.onclick = function(e) { e.stopPropagation(); }; 
+
+            const input = document.createElement('input');
+            input.type = 'checkbox';
+            input.checked = isVisible;
+            input.onchange = function() {
+                if (this.checked && currentRealCardsCount >= 8) {
+                    alert('⚠️ 最多只能顯示 8 張卡片，請先隱藏一張！');
+                    this.checked = false;
+                    return;
+                }
+                toggleCardVisibility(card.id);
+            };
+
+            const slider = document.createElement('span');
+            slider.className = 'slider';
+
+            label.appendChild(input);
+            label.appendChild(slider);
+
+            item.innerHTML = `
+                <div class="manage-info">
+                    <div class="manage-name">${card.name}</div>
+                    <div class="manage-desc">${card.nickname}</div>
+                </div>
+            `;
+            item.appendChild(label);
+            list.appendChild(item);
         });
+        
         document.getElementById('manageModal').style.display = 'flex';
     }
+    
     function toggleCardVisibility(cardId) {
         if (visibleCards.includes(cardId)) {
             visibleCards = visibleCards.filter(id => id !== cardId);
+            // 關閉一張卡後，若總數 < 8，自動補上 add1
             const realCardsCount = visibleCards.filter(id => id !== 'add1').length;
-            if (realCardsCount < 8 && !visibleCards.includes('add1')) visibleCards.push('add1');
+            if (realCardsCount < 8 && !visibleCards.includes('add1')) {
+                visibleCards.push('add1');
+            }
         } else {
             visibleCards.push(cardId);
-            if (visibleCards.includes('add1')) visibleCards = visibleCards.filter(id => id !== 'add1');
+            // 開啟一張卡後，若總數 >= 8 且包含 add1，移除 add1
+            if (visibleCards.includes('add1')) {
+                visibleCards = visibleCards.filter(id => id !== 'add1');
+            }
         }
         localStorage.setItem('visibleCards', JSON.stringify(visibleCards));
-        openManageModal(); renderGrid(); 
+        openManageModal(); 
+        renderGrid(); 
     }
 
+    // ... (其餘函式保持不變) ...
+    // (openQuickAdd, renderHappyDashboard, renderModalHistory, closeModal, addTransaction, deleteTransaction, resetAllData, exportData, triggerImport, importFile, showDonateModal, copyBankInfo, checkUrgentTasks) 
     function openQuickAdd(cardId) {
         const card = cards.find(c => c.id === cardId); 
         document.getElementById('modalTitle').innerText = card.name; 
         document.getElementById('modalSubtitle').innerText = card.note; 
         document.getElementById('cardIdInput').value = cardId; 
         history.pushState({modalOpen: true}, "", "#modal");
-        
-        // Hide all option blocks first
-        ['pigRichOptions', 'greenCardOptions', 'uniOptions', 'happyOptions', 'hsbcOptions', 'ctbcOptions'].forEach(id => document.getElementById(id).style.display = 'none');
-        
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('customDateInput').value = today;
-
-        if (cardId === 'c6') { document.getElementById('pigRichOptions').style.display = 'block'; document.getElementById('checkBonus10').checked = true; document.getElementById('checkBonus25').checked = true; document.getElementById('checkIsBill').checked = false; document.getElementById('labelBaseRate').innerText = "🔰 基本回饋 1% (無上限)"; }
-        if (cardId === 'c2') { document.getElementById('greenCardOptions').style.display = 'block'; document.getElementById('checkGreenChannel').checked = false; document.getElementById('checkForeign').checked = false; }
-        if (cardId === 'c7') { document.getElementById('uniOptions').style.display = 'block'; const now = new Date(); const hasUpTx = transactions.some(t => t.cardId === 'c7' && t.isUniUp && new Date(t.date) >= new Date(now.getFullYear(), now.getMonth(), 1)); document.getElementById('checkUniUp').checked = hasUpTx; document.getElementById('checkUniBonus').checked = false; }
-        if (cardId === 'c8') { document.getElementById('happyOptions').style.display = 'block'; document.getElementById('checkHappyPet').checked = false; document.getElementById('checkHappyLife').checked = false; document.getElementById('checkHappyForeign').checked = false; document.getElementById('happyDashboard').style.display = 'block'; renderHappyDashboard(); } else { document.getElementById('happyDashboard').style.display = 'none'; }
-        if (cardId === 'c9') { document.getElementById('hsbcOptions').style.display = 'block'; const savedTier = localStorage.getItem('hsbc_tier') || 'infinite'; document.querySelector(`input[name="hsbcTier"][value="${savedTier}"]`).checked = true; document.getElementById('checkHsbcForeign').checked = false; document.getElementById('hsbcInitialMiles').value = localStorage.getItem('hsbc_initial_miles') || ''; }
-        
-        // 中信 Uniopen 初始化
-        if (cardId === 'c10') {
-            document.getElementById('ctbcOptions').style.display = 'block';
-            document.querySelector('input[name="ctbcScene"][value="normal"]').checked = true;
-            toggleCtbcScene(); // 重置顯示
-            
-            // 自動掃描歷史紀錄並勾選
-            const now = new Date();
-            const start = new Date(now.getFullYear(), now.getMonth(), 1);
-            const historyBrands = new Set();
-            transactions.filter(t => t.cardId === 'c10' && new Date(t.date) >= start)
-                        .forEach(t => {
-                            if (t.ctbcBrands && Array.isArray(t.ctbcBrands)) {
-                                t.ctbcBrands.forEach(b => historyBrands.add(b));
-                            }
-                        });
-            
-            // 更新 UI
-            document.querySelectorAll('.ctbc-brand').forEach(cb => {
-                if (historyBrands.has(cb.value)) {
-                    cb.checked = true;
-                    // Visual cues for visited
-                    cb.parentElement.classList.add('visited');
-                } else {
-                    cb.checked = false;
-                    cb.parentElement.classList.remove('visited');
-                }
-            });
+        const pigRichOptions = document.getElementById('pigRichOptions');
+        const greenCardOptions = document.getElementById('greenCardOptions');
+        const uniOptions = document.getElementById('uniOptions');
+        const happyOptions = document.getElementById('happyOptions');
+        const hsbcOptions = document.getElementById('hsbcOptions');
+        const happyDashboard = document.getElementById('happyDashboard');
+        pigRichOptions.style.display = (cardId === 'c6') ? 'block' : 'none';
+        greenCardOptions.style.display = (cardId === 'c2') ? 'block' : 'none';
+        uniOptions.style.display = (cardId === 'c7') ? 'block' : 'none';
+        happyOptions.style.display = (cardId === 'c8') ? 'block' : 'none';
+        hsbcOptions.style.display = (cardId === 'c9') ? 'block' : 'none';
+        if (cardId === 'c6') {
+            document.getElementById('checkBonus10').checked = true;
+            document.getElementById('checkBonus25').checked = true;
+            document.getElementById('checkIsBill').checked = false; 
+            document.getElementById('labelBaseRate').innerText = "🔰 基本回饋 1% (無上限)";
         }
-
+        if (cardId === 'c2') {
+            document.getElementById('checkGreenChannel').checked = false; 
+            document.getElementById('checkForeign').checked = false; 
+        }
+        if (cardId === 'c7') {
+            const now = new Date();
+            const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            const hasUpTx = transactions.some(t => t.cardId === 'c7' && t.isUniUp && new Date(t.date) >= currentMonthStart);
+            document.getElementById('checkUniUp').checked = hasUpTx;
+            document.getElementById('checkUniBonus').checked = false; 
+        }
+        if (cardId === 'c8') {
+            document.getElementById('checkHappyPet').checked = false;
+            document.getElementById('checkHappyLife').checked = false;
+            document.getElementById('checkHappyForeign').checked = false;
+            happyDashboard.style.display = 'block';
+            renderHappyDashboard();
+        } else {
+            happyDashboard.style.display = 'none';
+        }
+        if (cardId === 'c9') {
+            const savedTier = localStorage.getItem('hsbc_tier') || 'infinite';
+            document.querySelector(`input[name="hsbcTier"][value="${savedTier}"]`).checked = true;
+            document.getElementById('checkHsbcForeign').checked = false;
+            document.getElementById('hsbcInitialMiles').value = localStorage.getItem('hsbc_initial_miles') || '';
+        }
         document.getElementById('liveRewardCalc').style.display = 'none';
         document.getElementById('liveRewardCalc').innerHTML = '';
         const parkingInfoDiv = document.getElementById('modalParkingInfo');
@@ -1278,180 +1403,6 @@
         renderModalHistory(cardId);
         setTimeout(() => document.getElementById('amountInput').focus(), 100);
     }
-    
-    // 渲染歷史 (包含新卡片的特殊標籤)
-    function renderModalHistory(cardId) {
-        const container = document.getElementById('modalHistoryList');
-        container.innerHTML = '';
-        const now = new Date();
-        const cardTx = transactions.filter(t => t.cardId === cardId && new Date(t.date) >= new Date(now.getFullYear(), now.getMonth(), 1)).sort((a, b) => new Date(b.date) - new Date(a.date));
-        if (cardTx.length === 0) { container.innerHTML = '<div style="text-align:center; color:#ccc; font-size:12px; margin-top:10px;">本月尚無消費紀錄</div>'; return; }
-        
-        cardTx.forEach(tx => {
-            const item = document.createElement('div');
-            item.className = 'history-item'; 
-            item.style.background = 'white'; 
-            item.style.borderBottom = '1px solid #f0f0f0';
-            let noteText = tx.note || '一般消費';
-            if (tx.isGreen) noteText = '🌿 ' + noteText;
-            if (tx.isForeign) noteText = '✈️ ' + noteText;
-            if (tx.isUniBonus) noteText = '🔥 ' + noteText;
-            if (tx.isHappyPet) noteText = '🐶 ' + noteText;
-            if (tx.isHappyPeace) noteText = '🍽️ ' + noteText;
-            if (tx.isHappyLife) noteText = '🛒 ' + noteText;
-            if (tx.isHappyForeign) noteText = '✈️ ' + noteText;
-            if (tx.isHsbcForeign) noteText = '✈️ ' + noteText;
-            
-            // 中信標籤 (修正國旗)
-            if (tx.cardId === 'c10') {
-                if (tx.ctbcScene === 'foreign') noteText = '✈️ ' + noteText;
-                if (tx.ctbcScene === 'unified') noteText = '🏪 ' + noteText;
-            }
-
-            let amountDisplay = `$${tx.amount.toLocaleString()}`;
-            if (cardId === 'c9') {
-                const tier = localStorage.getItem('hsbc_tier') || 'infinite';
-                let rate = 18; if (tier === 'infinite' && tx.isHsbcForeign) rate = 10; else if (tier === 'signature' && tx.isHsbcForeign) rate = 15;
-                const miles = Math.floor(tx.amount / rate); amountDisplay = `${miles} 哩`;
-            }
-            const txDate = new Date(tx.date);
-            const dateStr = `${txDate.getMonth()+1}/${txDate.getDate()}`;
-            item.innerHTML = `<div><div class="h-name">${noteText}</div><div class="h-date">${dateStr}</div></div><div style="display:flex;align-items:center;"><span class="h-amount" style="margin-right:10px;">${amountDisplay}</span><div class="item-actions"><button class="btn-icon btn-edit" onclick="editTransaction(${tx.id})">✎</button><button class="btn-icon btn-delete" onclick="deleteTransaction(${tx.id}, true)">✕</button></div></div>`;
-            container.appendChild(item);
-        });
-    }
-
-    function addTransaction(close = true) {
-        const cardId = document.getElementById('cardIdInput').value;
-        const amount = document.getElementById('amountInput').value;
-        const note = document.getElementById('noteInput').value;
-        const customDate = document.getElementById('customDateInput').value;
-        if (!amount || amount <= 0) return alert('請輸入金額');
-        if (!customDate) return alert('請選擇日期');
-
-        // 收集所有選項
-        let options = {
-            isGreen: document.getElementById('checkGreenChannel').checked,
-            isForeign: document.getElementById('checkForeign').checked,
-            isUniBonus: document.getElementById('checkUniBonus').checked,
-            isUniUp: document.getElementById('checkUniUp').checked,
-            isHappyPet: document.getElementById('checkHappyPet').checked,
-            isHappyPeace: document.getElementById('checkHappyPeace').checked,
-            isHappyLife: document.getElementById('checkHappyLife').checked,
-            isHappyForeign: document.getElementById('checkHappyForeign').checked,
-            isHsbcForeign: document.getElementById('checkHsbcForeign').checked,
-            ctbcScene: document.querySelector('input[name="ctbcScene"]:checked') ? document.querySelector('input[name="ctbcScene"]:checked').value : null,
-            isCtbcIcash: document.getElementById('checkCtbcIcash').checked,
-            ctbcBrands: Array.from(document.querySelectorAll('.ctbc-brand:checked')).map(cb => cb.value)
-        };
-
-        const recordDate = new Date(customDate);
-        const todayStr = new Date().toISOString().split('T')[0];
-        if (customDate === todayStr) { const now = new Date(); recordDate.setHours(now.getHours(), now.getMinutes(), now.getSeconds()); } 
-        else { recordDate.setHours(12, 0, 0); }
-
-        transactions.push({ id: Date.now(), cardId: cardId, amount: parseFloat(amount), note: note, date: recordDate.toISOString(), ...options }); 
-        localStorage.setItem('transactions', JSON.stringify(transactions)); 
-        document.getElementById('amountInput').value = ''; document.getElementById('noteInput').value = ''; document.getElementById('liveRewardCalc').style.display = 'none';
-        renderModalHistory(cardId); if(cardId === 'c8') renderHappyDashboard(); renderGrid(); if(close) closeModal();
-    }
-    
-    function editTransaction(id) {
-        const tx = transactions.find(t => t.id === id);
-        if (!tx) return;
-        document.getElementById('amountInput').value = tx.amount;
-        document.getElementById('noteInput').value = tx.note;
-        document.getElementById('customDateInput').value = new Date(tx.date).toISOString().split('T')[0];
-        
-        const cardId = tx.cardId;
-        if (cardId === 'c2') { document.getElementById('checkGreenChannel').checked = tx.isGreen || false; document.getElementById('checkForeign').checked = tx.isForeign || false; }
-        else if (cardId === 'c7') { document.getElementById('checkUniBonus').checked = tx.isUniBonus || false; }
-        else if (cardId === 'c8') { document.getElementById('checkHappyPet').checked = tx.isHappyPet || false; document.getElementById('checkHappyPeace').checked = tx.isHappyPeace || false; document.getElementById('checkHappyLife').checked = tx.isHappyLife || false; document.getElementById('checkHappyForeign').checked = tx.isHappyForeign || false; }
-        else if (cardId === 'c9') { document.getElementById('checkHsbcForeign').checked = tx.isHsbcForeign || false; }
-        else if (cardId === 'c10') {
-            if (tx.ctbcScene) {
-                document.querySelector(`input[name="ctbcScene"][value="${tx.ctbcScene}"]`).checked = true;
-                toggleCtbcScene(); // 觸發 UI 更新
-            }
-            document.getElementById('checkCtbcIcash').checked = tx.isCtbcIcash || false;
-            // 回填品牌勾選
-            // 先清除所有 (已踩) 標記
-            document.querySelectorAll('.ctbc-brand').forEach(cb => {
-                cb.checked = false;
-                cb.parentElement.classList.remove('visited');
-            });
-            
-            // 重新讀取歷史 (排除這一筆，因為要編輯)
-            const now = new Date();
-            const start = new Date(now.getFullYear(), now.getMonth(), 1);
-            const historyBrands = new Set();
-            transactions.filter(t => t.id !== id && t.cardId === 'c10' && new Date(t.date) >= start)
-                        .forEach(t => {
-                            if (t.ctbcBrands && Array.isArray(t.ctbcBrands)) {
-                                t.ctbcBrands.forEach(b => historyBrands.add(b));
-                            }
-                        });
-            
-            // 標記歷史
-            document.querySelectorAll('.ctbc-brand').forEach(cb => {
-                if (historyBrands.has(cb.value)) {
-                    cb.checked = true;
-                    cb.parentElement.classList.add('visited');
-                }
-            });
-
-            // 勾選當前編輯的品牌
-            if (tx.ctbcBrands && Array.isArray(tx.ctbcBrands)) {
-                tx.ctbcBrands.forEach(b => {
-                    const el = document.querySelector(`.ctbc-brand[value="${b}"]`);
-                    if(el) el.checked = true;
-                });
-            }
-        }
-        deleteTransaction(id, true);
-        updateRewardPreview();
-    }
-
-    function deleteTransaction(id, fromModal = false) {
-        if(fromModal || confirm('刪除此筆紀錄？')) {
-            transactions = transactions.filter(t => t.id !== id);
-            localStorage.setItem('transactions', JSON.stringify(transactions));
-            renderGrid(); 
-            if (fromModal) { const cardId = document.getElementById('cardIdInput').value; renderModalHistory(cardId); if(cardId === 'c8') renderHappyDashboard(); }
-        }
-    }
-    // ... (其餘函式：resetAllData, exportData, importFile... 保持不變) ...
-    function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
-    async function exportData() {
-        const dataStr = JSON.stringify(transactions);
-        const now = new Date();
-        const fileName = `backup_${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}.json`;
-        const file = new File([dataStr], fileName, { type: "application/json" });
-        if (navigator.share && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file] }); return; } catch (error) { if (error.name === 'AbortError') return; } }
-        const blob = new Blob([dataStr], {type: "application/json"}); const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = fileName; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-    }
-    function triggerImport() { document.getElementById('fileInput').click(); }
-    function importFile(input) {
-        const file = input.files[0]; if (!file) return; const reader = new FileReader();
-        reader.onload = function(e) { try { const json = JSON.parse(e.target.result); if (Array.isArray(json)) { transactions = json; localStorage.setItem('transactions', JSON.stringify(transactions)); alert('✅ 備份還原成功！(頁面將自動重整)'); location.reload(); } else { alert('❌ 檔案內容格式錯誤'); } } catch (err) { alert('❌ 無法讀取檔案，請確認是否為正確的備份檔'); } }; reader.readAsText(file); input.value = '';
-    }
-    function showDonateModal() { document.getElementById('donateModal').style.display = 'flex'; }
-    function copyBankInfo() { navigator.clipboard.writeText("396901798704").then(() => { alert("✅ 帳號已複製！(銀行代碼 396)"); }); }
-    function checkUrgentTasks() {
-        const alertArea = document.getElementById('urgent-alert-area'), alertList = document.getElementById('urgent-list'); alertList.innerHTML = ''; let hasUrgent = false;
-        cards.forEach(card => {
-            if (card.type === 'placeholder') return;
-            const stats = calculateStats(card.id); let target = card.type === 'floor' ? card.target : (card.type === 'mixed' ? card.minSpend : 0);
-            if (target > 0 && stats.spend < target) {
-                const end = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0), diff = Math.ceil((end - new Date()) / 86400000);
-                if (diff <= 3 && diff >= 0) { hasUrgent = true; alertList.innerHTML += `<div class="urgent-item">${card.name} 缺 $${(target - stats.spend).toLocaleString()} (剩 ${diff} 天)</div>`; }
-            }
-        });
-        alertArea.style.display = hasUrgent ? 'block' : 'none';
-    }
-    // ... (其餘輔助函式) ...
-    function closeModal() { history.back(); }
     function renderHappyDashboard() {
         const dashboard = document.getElementById('happyDashboard');
         const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
@@ -1467,8 +1418,151 @@
         };
         dashboard.innerHTML = createBar('🐶 寵物額度', petSpend, 5263) + createBar('🍽️ 安心刷額度', peaceSpend, 5714) + createBar('🛒 生活額度', lifeSpend, 5714) + createBar('💰 滿額門檻', totalSpend, 26000);
     }
-
+    function renderModalHistory(cardId) {
+        const container = document.getElementById('modalHistoryList');
+        const titleDiv = document.getElementById('modalHistoryTitle');
+        container.innerHTML = '';
+        const now = new Date();
+        const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+        const dateRange = `${now.getMonth() + 1}/1 - ${now.getMonth() + 1}/${lastDay}`;
+        titleDiv.innerHTML = `<span>📅 本月 (${dateRange}) 消費紀錄</span><span style="font-weight:normal; font-size:10px; color:#aaa;">(點 ✕ 刪除)</span>`;
+        const cardTx = transactions.filter(t => t.cardId === cardId && new Date(t.date) >= currentMonthStart).reverse();
+        if (cardTx.length === 0) {
+            container.innerHTML = '<div style="text-align:center; color:#ccc; font-size:12px; margin-top:10px;">本月尚無消費紀錄</div>';
+            return;
+        }
+        cardTx.forEach(tx => {
+            const item = document.createElement('div');
+            item.className = 'history-item'; 
+            item.style.background = 'white'; 
+            item.style.borderBottom = '1px solid #f0f0f0';
+            let noteText = tx.note || '一般消費';
+            if (tx.isGreen) noteText = '🌿 ' + noteText;
+            if (tx.isForeign) noteText = '✈️ ' + noteText;
+            if (tx.isUniBonus) noteText = '🔥 ' + noteText;
+            if (tx.isHappyPet) noteText = '🐶 ' + noteText;
+            if (tx.isHappyPeace) noteText = '🍽️ ' + noteText;
+            if (tx.isHappyLife) noteText = '🛒 ' + noteText;
+            if (tx.isHappyForeign) noteText = '✈️ ' + noteText;
+            if (tx.isHsbcForeign) noteText = '✈️ ' + noteText;
+            let amountDisplay = `$${tx.amount.toLocaleString()}`;
+            if (cardId === 'c9') {
+                const tier = localStorage.getItem('hsbc_tier') || 'infinite';
+                let rate = 18;
+                if (tier === 'infinite' && tx.isHsbcForeign) rate = 10;
+                else if (tier === 'signature' && tx.isHsbcForeign) rate = 15;
+                const miles = Math.floor(tx.amount / rate);
+                amountDisplay = `${miles} 哩`;
+            }
+            item.innerHTML = `<div><div class="h-name">${noteText}</div><div class="h-date">${new Date(tx.date).getMonth()+1}/${new Date(tx.date).getDate()}</div></div><div style="display:flex;align-items:center;"><span class="h-amount">${amountDisplay}</span><button class="btn-delete-single" onclick="deleteTransaction(${tx.id}, true)">✕</button></div>`;
+            container.appendChild(item);
+        });
+    }
+    function closeModal() { history.back(); }
+    function addTransaction(close = true) {
+        const cardId = document.getElementById('cardIdInput').value;
+        const amount = document.getElementById('amountInput').value;
+        const note = document.getElementById('noteInput').value;
+        if (!amount || amount <= 0) return alert('請輸入金額');
+        let isGreen = false; let isForeign = false; let isUniBonus = false; let isUniUp = false; let isHappyPet = false; let isHappyPeace = false; let isHappyLife = false; let isHappyForeign = false; let isHsbcForeign = false;
+        if (cardId === 'c2') {
+            isGreen = document.getElementById('checkGreenChannel').checked;
+            isForeign = document.getElementById('checkForeign').checked;
+        }
+        if (cardId === 'c7') {
+            isUniBonus = document.getElementById('checkUniBonus').checked;
+            isUniUp = document.getElementById('checkUniUp').checked;
+        }
+        if (cardId === 'c8') {
+            isHappyPet = document.getElementById('checkHappyPet').checked;
+            isHappyPeace = document.getElementById('checkHappyPeace').checked;
+            isHappyLife = document.getElementById('checkHappyLife').checked;
+            isHappyForeign = document.getElementById('checkHappyForeign').checked;
+        }
+        if (cardId === 'c9') {
+            isHsbcForeign = document.getElementById('checkHsbcForeign').checked;
+        }
+        transactions.push({ id: Date.now(), cardId: cardId, amount: parseFloat(amount), note: note, date: new Date().toISOString(), isGreen: isGreen, isForeign: isForeign, isUniBonus: isUniBonus, isUniUp: isUniUp, isHappyPet: isHappyPet, isHappyPeace: isHappyPeace, isHappyLife: isHappyLife, isHappyForeign: isHappyForeign, isHsbcForeign: isHsbcForeign }); 
+        localStorage.setItem('transactions', JSON.stringify(transactions)); 
+        document.getElementById('amountInput').value = '';
+        document.getElementById('noteInput').value = '';
+        document.getElementById('liveRewardCalc').style.display = 'none';
+        renderModalHistory(cardId); 
+        if(cardId === 'c8') renderHappyDashboard();
+        renderGrid(); 
+        if(close) closeModal();
+    }
+    function deleteTransaction(id, fromModal = false) {
+        if(confirm('刪除此筆紀錄？')) {
+            transactions = transactions.filter(t => t.id !== id);
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            renderGrid(); 
+            if (fromModal) {
+                const cardId = document.getElementById('cardIdInput').value;
+                renderModalHistory(cardId);
+                if(cardId === 'c8') renderHappyDashboard();
+            }
+        }
+    }
+    function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
+    async function exportData() {
+        const dataStr = JSON.stringify(transactions);
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const fileName = `backup_${year}-${month}-${day}.json`;
+        const file = new File([dataStr], fileName, { type: "application/json" });
+        if (navigator.share && navigator.canShare({ files: [file] })) {
+            try { await navigator.share({ files: [file] }); return; } catch (error) { if (error.name === 'AbortError') return; }
+        }
+        const blob = new Blob([dataStr], {type: "application/json"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+    function triggerImport() { document.getElementById('fileInput').click(); }
+    function importFile(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const json = JSON.parse(e.target.result);
+                if (Array.isArray(json)) {
+                    transactions = json;
+                    localStorage.setItem('transactions', JSON.stringify(transactions));
+                    alert('✅ 備份還原成功！(頁面將自動重整)');
+                    location.reload(); 
+                } else { alert('❌ 檔案內容格式錯誤'); }
+            } catch (err) { alert('❌ 無法讀取檔案，請確認是否為正確的備份檔'); }
+        };
+        reader.readAsText(file);
+        input.value = '';
+    }
+    function showDonateModal() { document.getElementById('donateModal').style.display = 'flex'; }
+    function copyBankInfo() { navigator.clipboard.writeText("396901798704").then(() => { alert("✅ 帳號已複製！(銀行代碼 396)"); }); }
+    function checkUrgentTasks() {
+        const alertArea = document.getElementById('urgent-alert-area'), alertList = document.getElementById('urgent-list'); alertList.innerHTML = ''; let hasUrgent = false;
+        cards.forEach(card => {
+            if (card.type === 'placeholder') return;
+            const stats = calculateStats(card.id); let target = card.type === 'floor' ? card.target : (card.type === 'mixed' ? card.minSpend : 0);
+            if (target > 0 && stats.spend < target) {
+                const end = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0), diff = Math.ceil((end - new Date()) / 86400000);
+                if (diff <= 3 && diff >= 0) { hasUrgent = true; alertList.innerHTML += `<div class="urgent-item">${card.name} 缺 $${(target - stats.spend).toLocaleString()} (剩 ${diff} 天)</div>`; }
+            }
+        });
+        alertArea.style.display = hasUrgent ? 'block' : 'none';
+    }
     updateDate(); renderGrid();
 </script>
 </body>
 </html>
+
+.

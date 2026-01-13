@@ -163,7 +163,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag">V123.18</div>
+            <div class="version-tag">V123.20</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -247,12 +247,14 @@
                      <div class="option-row" style="border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:10px;">
                         <span style="font-weight:700; color:#333;">💳 選擇您的卡片等級 (自動記憶)：</span>
                         <div style="display:flex; gap:15px; margin-top:8px;">
-                            <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;"><input type="radio" name="hsbcTier" value="infinite" onchange="saveHsbcTier()"> 無限卡</label>
-                            <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;"><input type="radio" name="hsbcTier" value="signature" onchange="saveHsbcTier()"> 御璽卡</label>
+                            <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;"><input type="radio" name="hsbcTier" value="infinite" onchange="saveHsbcSettings()"> 無限卡</label>
+                            <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;"><input type="radio" name="hsbcTier" value="signature" onchange="saveHsbcSettings()"> 御璽卡</label>
                         </div>
                     </div>
-                    <div class="option-row"><label for="hsbcInitialMiles">🏁 已有哩程 (起始值)</label><input type="number" id="hsbcInitialMiles" onchange="saveHsbcInitial()" style="text-align:right; width: 100px; border:1px solid #ccc; border-radius:4px; padding:4px;" placeholder="0"></div>
-                     <div class="option-row"><label for="checkHsbcForeign">✈️ 國外消費</label><input type="checkbox" id="checkHsbcForeign" onchange="updateRewardPreview()"></div>
+                    <div class="option-row"><label for="hsbcInitialMiles">➕ 起始/補登哩程</label><input type="number" id="hsbcInitialMiles" onchange="saveHsbcSettings()" style="text-align:right; width: 100px; border:1px solid #ccc; border-radius:4px; padding:4px;" placeholder="0"></div>
+                    <div class="option-row"><label for="hsbcRedeemedMiles" style="color:#d32f2f;">➖ 已兌換哩程</label><input type="number" id="hsbcRedeemedMiles" onchange="saveHsbcSettings()" style="text-align:right; width: 100px; border:1px solid #ffcdd2; color:#d32f2f; border-radius:4px; padding:4px;" placeholder="0"></div>
+                    
+                     <div class="option-row" style="margin-top:10px; border-top:1px dashed #ddd; padding-top:6px;"><label for="checkHsbcForeign">✈️ 國外消費</label><input type="checkbox" id="checkHsbcForeign" onchange="updateRewardPreview()"></div>
                 </div>
                 
                 <div class="input-group" style="margin-top:20px;">
@@ -298,7 +300,7 @@
     });
     window.addEventListener('popstate', function(event) { document.getElementById('transactionModal').style.display = 'none'; document.getElementById('manageModal').style.display = 'none'; });
 
-    // V123.12 終極修復：補回所有卡片的詳細通路名單 (HTML)
+    // V123.18 修正：樂家卡通路說明 (国内 -> 國內)
     const defaultCards = [
         { 
             id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', note: '百貨 / 超商 / 海外 / 街口 (刷 $8,000 封頂)', rule: '', 
@@ -532,8 +534,20 @@
 
     let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
     function updateDate() { const now = new Date(); document.getElementById('dateDisplay').innerText = `${now.getMonth()+1}/${now.getDate()}`; }
-    function saveHsbcTier() { const tier = document.querySelector('input[name="hsbcTier"]:checked').value; localStorage.setItem('hsbc_tier', tier); renderGrid(); updateRewardPreview(); }
-    function saveHsbcInitial() { const initial = document.getElementById('hsbcInitialMiles').value; localStorage.setItem('hsbc_initial_miles', initial); renderGrid(); }
+    
+    // V123.20: 升級的設定儲存函數
+    function saveHsbcSettings() { 
+        const tier = document.querySelector('input[name="hsbcTier"]:checked').value;
+        const initial = document.getElementById('hsbcInitialMiles').value;
+        const redeemed = document.getElementById('hsbcRedeemedMiles').value;
+        
+        localStorage.setItem('hsbc_tier', tier);
+        localStorage.setItem('hsbc_initial_miles', initial);
+        localStorage.setItem('hsbc_redeemed_miles', redeemed);
+        
+        renderGrid(); 
+        updateRewardPreview(); 
+    }
     
     // NEW: 品牌踩點邏輯
     const uniBrands = ["7-11", "星巴克", "康是美", "家樂福", "速邁樂", "21世紀", "酷聖石", "聖德科斯", "統一時代", "其他"];
@@ -651,10 +665,16 @@
             const tier = localStorage.getItem('hsbc_tier') || 'infinite';
             let rateDomestic = 18; let rateForeign = 10; if (tier === 'signature') { rateDomestic = 18; rateForeign = 15; }
             let totalMiles = parseInt(localStorage.getItem('hsbc_initial_miles') || 0);
+            // V123.20 新增：扣除已兌換
+            let redeemedMiles = parseInt(localStorage.getItem('hsbc_redeemed_miles') || 0);
+            
             const allHistoryTx = transactions.filter(t => t.cardId === 'c9');
             allHistoryTx.forEach(tx => { const rate = tx.isHsbcForeign ? rateForeign : rateDomestic; totalMiles += Math.floor(tx.amount / rate); });
             if (addedAmount > 0) { const currentRate = addedIsHsbcForeign ? rateForeign : rateDomestic; totalMiles += Math.floor(addedAmount / currentRate); }
-            reward = totalMiles;
+            
+            reward = totalMiles - redeemedMiles; // 淨額
+            if (reward < 0) reward = 0; // 避免負數
+            
             return { spend: totalSpend, validSpend: totalSpend, reward: reward, rate: (totalSpend>0?(totalSpend/totalMiles).toFixed(1):0) };
         }
         
@@ -718,14 +738,7 @@
     }
 
     // ... (toggleBillLogic 等切換邏輯保持不變) ...
-    function toggleBillLogic() { 
-        const isBill = document.getElementById('checkIsBill').checked; 
-        const label = document.getElementById('labelBaseRate');
-        // V123.18 修正：顯示 0.15% 而非 1%
-        label.innerText = isBill ? "🔰 基本回饋 0.15% (無上限)" : "🔰 基本回饋 1% (無上限)"; 
-        if(isBill) document.getElementById('checkBonus25').checked = false; 
-        updateRewardPreview(); 
-    }
+    function toggleBillLogic() { const isBill = document.getElementById('checkIsBill').checked; document.getElementById('labelBaseRate').innerText = isBill ? "🔰 基本回饋 0.15% (無上限)" : "🔰 基本回饋 1% (無上限)"; if(isBill) document.getElementById('checkBonus25').checked = false; updateRewardPreview(); }
     function toggleSelectedLogic() { const isSelected = document.getElementById('checkBonus25').checked; document.getElementById('labelBaseRate').innerText = isSelected ? "🔰 基本回饋 1% (無上限)" : "🔰 基本回饋 1% (無上限)"; if(isSelected) document.getElementById('checkIsBill').checked = false; updateRewardPreview(); }
     function toggleGreenLogic() { if(document.getElementById('checkGreenChannel').checked) document.getElementById('checkForeign').checked = false; updateRewardPreview(); }
     function toggleForeignLogic() { if(document.getElementById('checkForeign').checked) document.getElementById('checkGreenChannel').checked = false; updateRewardPreview(); }
@@ -906,7 +919,14 @@
         if (cardId === 'c8') document.getElementById('happyDashboard').style.display = 'block'; 
         else document.getElementById('happyDashboard').style.display = 'none';
 
-        if (cardId === 'c9') { const savedTier = localStorage.getItem('hsbc_tier') || 'infinite'; document.querySelector(`input[name="hsbcTier"][value="${savedTier}"]`).checked = true; document.getElementById('checkHsbcForeign').checked = false; document.getElementById('hsbcInitialMiles').value = localStorage.getItem('hsbc_initial_miles') || ''; }
+        if (cardId === 'c9') { 
+            const savedTier = localStorage.getItem('hsbc_tier') || 'infinite'; 
+            document.querySelector(`input[name="hsbcTier"][value="${savedTier}"]`).checked = true; 
+            document.getElementById('checkHsbcForeign').checked = false; 
+            document.getElementById('hsbcInitialMiles').value = localStorage.getItem('hsbc_initial_miles') || '';
+            // V123.20 補上 redeemed 讀取
+            document.getElementById('hsbcRedeemedMiles').value = localStorage.getItem('hsbc_redeemed_miles') || '';
+        }
 
         document.getElementById('liveRewardCalc').style.display = 'none'; document.getElementById('liveRewardCalc').innerHTML = '';
         document.getElementById('transactionModal').style.display = 'flex'; 
@@ -997,17 +1017,71 @@
         }
     }
     function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
+    
+    // V123.20: Fix Backup - Include Settings
     async function exportData() {
-        const dataStr = JSON.stringify(transactions); const fileName = `backup.json`; const file = new File([dataStr], fileName, { type: "application/json" });
+        // Collect all localStorage items
+        const backupData = {
+            transactions: transactions,
+            settings: {
+                hsbc_tier: localStorage.getItem('hsbc_tier'),
+                hsbc_initial_miles: localStorage.getItem('hsbc_initial_miles'),
+                hsbc_redeemed_miles: localStorage.getItem('hsbc_redeemed_miles'),
+                uniOpenState: localStorage.getItem('uniOpenState'),
+                visibleCards: localStorage.getItem('visibleCards'),
+                cardOrder: localStorage.getItem('cardOrder')
+            }
+        };
+        const dataStr = JSON.stringify(backupData); 
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const fileName = `backup_${year}-${month}-${day}.json`;
+        
+        const file = new File([dataStr], fileName, { type: "application/json" });
         if (navigator.share && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file] }); return; } catch (error) { if (error.name === 'AbortError') return; } }
         const blob = new Blob([dataStr], {type: "application/json"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = fileName; document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
+    
     function triggerImport() { document.getElementById('fileInput').click(); }
+    
+    // V123.20: Fix Restore - Handle Legacy & New Format
     function importFile(input) {
         const file = input.files[0]; if (!file) return; const reader = new FileReader();
-        reader.onload = function(e) { try { const json = JSON.parse(e.target.result); if (Array.isArray(json)) { transactions = json; localStorage.setItem('transactions', JSON.stringify(transactions)); alert('✅ 備份還原成功！(頁面將自動重整)'); location.reload(); } else { alert('❌ 檔案內容格式錯誤'); } } catch (err) { alert('❌ 無法讀取檔案'); } };
+        reader.onload = function(e) { 
+            try { 
+                const json = JSON.parse(e.target.result); 
+                
+                // Legacy Format (Array only)
+                if (Array.isArray(json)) { 
+                    transactions = json; 
+                    localStorage.setItem('transactions', JSON.stringify(transactions)); 
+                    alert('✅ 舊版備份還原成功！(僅包含交易紀錄)'); 
+                } 
+                // New Format (Object with settings)
+                else if (json.transactions) {
+                    transactions = json.transactions;
+                    localStorage.setItem('transactions', JSON.stringify(transactions));
+                    
+                    if (json.settings) {
+                        if(json.settings.hsbc_tier) localStorage.setItem('hsbc_tier', json.settings.hsbc_tier);
+                        if(json.settings.hsbc_initial_miles) localStorage.setItem('hsbc_initial_miles', json.settings.hsbc_initial_miles);
+                        if(json.settings.hsbc_redeemed_miles) localStorage.setItem('hsbc_redeemed_miles', json.settings.hsbc_redeemed_miles);
+                        if(json.settings.uniOpenState) localStorage.setItem('uniOpenState', json.settings.uniOpenState);
+                        if(json.settings.visibleCards) localStorage.setItem('visibleCards', json.settings.visibleCards);
+                        if(json.settings.cardOrder) localStorage.setItem('cardOrder', json.settings.cardOrder);
+                    }
+                    alert('✅ 完整備份還原成功！(含設定與哩程)'); 
+                }
+                else { alert('❌ 檔案內容格式錯誤'); }
+                
+                location.reload(); 
+            } catch (err) { alert('❌ 無法讀取檔案'); } 
+        };
         reader.readAsText(file); input.value = '';
     }
+    
     function checkUrgentTasks() {
         const alertArea = document.getElementById('urgent-alert-area'), alertList = document.getElementById('urgent-list'); alertList.innerHTML = ''; let hasUrgent = false;
         cards.forEach(card => {

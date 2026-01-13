@@ -163,7 +163,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag">V123.20</div>
+            <div class="version-tag">V123.21</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -247,13 +247,12 @@
                      <div class="option-row" style="border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:10px;">
                         <span style="font-weight:700; color:#333;">💳 選擇您的卡片等級 (自動記憶)：</span>
                         <div style="display:flex; gap:15px; margin-top:8px;">
-                            <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;"><input type="radio" name="hsbcTier" value="infinite" onchange="saveHsbcSettings()"> 無限卡</label>
-                            <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;"><input type="radio" name="hsbcTier" value="signature" onchange="saveHsbcSettings()"> 御璽卡</label>
+                            <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;"><input type="radio" name="hsbcTier" value="infinite" onchange="saveHsbcTier()"> 無限卡</label>
+                            <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;"><input type="radio" name="hsbcTier" value="signature" onchange="saveHsbcTier()"> 御璽卡</label>
                         </div>
                     </div>
                     <div class="option-row"><label for="hsbcInitialMiles">➕ 起始/補登哩程</label><input type="number" id="hsbcInitialMiles" onchange="saveHsbcSettings()" style="text-align:right; width: 100px; border:1px solid #ccc; border-radius:4px; padding:4px;" placeholder="0"></div>
                     <div class="option-row"><label for="hsbcRedeemedMiles" style="color:#d32f2f;">➖ 已兌換哩程</label><input type="number" id="hsbcRedeemedMiles" onchange="saveHsbcSettings()" style="text-align:right; width: 100px; border:1px solid #ffcdd2; color:#d32f2f; border-radius:4px; padding:4px;" placeholder="0"></div>
-                    
                      <div class="option-row" style="margin-top:10px; border-top:1px dashed #ddd; padding-top:6px;"><label for="checkHsbcForeign">✈️ 國外消費</label><input type="checkbox" id="checkHsbcForeign" onchange="updateRewardPreview()"></div>
                 </div>
                 
@@ -300,7 +299,7 @@
     });
     window.addEventListener('popstate', function(event) { document.getElementById('transactionModal').style.display = 'none'; document.getElementById('manageModal').style.display = 'none'; });
 
-    // V123.18 修正：樂家卡通路說明 (国内 -> 國內)
+    // V123.21 修正：移除匯豐錯誤文案 + 樂家繁體修正
     const defaultCards = [
         { 
             id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', note: '百貨 / 超商 / 海外 / 街口 (刷 $8,000 封頂)', rule: '', 
@@ -482,7 +481,6 @@
                 <hr style="opacity:0.3; margin:8px 0;">
                 <b>無限卡：</b>國內 $18/哩、國外 $10/哩<br>
                 <b>御璽卡：</b>國內 $18/哩、國外 $15/哩<br>
-                ✈️ <b>海外滿額：</b>滿5萬多領$500<br>
                 <div style="font-size:10px; opacity:0.8; margin-top:4px;">(卡別請於記帳時設定，系統會自動記憶)</div>
             `
         },
@@ -738,7 +736,14 @@
     }
 
     // ... (toggleBillLogic 等切換邏輯保持不變) ...
-    function toggleBillLogic() { const isBill = document.getElementById('checkIsBill').checked; document.getElementById('labelBaseRate').innerText = isBill ? "🔰 基本回饋 0.15% (無上限)" : "🔰 基本回饋 1% (無上限)"; if(isBill) document.getElementById('checkBonus25').checked = false; updateRewardPreview(); }
+    function toggleBillLogic() { 
+        const isBill = document.getElementById('checkIsBill').checked; 
+        const label = document.getElementById('labelBaseRate');
+        // V123.18 修正：顯示 0.15% 而非 1%
+        label.innerText = isBill ? "🔰 基本回饋 0.15% (無上限)" : "🔰 基本回饋 1% (無上限)"; 
+        if(isBill) document.getElementById('checkBonus25').checked = false; 
+        updateRewardPreview(); 
+    }
     function toggleSelectedLogic() { const isSelected = document.getElementById('checkBonus25').checked; document.getElementById('labelBaseRate').innerText = isSelected ? "🔰 基本回饋 1% (無上限)" : "🔰 基本回饋 1% (無上限)"; if(isSelected) document.getElementById('checkIsBill').checked = false; updateRewardPreview(); }
     function toggleGreenLogic() { if(document.getElementById('checkGreenChannel').checked) document.getElementById('checkForeign').checked = false; updateRewardPreview(); }
     function toggleForeignLogic() { if(document.getElementById('checkForeign').checked) document.getElementById('checkGreenChannel').checked = false; updateRewardPreview(); }

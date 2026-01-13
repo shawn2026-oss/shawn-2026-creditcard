@@ -108,7 +108,8 @@
         #liveRewardCalc { text-align: center; font-size: 16px; color: #0056b3; font-weight: 700; margin-top: 12px; min-height: 20px; background: #E3F2FD; padding: 8px; border-radius: 8px; display: none; }
         .modal-history-section { margin-top: 15px; border-top: 2px solid #f0f0f0; padding-top: 10px; height: auto; overflow: visible; }
         .modal-history-title { font-size: 12px; font-weight: 700; color: #555; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .history-item { padding: 10px 0; border-bottom: 1px solid #f9f9f9; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+        .history-item { padding: 10px 0; border-bottom: 1px solid #f9f9f9; display: flex; justify-content: space-between; align-items: center; font-size: 12px; cursor: pointer; }
+        .history-item:active { background: #f5f5f5; }
         .history-item:last-child { border-bottom: none; }
         .h-name { font-weight: 600; color: #555; }
         .h-date { font-size: 10px; color: #aaa; margin-top: 2px;}
@@ -163,7 +164,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag">V123.21</div>
+            <div class="version-tag">V123.23</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -251,12 +252,17 @@
                             <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;"><input type="radio" name="hsbcTier" value="signature" onchange="saveHsbcTier()"> 御璽卡</label>
                         </div>
                     </div>
-                    <div class="option-row"><label for="hsbcInitialMiles">➕ 起始/補登哩程</label><input type="number" id="hsbcInitialMiles" onchange="saveHsbcSettings()" style="text-align:right; width: 100px; border:1px solid #ccc; border-radius:4px; padding:4px;" placeholder="0"></div>
+                    <div class="option-row"><label for="hsbcInitialMiles">🏁 已有哩程 (起始值)</label><input type="number" id="hsbcInitialMiles" onchange="saveHsbcInitial()" style="text-align:right; width: 100px; border:1px solid #ccc; border-radius:4px; padding:4px;" placeholder="0"></div>
                     <div class="option-row"><label for="hsbcRedeemedMiles" style="color:#d32f2f;">➖ 已兌換哩程</label><input type="number" id="hsbcRedeemedMiles" onchange="saveHsbcSettings()" style="text-align:right; width: 100px; border:1px solid #ffcdd2; color:#d32f2f; border-radius:4px; padding:4px;" placeholder="0"></div>
                      <div class="option-row" style="margin-top:10px; border-top:1px dashed #ddd; padding-top:6px;"><label for="checkHsbcForeign">✈️ 國外消費</label><input type="checkbox" id="checkHsbcForeign" onchange="updateRewardPreview()"></div>
                 </div>
                 
-                <div class="input-group" style="margin-top:20px;">
+                <div class="input-group" style="margin-top:15px; border-top:1px solid #eee; padding-top:15px;">
+                    <label style="margin-bottom:4px;">📅 消費日期</label>
+                    <input type="date" id="dateInput" style="font-size:16px; padding:8px; text-align:left;">
+                </div>
+
+                <div class="input-group" style="margin-top:10px;">
                     <input type="number" id="amountInput" placeholder="$ 金額" inputmode="numeric" style="font-size:28px; text-align:center; border:none; border-bottom:2px solid #eee; border-radius:0;" oninput="updateRewardPreview()" onkeyup="updateRewardPreview()" onpaste="updateRewardPreview()">
                 </div>
                 
@@ -265,11 +271,11 @@
                 <div class="btn-group">
                     <button class="btn btn-cancel" onclick="closeModal()">取消</button>
                     <button class="btn btn-again" onclick="addTransaction(false)">🔄 再記一筆</button>
-                    <button class="btn btn-confirm" onclick="addTransaction(true)">確認</button>
+                    <button class="btn btn-confirm" id="btn-confirm" onclick="addTransaction(true)">確認</button>
                 </div>
             </div>
             <div class="modal-history-section">
-                <div class="modal-history-title" id="modalHistoryTitle"><span>📅 本月消費紀錄</span><span style="font-weight:normal; font-size:10px; color:#aaa;">(點 ✕ 刪除)</span></div>
+                <div class="modal-history-title" id="modalHistoryTitle"><span>📅 本月消費紀錄</span><span style="font-weight:normal; font-size:10px; color:#aaa;">(點擊文字修改 / ✕ 刪除)</span></div>
                 <div id="modalHistoryList"></div>
             </div>
         </div>
@@ -299,7 +305,7 @@
     });
     window.addEventListener('popstate', function(event) { document.getElementById('transactionModal').style.display = 'none'; document.getElementById('manageModal').style.display = 'none'; });
 
-    // V123.21 修正：移除匯豐錯誤文案 + 樂家繁體修正
+    // V123.12 終極修復：補回所有卡片的詳細通路名單 (HTML)
     const defaultCards = [
         { 
             id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', note: '百貨 / 超商 / 海外 / 街口 (刷 $8,000 封頂)', rule: '', 
@@ -532,20 +538,8 @@
 
     let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
     function updateDate() { const now = new Date(); document.getElementById('dateDisplay').innerText = `${now.getMonth()+1}/${now.getDate()}`; }
-    
-    // V123.20: 升級的設定儲存函數
-    function saveHsbcSettings() { 
-        const tier = document.querySelector('input[name="hsbcTier"]:checked').value;
-        const initial = document.getElementById('hsbcInitialMiles').value;
-        const redeemed = document.getElementById('hsbcRedeemedMiles').value;
-        
-        localStorage.setItem('hsbc_tier', tier);
-        localStorage.setItem('hsbc_initial_miles', initial);
-        localStorage.setItem('hsbc_redeemed_miles', redeemed);
-        
-        renderGrid(); 
-        updateRewardPreview(); 
-    }
+    function saveHsbcTier() { const tier = document.querySelector('input[name="hsbcTier"]:checked').value; localStorage.setItem('hsbc_tier', tier); renderGrid(); updateRewardPreview(); }
+    function saveHsbcInitial() { const initial = document.getElementById('hsbcInitialMiles').value; localStorage.setItem('hsbc_initial_miles', initial); renderGrid(); }
     
     // NEW: 品牌踩點邏輯
     const uniBrands = ["7-11", "星巴克", "康是美", "家樂福", "速邁樂", "21世紀", "酷聖石", "聖德科斯", "統一時代", "其他"];
@@ -736,14 +730,7 @@
     }
 
     // ... (toggleBillLogic 等切換邏輯保持不變) ...
-    function toggleBillLogic() { 
-        const isBill = document.getElementById('checkIsBill').checked; 
-        const label = document.getElementById('labelBaseRate');
-        // V123.18 修正：顯示 0.15% 而非 1%
-        label.innerText = isBill ? "🔰 基本回饋 0.15% (無上限)" : "🔰 基本回饋 1% (無上限)"; 
-        if(isBill) document.getElementById('checkBonus25').checked = false; 
-        updateRewardPreview(); 
-    }
+    function toggleBillLogic() { const isBill = document.getElementById('checkIsBill').checked; document.getElementById('labelBaseRate').innerText = isBill ? "🔰 基本回饋 0.15% (無上限)" : "🔰 基本回饋 1% (無上限)"; if(isBill) document.getElementById('checkBonus25').checked = false; updateRewardPreview(); }
     function toggleSelectedLogic() { const isSelected = document.getElementById('checkBonus25').checked; document.getElementById('labelBaseRate').innerText = isSelected ? "🔰 基本回饋 1% (無上限)" : "🔰 基本回饋 1% (無上限)"; if(isSelected) document.getElementById('checkIsBill').checked = false; updateRewardPreview(); }
     function toggleGreenLogic() { if(document.getElementById('checkGreenChannel').checked) document.getElementById('checkForeign').checked = false; updateRewardPreview(); }
     function toggleForeignLogic() { if(document.getElementById('checkForeign').checked) document.getElementById('checkGreenChannel').checked = false; updateRewardPreview(); }
@@ -891,6 +878,15 @@
         document.getElementById('modalTitle').innerText = card.name; 
         document.getElementById('modalSubtitle').innerText = card.note; 
         document.getElementById('cardIdInput').value = cardId; 
+        
+        // V123.22: Reset date input to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('dateInput').value = today;
+        
+        // Reset Edit Mode
+        editingId = null;
+        document.getElementById('btn-confirm').innerText = "確認";
+
         history.pushState({modalOpen: true}, "", "#modal");
         
         ['pigRichOptions', 'greenCardOptions', 'uniOptions', 'happyOptions', 'hsbcOptions', 'uniOpenOptions'].forEach(id => { document.getElementById(id).style.display = 'none'; });
@@ -970,12 +966,13 @@
         const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
         const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
         const dateRange = `${now.getMonth() + 1}/1 - ${now.getMonth() + 1}/${lastDay}`;
-        titleDiv.innerHTML = `<span>📅 本月 (${dateRange}) 消費紀錄</span><span style="font-weight:normal; font-size:10px; color:#aaa;">(點 ✕ 刪除)</span>`;
+        titleDiv.innerHTML = `<span>📅 本月 (${dateRange}) 消費紀錄</span><span style="font-weight:normal; font-size:10px; color:#aaa;">(點擊文字修改 / ✕ 刪除)</span>`;
         const cardTx = transactions.filter(t => t.cardId === cardId && new Date(t.date) >= currentMonthStart).reverse();
         if (cardTx.length === 0) { container.innerHTML = '<div style="text-align:center; color:#ccc; font-size:12px; margin-top:10px;">本月尚無消費紀錄</div>'; return; }
         cardTx.forEach(tx => {
             const item = document.createElement('div'); item.className = 'history-item'; 
             let noteText = tx.note || '一般消費';
+            // Append badges logic...
             if (tx.isGreen) noteText = '🌿 ' + noteText; if (tx.isForeign) noteText = '✈️ ' + noteText; if (tx.isUniBonus) noteText = '🔥 ' + noteText; if (tx.isHappyPet) noteText = '🐶 ' + noteText; if (tx.isHappyPeace) noteText = '🍽️ ' + noteText; if (tx.isHappyLife) noteText = '🛒 ' + noteText; if (tx.isHappyForeign) noteText = '✈️ ' + noteText; if (tx.isHsbcForeign) noteText = '✈️ ' + noteText;
             if (tx.isUniGroup) noteText = '🏪 ' + noteText; if (tx.isUniIcash) noteText = '📱 ' + noteText; if (tx.isUniOverseas) noteText = '✈️ ' + noteText;
 
@@ -985,35 +982,116 @@
                 let rate = 18; if (tier === 'infinite' && tx.isHsbcForeign) rate = 10; else if (tier === 'signature' && tx.isHsbcForeign) rate = 15;
                 const miles = Math.floor(tx.amount / rate); amountDisplay = `${miles} 哩`;
             }
-            item.innerHTML = `<div><div class="h-name">${noteText}</div><div class="h-date">${new Date(tx.date).getMonth()+1}/${new Date(tx.date).getDate()}</div></div><div style="display:flex;align-items:center;"><span class="h-amount">${amountDisplay}</span><button class="btn-delete-single" onclick="deleteTransaction(${tx.id}, true)">✕</button></div>`;
+            
+            // V123.22: Edit Trigger on Text Click
+            const textDiv = document.createElement('div');
+            textDiv.style.flex = '1';
+            textDiv.innerHTML = `<div class="h-name">${noteText}</div><div class="h-date">${new Date(tx.date).getMonth()+1}/${new Date(tx.date).getDate()}</div>`;
+            textDiv.onclick = () => editTransaction(tx.id);
+
+            const rightDiv = document.createElement('div');
+            rightDiv.style.display = 'flex';
+            rightDiv.style.alignItems = 'center';
+            rightDiv.innerHTML = `<span class="h-amount">${amountDisplay}</span>`;
+            
+            const delBtn = document.createElement('button');
+            delBtn.className = 'btn-delete-single';
+            delBtn.innerText = '✕';
+            delBtn.onclick = (e) => { e.stopPropagation(); deleteTransaction(tx.id, true); };
+            rightDiv.appendChild(delBtn);
+
+            item.appendChild(textDiv);
+            item.appendChild(rightDiv);
             container.appendChild(item);
         });
     }
+
+    // V123.22: Edit Function Logic
+    let editingId = null;
+    function editTransaction(id) {
+        const tx = transactions.find(t => t.id === id);
+        if(!tx) return;
+        editingId = id;
+        document.getElementById('amountInput').value = tx.amount;
+        document.getElementById('noteInput').value = tx.note || '';
+        document.getElementById('dateInput').value = tx.date.split('T')[0];
+        
+        // Restore Checkboxes
+        if(document.getElementById('checkGreenChannel')) document.getElementById('checkGreenChannel').checked = tx.isGreen;
+        if(document.getElementById('checkForeign')) document.getElementById('checkForeign').checked = tx.isForeign;
+        if(document.getElementById('checkUniUp')) document.getElementById('checkUniUp').checked = tx.isUniUp;
+        if(document.getElementById('checkUniBonus')) document.getElementById('checkUniBonus').checked = tx.isUniBonus;
+        if(document.getElementById('checkHappyPet')) document.getElementById('checkHappyPet').checked = tx.isHappyPet;
+        if(document.getElementById('checkHappyPeace')) document.getElementById('checkHappyPeace').checked = tx.isHappyPeace;
+        if(document.getElementById('checkHappyLife')) document.getElementById('checkHappyLife').checked = tx.isHappyLife;
+        if(document.getElementById('checkHappyForeign')) document.getElementById('checkHappyForeign').checked = tx.isHappyForeign;
+        if(document.getElementById('checkHsbcForeign')) document.getElementById('checkHsbcForeign').checked = tx.isHsbcForeign;
+        if(document.getElementById('checkUniGroup')) document.getElementById('checkUniGroup').checked = tx.isUniGroup;
+        if(document.getElementById('checkUniIcash')) document.getElementById('checkUniIcash').checked = tx.isUniIcash;
+        if(document.getElementById('checkUniOverseas')) document.getElementById('checkUniOverseas').checked = tx.isUniOverseas;
+
+        // Change button text
+        document.getElementById('btn-confirm').innerText = "修改";
+        updateRewardPreview();
+    }
+
     function closeModal() { history.back(); }
+    
     function addTransaction(close = true) {
         const cardId = document.getElementById('cardIdInput').value;
         const amount = document.getElementById('amountInput').value;
         const note = document.getElementById('noteInput').value;
+        const dateVal = document.getElementById('dateInput').value; // V123.22 Read Date
+        
         if (!amount || amount <= 0) return alert('請輸入金額');
-        let isGreen = false; let isForeign = false; let isUniBonus = false; let isUniUp = false; let isHappyPet = false; let isHappyPeace = false; let isHappyLife = false; let isHappyForeign = false; let isHsbcForeign = false;
-        let isUniGroup = false; let isUniIcash = false; let isUniOverseas = false;
+        
+        const dateObj = dateVal ? new Date(dateVal) : new Date();
+        const dateStr = dateObj.toISOString();
 
-        if (cardId === 'c2') { isGreen = document.getElementById('checkGreenChannel').checked; isForeign = document.getElementById('checkForeign').checked; }
-        if (cardId === 'c7') { isUniBonus = document.getElementById('checkUniBonus').checked; isUniUp = document.getElementById('checkUniUp').checked; }
-        if (cardId === 'c8') { isHappyPet = document.getElementById('checkHappyPet').checked; isHappyPeace = document.getElementById('checkHappyPeace').checked; isHappyLife = document.getElementById('checkHappyLife').checked; isHappyForeign = document.getElementById('checkHappyForeign').checked; }
-        if (cardId === 'c9') { isHsbcForeign = document.getElementById('checkHsbcForeign').checked; }
-        if (cardId === 'c10') { isUniGroup = document.getElementById('checkUniGroup').checked; isUniIcash = document.getElementById('checkUniIcash').checked; isUniOverseas = document.getElementById('checkUniOverseas').checked; }
+        // Capture Flags
+        let isGreen = document.getElementById('checkGreenChannel') ? document.getElementById('checkGreenChannel').checked : false;
+        let isForeign = document.getElementById('checkForeign') ? document.getElementById('checkForeign').checked : false;
+        let isUniBonus = document.getElementById('checkUniBonus') ? document.getElementById('checkUniBonus').checked : false;
+        let isUniUp = document.getElementById('checkUniUp') ? document.getElementById('checkUniUp').checked : false;
+        let isHappyPet = document.getElementById('checkHappyPet') ? document.getElementById('checkHappyPet').checked : false;
+        let isHappyPeace = document.getElementById('checkHappyPeace') ? document.getElementById('checkHappyPeace').checked : false;
+        let isHappyLife = document.getElementById('checkHappyLife') ? document.getElementById('checkHappyLife').checked : false;
+        let isHappyForeign = document.getElementById('checkHappyForeign') ? document.getElementById('checkHappyForeign').checked : false;
+        let isHsbcForeign = document.getElementById('checkHsbcForeign') ? document.getElementById('checkHsbcForeign').checked : false;
+        let isUniGroup = document.getElementById('checkUniGroup') ? document.getElementById('checkUniGroup').checked : false;
+        let isUniIcash = document.getElementById('checkUniIcash') ? document.getElementById('checkUniIcash').checked : false;
+        let isUniOverseas = document.getElementById('checkUniOverseas') ? document.getElementById('checkUniOverseas').checked : false;
 
-        transactions.push({ 
-            id: Date.now(), cardId: cardId, amount: parseFloat(amount), note: note, date: new Date().toISOString(), 
-            isGreen: isGreen, isForeign: isForeign, isUniBonus: isUniBonus, isUniUp: isUniUp, 
-            isHappyPet: isHappyPet, isHappyPeace: isHappyPeace, isHappyLife: isHappyLife, isHappyForeign: isHappyForeign, isHsbcForeign: isHsbcForeign,
-            isUniGroup: isUniGroup, isUniIcash: isUniIcash, isUniOverseas: isUniOverseas
-        });
+        // V123.22: Update or Create
+        if (editingId) {
+            // Update existing
+            const index = transactions.findIndex(t => t.id === editingId);
+            if (index !== -1) {
+                transactions[index] = {
+                    ...transactions[index],
+                    amount: parseFloat(amount),
+                    note: note,
+                    date: dateStr,
+                    isGreen, isForeign, isUniBonus, isUniUp, isHappyPet, isHappyPeace, isHappyLife, isHappyForeign, isHsbcForeign, isUniGroup, isUniIcash, isUniOverseas
+                };
+            }
+            editingId = null;
+        } else {
+            // Create new
+            transactions.push({ 
+                id: Date.now(), cardId: cardId, amount: parseFloat(amount), note: note, date: dateStr, 
+                isGreen, isForeign, isUniBonus, isUniUp, 
+                isHappyPet, isHappyPeace, isHappyLife, isHappyForeign, isHsbcForeign,
+                isUniGroup, isUniIcash, isUniOverseas
+            });
+        }
+        
         localStorage.setItem('transactions', JSON.stringify(transactions)); 
         document.getElementById('amountInput').value = ''; document.getElementById('noteInput').value = '';
-        renderGrid(); if(close) closeModal(); else renderModalHistory(cardId);
+        renderGrid(); 
+        if(close) closeModal(); else renderModalHistory(cardId);
     }
+    
     function deleteTransaction(id, fromModal = false) {
         if(confirm('刪除此筆紀錄？')) {
             transactions = transactions.filter(t => t.id !== id);

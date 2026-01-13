@@ -144,7 +144,14 @@
         .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         input:checked + .slider { background-color: #34C759; }
         input:checked + .slider:before { transform: translateX(20px); }
-        .happy-dashboard { background: #fff0f5; border: 1px solid #ffd1dc; border-radius: 10px; padding: 10px; margin-top: 10px; display: none; }
+
+        .happy-dashboard {
+            background: transparent; 
+            border: none; 
+            padding: 0; 
+            margin-top: 10px; 
+            display: none;
+        }
         .dash-row { margin-bottom: 8px; }
         .dash-label { font-size: 12px; font-weight: 700; color: #555; display: flex; justify-content: space-between; margin-bottom: 2px;}
         .dash-bar-bg { background: #eee; height: 6px; border-radius: 3px; overflow: hidden; }
@@ -156,7 +163,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag">V123.13</div>
+            <div class="version-tag">V123.18</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -204,16 +211,19 @@
                     <div class="option-row" style="margin-bottom:0; border-top:1px dashed #ddd; padding-top:6px;"><label for="checkIsBill">🧾 APP繳費 (底1%→0.15%)</label><input type="checkbox" id="checkIsBill" onchange="toggleBillLogic()"></div>
                 </div>
                 <div id="greenCardOptions">
+                    <div class="option-row read-only"><label>🔰 國內 1% / 國外 2%</label><input type="checkbox" checked disabled></div>
                     <div class="option-row" style="margin-bottom:0;"><label for="checkGreenChannel">🌿 綠色通路 (6% 限刷$2500)</label><input type="checkbox" id="checkGreenChannel" onchange="toggleGreenLogic()"></div>
                     <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;"><label for="checkForeign">✈️ 國外消費 (2% 無上限)</label><input type="checkbox" id="checkForeign" onchange="toggleForeignLogic()"></div>
                 </div>
                 <div id="uniOptions">
+                    <div class="option-row read-only"><label>🔰 基本回饋 3.5%</label><input type="checkbox" checked disabled></div>
                     <div class="option-row"><label for="checkUniUp">🆙 訂閱 UP 選 (4.5% 限刷14萬)</label><input type="checkbox" id="checkUniUp" onchange="updateRewardPreview()"></div>
                     <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;"><label for="checkUniBonus">🔥 統一時代任務 (+3% 限刷1.6萬)</label><input type="checkbox" id="checkUniBonus" onchange="updateRewardPreview()"></div>
                 </div>
                 <div id="uniOpenOptions">
-                    <div class="option-row"><label for="checkUniGroup">🏪 統一集團通路 (+2%)</label><input type="checkbox" id="checkUniGroup" onchange="saveUniOpenState()"></div>
-                    <div class="option-row"><label for="checkUniIcash">📱 綁定 icash Pay (+4%)</label><input type="checkbox" id="checkUniIcash" onchange="saveUniOpenState()"></div>
+                    <div class="option-row read-only"><label>🔰 基本回饋 1% (無上限)</label><input type="checkbox" checked disabled></div>
+                    <div class="option-row"><label for="checkUniGroup">🏪 統一集團通路 (+2%)</label><input type="checkbox" id="checkUniGroup" onchange="toggleUniDomestic()"></div>
+                    <div class="option-row"><label for="checkUniIcash">📱 綁定 icash Pay (+4%)</label><input type="checkbox" id="checkUniIcash" onchange="toggleUniDomestic()"></div>
                     <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px; margin-top:6px; flex-direction:column; align-items:flex-start;">
                         <label style="margin-bottom:4px;">🏃 踩點任務 (2家起跳，最高+4%)</label>
                         <div class="brand-grid" id="uniBrandGrid">
@@ -222,10 +232,11 @@
                     </div>
                     <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px;">
                         <label for="checkUniOverseas">✈️ 海外實體 (11% 限$6250)</label>
-                        <input type="checkbox" id="checkUniOverseas" onchange="saveUniOpenState()">
+                        <input type="checkbox" id="checkUniOverseas" onchange="toggleUniOverseas()">
                     </div>
                 </div>
                 <div id="happyOptions">
+                     <div class="option-row read-only"><label>🔰 一般消費 0.5% (無上限)</label><input type="checkbox" checked disabled></div>
                      <div class="option-row"><label for="checkHappyPet">🐶 寵物通路 (10% 刷$5263)</label><input type="checkbox" id="checkHappyPet" onchange="toggleHappyPet()"></div>
                     <div class="option-row"><label for="checkHappyPeace">🍽️ 大小安心刷 (4% 刷$5714)</label><input type="checkbox" id="checkHappyPeace" onchange="toggleHappyPeace()"></div>
                     <div class="option-row"><label for="checkHappyLife">🛒 生活禮遇 (4% 刷$5714)</label><input type="checkbox" id="checkHappyLife" onchange="toggleHappyLife()"></div>
@@ -437,7 +448,7 @@
                 <details onclick="event.stopPropagation()" style="margin-top:6px; border-top:1px dashed rgba(0,0,0,0.1); padding-top:6px;">
                     <summary style="cursor:pointer; font-weight:700; color:#8B0000; font-size:12px;">▼ 點我看安心刷通路 (餐廳/電影...)</summary>
                     <div style="margin-top:6px; padding:8px; font-size:11px; line-height:1.6; color:#333; background:rgba(255,255,255,0.9); border-radius:6px;">
-                        🍽️ <b>美食餐廳：</b>国内一般餐廳 (排除百貨/飯店/賣場內)<br>
+                        🍽️ <b>美食餐廳：</b>國內一般餐廳 (排除百貨/飯店/賣場內)<br>
                         🎬 <b>電影娛樂：</b>威秀/秀泰/國賓/錢櫃/好樂迪...<br>
                         👶 <b>母嬰百貨：</b>小丁婦幼/卡多摩...<br>
                         🏨 <b>飯店/旅遊：</b>各大飯店/Klook/KKday
@@ -462,7 +473,17 @@
                 </div>
             `
         },
-        { id: 'c9', name: '匯豐旅人卡', nickname: '哩程累積', note: '無限:國內18/國外10 | 御璽:國內18/國外15', type: 'miles', gradient: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)', textColor: 'white', msgDanger: '' },
+        { id: 'c9', name: '匯豐旅人卡', nickname: '哩程累積', note: '無限:國內18/國外10 | 御璽:國內18/國外15', type: 'miles', gradient: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)', textColor: 'white', msgDanger: '',
+            parking: `
+                ✈️ <b>哩程累積神卡</b><br>
+                最優 NT$10 = 1 哩<br>
+                <hr style="opacity:0.3; margin:8px 0;">
+                <b>無限卡：</b>國內 $18/哩、國外 $10/哩<br>
+                <b>御璽卡：</b>國內 $18/哩、國外 $15/哩<br>
+                ✈️ <b>海外滿額：</b>滿5萬多領$500<br>
+                <div style="font-size:10px; opacity:0.8; margin-top:4px;">(卡別請於記帳時設定，系統會自動記憶)</div>
+            `
+        },
         
         // NEW: 中信 UniOpen 卡 (V123.9 Update: 增加海外實體選項)
         { 
@@ -564,6 +585,26 @@
         else if(count === 3) rate = 2;
         else if(count === 2) rate = 1;
         display.innerText = `目前踩點 ${count} 家 (加碼 +${rate}%)`;
+    }
+    
+    // NEW: UniOpen Mutually Exclusive Logic (V123.17)
+    function toggleUniOverseas() {
+        const isOverseas = document.getElementById('checkUniOverseas').checked;
+        if (isOverseas) {
+            // Check Overseas -> Clear Domestic
+            document.getElementById('checkUniGroup').checked = false;
+            document.getElementById('checkUniIcash').checked = false;
+            // Clear Brands
+            const btns = document.querySelectorAll('.brand-btn');
+            btns.forEach(btn => btn.classList.remove('active'));
+        }
+        saveUniOpenState();
+    }
+
+    function toggleUniDomestic() {
+        // Check Domestic -> Clear Overseas
+        document.getElementById('checkUniOverseas').checked = false;
+        saveUniOpenState();
     }
 
     // --- 核心計算邏輯 (V123.10: 修正回溯觸發條件) ---
@@ -677,7 +718,14 @@
     }
 
     // ... (toggleBillLogic 等切換邏輯保持不變) ...
-    function toggleBillLogic() { const isBill = document.getElementById('checkIsBill').checked; document.getElementById('labelBaseRate').innerText = isBill ? "🔰 基本回饋 0.15% (無上限)" : "🔰 基本回饋 1% (無上限)"; if(isBill) document.getElementById('checkBonus25').checked = false; updateRewardPreview(); }
+    function toggleBillLogic() { 
+        const isBill = document.getElementById('checkIsBill').checked; 
+        const label = document.getElementById('labelBaseRate');
+        // V123.18 修正：顯示 0.15% 而非 1%
+        label.innerText = isBill ? "🔰 基本回饋 0.15% (無上限)" : "🔰 基本回饋 1% (無上限)"; 
+        if(isBill) document.getElementById('checkBonus25').checked = false; 
+        updateRewardPreview(); 
+    }
     function toggleSelectedLogic() { const isSelected = document.getElementById('checkBonus25').checked; document.getElementById('labelBaseRate').innerText = isSelected ? "🔰 基本回饋 1% (無上限)" : "🔰 基本回饋 1% (無上限)"; if(isSelected) document.getElementById('checkIsBill').checked = false; updateRewardPreview(); }
     function toggleGreenLogic() { if(document.getElementById('checkGreenChannel').checked) document.getElementById('checkForeign').checked = false; updateRewardPreview(); }
     function toggleForeignLogic() { if(document.getElementById('checkForeign').checked) document.getElementById('checkGreenChannel').checked = false; updateRewardPreview(); }
@@ -752,9 +800,30 @@
                 card.note = (tier === 'infinite') ? '國內18/國外10 (哩)' : '國內18/國外15 (哩)';
                 statusText = `總哩程 ${stats.reward.toLocaleString()} 哩`; msgStyle = 'color: #007AFF; font-weight:bold;';
             } else if (card.id === 'c8') { 
-                if (stats.spend < 3000) { percent = (stats.spend / 3000) * 100; statusText = `差 $${(3000 - stats.spend).toLocaleString()} 啟動高回饋`; msgStyle = 'color: #FFD700;'; } 
+                // V123.17: Unify c8 status text with c4
+                if (stats.spend < 3000) { 
+                    percent = (stats.spend / 3000) * 100; 
+                    statusText = `差 $${(3000 - stats.spend).toLocaleString()} 升級回饋`; // Changed
+                    msgStyle = 'color: #FFD700;'; 
+                } 
                 else if (stats.spend < 26000) { percent = (stats.spend / 26000) * 100; statusText = `差 $${(26000 - stats.spend).toLocaleString()} 領滿額禮`; } 
                 else { percent = 100; statusText = '🎉 滿額達標 (記得登錄!)'; msgStyle = 'color: #38ef7d;'; }
+            } else if (card.type === 'mixed') { // V123.17: Restore mixed type logic for c4
+                if (stats.validSpend < card.minSpend) { 
+                    percent = (stats.validSpend / card.minSpend) * 100; 
+                    statusText = `差 $${(card.minSpend - stats.validSpend).toLocaleString()} 升級回饋`; // Changed
+                    msgStyle = 'color: #FFD700;'; 
+                }
+                else if (stats.validSpend <= card.limit) { 
+                    percent = (stats.validSpend / card.limit) * 100; 
+                    const remain = card.limit - stats.validSpend; 
+                    statusText = `剩 $${remain.toLocaleString()} (5%)`; 
+                }
+                else { 
+                    percent = 100; 
+                    statusText = '已封頂 (變0.5%)'; 
+                    msgStyle = 'color: #ffcccc;'; 
+                }
             } else if (card.type === 'ceiling' || card.id === 'c6') {
                 percent = (stats.validSpend / card.limit) * 100;
                 if (stats.validSpend <= card.limit) { const remain = card.limit - stats.validSpend; statusText = `剩 $${remain.toLocaleString()}`; if(remain < 1000) {statusText = `⚠️ 剩 $${remain.toLocaleString()}`; msgStyle='color:#FFD700;';} }
@@ -832,29 +901,42 @@
         }
 
         if (card.parking) { document.getElementById('modalParkingInfo').innerHTML = card.parking; document.getElementById('modalParkingInfo').style.display = 'block'; } else { document.getElementById('modalParkingInfo').style.display = 'none'; }
-        if (cardId === 'c8') document.getElementById('happyDashboard').style.display = 'block'; else document.getElementById('happyDashboard').style.display = 'none';
+        
+        // V123.15 修復：樂家卡總是顯示 Dashboard
+        if (cardId === 'c8') document.getElementById('happyDashboard').style.display = 'block'; 
+        else document.getElementById('happyDashboard').style.display = 'none';
+
         if (cardId === 'c9') { const savedTier = localStorage.getItem('hsbc_tier') || 'infinite'; document.querySelector(`input[name="hsbcTier"][value="${savedTier}"]`).checked = true; document.getElementById('checkHsbcForeign').checked = false; document.getElementById('hsbcInitialMiles').value = localStorage.getItem('hsbc_initial_miles') || ''; }
 
         document.getElementById('liveRewardCalc').style.display = 'none'; document.getElementById('liveRewardCalc').innerHTML = '';
         document.getElementById('transactionModal').style.display = 'flex'; 
         document.getElementById('amountInput').value = ''; document.getElementById('noteInput').value = ''; 
+        
+        // V123.18: 初始化 Pig Rich 的 Label 狀態
+        if (cardId === 'c6') {
+             const isBill = document.getElementById('checkIsBill').checked;
+             document.getElementById('labelBaseRate').innerText = isBill ? "🔰 基本回饋 0.15% (無上限)" : "🔰 基本回饋 1% (無上限)";
+        }
+        
         renderModalHistory(cardId); setTimeout(() => document.getElementById('amountInput').focus(), 100);
     }
+    
+    // V123.15 修復：只顯示總門檻，且背景透明
     function renderHappyDashboard() {
         const dashboard = document.getElementById('happyDashboard');
         const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
         const txs = transactions.filter(t => t.cardId === 'c8' && new Date(t.date) >= startDate);
-        const petSpend = txs.filter(t => t.isHappyPet).reduce((sum, t) => sum + t.amount, 0);
-        const peaceSpend = txs.filter(t => t.isHappyPeace).reduce((sum, t) => sum + t.amount, 0);
-        const lifeSpend = txs.filter(t => t.isHappyLife).reduce((sum, t) => sum + t.amount, 0);
         const totalSpend = txs.reduce((sum, t) => sum + t.amount, 0);
+        
         const createBar = (label, current, max) => {
             const percent = Math.min((current / max) * 100, 100);
             const isDanger = percent >= 100;
             return `<div class="dash-row"><div class="dash-label"><span>${label}</span><span style="color:${isDanger ? 'red' : '#555'}">$${current.toLocaleString()} / ${max.toLocaleString()}</span></div><div class="dash-bar-bg"><div class="dash-bar-fill ${isDanger ? 'danger' : ''}" style="width: ${percent}%"></div></div></div>`;
         };
-        dashboard.innerHTML = createBar('🐶 寵物額度', petSpend, 5263) + createBar('🍽️ 安心刷額度', peaceSpend, 5714) + createBar('🛒 生活額度', lifeSpend, 5714) + createBar('💰 滿額門檻', totalSpend, 26000);
+        // Simplified dashboard content
+        dashboard.innerHTML = createBar('💰 滿額門檻', totalSpend, 26000);
     }
+    
     function renderModalHistory(cardId) {
         const container = document.getElementById('modalHistoryList');
         const titleDiv = document.getElementById('modalHistoryTitle');

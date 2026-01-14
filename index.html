@@ -67,6 +67,8 @@
         .progress-track { background: rgba(0,0,0,0.2); height: 4px; border-radius: 2px; overflow: hidden; margin-bottom: 4px; }
         .progress-fill { height: 100%; background: rgba(255,255,255,0.95); transition: width 0.5s ease; }
         .tile-msg { font-size: 11px; font-weight: 700; opacity: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+        .tile-cycle-hint { font-size: 9px; color: rgba(255,255,255,0.6); margin-top: 2px; text-align: right; }
+        
         .history-section { flex: 1; display: flex; flex-direction: column; }
         .history-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #555; }
         .settings-area { margin-top: auto; display: flex; gap: 8px; flex-direction: column; padding-top: 20px;}
@@ -146,6 +148,10 @@
         .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         input:checked + .slider { background-color: #34C759; }
         input:checked + .slider:before { transform: translateX(20px); }
+        
+        /* New Setting Button */
+        .btn-card-setting { background: #f0f0f0; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; margin-right: 12px; color: #555; }
+        .btn-card-setting:hover { background: #e0e0e0; }
 
         .happy-dashboard {
             background: transparent;
@@ -165,7 +171,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag">V123.41</div>
+            <div class="version-tag">V123.42</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -325,10 +331,13 @@ id="checkUniUp" onchange="updateRewardPreview()"></div>
 
     <script>
     fetch('config.json?t=' + Date.now()).then(response => response.json()).then(data => { if(data.news) document.getElementById('news-text').innerHTML = data.news; }).catch(error => {});
+    // V123.42: Card Settings Storage
+    let cardSettings = JSON.parse(localStorage.getItem('cardSettings')) || {};
+
     window.addEventListener('load', () => {
         setTimeout(() => { const ticker = document.querySelector('.ticker-content'); if(ticker) { ticker.style.animation = 'none'; void ticker.offsetWidth; ticker.style.animation = 'scroll-left 15s linear infinite'; } }, 100);
         let currentCards = JSON.parse(localStorage.getItem('visibleCards')) || [];
-        const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9', 'c10', 'c11']; // Added c11
+        const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9', 'c10', 'c11']; 
         let realCards = currentCards.filter(id => realCardIds.includes(id));
         if (realCards.length > 8) { realCards = realCards.slice(0, 8); localStorage.setItem('visibleCards', JSON.stringify(realCards)); }
         if (realCards.length < 8) { if (!currentCards.includes('add1')) { realCards.push('add1'); localStorage.setItem('visibleCards', JSON.stringify(realCards)); } } 
@@ -696,13 +705,50 @@ btns.forEach(btn => btn.classList.remove('active'));
 saveUniOpenState();
     }
 
-    // --- 核心計算邏輯 (V123.10: 修正回溯觸發條件) ---
+    // V123.42: Helper to calculate cycle dates
+    function getBillingCycle(cardId, dateObj = new Date()) {
+        const settings = cardSettings[cardId] || {};
+        const bDay = parseInt(settings.billingDay) || 1; // Default 1st
+
+        if (bDay === 1) {
+            return {
+                start: new Date(dateObj.getFullYear(), dateObj.getMonth(), 1),
+                end: new Date(dateObj.getFullYear(), dateObj.getMonth() + 1, 0),
+                isCustom: false
+            };
+        }
+
+        let start, end;
+        const currentDay = dateObj.getDate();
+        // If billing day is 17
+        // Today 18th -> Cycle: 1/17 - 2/16
+        // Today 10th -> Cycle: 12/17 - 1/16
+        if (currentDay >= bDay) {
+            start = new Date(dateObj.getFullYear(), dateObj.getMonth(), bDay);
+            end = new Date(dateObj.getFullYear(), dateObj.getMonth() + 1, bDay - 1);
+        } else {
+            start = new Date(dateObj.getFullYear(), dateObj.getMonth() - 1, bDay);
+            end = new Date(dateObj.getFullYear(), dateObj.getMonth(), bDay - 1);
+        }
+        // Ensure end of day
+        end.setHours(23, 59, 59, 999);
+        return { start, end, isCustom: true };
+    }
+
+    // --- 核心計算邏輯 (V123.42: Updated to use dynamic cycle) ---
     function calculateStats(cardId, addedAmount = 0, addedIsGreen = false, addedIsForeign = false, addedIsUniBonus = false, addedIsUniUp = false, addedIsHappyPet = false, addedIsHappyLife = false, addedIsHappyForeign = false, addedIsHappyPeace = false, addedIsHsbcForeign = false, addedIsUniGroup = false, addedIsUniIcash = false, addedIsUniOverseas = false, addedIsRichartPay = false, addedIsRichartOnline = false, addedIsRichartLine = false, addedIsRichartOverseas = false) {
         const card = cards.find(c => c.id === cardId);
 if (card.type === 'placeholder') return { spend: 0, validSpend: 0, reward: 0, rate: '0.0' };
-const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
-        const relevantTx = transactions.filter(t => t.cardId === cardId && new Date(t.date) >= startDate);
-let totalSpend = relevantTx.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+
+        const { start: cycleStart, end: cycleEnd, isCustom } = getBillingCycle(cardId);
+        
+        // Filter by dynamic cycle
+        const relevantTx = transactions.filter(t => {
+            const tDate = new Date(t.date);
+            return t.cardId === cardId && tDate >= cycleStart && tDate <= cycleEnd;
+        });
+
+        let totalSpend = relevantTx.reduce((sum, t) => sum + parseFloat(t.amount), 0);
         totalSpend += addedAmount;
         let reward = 0;
 // UniOpen
@@ -734,7 +780,7 @@ reward = overseasReward + domesticReward + groupBonus + icashBonus + taskBonus;
 else { if (savedState.group) displayRate += 2; if (savedState.icash) displayRate += 4; if (savedState.group) displayRate += (taskRate * 100);
 }
             
-            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: displayRate.toFixed(1) };
+            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: displayRate.toFixed(1), isCustom, cycleStart, cycleEnd };
 }
 
         // Richart (c11)
@@ -763,7 +809,7 @@ else { if (savedState.group) displayRate += 2; if (savedState.icash) displayRate
             else if(addedIsRichartLine) currentRate = 2.3;
             else if(addedIsRichartOverseas) currentRate = 3.3;
             
-            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: currentRate.toFixed(1) };
+            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: currentRate.toFixed(1), isCustom, cycleStart, cycleEnd };
         }
 
         // HSBC
@@ -785,7 +831,7 @@ if (addedAmount > 0) { const currentRate = addedIsHsbcForeign ? rateForeign : ra
             if (reward < 0) reward = 0;
 // 避免負數
             
-            return { spend: totalSpend, validSpend: totalSpend, reward: reward, rate: (totalSpend>0?(totalSpend/totalMiles).toFixed(1):0) };
+            return { spend: totalSpend, validSpend: totalSpend, reward: reward, rate: (totalSpend>0?(totalSpend/totalMiles).toFixed(1):0), isCustom, cycleStart, cycleEnd };
 }
         
         // Happy+ (V123.10: 修正 3000 門檻)
@@ -793,7 +839,7 @@ if (addedAmount > 0) { const currentRate = addedIsHsbcForeign ? rateForeign : ra
             if (totalSpend < 3000) {
                 // 未滿3000，僅基本回饋 (約0.5%)
                 reward = totalSpend * 0.005;
-return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.5" };
+return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.5", isCustom, cycleStart, cycleEnd };
 } else {
                 // 滿3000，啟動高回饋
                 const petSpend = relevantTx.filter(t => t.isHappyPet).reduce((sum, t) => sum + t.amount, 0) + (addedIsHappyPet ? addedAmount : 0);
@@ -803,7 +849,7 @@ const foreignSpend = relevantTx.filter(t => t.isHappyForeign).reduce((sum, t) =>
 const normalSpend = Math.max(0, totalSpend - petSpend - lifeSpend - peaceSpend - foreignSpend);
 reward = (Math.min(petSpend, 5263)*0.1) + (Math.min(lifeSpend, 5714)*0.04) + (Math.min(peaceSpend, 5714)*0.04) + (foreignSpend*0.025) + (normalSpend*0.005);
                 if(totalSpend >= 26000) reward += 400;
-return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "10.0" };
+return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "10.0", isCustom, cycleStart, cycleEnd };
 }
         }
         
@@ -812,14 +858,14 @@ return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), 
             if (totalSpend < 12000) {
                 // 未滿12000，僅一般回饋 (1%)
                 reward = totalSpend * 0.01;
-return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "1.0" };
+return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "1.0", isCustom, cycleStart, cycleEnd };
 } else {
                 // 滿12000，啟動綠色6%
                 const greenSpend = relevantTx.filter(t => t.isGreen).reduce((sum, t) => sum + t.amount, 0) + (addedIsGreen ? addedAmount : 0);
 const foreignSpend = relevantTx.filter(t => t.isForeign).reduce((sum, t) => sum + t.amount, 0) + (addedIsForeign ? addedAmount : 0);
 const normalSpend = Math.max(0, totalSpend - greenSpend - foreignSpend);
                 reward = (Math.min(greenSpend, 2500)*0.06) + (foreignSpend*0.02) + (normalSpend*0.01);
-return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "6.0" };
+return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "6.0", isCustom, cycleStart, cycleEnd };
 }
         }
         
@@ -831,14 +877,14 @@ let baseCap = 40000;
 }
             const bonusSpend = relevantTx.filter(t => t.isUniBonus).reduce((sum, t) => sum + t.amount, 0) + (addedIsUniBonus ? addedAmount : 0);
 reward = (Math.min(totalSpend, baseCap) * baseRate) + (Math.max(0, totalSpend-baseCap)*0.01) + (Math.min(bonusSpend, 16666)*0.03);
-return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: (baseRate*100).toFixed(1) };
+return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: (baseRate*100).toFixed(1), isCustom, cycleStart, cycleEnd };
 }
         // Pig
         if (cardId === 'c6') {
              const threshold = 8000;
 if (totalSpend > threshold) reward = (threshold * 0.135) + ((totalSpend - threshold) * 0.035);
 else reward = totalSpend * 0.135;
-             return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: (totalSpend>0?(reward/totalSpend)*100:13.5).toFixed(1) };
+             return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: (totalSpend>0?(reward/totalSpend)*100:13.5).toFixed(1), isCustom, cycleStart, cycleEnd };
 }
         
         let validSpend = totalSpend;
@@ -853,7 +899,7 @@ else reward = (card.limit * card.tier1Rate) + ((validSpend - card.limit) * card.
 }
         let currentRate = (card.tier1Rate || 0)*100;
         if(totalSpend>0) currentRate = (reward/totalSpend)*100;
-return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: currentRate.toFixed(1) };
+return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: currentRate.toFixed(1), isCustom, cycleStart, cycleEnd };
 }
 
     // ... (toggleBillLogic 等切換邏輯保持不變) ...
@@ -1023,7 +1069,13 @@ if (card.id === 'c9') {
 // V123.39: Show Max Rate for Richart on cover
 if (card.id === 'c11') displayRate = '3.8%';
 
-            tile.innerHTML = `<div class="tile-header"><span class="tile-name">${card.name}</span><span class="rate-badge" style="color:black">${displayRate}</span></div><div class="${nickClass}">${card.nickname}</div><span class="tile-note" style="color:${card.textColor==='white'?'rgba(255,255,255,0.8)':'rgba(0,0,0,0.6)'}">${card.note}</span><div class="tile-body"><div class="tile-stat">$${stats.spend.toLocaleString()}</div><div class="tile-earned">${earnedText}</div></div><div class="tile-footer"><div class="progress-track"><div class="progress-fill" style="width:${Math.min(percent, 100)}%"></div></div><div class="tile-msg" style="${msgStyle}">${statusText}</div></div>`;
+            // V123.42: Hint text for custom cycle
+            let cycleHint = '';
+            if (stats.isCustom) {
+                cycleHint = `<div class="tile-cycle-hint">週期: ${stats.cycleStart.getMonth()+1}/${stats.cycleStart.getDate()}-${stats.cycleEnd.getMonth()+1}/${stats.cycleEnd.getDate()}</div>`;
+            }
+
+            tile.innerHTML = `<div class="tile-header"><span class="tile-name">${card.name}</span><span class="rate-badge" style="color:black">${displayRate}</span></div><div class="${nickClass}">${card.nickname}</div><span class="tile-note" style="color:${card.textColor==='white'?'rgba(255,255,255,0.8)':'rgba(0,0,0,0.6)'}">${card.note}</span><div class="tile-body"><div class="tile-stat">$${stats.spend.toLocaleString()}</div><div class="tile-earned">${earnedText}</div></div><div class="tile-footer"><div class="progress-track"><div class="progress-fill" style="width:${Math.min(percent, 100)}%"></div></div><div class="tile-msg" style="${msgStyle}">${statusText}</div>${cycleHint}</div>`;
 container.appendChild(tile);
         });
         checkUrgentTasks(); initSortable();
@@ -1038,17 +1090,47 @@ const currentRealCardsCount = visibleCards.filter(id => realCardIds.includes(id)
             if (card.id === 'add1') return; 
             const isVisible = visibleCards.includes(card.id);
             const item = document.createElement('div'); item.className = 'manage-item';
-            item.onclick = function(e) { if (e.target.tagName === 'INPUT') return; const checkbox = this.querySelector('input[type="checkbox"]'); if (!checkbox.checked && currentRealCardsCount >= 8) { alert('⚠️ 最多只能顯示 8 張卡片，請先隱藏一張！'); return; } checkbox.checked = !checkbox.checked; toggleCardVisibility(card.id); 
-};
+            
+            // V123.42: Setting Button
+            const settingBtn = document.createElement('button');
+            settingBtn.className = 'btn-card-setting';
+            settingBtn.innerHTML = '⚙️';
+            settingBtn.onclick = (e) => { e.stopPropagation(); editCardSettings(card.id); };
+
             const label = document.createElement('label'); label.className = 'switch'; label.onclick = function(e) { e.stopPropagation(); }; 
             const input = document.createElement('input'); input.type = 'checkbox'; input.checked = isVisible;
             input.onchange = function() { if (this.checked && currentRealCardsCount >= 8) { alert('⚠️ 最多只能顯示 8 張卡片，請先隱藏一張！'); this.checked = false; return; } toggleCardVisibility(card.id); };
             const slider = document.createElement('span');
 slider.className = 'slider'; label.appendChild(input); label.appendChild(slider);
-            item.innerHTML = `<div class="manage-info"><div class="manage-name">${card.name}</div><div class="manage-desc">${card.nickname}</div></div>`; item.appendChild(label); list.appendChild(item);
+            
+            // Re-bind item onclick to toggle
+            item.onclick = function(e) { if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return; const checkbox = this.querySelector('input[type="checkbox"]'); if (!checkbox.checked && currentRealCardsCount >= 8) { alert('⚠️ 最多只能顯示 8 張卡片，請先隱藏一張！'); return; } checkbox.checked = !checkbox.checked; toggleCardVisibility(card.id); };
+
+            item.innerHTML = `<div class="manage-info"><div class="manage-name">${card.name}</div><div class="manage-desc">${card.nickname}</div></div>`; 
+            item.appendChild(settingBtn);
+            item.appendChild(label); 
+            list.appendChild(item);
         });
         document.getElementById('manageModal').style.display = 'flex';
 }
+
+    // V123.42: Edit Settings Logic
+    function editCardSettings(cardId) {
+        const current = cardSettings[cardId] || {};
+        const bDay = prompt('請輸入此卡片的「結帳日」 (1-31)\n\n例如：若帳單週期為 1/17~2/16，請輸入 17。\n若輸入 1 或不輸入，則代表每月 1 號開始。', current.billingDay || '');
+        
+        if (bDay !== null) {
+            const dayNum = parseInt(bDay);
+            if (!isNaN(dayNum) && dayNum >= 1 && dayNum <= 31) {
+                cardSettings[cardId] = { billingDay: dayNum };
+            } else {
+                delete cardSettings[cardId]; // Reset if invalid
+            }
+            localStorage.setItem('cardSettings', JSON.stringify(cardSettings));
+            renderGrid();
+            alert('✅ 設定已更新！');
+        }
+    }
     
     function toggleCardVisibility(cardId) {
         if (visibleCards.includes(cardId)) { visibleCards = visibleCards.filter(id => id !== cardId);
@@ -1343,7 +1425,8 @@ transactions = []; renderGrid(); } }
                 hsbc_redeemed_miles: localStorage.getItem('hsbc_redeemed_miles'),
                 uniOpenState: localStorage.getItem('uniOpenState'),
                 visibleCards: localStorage.getItem('visibleCards'),
-                cardOrder: localStorage.getItem('cardOrder')
+                cardOrder: localStorage.getItem('cardOrder'),
+                cardSettings: localStorage.getItem('cardSettings') // V123.42 Add this
             }
         };
 const dataStr = JSON.stringify(backupData); 
@@ -1388,6 +1471,7 @@ if(json.settings.hsbc_initial_miles) localStorage.setItem('hsbc_initial_miles', 
                         if(json.settings.uniOpenState) localStorage.setItem('uniOpenState', json.settings.uniOpenState);
                         if(json.settings.visibleCards) localStorage.setItem('visibleCards', json.settings.visibleCards);
                         if(json.settings.cardOrder) localStorage.setItem('cardOrder', json.settings.cardOrder);
+                        if(json.settings.cardSettings) localStorage.setItem('cardSettings', json.settings.cardSettings); // V123.42
 }
                     alert('✅ 完整備份還原成功！(含設定與哩程)');
 }

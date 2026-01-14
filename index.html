@@ -68,6 +68,7 @@
         .progress-fill { height: 100%; background: rgba(255,255,255,0.95); transition: width 0.5s ease; }
         .tile-msg { font-size: 11px; font-weight: 700; opacity: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
         .tile-cycle-hint { font-size: 9px; color: rgba(255,255,255,0.6); margin-top: 2px; text-align: right; }
+        .tile-cycle-hint.dark-text { color: rgba(0,0,0,0.4); } /* New for light cards */
         
         .history-section { flex: 1; display: flex; flex-direction: column; }
         .history-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #555; }
@@ -171,7 +172,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V123.46</div>
+            <div class="version-tag">V123.47</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -337,7 +338,7 @@ id="checkUniUp" onchange="updateRewardPreview()"></div>
     window.addEventListener('load', () => {
         setTimeout(() => { const ticker = document.querySelector('.ticker-content'); if(ticker) { ticker.style.animation = 'none'; void ticker.offsetWidth; ticker.style.animation = 'scroll-left 15s linear infinite'; } }, 100);
         let currentCards = JSON.parse(localStorage.getItem('visibleCards')) || [];
-        const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9', 'c10', 'c11']; // Added c11
+        const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9', 'c10', 'c11']; 
         let realCards = currentCards.filter(id => realCardIds.includes(id));
         if (realCards.length > 8) { realCards = realCards.slice(0, 8); localStorage.setItem('visibleCards', JSON.stringify(realCards)); }
         if (realCards.length < 8) { if (!currentCards.includes('add1')) { realCards.push('add1'); localStorage.setItem('visibleCards', JSON.stringify(realCards)); } } 
@@ -422,7 +423,10 @@ textColor: 'white', msgDanger: '已封頂 (變3.5%)',
      
        id: 'c4', name: '將來將將卡', nickname: '行支泛用', note: '行動支付 / 外送 (刷 $6,666 封頂)', rule: '', 
             type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
-            gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: '#333', msgDanger: '已封頂 (變0.5%)',
+            gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', // Old Orange
+            // V123.47: Change to Lemon Yellow
+            gradient: 'linear-gradient(135deg, #ffe259 0%, #ffa751 100%)', // Bright Yellow
+            textColor: '#333', msgDanger: '已封頂 (變0.5%)',
             parking: `
                 🎯 <b>任務：</b>當月累積滿 <b>$3,000</b>，指定通路即享 <b>5%</b><br>
   
@@ -558,7 +562,8 @@ textColor: 'white', msgDanger: '已封頂 (變3.5%)',
             id: 'c10', name: '中信 UniOpen 卡', nickname: '統一集團神卡', note: 'icash($3750) / 任務($1.25萬) / 集團($2.5萬) / 海外($6250)', 
             type: 'uniopen_special', 
        
-     gradient: 'linear-gradient(135deg, #FF8008 0%, #FFC837 100%)', 
+     // V123.47: Change to Coral Orange
+     gradient: 'linear-gradient(135deg, #FF512F 0%, #F09819 100%)', 
             textColor: 'white', msgDanger: '',
             parking: `
                 🏪 <b>統一集團通路加碼</b><br>
@@ -1233,32 +1238,25 @@ document.getElementById('labelBaseRate').innerText = isBill ? "🔰 基本回饋
 setTimeout(() => document.getElementById('amountInput').focus(), 100);
     }
     
-    // V123.15 修復：只顯示總門檻，且背景透明
-    function renderHappyDashboard() {
-        const dashboard = document.getElementById('happyDashboard');
-const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
-        const txs = transactions.filter(t => t.cardId === 'c8' && new Date(t.date) >= startDate);
-const totalSpend = txs.reduce((sum, t) => sum + t.amount, 0);
-const createBar = (label, current, max) => {
-            const percent = Math.min((current / max) * 100, 100);
-const isDanger = percent >= 100;
-            return `<div class="dash-row"><div class="dash-label"><span>${label}</span><span style="color:${isDanger ? 'red' : '#555'}">$${current.toLocaleString()} / ${max.toLocaleString()}</span></div><div class="dash-bar-bg"><div class="dash-bar-fill ${isDanger ? 'danger' : ''}" style="width: ${percent}%"></div></div></div>`;
-};
-        // Simplified dashboard content
-        dashboard.innerHTML = createBar('💰 滿額門檻', totalSpend, 26000);
-}
-    
+    // V123.43: Fix renderModalHistory to use Billing Cycle
     function renderModalHistory(cardId) {
         const container = document.getElementById('modalHistoryList');
-const titleDiv = document.getElementById('modalHistoryTitle');
+        const titleDiv = document.getElementById('modalHistoryTitle');
         container.innerHTML = '';
-        const now = new Date();
-        const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-        const dateRange = `${now.getMonth() + 1}/1 - ${now.getMonth() + 1}/${lastDay}`;
-titleDiv.innerHTML = `<span>📅 本月 (${dateRange}) 消費紀錄</span><span style="font-weight:normal; font-size:10px; color:#aaa;">(點擊文字修改 / ✕ 刪除)</span>`;
-const cardTx = transactions.filter(t => t.cardId === cardId && new Date(t.date) >= currentMonthStart).reverse();
-if (cardTx.length === 0) { container.innerHTML = '<div style="text-align:center; color:#ccc; font-size:12px; margin-top:10px;">本月尚無消費紀錄</div>'; return;
+        
+        // Use the same cycle logic as the card tile
+        const { start, end, isCustom } = getBillingCycle(cardId);
+        
+        // Dynamic Title
+        const rangeText = `${start.getMonth() + 1}/${start.getDate()} - ${end.getMonth() + 1}/${end.getDate()}`;
+        titleDiv.innerHTML = `<span>📅 本期 (${rangeText}) 消費紀錄</span><span style="font-weight:normal; font-size:10px; color:#aaa;">(點擊文字修改 / ✕ 刪除)</span>`;
+
+        const cardTx = transactions.filter(t => {
+            const tDate = new Date(t.date);
+            return t.cardId === cardId && tDate >= start && tDate <= end;
+        }).reverse(); // Show newest first
+
+        if (cardTx.length === 0) { container.innerHTML = '<div style="text-align:center; color:#ccc; font-size:12px; margin-top:10px;">本期尚無消費紀錄</div>'; return;
 }
         cardTx.forEach(tx => {
             const item = document.createElement('div'); item.className = 'history-item'; 
@@ -1267,6 +1265,8 @@ if (cardTx.length === 0) { container.innerHTML = '<div style="text-align:center;
             if (tx.isGreen) noteText = '🌿 ' + noteText; if (tx.isForeign) noteText = '✈️ ' + noteText; if (tx.isUniBonus) noteText = '🔥 ' + noteText; if (tx.isHappyPet) noteText 
 = '🐶 ' + noteText; if (tx.isHappyPeace) noteText = '🍽️ ' + noteText; if (tx.isHappyLife) noteText = '🛒 ' + noteText; if (tx.isHappyForeign) noteText = '✈️ ' + noteText; if (tx.isHsbcForeign) noteText = '✈️ ' + noteText;
             if (tx.isUniGroup) noteText = '🏪 ' + noteText; if (tx.isUniIcash) noteText = '📱 ' + noteText; if (tx.isUniOverseas) noteText = '✈️ ' + noteText;
+            // Richart Badges
+            if (tx.isRichartPay) noteText = '📱 ' + noteText; if (tx.isRichartOnline) noteText = '🛍️ ' + noteText; if (tx.isRichartLine) noteText = '🟢 ' + noteText; if (tx.isRichartOverseas) noteText = '✈️ ' + noteText;
 
             let amountDisplay = `$${tx.amount.toLocaleString()}`;
             if (cardId 
@@ -1322,6 +1322,13 @@ if(document.getElementById('checkHappyForeign')) document.getElementById('checkH
         if(document.getElementById('checkUniGroup')) document.getElementById('checkUniGroup').checked = tx.isUniGroup;
         if(document.getElementById('checkUniIcash')) document.getElementById('checkUniIcash').checked = tx.isUniIcash;
         if(document.getElementById('checkUniOverseas')) document.getElementById('checkUniOverseas').checked = tx.isUniOverseas;
+        // Richart (Restore Radio)
+        if (tx.isRichartPay) document.getElementById('rbRichartPay').checked = true;
+        else if (tx.isRichartOnline) document.getElementById('rbRichartOnline').checked = true;
+        else if (tx.isRichartLine) document.getElementById('rbRichartLine').checked = true;
+        else if (tx.isRichartOverseas) document.getElementById('rbRichartOverseas').checked = true;
+        else document.getElementById('rbRichartGeneral').checked = true;
+
 // Change button text
         document.getElementById('btn-confirm').innerText = "修改";
         updateRewardPreview();
@@ -1352,6 +1359,12 @@ let isHappyForeign = document.getElementById('checkHappyForeign') ? document.get
 let isUniGroup = document.getElementById('checkUniGroup') ? document.getElementById('checkUniGroup').checked : false;
         let isUniIcash = document.getElementById('checkUniIcash') ? document.getElementById('checkUniIcash').checked : false;
 let isUniOverseas = document.getElementById('checkUniOverseas') ? document.getElementById('checkUniOverseas').checked : false;
+        // Richart Radio
+        let richartMode = document.querySelector('input[name="richartMode"]:checked') ? document.querySelector('input[name="richartMode"]:checked').value : 'general';
+        let isRichartPay = richartMode === 'pay';
+        let isRichartOnline = richartMode === 'online';
+        let isRichartLine = richartMode === 'line';
+        let isRichartOverseas = richartMode === 'overseas';
 
         // V123.22: Update or Create
         if (editingId) {
@@ -1364,7 +1377,8 @@ if (index !== -1) {
                     note: note,
                 
     date: dateStr,
-                    isGreen, isForeign, isUniBonus, isUniUp, isHappyPet, isHappyPeace, isHappyLife, isHappyForeign, isHsbcForeign, isUniGroup, isUniIcash, isUniOverseas
+                    isGreen, isForeign, isUniBonus, isUniUp, isHappyPet, isHappyPeace, isHappyLife, isHappyForeign, isHsbcForeign, isUniGroup, isUniIcash, isUniOverseas,
+                    isRichartPay, isRichartOnline, isRichartLine, isRichartOverseas
                 };
 }
             editingId = null;
@@ -1375,7 +1389,8 @@ if (index !== -1) {
                 isGreen, isForeign, isUniBonus, isUniUp, 
                 isHappyPet, isHappyPeace, isHappyLife, isHappyForeign, isHsbcForeign,
      
-           isUniGroup, isUniIcash, isUniOverseas
+           isUniGroup, isUniIcash, isUniOverseas,
+           isRichartPay, isRichartOnline, isRichartLine, isRichartOverseas
             });
 }
         
@@ -1408,7 +1423,8 @@ transactions = []; renderGrid(); } }
                 hsbc_redeemed_miles: localStorage.getItem('hsbc_redeemed_miles'),
                 uniOpenState: localStorage.getItem('uniOpenState'),
                 visibleCards: localStorage.getItem('visibleCards'),
-                cardOrder: localStorage.getItem('cardOrder')
+                cardOrder: localStorage.getItem('cardOrder'),
+                cardSettings: localStorage.getItem('cardSettings') // V123.42 Add this
             }
         };
 const dataStr = JSON.stringify(backupData); 
@@ -1453,6 +1469,7 @@ if(json.settings.hsbc_initial_miles) localStorage.setItem('hsbc_initial_miles', 
                         if(json.settings.uniOpenState) localStorage.setItem('uniOpenState', json.settings.uniOpenState);
                         if(json.settings.visibleCards) localStorage.setItem('visibleCards', json.settings.visibleCards);
                         if(json.settings.cardOrder) localStorage.setItem('cardOrder', json.settings.cardOrder);
+                        if(json.settings.cardSettings) localStorage.setItem('cardSettings', json.settings.cardSettings); // V123.42
 }
                     alert('✅ 完整備份還原成功！(含設定與哩程)');
 }

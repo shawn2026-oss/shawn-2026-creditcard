@@ -171,7 +171,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag">V123.43</div>
+            <div class="version-tag">V123.45</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -183,7 +183,7 @@
         </div>
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
         <div class="total-reward-card">
-            <span class="total-reward-label">本月總回饋預估</span>
+            <span class="total-reward-label">當期累積回饋預估</span>
             <span class="total-reward-amount" id="totalRewardDisplay">$0</span>
         </div>
         <div id="card-grid"></div>
@@ -541,7 +541,7 @@ textColor: 'white', msgDanger: '已封頂 (變3.5%)',
                 </div>
             `
         },
-        { id: 'c9', name: '匯豐旅人卡', nickname: '哩程累積', note: '無限:國內18/國外10 | 御璽:國內18/國外15', type: 'miles', gradient: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)', textColor: 'white', msgDanger: '',
+        { id: 'c9', name: '滙豐旅人卡', nickname: '哩程累積', note: '無限:國內18/國外10 | 御璽:國內18/國外15', type: 'miles', gradient: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)', textColor: 'white', msgDanger: '',
            
  parking: `
                 ✈️ <b>哩程累積神卡</b><br>
@@ -1000,7 +1000,7 @@ document.getElementById('totalRewardDisplay').innerText = `$${monthTotalReward.t
          
        const tier = localStorage.getItem('hsbc_tier') || 'infinite';
                 card.name = (tier === 'infinite') ?
-'匯豐旅人無限卡' : '匯豐旅人御璽卡';
+'滙豐旅人無限卡' : '滙豐旅人御璽卡';
                 card.note = (tier === 'infinite') ? '國內18/國外10 (哩)' : '國內18/國外15 (哩)';
                 statusText = `總哩程 ${stats.reward.toLocaleString()} 哩`;
 msgStyle = 'color: #007AFF; font-weight:bold;';

@@ -117,7 +117,7 @@
         .btn-delete-single { background: none; border: none; color: #ccc; font-size: 14px; padding: 0 5px; cursor: pointer; margin-left: 8px;}
         .btn-delete-single:hover { color: #FF3B30; }
         
-        #pigRichOptions, #greenCardOptions, #uniOptions, #happyOptions, #hsbcOptions, #uniOpenOptions { display: none; background: #f9f9f9; padding: 10px; border-radius: 10px; margin-top: 10px; border: 1px dashed #ddd; }
+        #pigRichOptions, #greenCardOptions, #uniOptions, #happyOptions, #hsbcOptions, #uniOpenOptions, #richartOptions { display: none; background: #f9f9f9; padding: 10px; border-radius: 10px; margin-top: 10px; border: 1px dashed #ddd; }
         .option-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #555; }
         .option-row input[type="checkbox"], .option-row input[type="radio"], .option-row input[type="number"] { margin: 0; }
         .option-row input[type="checkbox"], .option-row input[type="radio"] { width: 20px; height: 20px; }
@@ -165,7 +165,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Shawn</div>
-            <div class="version-tag">V123.36</div>
+            <div class="version-tag">V123.41</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -272,6 +272,22 @@ id="checkUniUp" onchange="updateRewardPreview()"></div>
                      <div class="option-row" style="margin-top:10px; border-top:1px dashed #ddd; padding-top:6px;"><label for="checkHsbcForeign">✈️ 國外消費</label><input type="checkbox" id="checkHsbcForeign" onchange="updateRewardPreview()"></div>
                 </div>
                 
+                <div id="richartOptions">
+                    <div style="font-size:12px; color:#D32F2F; background:#FFEBEE; padding:8px; border-radius:6px; margin-bottom:10px; font-weight:700; border:1px solid #FFCDD2;">
+                        ⚠️ 需綁定 Richart 帳戶自動扣繳 (未綁僅0.3%)
+                    </div>
+                    
+                    <div class="option-row"><label for="rbRichartGeneral">🔰 一般消費 (0.3%)</label><input type="radio" name="richartMode" id="rbRichartGeneral" value="general" checked onchange="toggleRichartLogic()"></div>
+                    <div class="option-row"><label for="rbRichartPay">📱 台新Pay/Pay+ (3.8%)</label><input type="radio" name="richartMode" id="rbRichartPay" value="pay" onchange="toggleRichartLogic()"></div>
+                    <div class="option-row"><label for="rbRichartOnline">🛍️ 指定網購/影音 (3.3%)</label><input type="radio" name="richartMode" id="rbRichartOnline" value="online" onchange="toggleRichartLogic()"></div>
+                    <div class="option-row"><label for="rbRichartLine">🟢 LINE Pay (2.3%)</label><input type="radio" name="richartMode" id="rbRichartLine" value="line" onchange="toggleRichartLogic()"></div>
+                    <div class="option-row" style="border-top:1px dashed #ddd; margin-top:6px; padding-top:6px;"><label for="rbRichartOverseas">✈️ 海外消費 (3.3%)</label><input type="radio" name="richartMode" id="rbRichartOverseas" value="overseas" onchange="toggleRichartLogic()"></div>
+                    
+                    <div style="font-size:10px; color:#555; margin-top:8px; opacity:0.8;">
+                        💡 小撇步：若網購使用台新Pay，請勾選「台新Pay (3.8%)」
+                    </div>
+                </div>
+                
                 <div class="input-group" style="margin-top:15px; border-top:1px solid #eee; padding-top:15px;">
                     <label style="margin-bottom:4px;">📅 消費日期</label>
                     <input type="date" id="dateInput" style="font-size:16px; padding:8px; text-align:left;">
@@ -312,7 +328,7 @@ id="checkUniUp" onchange="updateRewardPreview()"></div>
     window.addEventListener('load', () => {
         setTimeout(() => { const ticker = document.querySelector('.ticker-content'); if(ticker) { ticker.style.animation = 'none'; void ticker.offsetWidth; ticker.style.animation = 'scroll-left 15s linear infinite'; } }, 100);
         let currentCards = JSON.parse(localStorage.getItem('visibleCards')) || [];
-        const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9', 'c10'];
+        const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9', 'c10', 'c11']; // Added c11
         let realCards = currentCards.filter(id => realCardIds.includes(id));
         if (realCards.length > 8) { realCards = realCards.slice(0, 8); localStorage.setItem('visibleCards', JSON.stringify(realCards)); }
         if (realCards.length < 8) { if (!currentCards.includes('add1')) { realCards.push('add1'); localStorage.setItem('visibleCards', JSON.stringify(realCards)); } } 
@@ -450,7 +466,7 @@ textColor: 'white', msgDanger: '已封頂 (變3.5%)',
      
    },
         {
-            id: 'c7', name: '玉山 UNI 卡', nickname: '行支/百貨神卡', note: '任意3.5% / UP 4.5% (刷 4~14萬 封頂)',
+            id: 'c7', name: '玉山 UNI 卡', nickname: '行支/百貨優等生', note: '任意3.5% / UP 4.5% (刷 4~14萬 封頂)',
             type: 'ceiling', limit: 40000, tier1Rate: 0.035, tier2Rate: 0.01,
             gradient: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
             textColor: 'white', msgDanger: '已封頂 (變1%)',
@@ -550,12 +566,36 @@ textColor: 'white', msgDanger: '已封頂 (變3.5%)',
             `
         },
         
+        // NEW: 台新 Richart 卡 (原 @GoGo)
+        {
+            id: 'c11', name: '台新 Richart 卡', nickname: '權益自由選', 
+            note: '台新Pay 3.8% / 網購 3.3% / LP 2.3% (無上限)',
+            type: 'ceiling', limit: 99999999, // Uncapped basically
+            tier1Rate: 0.038, tier2Rate: 0.003,
+            gradient: 'linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%)', // Space Teal
+            textColor: 'white', msgDanger: '',
+            parking: `
+                🐶 <b>權益自由選 (無上限回饋)</b><br>
+                需至 Richart Life App 切換權益<br>
+                <hr style="opacity:0.3; margin:8px 0;">
+                📱 <b>Pay 著刷：</b><br>
+                台新Pay / 台新Pay+：<b>3.8%</b><br>
+                LINE Pay：<b>2.3%</b><br>
+                <br>
+                🛍️ <b>數趣刷 (網購)：3.3%</b><br>
+                蝦皮、Momo、PChome、Yahoo、Coupang...<br>
+                <br>
+                ✈️ <b>玩旅刷 (海外)：3.3%</b><br>
+                海外實體、訂房網、航空公司...
+            `
+        },
+        
         { id: 'add1', name: '新增卡片', nickname: '點擊選卡', note: '前往資料庫挑選', type: 'placeholder', gradient: 'linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%)', textColor: '#999', msgDanger: '' }
     ];
 
     let visibleCards = JSON.parse(localStorage.getItem('visibleCards'));
     if (!visibleCards) { visibleCards = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8']; localStorage.setItem('visibleCards', JSON.stringify(visibleCards)); }
-    else { if (!visibleCards.includes('c8')) visibleCards.push('c8'); const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9', 'c10']; let currentRealCards = visibleCards.filter(id => realCardIds.includes(id)); if (currentRealCards.length > 8) { visibleCards = currentRealCards.slice(0, 8); } else if (currentRealCards.length === 8) { visibleCards = currentRealCards; } else { if (!visibleCards.includes('add1')) visibleCards.push('add1'); visibleCards = visibleCards.filter(id => id !== 'add2');
+    else { if (!visibleCards.includes('c8')) visibleCards.push('c8'); const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9', 'c10', 'c11']; let currentRealCards = visibleCards.filter(id => realCardIds.includes(id)); if (currentRealCards.length > 8) { visibleCards = currentRealCards.slice(0, 8); } else if (currentRealCards.length === 8) { visibleCards = currentRealCards; } else { if (!visibleCards.includes('add1')) visibleCards.push('add1'); visibleCards = visibleCards.filter(id => id !== 'add2');
 } localStorage.setItem('visibleCards', JSON.stringify(visibleCards)); }
 
     let savedOrder = JSON.parse(localStorage.getItem('cardOrder'));
@@ -657,7 +697,7 @@ saveUniOpenState();
     }
 
     // --- 核心計算邏輯 (V123.10: 修正回溯觸發條件) ---
-    function calculateStats(cardId, addedAmount = 0, addedIsGreen = false, addedIsForeign = false, addedIsUniBonus = false, addedIsUniUp = false, addedIsHappyPet = false, addedIsHappyLife = false, addedIsHappyForeign = false, addedIsHappyPeace = false, addedIsHsbcForeign = false, addedIsUniGroup = false, addedIsUniIcash = false, addedIsUniOverseas = false) {
+    function calculateStats(cardId, addedAmount = 0, addedIsGreen = false, addedIsForeign = false, addedIsUniBonus = false, addedIsUniUp = false, addedIsHappyPet = false, addedIsHappyLife = false, addedIsHappyForeign = false, addedIsHappyPeace = false, addedIsHsbcForeign = false, addedIsUniGroup = false, addedIsUniIcash = false, addedIsUniOverseas = false, addedIsRichartPay = false, addedIsRichartOnline = false, addedIsRichartLine = false, addedIsRichartOverseas = false) {
         const card = cards.find(c => c.id === cardId);
 if (card.type === 'placeholder') return { spend: 0, validSpend: 0, reward: 0, rate: '0.0' };
 const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1); 
@@ -696,6 +736,35 @@ else { if (savedState.group) displayRate += 2; if (savedState.icash) displayRate
             
             return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: displayRate.toFixed(1) };
 }
+
+        // Richart (c11)
+        if (cardId === 'c11') {
+            // New Logic: 0.3% base + specific logic
+            // Note: Unlimited
+            const richartPaySpend = relevantTx.filter(t => t.isRichartPay).reduce((sum, t) => sum + t.amount, 0) + (addedIsRichartPay ? addedAmount : 0);
+            const richartOnlineSpend = relevantTx.filter(t => t.isRichartOnline).reduce((sum, t) => sum + t.amount, 0) + (addedIsRichartOnline ? addedAmount : 0);
+            const richartLineSpend = relevantTx.filter(t => t.isRichartLine).reduce((sum, t) => sum + t.amount, 0) + (addedIsRichartLine ? addedAmount : 0);
+            const richartOverseasSpend = relevantTx.filter(t => t.isRichartOverseas).reduce((sum, t) => sum + t.amount, 0) + (addedIsRichartOverseas ? addedAmount : 0);
+            
+            const normalSpend = Math.max(0, totalSpend - richartPaySpend - richartOnlineSpend - richartLineSpend - richartOverseasSpend);
+            
+            // Rate Calculation
+            reward = (richartPaySpend * 0.038) + 
+                     (richartOnlineSpend * 0.033) + 
+                     (richartLineSpend * 0.023) + 
+                     (richartOverseasSpend * 0.033) + 
+                     (normalSpend * 0.003);
+            
+            // Display Rate Estimate
+            let currentRate = 0.3;
+            if(totalSpend > 0) currentRate = (reward / totalSpend) * 100;
+            else if(addedIsRichartPay) currentRate = 3.8;
+            else if(addedIsRichartOnline) currentRate = 3.3;
+            else if(addedIsRichartLine) currentRate = 2.3;
+            else if(addedIsRichartOverseas) currentRate = 3.3;
+            
+            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: currentRate.toFixed(1) };
+        }
 
         // HSBC
         if (cardId === 'c9') {
@@ -806,6 +875,12 @@ document.getElementById('labelBaseRate').innerText = isBill ? "🔰 基本回饋
 }
     function toggleHappyForeign() { if(document.getElementById('checkHappyForeign').checked) { document.getElementById('checkHappyPet').checked = false; document.getElementById('checkHappyPeace').checked = false; document.getElementById('checkHappyLife').checked = false; } updateRewardPreview();
 }
+    // New Richart Toggles
+    function toggleRichartLogic() {
+        // Allow multiple for switching scenarios in preview, but conceptually usually one at a time per transaction.
+        // Actually, let them check whatever applies.
+        updateRewardPreview();
+    }
 
     function updateRewardPreview() {
         const inputVal = document.getElementById('amountInput').value;
@@ -828,9 +903,15 @@ let isHappyForeign = document.getElementById('checkHappyForeign') ? document.get
 let isUniGroup = document.getElementById('checkUniGroup') ? document.getElementById('checkUniGroup').checked : false;
         let isUniIcash = document.getElementById('checkUniIcash') ? document.getElementById('checkUniIcash').checked : false;
 let isUniOverseas = document.getElementById('checkUniOverseas') ? document.getElementById('checkUniOverseas').checked : false;
+        // Richart (Radio)
+        let richartMode = document.querySelector('input[name="richartMode"]:checked') ? document.querySelector('input[name="richartMode"]:checked').value : 'general';
+        let isRichartPay = richartMode === 'pay';
+        let isRichartOnline = richartMode === 'online';
+        let isRichartLine = richartMode === 'line';
+        let isRichartOverseas = richartMode === 'overseas';
 
         const currentStats = calculateStats(cardId, 0);
-const newStats = calculateStats(cardId, amount, isGreen, isForeign, isUniBonus, isUniUp, isHappyPet, isHappyLife, isHappyForeign, isHappyPeace, isHsbcForeign, isUniGroup, isUniIcash, isUniOverseas);
+const newStats = calculateStats(cardId, amount, isGreen, isForeign, isUniBonus, isUniUp, isHappyPet, isHappyLife, isHappyForeign, isHappyPeace, isHsbcForeign, isUniGroup, isUniIcash, isUniOverseas, isRichartPay, isRichartOnline, isRichartLine, isRichartOverseas);
 const thisTransactionReward = newStats.reward - currentStats.reward;
         
         if (cardId === 'c9') { 
@@ -939,6 +1020,8 @@ if (card.id === 'c9') {
     });
     earnedText = `+${monthlyMiles.toLocaleString()} 哩`;
 }
+// V123.39: Show Max Rate for Richart on cover
+if (card.id === 'c11') displayRate = '3.8%';
 
             tile.innerHTML = `<div class="tile-header"><span class="tile-name">${card.name}</span><span class="rate-badge" style="color:black">${displayRate}</span></div><div class="${nickClass}">${card.nickname}</div><span class="tile-note" style="color:${card.textColor==='white'?'rgba(255,255,255,0.8)':'rgba(0,0,0,0.6)'}">${card.note}</span><div class="tile-body"><div class="tile-stat">$${stats.spend.toLocaleString()}</div><div class="tile-earned">${earnedText}</div></div><div class="tile-footer"><div class="progress-track"><div class="progress-fill" style="width:${Math.min(percent, 100)}%"></div></div><div class="tile-msg" style="${msgStyle}">${statusText}</div></div>`;
 container.appendChild(tile);
@@ -949,7 +1032,7 @@ container.appendChild(tile);
     function openManageModal() {
         const list = document.getElementById('manageCardList');
 list.innerHTML = '';
-        const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9', 'c10'];
+        const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9', 'c10', 'c11'];
 const currentRealCardsCount = visibleCards.filter(id => realCardIds.includes(id)).length;
         cards.forEach(card => {
             if (card.id === 'add1') return; 
@@ -1004,7 +1087,7 @@ document.getElementById('modalTitle').innerText = card.name;
         document.getElementById('btn-confirm').innerText = "確認";
 history.pushState({modalOpen: true}, "", "#modal");
         
-        ['pigRichOptions', 'greenCardOptions', 'uniOptions', 'happyOptions', 'hsbcOptions', 'uniOpenOptions'].forEach(id => { document.getElementById(id).style.display = 'none'; });
+        ['pigRichOptions', 'greenCardOptions', 'uniOptions', 'happyOptions', 'hsbcOptions', 'uniOpenOptions', 'richartOptions'].forEach(id => { document.getElementById(id).style.display = 'none'; });
 if (cardId === 'c6') document.getElementById('pigRichOptions').style.display = 'block';
         if (cardId === 'c2') document.getElementById('greenCardOptions').style.display = 'block';
 if (cardId === 'c7') document.getElementById('uniOptions').style.display = 'block';
@@ -1027,6 +1110,13 @@ btns.forEach(btn => {
 }
             const count = savedState.brands ? savedState.brands.length : 0;
 updateTaskBonusDisplay(count);
+        }
+        
+        // Richart Options
+        if (cardId === 'c11') {
+            document.getElementById('richartOptions').style.display = 'block';
+            // Reset to General
+            document.getElementById('rbRichartGeneral').checked = true;
         }
 
         if (card.parking) { document.getElementById('modalParkingInfo').innerHTML = card.parking; document.getElementById('modalParkingInfo').style.display = 'block';
@@ -1095,6 +1185,8 @@ if (cardTx.length === 0) { container.innerHTML = '<div style="text-align:center;
             if (tx.isGreen) noteText = '🌿 ' + noteText; if (tx.isForeign) noteText = '✈️ ' + noteText; if (tx.isUniBonus) noteText = '🔥 ' + noteText; if (tx.isHappyPet) noteText 
 = '🐶 ' + noteText; if (tx.isHappyPeace) noteText = '🍽️ ' + noteText; if (tx.isHappyLife) noteText = '🛒 ' + noteText; if (tx.isHappyForeign) noteText = '✈️ ' + noteText; if (tx.isHsbcForeign) noteText = '✈️ ' + noteText;
             if (tx.isUniGroup) noteText = '🏪 ' + noteText; if (tx.isUniIcash) noteText = '📱 ' + noteText; if (tx.isUniOverseas) noteText = '✈️ ' + noteText;
+            // Richart Badges
+            if (tx.isRichartPay) noteText = '📱 ' + noteText; if (tx.isRichartOnline) noteText = '🛍️ ' + noteText; if (tx.isRichartLine) noteText = '🟢 ' + noteText; if (tx.isRichartOverseas) noteText = '✈️ ' + noteText;
 
             let amountDisplay = `$${tx.amount.toLocaleString()}`;
             if (cardId 
@@ -1150,6 +1242,13 @@ if(document.getElementById('checkHappyForeign')) document.getElementById('checkH
         if(document.getElementById('checkUniGroup')) document.getElementById('checkUniGroup').checked = tx.isUniGroup;
         if(document.getElementById('checkUniIcash')) document.getElementById('checkUniIcash').checked = tx.isUniIcash;
         if(document.getElementById('checkUniOverseas')) document.getElementById('checkUniOverseas').checked = tx.isUniOverseas;
+        // Richart (Restore Radio)
+        if (tx.isRichartPay) document.getElementById('rbRichartPay').checked = true;
+        else if (tx.isRichartOnline) document.getElementById('rbRichartOnline').checked = true;
+        else if (tx.isRichartLine) document.getElementById('rbRichartLine').checked = true;
+        else if (tx.isRichartOverseas) document.getElementById('rbRichartOverseas').checked = true;
+        else document.getElementById('rbRichartGeneral').checked = true;
+
 // Change button text
         document.getElementById('btn-confirm').innerText = "修改";
         updateRewardPreview();
@@ -1180,6 +1279,12 @@ let isHappyForeign = document.getElementById('checkHappyForeign') ? document.get
 let isUniGroup = document.getElementById('checkUniGroup') ? document.getElementById('checkUniGroup').checked : false;
         let isUniIcash = document.getElementById('checkUniIcash') ? document.getElementById('checkUniIcash').checked : false;
 let isUniOverseas = document.getElementById('checkUniOverseas') ? document.getElementById('checkUniOverseas').checked : false;
+        // Richart Radio
+        let richartMode = document.querySelector('input[name="richartMode"]:checked') ? document.querySelector('input[name="richartMode"]:checked').value : 'general';
+        let isRichartPay = richartMode === 'pay';
+        let isRichartOnline = richartMode === 'online';
+        let isRichartLine = richartMode === 'line';
+        let isRichartOverseas = richartMode === 'overseas';
 
         // V123.22: Update or Create
         if (editingId) {
@@ -1192,7 +1297,8 @@ if (index !== -1) {
                     note: note,
                 
     date: dateStr,
-                    isGreen, isForeign, isUniBonus, isUniUp, isHappyPet, isHappyPeace, isHappyLife, isHappyForeign, isHsbcForeign, isUniGroup, isUniIcash, isUniOverseas
+                    isGreen, isForeign, isUniBonus, isUniUp, isHappyPet, isHappyPeace, isHappyLife, isHappyForeign, isHsbcForeign, isUniGroup, isUniIcash, isUniOverseas,
+                    isRichartPay, isRichartOnline, isRichartLine, isRichartOverseas
                 };
 }
             editingId = null;
@@ -1203,7 +1309,8 @@ if (index !== -1) {
                 isGreen, isForeign, isUniBonus, isUniUp, 
                 isHappyPet, isHappyPeace, isHappyLife, isHappyForeign, isHsbcForeign,
      
-           isUniGroup, isUniIcash, isUniOverseas
+           isUniGroup, isUniIcash, isUniOverseas,
+           isRichartPay, isRichartOnline, isRichartLine, isRichartOverseas
             });
 }
         

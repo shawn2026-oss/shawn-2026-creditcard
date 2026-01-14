@@ -170,13 +170,49 @@
         .dash-bar-bg { background: #eee; height: 6px; border-radius: 3px; overflow: hidden; }
         .dash-bar-fill { height: 100%; background: #4cd964; transition: width 0.3s; }
         .dash-bar-fill.danger { background: #ff3b30; }
+
+        /* V123.50: Welcome Modal Styles */
+        .welcome-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 9999;
+            display: none; justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        .welcome-content {
+            background: white; width: 85%; max-width: 340px;
+            border-radius: 24px; padding: 24px;
+            text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .welcome-title { font-size: 22px; font-weight: 800; color: #333; margin-bottom: 10px; }
+        .welcome-desc { font-size: 14px; color: #666; margin-bottom: 20px; line-height: 1.5; }
+        .welcome-list { text-align: left; max-height: 300px; overflow-y: auto; margin-bottom: 20px; border: 1px solid #eee; border-radius: 12px; padding: 10px; }
+        .welcome-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #f9f9f9; }
+        .welcome-item:last-child { border-bottom: none; }
+        .welcome-item input { width: 20px; height: 20px; margin-right: 12px; margin-bottom: 0; padding: 0;}
+        .welcome-item label { margin: 0; font-size: 15px; font-weight: 600; color: #333; flex: 1; }
+        .welcome-btn {
+            background: #007AFF; color: white; border: none; padding: 14px;
+            width: 100%; border-radius: 12px; font-size: 16px; font-weight: 700;
+            cursor: pointer; box-shadow: 0 4px 12px rgba(0,122,255,0.3);
+        }
+        .welcome-btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
+    <div id="welcomeModal" class="welcome-overlay">
+        <div class="welcome-content">
+            <div class="welcome-title">👋 歡迎使用回饋管家</div>
+            <div class="welcome-desc">為了提供最精準的服務<br>請勾選您<b>目前持有</b>的卡片：</div>
+            <div class="welcome-list" id="welcomeList"></div>
+            <button class="welcome-btn" onclick="saveWelcomeSettings()">開始使用 🚀</button>
+        </div>
+    </div>
+
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V123.49</div>
+            <div class="version-tag">V123.52</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -341,15 +377,101 @@ id="checkUniUp" onchange="updateRewardPreview()"></div>
 
     window.addEventListener('load', () => {
         setTimeout(() => { const ticker = document.querySelector('.ticker-content'); if(ticker) { ticker.style.animation = 'none'; void ticker.offsetWidth; ticker.style.animation = 'scroll-left 15s linear infinite'; } }, 100);
+        
+        // V123.50: Check for First Time User
+        const isSetupDone = localStorage.getItem('user_setup_done');
+        // V123.51: Silent Migration for Old Users
+        const hasLegacyData = localStorage.getItem('visibleCards') !== null;
+
+        if (!isSetupDone) {
+            if (hasLegacyData) {
+                // Old user detected -> Silent migration
+                localStorage.setItem('user_setup_done', 'true');
+                loadAndRenderApp();
+            } else {
+                // True new user -> Show Welcome Modal
+                initWelcomeModal();
+            }
+        } else {
+            // Normal Load
+            loadAndRenderApp();
+        }
+    });
+
+    // V123.50: Welcome Modal Logic
+    function initWelcomeModal() {
+        const modal = document.getElementById('welcomeModal');
+        const list = document.getElementById('welcomeList');
+        list.innerHTML = '';
+        
+        // Use cards array to generate list (exclude placeholder)
+        cards.forEach(card => {
+            if (card.id === 'add1') return;
+            const item = document.createElement('div');
+            item.className = 'welcome-item';
+            // V123.52: Default unchecked (Opt-in)
+            item.innerHTML = `
+                <input type="checkbox" id="w_${card.id}" value="${card.id}">
+                <label for="w_${card.id}">${card.name}</label>
+            `;
+            list.appendChild(item);
+        });
+        modal.style.display = 'flex';
+    }
+
+    function saveWelcomeSettings() {
+        const checkboxes = document.querySelectorAll('.welcome-item input[type="checkbox"]:checked');
+        let selectedCards = [];
+        checkboxes.forEach(cb => selectedCards.push(cb.value));
+
+        if (selectedCards.length === 0) {
+            // V123.52: Friendly Hint for 0 selection
+            alert("💡 小提醒：\n如果您剛好都沒有這些卡片，建議您可以先「隨便勾選幾張」您有興趣的卡片（例如台新 Richart 或 豬富卡）來試用看看喔！");
+            return;
+        }
+        
+        // Save to visibleCards
+        localStorage.setItem('visibleCards', JSON.stringify(selectedCards));
+        localStorage.setItem('user_setup_done', 'true');
+        
+        document.getElementById('welcomeModal').style.display = 'none';
+        
+        // Reload to apply standard logic
+        location.reload(); 
+    }
+
+    function loadAndRenderApp() {
         let currentCards = JSON.parse(localStorage.getItem('visibleCards')) || [];
+        // Fallback default if somehow empty but setup done
+        if (currentCards.length === 0) {
+            currentCards = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9', 'c10', 'c11'];
+        }
+
         const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9', 'c10', 'c11']; 
         let realCards = currentCards.filter(id => realCardIds.includes(id));
-        if (realCards.length > 8) { realCards = realCards.slice(0, 8); localStorage.setItem('visibleCards', JSON.stringify(realCards)); }
-        if (realCards.length < 8) { if (!currentCards.includes('add1')) { realCards.push('add1'); localStorage.setItem('visibleCards', JSON.stringify(realCards)); } } 
-        else { if (currentCards.includes('add1')) { localStorage.setItem('visibleCards', JSON.stringify(realCards)); } }
+        
+        // Enforce Max 8 Limit logic
+        if (realCards.length > 8) { 
+            realCards = realCards.slice(0, 8); 
+            localStorage.setItem('visibleCards', JSON.stringify(realCards)); 
+        }
+        
+        // Add placeholder if room
+        if (realCards.length < 8) { 
+            if (!currentCards.includes('add1')) { 
+                realCards.push('add1'); 
+                localStorage.setItem('visibleCards', JSON.stringify(realCards)); 
+            } 
+        } else { 
+            if (currentCards.includes('add1')) { 
+                localStorage.setItem('visibleCards', JSON.stringify(realCards)); 
+            } 
+        }
+        
         visibleCards = JSON.parse(localStorage.getItem('visibleCards'));
         renderGrid();
-    });
+    }
+
 window.addEventListener('popstate', function(event) { document.getElementById('transactionModal').style.display = 'none'; document.getElementById('manageModal').style.display = 'none'; });
 // V123.12 終極修復：補回所有卡片的詳細通路名單 (HTML)
     const defaultCards = [
@@ -1425,7 +1547,8 @@ transactions = []; renderGrid(); } }
                 uniOpenState: localStorage.getItem('uniOpenState'),
                 visibleCards: localStorage.getItem('visibleCards'),
                 cardOrder: localStorage.getItem('cardOrder'),
-                cardSettings: localStorage.getItem('cardSettings') // V123.42 Add this
+                cardSettings: localStorage.getItem('cardSettings'), // V123.42 Add this
+                user_setup_done: localStorage.getItem('user_setup_done') // V123.51 Backup this
             }
         };
 const dataStr = JSON.stringify(backupData); 
@@ -1471,6 +1594,7 @@ if(json.settings.hsbc_initial_miles) localStorage.setItem('hsbc_initial_miles', 
                         if(json.settings.visibleCards) localStorage.setItem('visibleCards', json.settings.visibleCards);
                         if(json.settings.cardOrder) localStorage.setItem('cardOrder', json.settings.cardOrder);
                         if(json.settings.cardSettings) localStorage.setItem('cardSettings', json.settings.cardSettings); // V123.42
+                        if(json.settings.user_setup_done) localStorage.setItem('user_setup_done', json.settings.user_setup_done); // V123.51
 }
                     alert('✅ 完整備份還原成功！(含設定與哩程)');
 }

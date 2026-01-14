@@ -172,7 +172,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V123.47</div>
+            <div class="version-tag">V123.48</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -338,7 +338,7 @@ id="checkUniUp" onchange="updateRewardPreview()"></div>
     window.addEventListener('load', () => {
         setTimeout(() => { const ticker = document.querySelector('.ticker-content'); if(ticker) { ticker.style.animation = 'none'; void ticker.offsetWidth; ticker.style.animation = 'scroll-left 15s linear infinite'; } }, 100);
         let currentCards = JSON.parse(localStorage.getItem('visibleCards')) || [];
-        const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9', 'c10', 'c11']; 
+        const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9', 'c10', 'c11']; // Added c11
         let realCards = currentCards.filter(id => realCardIds.includes(id));
         if (realCards.length > 8) { realCards = realCards.slice(0, 8); localStorage.setItem('visibleCards', JSON.stringify(realCards)); }
         if (realCards.length < 8) { if (!currentCards.includes('add1')) { realCards.push('add1'); localStorage.setItem('visibleCards', JSON.stringify(realCards)); } } 
@@ -389,7 +389,7 @@ textColor: 'white', msgDanger: '已封頂 (變3.5%)',
            
  id: 'c1', name: '星展傳說對決卡', nickname: 'Line Pay神卡', note: 'LinePay / 蝦皮 / 外送 (刷 $11,363 封頂)', rule: '', 
             type: 'ceiling', limit: 11363, tier1Rate: 0.10, tier2Rate: 0.012, 
-            gradient: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)', textColor: 'white', msgDanger: '已封頂 (變1.2%)' 
+            gradient: 'linear-gradient(135deg, #43cea2 0%, #185a9d 100%)', textColor: 'white', msgDanger: '已封頂 (變1.2%)' 
         },
         { 
             id: 'c5', name: '聯邦賴點卡', nickname: 'Line Pay優等生', note: 'Line Pay / 偶數日指定通路 (刷 $3,000 封頂)', rule: '⚠️ 單筆需滿$100', 
@@ -423,10 +423,7 @@ textColor: 'white', msgDanger: '已封頂 (變3.5%)',
      
        id: 'c4', name: '將來將將卡', nickname: '行支泛用', note: '行動支付 / 外送 (刷 $6,666 封頂)', rule: '', 
             type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
-            gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', // Old Orange
-            // V123.47: Change to Lemon Yellow
-            gradient: 'linear-gradient(135deg, #ffe259 0%, #ffa751 100%)', // Bright Yellow
-            textColor: '#333', msgDanger: '已封頂 (變0.5%)',
+            gradient: 'linear-gradient(135deg, #ffe259 0%, #ffa751 100%)', textColor: '#333', msgDanger: '已封頂 (變0.5%)',
             parking: `
                 🎯 <b>任務：</b>當月累積滿 <b>$3,000</b>，指定通路即享 <b>5%</b><br>
   

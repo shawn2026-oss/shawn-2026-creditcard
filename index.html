@@ -140,6 +140,7 @@
         .dash-bar-fill { height: 100%; background: #4cd964; transition: width 0.3s; }
         .dash-bar-fill.danger { background: #ff3b30; }
 
+        /* 新增：歡迎頁面樣式 */
         .welcome-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .welcome-content { background: white; width: 85%; max-width: 340px; border-radius: 24px; padding: 24px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .welcome-title { font-size: 22px; font-weight: 800; color: #333; margin-bottom: 10px; }
@@ -312,30 +313,36 @@
     fetch('config.json?t=' + Date.now()).then(response => response.json()).then(data => { if(data.news) document.getElementById('news-text').innerHTML = data.news; }).catch(error => {});
     let cardSettings = JSON.parse(localStorage.getItem('cardSettings')) || {};
 
+    // --- 修改：初始化邏輯 (New User Check) ---
     window.addEventListener('load', () => {
         setTimeout(() => { const ticker = document.querySelector('.ticker-content'); if(ticker) { ticker.style.animation = 'none'; void ticker.offsetWidth; ticker.style.animation = 'scroll-left 15s linear infinite'; } }, 100);
         
+        // 檢查是否已經完成初始化設定
         const isSetupDone = localStorage.getItem('user_setup_done');
         const hasLegacyData = localStorage.getItem('visibleCards') !== null;
 
         if (!isSetupDone) {
             if (hasLegacyData) {
+                // 如果是老用戶 (有舊資料但沒標記)，直接標記完成並載入
                 localStorage.setItem('user_setup_done', 'true');
                 loadAndRenderApp();
             } else {
+                // 如果是全新用戶，顯示歡迎視窗，不載入 Grid
                 initWelcomeModal();
             }
         } else {
+            // 正常流程
             loadAndRenderApp();
         }
     });
 
+    // --- 新增：歡迎視窗邏輯 ---
     function initWelcomeModal() {
         const modal = document.getElementById('welcomeModal');
         const list = document.getElementById('welcomeList');
         list.innerHTML = '';
         cards.forEach(card => {
-            if (card.id === 'add1') return;
+            if (card.id === 'add1') return; // 跳過 Placeholder
             const item = document.createElement('div');
             item.className = 'welcome-item';
             item.innerHTML = `
@@ -344,32 +351,44 @@
             `;
             list.appendChild(item);
         });
-        modal.style.display = 'flex';
+        modal.style.display = 'flex'; // 顯示視窗
     }
 
     function saveWelcomeSettings() {
         const checkboxes = document.querySelectorAll('.welcome-item input[type="checkbox"]:checked');
         let selectedCards = [];
         checkboxes.forEach(cb => selectedCards.push(cb.value));
+        
+        // 強制檢查：至少選一張
         if (selectedCards.length === 0) {
             alert("💡 小提醒：\n如果您剛好都沒有這些卡片，建議您可以先「隨便勾選幾張」您有興趣的卡片（例如台新 Richart 或 豬富卡）來試用看看喔！");
             return;
         }
+
+        // 儲存設定
         localStorage.setItem('visibleCards', JSON.stringify(selectedCards));
-        localStorage.setItem('user_setup_done', 'true');
+        localStorage.setItem('user_setup_done', 'true'); // 標記已完成初始化
+
+        // 關閉視窗並重整頁面
         document.getElementById('welcomeModal').style.display = 'none';
-        location.reload();
+        location.reload(); // 簡單暴力，直接重整進入正常流程
     }
 
     function loadAndRenderApp() {
         let currentCards = JSON.parse(localStorage.getItem('visibleCards')) || [];
-        // Fallback default
+        
+        // Fallback default (理論上 FTUE 流程後不會跑到這裡為空，但保留以防萬一)
         if (currentCards.length === 0) {
-            currentCards = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9', 'c10', 'c11'];
+            // 如果真的為空 (例如手動清空 LocalStorage 但保留了 flag)，才給預設值
+             // currentCards = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9', 'c10', 'c11']; 
+             // 修改：不給預設值，讓他空著，或者讓他去觸發 add1
         }
+
+        // 移除不存在的卡片 ID 檢查 (略微簡化)
         const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9', 'c10', 'c11'];
         let realCards = currentCards.filter(id => realCardIds.includes(id));
         
+        // 邏輯：如果不滿 8 張且沒有 add1，自動補上 add1
         if (realCards.length > 8) { 
             realCards = realCards.slice(0, 8);
             localStorage.setItem('visibleCards', JSON.stringify(realCards)); 
@@ -381,10 +400,12 @@
                 localStorage.setItem('visibleCards', JSON.stringify(realCards)); 
             } 
         } else { 
+            // 如果滿 8 張但有 add1 (例如剛好選滿)，移除 add1
             if (currentCards.includes('add1')) { 
                 localStorage.setItem('visibleCards', JSON.stringify(realCards));
             } 
         }
+
         visibleCards = JSON.parse(localStorage.getItem('visibleCards'));
         renderGrid();
     }
@@ -437,20 +458,14 @@
     ];
 
     let visibleCards = JSON.parse(localStorage.getItem('visibleCards'));
-    if (!visibleCards) { visibleCards = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8']; localStorage.setItem('visibleCards', JSON.stringify(visibleCards)); }
-    else { 
-        const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9', 'c10', 'c11']; 
-        let currentRealCards = visibleCards.filter(id => realCardIds.includes(id));
-        if (currentRealCards.length > 8) { visibleCards = currentRealCards.slice(0, 8); } 
-        else if (currentRealCards.length === 8) { visibleCards = currentRealCards; } 
-        else { if (!visibleCards.includes('add1')) visibleCards.push('add1'); visibleCards = visibleCards.filter(id => id !== 'add2'); } 
-        localStorage.setItem('visibleCards', JSON.stringify(visibleCards));
-    }
-
+    // 修改：移除預設賦值，交由 initWelcomeModal 處理
+    // if (!visibleCards) { visibleCards = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8']; localStorage.setItem('visibleCards', JSON.stringify(visibleCards)); }
+    
     let savedOrder = JSON.parse(localStorage.getItem('cardOrder'));
     let cards = [...defaultCards];
     let sortableInstance = null;
     function getSortedCards() {
+        if (!visibleCards) return []; // 避免報錯
         let displayCards = cards.filter(c => visibleCards.includes(c.id));
         const realCardCount = displayCards.filter(c => c.type !== 'placeholder').length;
         if (realCardCount < 8 && !visibleCards.includes('add1')) { const placeholder = cards.find(c => c.id === 'add1'); if(placeholder && !displayCards.includes(placeholder)) displayCards.push(placeholder); }
@@ -1310,7 +1325,8 @@
         });
         alertArea.style.display = hasUrgent ? 'block' : 'none';
     }
-    updateDate(); renderGrid();
+    updateDate(); 
+    // renderGrid(); // 移除這行，改由 window.load 控制
 </script>
 </body>
 </html>

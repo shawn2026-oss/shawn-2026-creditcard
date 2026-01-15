@@ -875,8 +875,18 @@
             statusText = stats.validSpend >= card.target ? '任務達成' : `差 $${(card.target - stats.validSpend).toLocaleString()}`;
             }
 
+            // FORCE HIGHEST RATE DISPLAY (Marketing Rate)
+            if (card.id === 'c6') displayRate = '13.5%';
+            if (card.id === 'c1') displayRate = '10.0%';
+            if (card.id === 'c5') displayRate = '6.0%';
+            if (card.id === 'c3') displayRate = '5.0%';
+            if (card.id === 'c4') displayRate = '5.0%';
+            if (card.id === 'c2') displayRate = '6.0%';
+            if (card.id === 'c7') displayRate = '4.5%';
             if (card.id === 'c8') displayRate = '10.0%';
-            if (card.id === 'c2') displayRate = '6.0%'; if (card.id === 'c9') displayRate = '哩程';
+            if (card.id === 'c9') displayRate = '哩程';
+            if (card.id === 'c10') displayRate = '11.0%';
+            if (card.id === 'c11') displayRate = '3.8%';
             if (card.type === 'placeholder') displayRate = '--%';
             
             let tileClass = 'card-tile'; let nickClass = 'tile-nickname-badge';

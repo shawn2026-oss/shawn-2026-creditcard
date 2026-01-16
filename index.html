@@ -189,7 +189,8 @@
             </button>
             <button class="btn-reset-visible" onclick="resetAllData()">🗑️ 重置所有資料</button>
         </div>
-        <div style="text-align:center; font-size:11px; color:#555; background:#ebebeb; padding:10px; border-radius:8px; margin-top:15px; margin-bottom:10px; line-height:1.4; font-weight:600;">
+    
+    <div style="text-align:center; font-size:11px; color:#555; background:#ebebeb; padding:10px; border-radius:8px; margin-top:15px; margin-bottom:10px; line-height:1.4; font-weight:600;">
             ⚠️ 本工具僅協助用戶監控刷卡進度<br>實際入帳需以各家銀行判定為主
         </div>
         <div style="height:20px;"></div>
@@ -275,7 +276,7 @@
                 <div id="happyOptions">
                      <div class="option-row read-only"><label>🔰 一般消費 0.5% (無上限)</label><input type="checkbox" checked disabled></div>
                      <div class="option-row"><label for="checkHappyPet">🐶 寵物通路 (加碼9.5% 限$5263)</label><input type="checkbox" id="checkHappyPet" onchange="toggleHappyPet()"></div>
-                    <div class="option-row"><label for="checkHappyPeace">🍽️ 大小安心刷 (加碼3.5% 限$5714)</label><input type="checkbox" id="checkHappyPeace" onchange="toggleHappyPeace()"></div>
+                     <div class="option-row"><label for="checkHappyPeace">🍽️ 大小安心刷 (加碼3.5% 限$5714)</label><input type="checkbox" id="checkHappyPeace" onchange="toggleHappyPeace()"></div>
                     <div class="option-row"><label for="checkHappyLife">🛒 生活禮遇 (加碼3.5% 限$5714)</label><input type="checkbox" id="checkHappyLife" onchange="toggleHappyLife()"></div>
                      <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;"><label for="checkHappyForeign">✈️ 國外消費 (加碼2% 無上限)</label><input type="checkbox" id="checkHappyForeign" onchange="toggleHappyForeign()"></div>
                     <div id="happyDashboard" class="happy-dashboard"></div>
@@ -308,7 +309,7 @@
                 </div>
 
                 <div id="fubonJOptions">
-                    <div class="option-row read-only"><label id="labelFubonBase">🔰 國內消費 1% (無上限)</label><input type="checkbox" checked disabled></div>
+                   <div class="option-row read-only"><label id="labelFubonBase">🔰 國內消費 1% (無上限)</label><input type="checkbox" checked disabled></div>
                     <div class="option-row"><label for="checkFubonJJapan">🇯🇵 切換為日韓消費 (3%)</label><input type="checkbox" id="checkFubonJJapan" onchange="toggleFubonJLogic()"></div>
                     <div class="option-row" id="rowFubonPhysical" style="border-top:1px dashed #ddd; padding-top:6px;"><label for="checkFubonJPhysical">🛍️ 當地實體 (+3% 限$33333)</label><input type="checkbox" id="checkFubonJPhysical" onchange="updateRewardPreview()"></div>
                     <div class="option-row" id="rowFubonDomesticBonus" style="border-top:1px dashed #ddd; padding-top:6px;"><label for="checkFubonJDomesticBonus">🏪 國內指定 (超商/咖啡... +3%)</label><input type="checkbox" id="checkFubonJDomesticBonus" onchange="updateRewardPreview()"></div>
@@ -360,14 +361,14 @@
                 </div>
 
                 <div id="sinopacMitsuiOptions">
-                    <div class="option-row read-only"><label id="labelMitsuiBase">🔰 一般消費 0.3% (館外/國外)</label><input type="checkbox" checked disabled></div>
+                     <div class="option-row read-only"><label id="labelMitsuiBase">🔰 一般消費 0.3% (館外/國外)</label><input type="checkbox" checked disabled></div>
                     
                     <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px; display:flex; flex-direction:column; align-items:flex-start;">
                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
                             <label for="checkSinopacMitsuiSelected">🍽️ 特選通路 7% (餐飲/全盈+PAY)</label>
                             <input type="checkbox" id="checkSinopacMitsuiSelected" onchange="updateRewardPreview()">
                         </div>
-                        <div style="font-size:10px; color:#aaa; margin-top:2px; line-height:1.3;">
+                         <div style="font-size:10px; color:#aaa; margin-top:2px; line-height:1.3;">
                             通路：館外餐飲(MCC 58xx) / 全盈+PAY<br>
                             <span style="color:#d32f2f; font-weight:bold;">⚠️ 上限僅 100 元 (約刷 $1,428)</span>
                         </div>
@@ -408,7 +409,7 @@
             <button class="btn btn-confirm" style="width:100%; margin-top:20px;" onclick="document.getElementById('manageModal').style.display='none'">完成</button>
         </div>
     </div>
-<script>
+  <script>
     fetch('config.json?t=' + Date.now()).then(response => response.json()).then(data => { if(data.news) document.getElementById('news-text').innerHTML = data.news; }).catch(error => {});
     let cardSettings = JSON.parse(localStorage.getItem('cardSettings')) || {};
 
@@ -493,7 +494,8 @@
     window.addEventListener('popstate', function(event) { 
         closeModal();
     });
-
+    
+    // 核心資料庫
     const defaultCards = [
         { 
             id: 'c10', name: '中信 UniOpen 卡', nickname: '2026 統一集團神卡', 
@@ -586,12 +588,21 @@
     }
 
     let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-    function updateDate() { const now = new Date(); document.getElementById('dateDisplay').innerText = `${now.getMonth()+1}/${now.getDate()}`; }
-    function saveHsbcTier() { const tier = document.querySelector('input[name="hsbcTier"]:checked').value; localStorage.setItem('hsbc_tier', tier); renderGrid(); updateRewardPreview(); }
-    function saveHsbcInitial() { const initial = document.getElementById('hsbcInitialMiles').value; localStorage.setItem('hsbc_initial_miles', initial); renderGrid(); }
+    function updateDate() { const now = new Date();
+    document.getElementById('dateDisplay').innerText = `${now.getMonth()+1}/${now.getDate()}`; }
+    function saveHsbcTier() { const tier = document.querySelector('input[name="hsbcTier"]:checked').value; localStorage.setItem('hsbc_tier', tier); renderGrid(); updateRewardPreview();
+    }
+    function saveHsbcInitial() { const initial = document.getElementById('hsbcInitialMiles').value; localStorage.setItem('hsbc_initial_miles', initial); renderGrid();
+    }
     
+    // 修復：增加此存檔函式
+    function saveHsbcSettings() {
+        const redeemed = document.getElementById('hsbcRedeemedMiles').value;
+        localStorage.setItem('hsbc_redeemed_miles', redeemed);
+        renderGrid();
+    }
+
     const uniBrands = ["7-11", "星巴克", "康是美", "家樂福", "Mia C'bon", "博客來", "Yahoo購物", "速邁樂", "21世紀", "酷聖石", "聖德科斯", "統一時代", "夢時代", "其他"];
-    
     function initUniBrandGrid() {
         const grid = document.getElementById('uniBrandGrid');
         grid.innerHTML = '';
@@ -760,7 +771,6 @@
     }
 
     function toggleCurrencyLogic() {
-        // Only updates preview, logic handles state via radio
         updateRewardPreview();
     }
     
@@ -784,6 +794,108 @@
         localStorage.setItem('currency_level', level);
         renderGrid();
         updateRewardPreview();
+    }
+
+    // 核心資料寫入函式 (修復後)
+    function addTransaction(isConfirm) {
+        const amount = parseFloat(document.getElementById('amountInput').value);
+        const date = document.getElementById('dateInput').value;
+        const note = document.getElementById('noteInput').value;
+        const cardId = document.getElementById('cardIdInput').value;
+        
+        if (!amount || amount <= 0) { alert('請輸入有效金額'); return; }
+        if (!date) { alert('請選擇日期'); return; }
+
+        let isGreen = document.getElementById('checkGreenChannel') ? document.getElementById('checkGreenChannel').checked : false;
+        let isForeign = document.getElementById('checkForeign') ? document.getElementById('checkForeign').checked : false;
+        let isUniUp = document.getElementById('checkUniUp') ? document.getElementById('checkUniUp').checked : false;
+        let isUniBonus = document.getElementById('checkUniBonus') ? document.getElementById('checkUniBonus').checked : false;
+        let isHappyPet = document.getElementById('checkHappyPet') ? document.getElementById('checkHappyPet').checked : false;
+        let isHappyPeace = document.getElementById('checkHappyPeace') ? document.getElementById('checkHappyPeace').checked : false;
+        let isHappyLife = document.getElementById('checkHappyLife') ? document.getElementById('checkHappyLife').checked : false;
+        let isHappyForeign = document.getElementById('checkHappyForeign') ? document.getElementById('checkHappyForeign').checked : false;
+        let isHsbcForeign = document.getElementById('checkHsbcForeign') ? document.getElementById('checkHsbcForeign').checked : false;
+        let isUniGroup = document.getElementById('checkUniGroup') ? document.getElementById('checkUniGroup').checked : false;
+        let isUniIcash = document.getElementById('checkUniIcash') ? document.getElementById('checkUniIcash').checked : false;
+        let isUniOverseas = document.getElementById('checkUniOverseas') ? document.getElementById('checkUniOverseas').checked : false;
+        
+        let richartMode = document.querySelector('input[name="richartMode"]:checked') ? document.querySelector('input[name="richartMode"]:checked').value : 'general';
+        let isRichartPay = richartMode === 'pay';
+        let isRichartOnline = richartMode === 'online';
+        let isRichartLine = richartMode === 'line';
+        let isRichartOverseas = richartMode === 'overseas';
+
+        let isBonus10 = document.getElementById('checkBonus10') ? document.getElementById('checkBonus10').checked : false;
+        let isBonus25 = document.getElementById('checkBonus25') ? document.getElementById('checkBonus25').checked : false;
+        let isBill = document.getElementById('checkIsBill') ? document.getElementById('checkIsBill').checked : false;
+        
+        let isFubonJJapan = document.getElementById('checkFubonJJapan') ? document.getElementById('checkFubonJJapan').checked : false;
+        let isFubonJPhysical = document.getElementById('checkFubonJPhysical') ? document.getElementById('checkFubonJPhysical').checked : false;
+        let isFubonJDomesticBonus = document.getElementById('checkFubonJDomesticBonus') ? document.getElementById('checkFubonJDomesticBonus').checked : false;
+        
+        let isJiheJapan = document.getElementById('checkJiheJapan') ? document.getElementById('checkJiheJapan').checked : false;
+        let isJiheApple = document.getElementById('checkJiheApple') ? document.getElementById('checkJiheApple').checked : false;
+        let isJiheDomesticJapanese = document.getElementById('checkJiheDomesticJapanese') ? document.getElementById('checkJiheDomesticJapanese').checked : false;
+        
+        let isKumamonJapan = document.getElementById('checkKumamonJapan') ? document.getElementById('checkKumamonJapan').checked : false;
+        let isKumamonDesignated = document.getElementById('checkKumamonDesignated') ? document.getElementById('checkKumamonDesignated').checked : false;
+        let isKumamonPayPay = document.getElementById('checkKumamonPayPay') ? document.getElementById('checkKumamonPayPay').checked : false;
+        let isKumamonDomesticGreen = document.getElementById('checkKumamonDomesticGreen') ? document.getElementById('checkKumamonDomesticGreen').checked : false;
+
+        let isSinopacCurrencyOverseas = document.getElementById('checkSinopacCurrencyOverseas') ? document.getElementById('checkSinopacCurrencyOverseas').checked : false;
+        let isSinopacCurrencySelected = document.getElementById('checkSinopacCurrencySelected') ? document.getElementById('checkSinopacCurrencySelected').checked : false;
+        
+        let isSinopacMitsuiSelected = document.getElementById('checkSinopacMitsuiSelected') ? document.getElementById('checkSinopacMitsuiSelected').checked : false;
+        let isSinopacMitsuiTarget = document.getElementById('checkSinopacMitsuiTarget') ? document.getElementById('checkSinopacMitsuiTarget').checked : false;
+        let isSinopacMitsuiDining = document.getElementById('checkSinopacMitsuiDining') ? document.getElementById('checkSinopacMitsuiDining').checked : false;
+
+        let jiangMode = document.querySelector('input[name="jiangMode"]:checked') ? document.querySelector('input[name="jiangMode"]:checked').value : 'base';
+        let isJiangSelected = jiangMode === 'selected';
+        let isJiangTravel = jiangMode === 'travel';
+
+        let currencyType = document.querySelector('input[name="currencyType"]:checked') ? document.querySelector('input[name="currencyType"]:checked').value : 'domestic';
+        let isSinopacCurrencySelectedFinal = (currencyType === 'selected');
+        let isSinopacCurrencyOverseasFinal = (currencyType === 'selected');
+
+        const newTx = {
+            id: editingId || Date.now(),
+            cardId, amount, date, note,
+            isGreen, isForeign, isUniUp, isUniBonus, isHappyPet, isHappyPeace, isHappyLife, isHappyForeign, isHsbcForeign,
+            isUniGroup, isUniIcash, isUniOverseas,
+            isRichartPay, isRichartOnline, isRichartLine, isRichartOverseas,
+            isBonus10, isBonus25, isBill,
+            isFubonJJapan, isFubonJPhysical, isFubonJDomesticBonus,
+            isJiheJapan, isJiheApple, isJiheDomesticJapanese,
+            isKumamonJapan, isKumamonDesignated, isKumamonPayPay, isKumamonDomesticGreen,
+            isSinopacCurrencyOverseas: isSinopacCurrencyOverseasFinal, 
+            isSinopacCurrencySelected: isSinopacCurrencySelectedFinal,
+            isSinopacMitsuiSelected, isSinopacMitsuiTarget, isSinopacMitsuiDining,
+            isJiangSelected, isJiangTravel
+        };
+
+        if (editingId) {
+            const index = transactions.findIndex(t => t.id === editingId);
+            if (index !== -1) transactions[index] = newTx;
+            editingId = null;
+        } else {
+            transactions.push(newTx);
+        }
+
+        localStorage.setItem('transactions', JSON.stringify(transactions));
+        
+        document.getElementById('amountInput').value = '';
+        document.getElementById('noteInput').value = '';
+        document.getElementById('btn-confirm').innerText = "確認";
+        
+        renderGrid();
+        renderModalHistory(cardId);
+        updateRewardPreview();
+
+        if (isConfirm) {
+            document.getElementById('transactionModal').style.display = 'none';
+        } else {
+            document.getElementById('amountInput').focus();
+        }
     }
 
     function getBillingCycle(cardId, dateObj = new Date()) {
@@ -829,7 +941,6 @@
         let totalSpend = relevantTx.reduce((sum, t) => sum + parseFloat(t.amount), 0);
         totalSpend += addedAmount;
         let reward = 0;
-        
         if (cardId === 'j1') {
             const txList = [...relevantTx];
             if (addedAmount > 0) txList.push({ amount: addedAmount, isFubonJJapan: addedIsFubonJJapan, isFubonJPhysical: addedIsFubonJPhysical, isFubonJDomesticBonus: addedIsFubonJDomesticBonus });
@@ -891,12 +1002,10 @@
                 if(t.isSinopacCurrencySelected) baseReward += t.amount * 0.02;
                 else baseReward += t.amount * 0.01;
             });
-            
             // Bonus Reward: 4% on Selected, Capped
             const bonusTx = txList.filter(t => t.isSinopacCurrencySelected);
             const totalBonusSpend = bonusTx.reduce((sum, t) => sum + t.amount, 0);
             const actualBonus = Math.min(totalBonusSpend * 0.04, bonusCap);
-            
             reward = baseReward + actualBonus;
             
             // Display Rate logic
@@ -929,7 +1038,8 @@
                 const effectiveRate = ((addedAmount * 0.003 + effectiveBonus) / addedAmount) * 100;
                 displayRate = effectiveRate.toFixed(1);
             }
-            if (addedIsSinopacMitsuiTarget && targetSpend >= 30000) { displayRate = "6.9"; }
+            if (addedIsSinopacMitsuiTarget && targetSpend >= 30000) { displayRate = "6.9";
+            }
             return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: displayRate, isCustom, cycleStart, cycleEnd };
         }
         
@@ -1055,7 +1165,7 @@
             let displayRate = 1.0;
             if (addedIsUniOverseas) displayRate = 11.0;
             else if (addedIsUniGroup) {
-                displayRate = 3.0; 
+                displayRate = 3.0;
                 if (addedIsUniIcash) displayRate += 4.0;
                 displayRate += (taskRate * 100);
             }
@@ -1080,12 +1190,14 @@
 
         if (cardId === 'c9') {
             const tier = localStorage.getItem('hsbc_tier') || 'infinite';
-            let rateDomestic = 18; let rateForeign = 10; if (tier === 'signature') { rateDomestic = 18; rateForeign = 15; }
+            let rateDomestic = 18; let rateForeign = 10; if (tier === 'signature') { rateDomestic = 18; rateForeign = 15;
+            }
             let totalMiles = parseInt(localStorage.getItem('hsbc_initial_miles') || 0);
             let redeemedMiles = parseInt(localStorage.getItem('hsbc_redeemed_miles') || 0);
             const allHistoryTx = transactions.filter(t => t.cardId === 'c9');
             allHistoryTx.forEach(tx => { const rate = tx.isHsbcForeign ? rateForeign : rateDomestic; totalMiles += Math.floor(tx.amount / rate); });
-            if (addedAmount > 0) { const currentRate = addedIsHsbcForeign ? rateForeign : rateDomestic; totalMiles += Math.floor(addedAmount / currentRate); }
+            if (addedAmount > 0) { const currentRate = addedIsHsbcForeign ? rateForeign : rateDomestic; totalMiles += Math.floor(addedAmount / currentRate);
+            }
             reward = totalMiles - redeemedMiles;
             if (reward < 0) reward = 0;
             return { spend: totalSpend, validSpend: totalSpend, reward: reward, rate: (totalSpend>0?(totalSpend/totalMiles).toFixed(1):0), isCustom, cycleStart, cycleEnd };
@@ -1093,11 +1205,11 @@
         
         let validSpend = totalSpend;
         if (card.type === 'mixed') { if (validSpend < card.minSpend) reward = validSpend * card.tier2Rate;
-            else if (validSpend <= card.limit) reward = validSpend * card.tier1Rate;
-            else reward = (card.limit * card.tier1Rate) + ((validSpend - card.limit) * card.tier2Rate);
+        else if (validSpend <= card.limit) reward = validSpend * card.tier1Rate;
+        else reward = (card.limit * card.tier1Rate) + ((validSpend - card.limit) * card.tier2Rate);
         } 
         else if (card.type === 'ceiling') { if (validSpend <= card.limit) reward = validSpend * card.tier1Rate;
-            else reward = (card.limit * card.tier1Rate) + ((validSpend - card.limit) * card.tier2Rate);
+        else reward = (card.limit * card.tier1Rate) + ((validSpend - card.limit) * card.tier2Rate);
         } 
         else { reward = validSpend * (card.tier1Rate || 0);
         }
@@ -1106,14 +1218,22 @@
         return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: currentRate.toFixed(1), isCustom, cycleStart, cycleEnd };
     }
 
-    function toggleBillLogic() { const isBill = document.getElementById('checkIsBill').checked; document.getElementById('labelBaseRate').innerText = isBill ? "🔰 基本回饋 0.15% (無上限)" : "🔰 基本回饋 1% (無上限)"; if(isBill) document.getElementById('checkBonus25').checked = false; updateRewardPreview(); }
-    function toggleSelectedLogic() { const isSelected = document.getElementById('checkBonus25').checked; document.getElementById('labelBaseRate').innerText = isSelected ? "🔰 基本回饋 1% (無上限)" : "🔰 基本回饋 1% (無上限)"; if(isSelected) document.getElementById('checkIsBill').checked = false; updateRewardPreview(); }
-    function toggleGreenLogic() { if(document.getElementById('checkGreenChannel').checked) document.getElementById('checkForeign').checked = false; updateRewardPreview(); }
-    function toggleForeignLogic() { if(document.getElementById('checkForeign').checked) document.getElementById('checkGreenChannel').checked = false; updateRewardPreview(); }
-    function toggleHappyPet() { if(document.getElementById('checkHappyPet').checked) { document.getElementById('checkHappyPeace').checked = false; document.getElementById('checkHappyLife').checked = false; document.getElementById('checkHappyForeign').checked = false; } updateRewardPreview(); }
-    function toggleHappyPeace() { if(document.getElementById('checkHappyPeace').checked) { document.getElementById('checkHappyPet').checked = false; document.getElementById('checkHappyLife').checked = false; document.getElementById('checkHappyForeign').checked = false; } updateRewardPreview(); }
-    function toggleHappyLife() { if(document.getElementById('checkHappyLife').checked) { document.getElementById('checkHappyPet').checked = false; document.getElementById('checkHappyPeace').checked = false; document.getElementById('checkHappyForeign').checked = false; } updateRewardPreview(); }
-    function toggleHappyForeign() { if(document.getElementById('checkHappyForeign').checked) { document.getElementById('checkHappyPet').checked = false; document.getElementById('checkHappyPeace').checked = false; document.getElementById('checkHappyLife').checked = false; } updateRewardPreview(); }
+    function toggleBillLogic() { const isBill = document.getElementById('checkIsBill').checked; document.getElementById('labelBaseRate').innerText = isBill ? "🔰 基本回饋 0.15% (無上限)" : "🔰 基本回饋 1% (無上限)"; if(isBill) document.getElementById('checkBonus25').checked = false; updateRewardPreview();
+    }
+    function toggleSelectedLogic() { const isSelected = document.getElementById('checkBonus25').checked; document.getElementById('labelBaseRate').innerText = isSelected ? "🔰 基本回饋 1% (無上限)" : "🔰 基本回饋 1% (無上限)"; if(isSelected) document.getElementById('checkIsBill').checked = false; updateRewardPreview();
+    }
+    function toggleGreenLogic() { if(document.getElementById('checkGreenChannel').checked) document.getElementById('checkForeign').checked = false; updateRewardPreview();
+    }
+    function toggleForeignLogic() { if(document.getElementById('checkForeign').checked) document.getElementById('checkGreenChannel').checked = false; updateRewardPreview();
+    }
+    function toggleHappyPet() { if(document.getElementById('checkHappyPet').checked) { document.getElementById('checkHappyPeace').checked = false; document.getElementById('checkHappyLife').checked = false; document.getElementById('checkHappyForeign').checked = false; } updateRewardPreview();
+    }
+    function toggleHappyPeace() { if(document.getElementById('checkHappyPeace').checked) { document.getElementById('checkHappyPet').checked = false; document.getElementById('checkHappyLife').checked = false; document.getElementById('checkHappyForeign').checked = false; } updateRewardPreview();
+    }
+    function toggleHappyLife() { if(document.getElementById('checkHappyLife').checked) { document.getElementById('checkHappyPet').checked = false; document.getElementById('checkHappyPeace').checked = false; document.getElementById('checkHappyForeign').checked = false; } updateRewardPreview();
+    }
+    function toggleHappyForeign() { if(document.getElementById('checkHappyForeign').checked) { document.getElementById('checkHappyPet').checked = false; document.getElementById('checkHappyPeace').checked = false; document.getElementById('checkHappyLife').checked = false; } updateRewardPreview();
+    }
     function toggleRichartLogic() { updateRewardPreview(); }
 
     function updateRewardPreview() {
@@ -1121,7 +1241,8 @@
         const amount = parseFloat(inputVal);
         const previewDiv = document.getElementById('liveRewardCalc');
         const cardId = document.getElementById('cardIdInput').value;
-        if (!amount || amount <= 0) { previewDiv.style.display = 'none'; return; }
+        if (!amount || amount <= 0) { previewDiv.style.display = 'none'; return;
+        }
         previewDiv.style.display = 'block'; 
         
         let isGreen = document.getElementById('checkGreenChannel') ? document.getElementById('checkGreenChannel').checked : false;
@@ -1160,14 +1281,12 @@
         let isSinopacMitsuiSelected = document.getElementById('checkSinopacMitsuiSelected') ? document.getElementById('checkSinopacMitsuiSelected').checked : false;
         let isSinopacMitsuiTarget = document.getElementById('checkSinopacMitsuiTarget') ? document.getElementById('checkSinopacMitsuiTarget').checked : false;
         let isSinopacMitsuiDining = document.getElementById('checkSinopacMitsuiDining') ? document.getElementById('checkSinopacMitsuiDining').checked : false;
-        
         let jiangMode = document.querySelector('input[name="jiangMode"]:checked') ? document.querySelector('input[name="jiangMode"]:checked').value : 'base';
         let isJiangSelected = jiangMode === 'selected';
         let isJiangTravel = jiangMode === 'travel';
-        
         let currencyType = document.querySelector('input[name="currencyType"]:checked') ? document.querySelector('input[name="currencyType"]:checked').value : 'domestic';
         let isSinopacCurrencySelectedFinal = (currencyType === 'selected');
-        let isSinopacCurrencyOverseasFinal = (currencyType === 'selected'); // Selected implies Overseas/Bonus
+        let isSinopacCurrencyOverseasFinal = (currencyType === 'selected');
 
         const currentStats = calculateStats(cardId, 0);
         const newStats = calculateStats(cardId, amount, isGreen, isForeign, isUniBonus, isUniUp, isHappyPet, isHappyLife, isHappyForeign, isHappyPeace, isHsbcForeign, isUniGroup, isUniIcash, isUniOverseas, isRichartPay, isRichartOnline, isRichartLine, isRichartOverseas, isBonus10, isBonus25, isBill,
@@ -1176,9 +1295,8 @@
             isKumamonJapan, isKumamonDesignated, isKumamonPayPay, isKumamonDomesticGreen,
             isSinopacCurrencyOverseasFinal, isSinopacCurrencySelectedFinal,
             isSinopacMitsuiSelected, isSinopacMitsuiTarget, isSinopacMitsuiDining,
-            isJiangSelected, isJiangTravel);
+             isJiangSelected, isJiangTravel);
         const thisTransactionReward = newStats.reward - currentStats.reward;
-        
         if (cardId === 'c9') { 
             previewDiv.innerHTML = `✨ 預計回饋：${thisTransactionReward} 哩`;
         } else { 
@@ -1205,7 +1323,7 @@
 
             if (card.id === 'c10') {
                 statusText = `本月已賺 ${stats.reward} 點`;
-                const savedState = JSON.parse(localStorage.getItem('uniOpenState') || '{}');
+                 const savedState = JSON.parse(localStorage.getItem('uniOpenState') || '{}');
                 if (savedState.icash) {
                     const icashSpend = transactions.filter(t => t.cardId === 'c10' && t.isUniIcash).reduce((sum, t) => sum + t.amount, 0);
                     if (icashSpend >= 3750) { msgStyle = 'color:#d32f2f;'; statusText = 'icash回饋已滿'; }
@@ -1246,7 +1364,7 @@
                 else { percent = 100;
                 statusText = card.msgDanger; msgStyle = 'color: #ffcccc;'; }
             } else { percent = (stats.validSpend / card.target) * 100;
-            statusText = stats.validSpend >= card.target ? '任務達成' : `差 $${(card.target - stats.validSpend).toLocaleString()}`;
+                statusText = stats.validSpend >= card.target ? '任務達成' : `差 $${(card.target - stats.validSpend).toLocaleString()}`;
             }
 
             if (card.id === 'c6') displayRate = '13.5%';
@@ -1267,9 +1385,11 @@
             if (card.id === 'j5') displayRate = '7.3%';
             if (card.type === 'placeholder') displayRate = '--%';
             
-            let tileClass = 'card-tile'; let nickClass = 'tile-nickname-badge';
+            let tileClass = 'card-tile';
+            let nickClass = 'tile-nickname-badge';
             if (card.type === 'placeholder') nickClass += ' placeholder';
-            const tile = document.createElement('div'); tile.className = tileClass; tile.setAttribute('data-card-id', card.id);
+            const tile = document.createElement('div'); tile.className = tileClass;
+            tile.setAttribute('data-card-id', card.id);
             tile.style.background = card.gradient;
             tile.style.color = card.textColor; 
             tile.onclick = () => card.type === 'placeholder' ? openManageModal() : openQuickAdd(card.id);
@@ -1280,7 +1400,8 @@
                 let monthlyMiles = 0;
                 const tier = localStorage.getItem('hsbc_tier') || 'infinite';
                 let rateDomestic = 18; let rateForeign = 10;
-                if (tier === 'signature') { rateDomestic = 18; rateForeign = 15; }
+                if (tier === 'signature') { rateDomestic = 18; rateForeign = 15;
+                }
                 monthlyTx.forEach(tx => {
                     const rate = tx.isHsbcForeign ? rateForeign : rateDomestic;
                     monthlyMiles += Math.floor(tx.amount / rate);
@@ -1316,7 +1437,8 @@
 
             const label = document.createElement('label'); label.className = 'switch'; label.onclick = function(e) { e.stopPropagation(); }; 
             const input = document.createElement('input'); input.type = 'checkbox'; input.checked = isVisible;
-            input.onchange = function() { if (this.checked && currentRealCardsCount >= 8) { alert('⚠️ 最多只能顯示 8 張卡片，請先隱藏一張！'); this.checked = false; return; } toggleCardVisibility(card.id); };
+            input.onchange = function() { if (this.checked && currentRealCardsCount >= 8) 
+            { alert('⚠️ 最多只能顯示 8 張卡片，請先隱藏一張！'); this.checked = false; return; } toggleCardVisibility(card.id); };
             const slider = document.createElement('span');
             slider.className = 'slider'; label.appendChild(input); label.appendChild(slider);
             
@@ -1387,7 +1509,7 @@
         if (cardId === 'c2') document.getElementById('greenCardOptions').style.display = 'block';
         if (cardId === 'c7') {
              document.getElementById('uniOptions').style.display = 'block';
-             toggleUniUpLogic(); 
+            toggleUniUpLogic(); 
         }
         if (cardId === 'c8') document.getElementById('happyOptions').style.display = 'block';
         if (cardId === 'c9') document.getElementById('hsbcOptions').style.display = 'block';
@@ -1413,15 +1535,19 @@
             document.getElementById('rbRichartGeneral').checked = true;
         }
 
-        if (cardId === 'j1') { document.getElementById('fubonJOptions').style.display = 'block'; toggleFubonJLogic(); }
-        if (cardId === 'j2') { document.getElementById('jiheOptions').style.display = 'block'; toggleJiheLogic(); }
-        if (cardId === 'j3') { document.getElementById('kumamonOptions').style.display = 'block'; toggleKumamonLogic(); }
+        if (cardId === 'j1') { document.getElementById('fubonJOptions').style.display = 'block'; toggleFubonJLogic();
+        }
+        if (cardId === 'j2') { document.getElementById('jiheOptions').style.display = 'block'; toggleJiheLogic();
+        }
+        if (cardId === 'j3') { document.getElementById('kumamonOptions').style.display = 'block'; toggleKumamonLogic();
+        }
         if (cardId === 'j4') { 
-            document.getElementById('sinopacCurrencyOptions').style.display = 'block'; 
+            document.getElementById('sinopacCurrencyOptions').style.display = 'block';
             document.querySelector('input[name="currencyType"][value="domestic"]').checked = true;
             toggleCurrencyLogic(); 
         }
-        if (cardId === 'j5') { document.getElementById('sinopacMitsuiOptions').style.display = 'block'; }
+        if (cardId === 'j5') { document.getElementById('sinopacMitsuiOptions').style.display = 'block';
+        }
         
         if (cardId === 'c4') {
             document.getElementById('jiangOptions').style.display = 'block';
@@ -1444,7 +1570,8 @@
             }
         }
 
-        if (card.parking) { document.getElementById('modalParkingInfo').innerHTML = card.parking; document.getElementById('modalParkingInfo').style.display = 'block';
+        if (card.parking) { document.getElementById('modalParkingInfo').innerHTML = card.parking;
+        document.getElementById('modalParkingInfo').style.display = 'block';
         } else { document.getElementById('modalParkingInfo').style.display = 'none'; }
         
         if (cardId === 'c8') document.getElementById('happyDashboard').style.display = 'block';
@@ -1461,8 +1588,7 @@
         document.getElementById('liveRewardCalc').style.display = 'none'; document.getElementById('liveRewardCalc').innerHTML = '';
         
         document.getElementById('amountInput').value = '';
-        document.getElementById('noteInput').value = ''; 
-        
+        document.getElementById('noteInput').value = '';
         if (cardId === 'c6') {
              const isBill = document.getElementById('checkIsBill').checked;
              document.getElementById('labelBaseRate').innerText = isBill ? "🔰 基本回饋 0.15% (無上限)" : "🔰 基本回饋 1% (無上限)";
@@ -1569,11 +1695,14 @@
         if(document.getElementById('checkBonus25')) document.getElementById('checkBonus25').checked = tx.isBonus25;
         if(document.getElementById('checkIsBill')) document.getElementById('checkIsBill').checked = tx.isBill;
 
-        if(document.getElementById('checkFubonJJapan')) { document.getElementById('checkFubonJJapan').checked = tx.isFubonJJapan; toggleFubonJLogic(); }
+        if(document.getElementById('checkFubonJJapan')) { document.getElementById('checkFubonJJapan').checked = tx.isFubonJJapan; toggleFubonJLogic();
+        }
         if(document.getElementById('checkFubonJPhysical')) document.getElementById('checkFubonJPhysical').checked = tx.isFubonJPhysical;
-        if(document.getElementById('checkJiheJapan')) { document.getElementById('checkJiheJapan').checked = tx.isJiheJapan; toggleJiheLogic(); }
+        if(document.getElementById('checkJiheJapan')) { document.getElementById('checkJiheJapan').checked = tx.isJiheJapan; toggleJiheLogic();
+        }
         if(document.getElementById('checkJiheApple')) document.getElementById('checkJiheApple').checked = tx.isJiheApple;
-        if(document.getElementById('checkKumamonJapan')) { document.getElementById('checkKumamonJapan').checked = tx.isKumamonJapan; toggleKumamonLogic(); }
+        if(document.getElementById('checkKumamonJapan')) { document.getElementById('checkKumamonJapan').checked = tx.isKumamonJapan; toggleKumamonLogic();
+        }
         if(document.getElementById('checkKumamonDesignated')) document.getElementById('checkKumamonDesignated').checked = tx.isKumamonDesignated;
         if(document.getElementById('checkKumamonPayPay')) document.getElementById('checkKumamonPayPay').checked = tx.isKumamonPayPay;
         if(document.getElementById('checkSinopacCurrencyOverseas')) { document.getElementById('checkSinopacCurrencyOverseas').checked = tx.isSinopacCurrencyOverseas; toggleCurrencyLogic(); }
@@ -1598,7 +1727,8 @@
             }
         }
     }
-    function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear(); transactions = []; renderGrid(); } }
+    function resetAllData() { if(confirm('⚠️ 確定清空？')) { localStorage.clear();
+    transactions = []; renderGrid(); } }
     
     async function exportData() {
         const backupData = {
@@ -1612,7 +1742,7 @@
                 cardOrder: localStorage.getItem('cardOrder'),
                 cardSettings: localStorage.getItem('cardSettings'),
                 user_setup_done: localStorage.getItem('user_setup_done')
-            }
+             }
         };
         const dataStr = JSON.stringify(backupData); 
         const now = new Date();
@@ -1627,7 +1757,8 @@
         const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = fileName; document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
     
-    function triggerImport() { document.getElementById('fileInput').click(); }
+    function triggerImport() { document.getElementById('fileInput').click();
+    }
     
     function importFile(input) {
         const file = input.files[0];
@@ -1662,18 +1793,6 @@
             } catch (err) { alert('❌ 無法讀取檔案'); } 
         };
         reader.readAsText(file); input.value = '';
-    }
-    
-    function saveCurrencyLevel() {
-        const level = document.querySelector('input[name="currencyLevel"]:checked').value;
-        localStorage.setItem('currency_level', level);
-        renderGrid();
-        updateRewardPreview();
-    }
-    
-    function toggleCurrencyDetails() {
-        const el = document.getElementById('currencyDetails');
-        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
     }
     
     function checkUrgentTasks() {

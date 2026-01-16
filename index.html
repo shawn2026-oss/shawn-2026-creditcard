@@ -29,8 +29,10 @@
 
     <style>
         :root { --bg-color: #F0F2F5; --text-primary: #1C1C1E; --text-secondary: #8E8E93; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; background-color: #E0E5EC; color: var(--text-primary); margin: 0; display: flex; justify-content: center; min-height: 100vh; -webkit-font-smoothing: antialiased; }
-        .app-container { width: 100%; max-width: 480px; background-color: var(--bg-color); min-height: 100vh; padding: 16px 12px; padding-top: env(safe-area-inset-top, 20px); padding-bottom: env(safe-area-inset-bottom, 20px); box-shadow: 0 0 40px rgba(0,0,0,0.05); display: flex; flex-direction: column; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; background-color: #E0E5EC;
+        color: var(--text-primary); margin: 0; display: flex; justify-content: center; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+        .app-container { width: 100%; max-width: 480px; background-color: var(--bg-color); min-height: 100vh;
+        padding: 16px 12px; padding-top: env(safe-area-inset-top, 20px); padding-bottom: env(safe-area-inset-bottom, 20px); box-shadow: 0 0 40px rgba(0,0,0,0.05); display: flex; flex-direction: column; box-sizing: border-box; }
         @media (max-width: 480px) { body { background-color: var(--bg-color); } .app-container { box-shadow: none; width: 100%; max-width: 100%; } }
         .header-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; width: 100%; }
         .author-top { font-size: 12px; font-weight: 800; color: #007AFF; letter-spacing: 0.5px; }
@@ -42,10 +44,31 @@
         .news-ticker { background: #FFF9C4; color: #856404; border-radius: 8px; margin-bottom: 12px; height: 36px; display: block; overflow: hidden; white-space: nowrap; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.05); width: 100%; transform: translate3d(0,0,0); }
         .ticker-content { display: inline-block; height: 36px; line-height: 36px; padding-left: 100%; min-width: 100%; box-sizing: content-box; animation: scroll-left 15s linear infinite; will-change: transform; transform: translate3d(0, 0, 0); }
         @keyframes scroll-left { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
+        
+        /* [UPDATED] 總回饋卡片與高質感分享按鈕樣式 */
         .total-reward-card { background: #2c3e50; color: white; border-radius: 16px; padding: 14px 20px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(44, 62, 80, 0.2); }
         .total-reward-card::after { content: ''; position: absolute; top: -50%; right: -50%; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%; pointer-events: none; }
         .total-reward-label { font-size: 13px; font-weight: 600; opacity: 0.9; }
-        .total-reward-amount { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+        .total-reward-amount { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-right: 0px; }
+        
+        /* [NEW] 高質感膠囊按鈕 */
+        .btn-share-premium {
+            position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+            /* 漸層半透明背景 */
+            background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.1));
+            border: 1px solid rgba(255,255,255,0.4);
+            color: white; padding: 8px 16px; border-radius: 20px;
+            display: flex; align-items: center; gap: 6px;
+            cursor: pointer; backdrop-filter: blur(5px); z-index: 5;
+            font-size: 13px; font-weight: 700;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            /* 防止文字選取 */
+            user-select: none; -webkit-user-select: none;
+        }
+        .btn-share-premium:active { transform: translateY(-50%) scale(0.95); background: rgba(255,255,255,0.3); }
+
         #urgent-alert-area { display: none; margin-bottom: 12px; }
         .urgent-card { background: linear-gradient(135deg, #FF3B30, #FF2D55); color: white; border-radius: 12px; padding: 10px 14px; box-shadow: 0 4px 10px rgba(255, 59, 48, 0.25); animation: pulse 2s infinite; }
         .urgent-title { font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 6px; }
@@ -157,6 +180,7 @@
     </div>
 
     <div class="app-container">
+        
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
             <div class="version-tag">V123.77</div>
@@ -169,10 +193,17 @@
             <div class="ticker-content" id="news-text">🎉 歡迎使用刷卡回饋管家！幣倍卡2026/將將卡2026 最新權益已更新。</div>
         </div>
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
+        
         <div class="total-reward-card">
-            <span class="total-reward-label">當期累積回饋預估</span>
-            <span class="total-reward-amount" id="totalRewardDisplay">$0</span>
+            <div>
+                <span class="total-reward-label">當期累積回饋預估</span><br>
+                <span class="total-reward-amount" id="totalRewardDisplay">$0</span>
+            </div>
+            <button class="btn-share-premium" onclick="shareResult()">
+                📤 曬戰績
+            </button>
         </div>
+        
         <div id="card-grid"></div>
         <div style="flex:1;"></div>
         <div class="settings-area">
@@ -195,8 +226,7 @@
         </div>
         <div style="height:20px;"></div>
     </div>
-
-    <div id="transactionModal" class="modal" onclick="if(event.target===this) closeModal()">
+  <div id="transactionModal" class="modal" onclick="if(event.target===this) closeModal()">
         <div class="modal-content">
             <div class="modal-body-input">
                 <h2 id="modalTitle" style="margin: 0 0 4px 0; font-size: 18px; font-weight: 800; color:#333;"></h2>
@@ -409,6 +439,38 @@
         </div>
     </div>
   <script>
+    // [NEW] 核心分享功能 - 讓「曬戰績」按鈕生效的魔法
+    async function shareResult() {
+        // 抓取目前畫面上的金額文字
+        const totalText = document.getElementById('totalRewardDisplay').innerText;
+        const now = new Date();
+        const month = now.getMonth() + 1;
+        
+        // 設定要分享的內容
+        const shareData = {
+            title: '刷卡回饋管家戰績',
+            text: `💰 狂！我在刷卡回饋管家 ${month} 月目前累積回饋 ${totalText}！\n\n快來看看你賺了多少 👉`,
+            url: window.location.href 
+        };
+
+        // 偵測是否支援原生分享 (手機通常支援)
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+            } catch (err) {
+                console.log('分享已取消');
+            }
+        } else {
+            // 電腦版或不支援 Web Share 的備案：自動複製文字
+            const textToCopy = `${shareData.text} ${shareData.url}`;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert('已複製分享文字！可直接貼上社群。\n\n' + textToCopy);
+            }).catch(() => {
+                prompt('請手動複製以下文字分享：', textToCopy);
+            });
+        }
+    }
+
     fetch('config.json?t=' + Date.now()).then(response => response.json()).then(data => { if(data.news) document.getElementById('news-text').innerHTML = data.news; }).catch(error => {});
     let cardSettings = JSON.parse(localStorage.getItem('cardSettings')) || {};
 
@@ -493,7 +555,7 @@
     window.addEventListener('popstate', function(event) { 
         closeModal();
     });
-    // 核心資料庫
+    // [PART 3 START] 核心資料庫與運算邏輯
     const defaultCards = [
         { 
             id: 'c10', name: '中信 UniOpen 卡', nickname: '2026 統一集團神卡', 
@@ -592,7 +654,6 @@
     function saveHsbcInitial() { const initial = document.getElementById('hsbcInitialMiles').value; localStorage.setItem('hsbc_initial_miles', initial); renderGrid();
     }
     
-    // 修復：增加此存檔函式
     function saveHsbcSettings() {
         const redeemed = document.getElementById('hsbcRedeemedMiles').value;
         localStorage.setItem('hsbc_redeemed_miles', redeemed);
@@ -793,7 +854,6 @@
         updateRewardPreview();
     }
 
-    // 核心資料寫入函式 (修復後)
     function addTransaction(isConfirm) {
         const amount = parseFloat(document.getElementById('amountInput').value);
         const date = document.getElementById('dateInput').value;
@@ -853,6 +913,7 @@
         let currencyType = document.querySelector('input[name="currencyType"]:checked') ? document.querySelector('input[name="currencyType"]:checked').value : 'domestic';
         let isSinopacCurrencySelectedFinal = (currencyType === 'selected');
         let isSinopacCurrencyOverseasFinal = (currencyType === 'selected');
+        
         const newTx = {
             id: editingId || Date.now(),
             cardId, amount, date, note,
@@ -1213,9 +1274,11 @@
         return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: currentRate.toFixed(1), isCustom, cycleStart, cycleEnd };
     }
 
-    function toggleBillLogic() { const isBill = document.getElementById('checkIsBill').checked; document.getElementById('labelBaseRate').innerText = isBill ? "🔰 基本回饋 0.15% (無上限)" : "🔰 基本回饋 1% (無上限)"; if(isBill) document.getElementById('checkBonus25').checked = false; updateRewardPreview();
+    function toggleBillLogic() { const isBill = document.getElementById('checkIsBill').checked; document.getElementById('labelBaseRate').innerText = isBill ?
+    "🔰 基本回饋 0.15% (無上限)" : "🔰 基本回饋 1% (無上限)"; if(isBill) document.getElementById('checkBonus25').checked = false; updateRewardPreview();
     }
-    function toggleSelectedLogic() { const isSelected = document.getElementById('checkBonus25').checked; document.getElementById('labelBaseRate').innerText = isSelected ? "🔰 基本回饋 1% (無上限)" : "🔰 基本回饋 1% (無上限)"; if(isSelected) document.getElementById('checkIsBill').checked = false; updateRewardPreview();
+    function toggleSelectedLogic() { const isSelected = document.getElementById('checkBonus25').checked; document.getElementById('labelBaseRate').innerText = isSelected ?
+    "🔰 基本回饋 1% (無上限)" : "🔰 基本回饋 1% (無上限)"; if(isSelected) document.getElementById('checkIsBill').checked = false; updateRewardPreview();
     }
     function toggleGreenLogic() { if(document.getElementById('checkGreenChannel').checked) document.getElementById('checkForeign').checked = false; updateRewardPreview();
     }
@@ -1326,7 +1389,8 @@
                 }
             } else if (card.id === 'c9') {
                 const tier = localStorage.getItem('hsbc_tier') || 'infinite';
-                card.name = (tier === 'infinite') ? '滙豐旅人無限卡' : '滙豐旅人御璽卡';
+                card.name = (tier === 'infinite') ? '滙豐旅人無限卡' 
+                : '滙豐旅人御璽卡';
                 card.note = (tier === 'infinite') ? '國內18/國外10 (哩)' : '國內18/國外15 (哩)';
                 statusText = `總哩程 ${stats.reward.toLocaleString()} 哩`;
                 msgStyle = 'color: #007AFF; font-weight:bold;';
@@ -1410,7 +1474,7 @@
                 cycleHint = `<div class="tile-cycle-hint">週期: ${stats.cycleStart.getMonth()+1}/${stats.cycleStart.getDate()}-${stats.cycleEnd.getMonth()+1}/${stats.cycleEnd.getDate()}</div>`;
             }
 
-            tile.innerHTML = `<div class="tile-header"><span class="tile-name">${card.name}</span><span class="rate-badge" style="color:black">${displayRate}</span></div><div class="${nickClass}">${card.nickname}</div><span class="tile-note" style="color:${card.textColor==='white'?'rgba(255,255,255,0.8)':'rgba(0,0,0,0.6)'}">${card.note}</span><div class="tile-body"><div class="tile-stat">$${stats.spend.toLocaleString()}</div><div class="tile-earned">${earnedText}</div></div><div class="tile-footer"><div class="progress-track"><div class="progress-fill" style="width:${Math.min(percent, 100)}%"></div></div><div class="tile-msg" style="${msgStyle}">${statusText}</div>${cycleHint}</div>`;
+            tile.innerHTML = `<div class="tile-header"><span class="tile-name">${card.name}</span><span class="rate-badge" style="color:black">${displayRate}</span></div><div class="tile-nickname-badge ${nickClass}">${card.nickname}</div><span class="tile-note" style="color:${card.textColor==='white'?'rgba(255,255,255,0.8)':'rgba(0,0,0,0.6)'}">${card.note}</span><div class="tile-body"><div class="tile-stat">$${stats.spend.toLocaleString()}</div><div class="tile-earned">${earnedText}</div></div><div class="tile-footer"><div class="progress-track"><div class="progress-fill" style="width:${Math.min(percent, 100)}%"></div></div><div class="tile-msg" style="${msgStyle}">${statusText}</div>${cycleHint}</div>`;
             container.appendChild(tile);
         });
         checkUrgentTasks(); initSortable();
@@ -1505,7 +1569,7 @@
         if (cardId === 'c2') document.getElementById('greenCardOptions').style.display = 'block';
         if (cardId === 'c7') {
              document.getElementById('uniOptions').style.display = 'block';
-             toggleUniUpLogic(); 
+        toggleUniUpLogic(); 
         }
         if (cardId === 'c8') document.getElementById('happyOptions').style.display = 'block';
         if (cardId === 'c9') document.getElementById('hsbcOptions').style.display = 'block';
@@ -1615,7 +1679,8 @@
             if (tx.isGreen) noteText = '🌿 ' + noteText; if (tx.isForeign) noteText = '✈️ ' + noteText; if (tx.isUniBonus) noteText = '🔥 ' + noteText; if (tx.isHappyPet) 
             noteText = '🐶 ' + noteText; if (tx.isHappyPeace) noteText = '🍽️ ' + noteText; if (tx.isHappyLife) noteText = '🛒 ' + noteText; if (tx.isHappyForeign) noteText = '✈️ ' + noteText; if (tx.isHsbcForeign) noteText = '✈️ ' + noteText;
             if (tx.isUniGroup) noteText = '🏪 ' + noteText; if (tx.isUniIcash) noteText = '📱 ' + noteText; if (tx.isUniOverseas) noteText = '✈️ ' + noteText;
-            if (tx.isRichartPay) noteText = '📱 ' + noteText; if (tx.isRichartOnline) noteText = '🛍️ ' + noteText; if (tx.isRichartLine) noteText = '🟢 ' + noteText; if (tx.isRichartOverseas) noteText = '✈️ ' + noteText;
+            if (tx.isRichartPay) noteText = '📱 ' + noteText; if (tx.isRichartOnline) noteText = '🛍️ ' + noteText; if (tx.isRichartLine) noteText = 
+            '🟢 ' + noteText; if (tx.isRichartOverseas) noteText = '✈️ ' + noteText;
             if (tx.isBill) noteText = '🧾 ' + noteText;
             if (tx.isBonus25) noteText = '🌟 ' + noteText; if (tx.isBonus10) noteText = '⚡ ' + noteText;
             if (tx.isFubonJJapan) noteText = '🇯🇵 ' + noteText;
@@ -1671,7 +1736,7 @@
         if(document.getElementById('checkForeign')) document.getElementById('checkForeign').checked = tx.isForeign;
         if(document.getElementById('checkUniUp')) {
              document.getElementById('checkUniUp').checked = tx.isUniUp;
-             toggleUniUpLogic(); 
+        toggleUniUpLogic(); 
         }
         if(document.getElementById('checkUniBonus')) document.getElementById('checkUniBonus').checked = tx.isUniBonus;
         if(document.getElementById('checkHappyPet')) document.getElementById('checkHappyPet').checked = tx.isHappyPet;
@@ -1738,9 +1803,9 @@
                 cardOrder: localStorage.getItem('cardOrder'),
                 cardSettings: localStorage.getItem('cardSettings'),
                 user_setup_done: localStorage.getItem('user_setup_done')
-              }
+            }
         };
-        const dataStr = JSON.stringify(backupData); 
+        const dataStr = JSON.stringify(backupData);
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -1798,7 +1863,8 @@
             if (card.type === 'placeholder') return;
             const stats = calculateStats(card.id); let target = card.type === 'floor' ? card.target : (card.type === 'mixed' ? card.minSpend : 0);
             if (target > 0 && stats.spend < target) {
-                const end = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0), diff = Math.ceil((end - new Date()) / 86400000);
+                const end = new Date(new Date().getFullYear(), new Date().getMonth() 
+                + 1, 0), diff = Math.ceil((end - new Date()) / 86400000);
                 if (diff <= 3 && diff >= 0) { hasUrgent = true; alertList.innerHTML += `<div class="urgent-item">${card.name} 缺 $${(target - stats.spend).toLocaleString()} (剩 ${diff} 天)</div>`; }
             }
         });

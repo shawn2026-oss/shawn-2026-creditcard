@@ -2,6 +2,7 @@
 <html lang="zh-TW">
 <head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-FMD1PV6QZV"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -44,28 +45,11 @@
         @keyframes scroll-left { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
         .total-reward-card { background: #2c3e50; color: white; border-radius: 16px; padding: 16px 20px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(44, 62, 80, 0.2); }
         .total-reward-card::after { content: ''; position: absolute; top: -50%; right: -50%; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%; pointer-events: none; }
-        
         .total-info { display: flex; flex-direction: column; gap: 2px; }
         .total-reward-label { font-size: 13px; font-weight: 600; opacity: 0.9; }
         .total-reward-amount { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; }
         
-        /* 曬戰績按鈕 */
-        .btn-share-result { 
-            background: rgba(255,255,255,0.2); 
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.3);
-            color: white; 
-            padding: 8px 16px; 
-            border-radius: 20px; 
-            font-size: 13px; 
-            font-weight: 700; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            gap: 6px; 
-            transition: all 0.2s;
-            z-index: 2;
-        }
+        .btn-share-result { background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; z-index: 2; }
         .btn-share-result:active { transform: scale(0.95); background: rgba(255,255,255,0.3); }
 
         #urgent-alert-area { display: none; margin-bottom: 12px; }
@@ -105,9 +89,43 @@
         .btn-ig { width: 100%; padding: 12px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 12px rgba(220, 39, 67, 0.3); display: flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-ig:active { transform: scale(0.98); }
         .details-content { display: none; background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 10px; margin-top: 6px; font-size: 11px; color: #666; line-height: 1.6; }
+        
+        /* Modal 核心樣式 - 確保置中且不模糊 */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 1000; align-items: center; justify-content: center; }
         .modal-content { background: white; width: 85%; max-width: 320px; border-radius: 20px; padding: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.25); animation: modalPop 0.2s; display: flex; flex-direction: column; max-height: 85vh; overflow-y: auto; }
         .modal-body-input { flex-shrink: 0; }
+        
+        /* 分享區塊與戰績卡 */
+        #captureArea { position: fixed; top: -9999px; left: -9999px; z-index: -1; }
+        .share-card-node {
+            width: 320px;
+            background: linear-gradient(135deg, #1C1C1E, #2c3e50);
+            color: white;
+            border-radius: 20px;
+            padding: 24px;
+            box-sizing: border-box;
+            font-family: -apple-system, sans-serif;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            margin-bottom: 20px; /* 與下方按鈕區隔 */
+        }
+        .share-header { font-size: 14px; opacity: 0.8; letter-spacing: 1px; margin-bottom: 4px; text-transform: uppercase; }
+        .share-month { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+        .share-amount { font-size: 48px; font-weight: 800; margin-bottom: 20px; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .share-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 15px 0; }
+        .share-footer { font-size: 10px; opacity: 0.5; margin-top: 15px; }
+        .share-list { text-align: left; margin-top: 10px; }
+        .share-item { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; font-weight: 500; }
+        .share-item span:last-child { font-weight: 700; color: #FFD700; }
+        
+        .social-btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+        .social-btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px; border-radius: 12px; border: none; font-size: 13px; font-weight: 700; color: white; cursor: pointer; transition: transform 0.1s; }
+        .social-btn:active { transform: scale(0.97); }
+        .social-btn.threads { background: #000000; border: 1px solid #333; grid-column: span 2; }
+        .social-btn.facebook { background: #1877F2; }
+        .social-btn.line { background: #06C755; }
+        .social-btn.download { background: #555; grid-column: span 2; margin-top: 5px;}
+        
         .input-group label { display: block; font-size: 12px; font-weight: 600; color: #888; margin-bottom: 6px; margin-top: 10px; }
         input { width: 100%; padding: 10px; border: 2px solid #f0f0f0; background: #fff; border-radius: 12px; font-size: 18px; box-sizing: border-box; outline: none; font-weight: 600; color: #333; }
         .btn-group { display: flex; gap: 8px; margin-top: 20px; flex-shrink: 0; }
@@ -181,7 +199,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V123.80</div>
+            <div class="version-tag">V123.83</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -196,7 +214,7 @@
                 <span class="total-reward-label">當期累積回饋預估</span>
                 <span class="total-reward-amount" id="totalRewardDisplay">$0</span>
             </div>
-            <button class="btn-share-result" onclick="shareResult()">📩 曬戰績</button>
+            <button class="btn-share-result" onclick="openShareModal()">📩 曬戰績</button>
         </div>
         <div id="card-grid"></div>
         <div style="flex:1;"></div>
@@ -220,9 +238,34 @@
         </div>
         <div style="height:20px;"></div>
     </div>
+  <div id="sharePreviewModal" class="modal" onclick="if(event.target===this) document.getElementById('sharePreviewModal').style.display='none'">
+        <div class="modal-content" style="background:transparent; box-shadow:none; align-items:center; padding:0; width:100%; max-width:340px;">
+            <div id="captureNode" class="share-card-node">
+                <div class="share-header">Monthly Rewards</div>
+                <div class="share-month" id="shareCardMonth">戰績報告</div>
+                <div class="share-amount" id="shareCardAmount">$0</div>
+                <div class="share-divider"></div>
+                <div class="share-list" id="shareCardList"></div>
+                <div class="share-footer">Generated by 刷卡回饋管家</div>
+            </div>
+
+            <div style="background:white; border-radius:20px; padding:15px; width:100%; box-sizing:border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                <button class="btn btn-confirm" style="width:100%; margin-bottom:15px; background:#333;" onclick="downloadShareImage()">📥 下載圖片 (發IG限動)</button>
+                
+                <div style="text-align:center; font-size:12px; color:#888; margin-bottom:10px;">或直接分享文字連結：</div>
+                <div class="social-btn-grid">
+                    <button class="social-btn threads" onclick="shareToThreads()">🧵 Threads</button>
+                    <button class="social-btn facebook" onclick="shareToFB()">📘 Facebook</button>
+                    <button class="social-btn line" onclick="shareToLine()">🟢 LINE</button>
+                    <button class="social-btn copy" onclick="copyShareText()">📋 複製文字</button>
+                </div>
+            </div>
+            <button style="margin-top:15px; background:none; border:none; color:white; font-size:14px; text-decoration:underline; cursor:pointer;" onclick="document.getElementById('sharePreviewModal').style.display='none'">關閉視窗</button>
+        </div>
+    </div>
 
     <div id="transactionModal" class="modal" onclick="if(event.target===this) closeModal()">
-      <div class="modal-content">
+        <div class="modal-content">
             <div class="modal-body-input">
                 <h2 id="modalTitle" style="margin: 0 0 4px 0; font-size: 18px; font-weight: 800; color:#333;"></h2>
                 <div style="font-size:12px; color:#888; margin-bottom:10px; font-weight: 500;" id="modalSubtitle"></div>
@@ -500,10 +543,10 @@
         </div>
     </div>
   <script>
-    // 自動注入遠東樂家+卡完整通路 (保險起見，若HTML未正確載入則由JS補上)
+    // 自動注入遠東樂家+卡完整通路 (確保資料不遺失)
     function injectHappyDetails() {
         const petDiv = document.getElementById('happyPetDetails');
-        if(petDiv && petDiv.innerHTML.trim() === "") {
+        if(petDiv) {
             petDiv.innerHTML = `
                 <b>(1) 指定寵物連鎖：</b><br>寵物公園、東森寵物、魚中魚、貓狗隊長、毛孩市集、金吉利、好狗命、好狗運、金王子、愛貓園、福壽寵物旗艦館<br>
                 <b>(2) 2026 新增品牌：</b><br>汪喵星球、怪獸部落、超凝小姐、Hero Mama<br>
@@ -511,7 +554,7 @@
             `;
         }
         const peaceDiv = document.getElementById('happyPeaceDetails');
-        if(peaceDiv && peaceDiv.innerHTML.trim() === "") {
+        if(peaceDiv) {
             peaceDiv.innerHTML = `
                 <b>(1) 國內餐廳：</b><br>國內各大指定餐廳 (MCC 5811, 5812, 5813, 5814)<br>
                 <b>(2) 婦幼藥局/居家：</b><br>大樹、杏一、維康、躍獅、卡多摩、宜兒樂、營養銀行、麗兒采家、媽咪樂居家服務、潔客幫<br>
@@ -519,7 +562,7 @@
             `;
         }
         const lifeDiv = document.getElementById('happyLifeDetails');
-        if(lifeDiv && lifeDiv.innerHTML.trim() === "") {
+        if(lifeDiv) {
             lifeDiv.innerHTML = `
                 <b>(1) 百貨/Outlet：</b><br>遠東百貨、SOGO、巨城、大遠百、南紡、夢時代、skmpark、尚順、大魯閣(湳雅)、桃知道、大江、台茂、新月、遠雄、宏匯、CITYLINK、美麗華、大葉高島屋、統一時代、故宮、秀泰、環球、IKEA、麗寶、LaLaport<br>
                 <b>(2) 超市量販/生機：</b><br>愛買、家樂福、美廉社、小北、大買家、喜互惠、棉花田、聖德科斯、永豐餘生技、里仁、台灣主婦聯盟、健康食彩、安麗、葡眾、美樂家<br>
@@ -529,33 +572,99 @@
         }
     }
 
-    // 曬戰績功能 (恢復)
-    async function shareResult() {
-        let totalReward = document.getElementById('totalRewardDisplay').innerText;
-        let date = new Date();
-        let month = date.getMonth() + 1;
-        let msg = `💰 狂！我在刷卡回饋管家 ${month} 月目前累積回饋 ${totalReward}！\n\n快來看看你賺了多少 👉 https://shawn2026-oss.github.io/shawn-2026-creditcard/`;
+    // --- 曬戰績功能核心邏輯 ---
+    function openShareModal() {
+        const totalAmount = document.getElementById('totalRewardDisplay').innerText;
+        const date = new Date();
+        const month = date.getMonth() + 1;
         
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: '刷卡回饋管家戰績',
-                    text: msg
-                });
-            } catch (err) {
-                console.log('分享已取消');
+        // 1. 填入數據到隱藏的卡片中
+        document.getElementById('shareCardMonth').innerText = `${month} 月回饋戰績`;
+        document.getElementById('shareCardAmount').innerText = totalAmount;
+        
+        // 2. 找出前 3 名回饋最高的卡片
+        let cardRewards = [];
+        cards.forEach(card => {
+            if(card.type === 'placeholder') return;
+            const stats = calculateStats(card.id);
+            if(stats.reward > 0) {
+                cardRewards.push({ name: card.name, reward: stats.reward });
             }
+        });
+        cardRewards.sort((a, b) => b.reward - a.reward);
+        const top3 = cardRewards.slice(0, 3);
+        
+        const listContainer = document.getElementById('shareCardList');
+        listContainer.innerHTML = '';
+        if(top3.length === 0) {
+             listContainer.innerHTML = '<div style="text-align:center; opacity:0.6;">尚無回饋紀錄</div>';
         } else {
-            // 電腦版或不支援 Web Share API 時使用複製
-            const tempInput = document.createElement("textarea");
-            tempInput.value = msg;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand("copy");
-            document.body.removeChild(tempInput);
-            alert("📋 戰績文字已複製！快去貼上分享吧！");
+            top3.forEach(c => {
+                let unit = (c.name.includes('旅人')) ? '哩' : '元';
+                listContainer.innerHTML += `
+                    <div class="share-item">
+                        <span>${c.name}</span>
+                        <span>+${c.reward.toLocaleString()} ${unit}</span>
+                    </div>`;
+            });
         }
+
+        // 3. 顯示視窗
+        document.getElementById('sharePreviewModal').style.display = 'flex';
     }
+
+    // 下載圖片 (html2canvas)
+    function downloadShareImage() {
+        const node = document.getElementById('captureNode');
+        // 暫存原始樣式
+        const originalTransform = node.style.transform;
+        node.style.transform = 'none'; // 確保截圖時不偏移
+        
+        html2canvas(node, {
+            backgroundColor: null,
+            scale: 2 // 提高解析度，讓文字更清晰
+        }).then(canvas => {
+            node.style.transform = originalTransform; // 恢復
+            
+            const link = document.createElement('a');
+            link.download = `我的回饋戰績_${new Date().getTime()}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+    }
+
+    // 社群分享功能
+    function getShareText() {
+        const totalAmount = document.getElementById('totalRewardDisplay').innerText;
+        return `💰 狂！我在刷卡回饋管家本月目前累積回饋 ${totalAmount}！\n快來看看你賺了多少 👉 https://shawn2026-oss.github.io/shawn-2026-creditcard/`;
+    }
+
+    function shareToThreads() {
+        const text = getShareText();
+        window.open(`https://www.threads.net/intent/post?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    function shareToFB() {
+        const url = 'https://shawn2026-oss.github.io/shawn-2026-creditcard/';
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+    }
+
+    function shareToLine() {
+        const text = getShareText();
+        window.open(`https://line.me/R/msg/text/?${encodeURIComponent(text)}`, '_blank');
+    }
+
+    function copyShareText() {
+        const text = getShareText();
+        const tempInput = document.createElement("textarea");
+        tempInput.value = text;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+        alert("📋 文字已複製！請開啟 IG 或社群貼上。");
+    }
+    // --- 結束 曬戰績功能 ---
 
     fetch('config.json?t=' + Date.now()).then(response => response.json()).then(data => { if(data.news) document.getElementById('news-text').innerHTML = data.news; }).catch(error => {});
     let cardSettings = JSON.parse(localStorage.getItem('cardSettings')) || {};
@@ -636,12 +745,14 @@
     function closeModal() {
         document.getElementById('transactionModal').style.display = 'none';
         document.getElementById('manageModal').style.display = 'none';
+        document.getElementById('sharePreviewModal').style.display = 'none';
     }
 
     window.addEventListener('popstate', function(event) { 
         closeModal();
     });
-    // 核心資料庫
+
+    // 核心資料庫 (更新：幣倍卡文字修正)
     const defaultCards = [
         { 
             id: 'c10', name: '中信 UniOpen 卡', nickname: '2026 統一集團神卡', 
@@ -1307,7 +1418,6 @@
         if (cardId === 'c6') {
             const bonus10TxSpend = relevantTx.filter(t => t.isBonus10).reduce((sum, t) => sum + t.amount, 0) + (addedIsBonus10 ? addedAmount : 0);
             const bonus10Reward = Math.min(bonus10TxSpend, 8000) * 0.10;
-            // 修正：精選通路 2.5% (上限40萬)
             const bonus25TxSpend = relevantTx.filter(t => t.isBonus25).reduce((sum, t) => sum + t.amount, 0) + (addedIsBonus25 ? addedAmount : 0);
             const selectedReward = Math.min(bonus25TxSpend, 400000) * 0.025;
             

@@ -22,12 +22,11 @@
     <meta name="apple-mobile-web-app-title" content="刷卡回饋管家">
     <meta name="theme-color" content="#F0F2F5">
     
-    <meta property="og:title" content="刷卡回饋管家 - 信用卡回饋試算神器">
-    <meta property="og:description" content="別讓回饋溜走了！自動計算上限、即時試算。快來看看這個月我賺了多少！">
+    <meta property="og:title" content="刷卡回饋管家 - 您的信用卡最佳幫手">
+    <meta property="og:description" content="自動計算回饋、即時顯示上限、支援戰績圖分享。快來看看你本月賺了多少回饋！">
     <meta property="og:image" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/icon-192.png">
     <meta property="og:url" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/">
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="刷卡回饋管家">
 
     <title>刷卡回饋管家</title>
     
@@ -119,7 +118,7 @@
         #captureArea { position: fixed; top: -9999px; left: -9999px; z-index: -1; }
         .share-card-node {
             width: 320px;
-            /* V123.91 修正：高度自動延伸 */
+            /* V123.92 修正：高度自動延伸 */
             height: auto; 
             background: linear-gradient(135deg, #1C1C1E, #2c3e50);
             color: white;
@@ -226,7 +225,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V123.91</div>
+            <div class="version-tag">V123.92</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -288,7 +287,9 @@
                     <button class="social-btn line" onclick="shareToLine()">🟢 LINE</button>
                     <button class="social-btn download" onclick="downloadShareImage()">📥 下載圖片</button>
                 </div>
-                <div style="text-align:center; font-size:10px; color:#ccc; margin-top:8px;">(IG/FB 為複製文案+開App)</div>
+                <div style="text-align:center; font-size:10px; color:#ccc; margin-top:8px; line-height:1.4;">
+                    (IG/FB：系統將自動下載圖片並複製文案<br>請開啟 App 後直接貼上)
+                </div>
             </div>
             <button style="margin-top:15px; background:none; border:none; color:white; font-size:14px; text-decoration:underline; cursor:pointer;" onclick="document.getElementById('sharePreviewModal').style.display='none'">關閉視窗</button>
         </div>
@@ -573,7 +574,7 @@
         </div>
     </div>
   <script>
-    // 自動注入遠東樂家+卡完整通路 (確保資料穩定)
+    // 自動注入遠東樂家+卡完整通路 (雙重保險)
     function injectHappyDetails() {
         const petDiv = document.getElementById('happyPetDetails');
         if(petDiv) {
@@ -602,7 +603,7 @@
         }
     }
 
-    // --- 曬戰績功能核心邏輯 (V123.90) ---
+    // --- 曬戰績功能核心邏輯 (V123.92) ---
     function openShareModal() {
         const totalAmount = document.getElementById('totalRewardDisplay').innerText;
         const date = new Date();
@@ -612,11 +613,11 @@
         document.getElementById('shareCardMonth').innerText = `${month} 月回饋戰績`;
         document.getElementById('shareCardAmount').innerText = totalAmount;
         
-        // 2. 找出所有回饋 > 0 的卡片 (全列出)
-        // calculateStats 預設回傳「本週期」數值，這符合戰績卡只看當月的需求
+        // 2. 找出所有回饋 > 0 的卡片 (修正：全部列出，不限前3)
         let cardRewards = [];
         cards.forEach(card => {
             if(card.type === 'placeholder') return;
+            // calculateStats 預設計算當月回饋，這符合戰績卡只看當月的需求
             const stats = calculateStats(card.id);
             if(stats.reward > 0) {
                 cardRewards.push({ name: card.name, reward: stats.reward });
@@ -649,7 +650,6 @@
     // 新增：系統原生分享 (直接傳圖)
     function shareNativeImage() {
         const node = document.getElementById('captureNode');
-        // 暫存樣式
         const originalTransform = node.style.transform;
         node.style.transform = 'none';
 
@@ -657,32 +657,32 @@
             backgroundColor: null,
             scale: 2 // 高解析度
         }).then(canvas => {
-            node.style.transform = originalTransform; // 恢復
+            node.style.transform = originalTransform;
             
             canvas.toBlob(async (blob) => {
                 const file = new File([blob], `reward_${Date.now()}.png`, { type: "image/png" });
                 
-                // 檢查是否支援分享檔案
+                // 檢查是否支援原生分享檔案
                 if (navigator.share && navigator.canShare({ files: [file] })) {
                     try {
                         await navigator.share({
                             files: [file],
                             title: '我的刷卡戰績',
-                            text: getShareText() // 帶入文案
+                            text: getShareText()
                         });
                     } catch (err) {
-                        console.log('分享取消'); // 用戶取消不需報錯
+                        console.log('分享取消');
                     }
                 } else {
                     alert("您的裝置不支援直接傳圖，系統將自動為您下載圖片。\n請手動傳送。");
-                    downloadShareImage(); // 自動降級為下載
+                    downloadShareImage(); // 降級：下載圖片
                 }
             });
         });
     }
 
-    // 下載圖片 (Fallback)
-    function downloadShareImage() {
+    // 下載圖片 (與 FB/IG 共用)
+    function downloadShareImage(callback) {
         const node = document.getElementById('captureNode');
         const originalTransform = node.style.transform;
         node.style.transform = 'none'; 
@@ -696,10 +696,11 @@
             link.download = `我的回饋戰績_${new Date().getTime()}.png`;
             link.href = canvas.toDataURL();
             link.click();
+            if(callback) callback(); // 下載完成後執行回調
         });
     }
 
-    // 社群分享功能 (複製+喚醒App)
+    // 社群分享功能 (修正：自動下載圖片 -> 複製 -> 開App)
     function getShareText() {
         const totalAmount = document.getElementById('totalRewardDisplay').innerText;
         return `💰 狂！快來看看你本月賺了多少回饋！\n我在刷卡回饋管家累積了 ${totalAmount}！\n👉 https://shawn2026-oss.github.io/shawn-2026-creditcard/`;
@@ -707,16 +708,26 @@
 
     function shareToIG() {
         copyShareText(false); 
-        alert("📋 文案已複製！\n\n即將為您開啟 Instagram，請直接發布限動並「貼上」文案！");
-        window.location.href = "instagram://app";
+        // 先下載圖片，下載完後再跳提示與開App
+        downloadShareImage(() => {
+            setTimeout(() => {
+                alert("✅ 圖片已存入相簿！\n✅ 文案已複製！\n\n即將開啟 Instagram，請發布限動 > 選取剛下載的圖片 > 貼上文案！");
+                window.location.href = "instagram://app";
+            }, 500);
+        });
     }
 
     function shareToFB() {
         copyShareText(false);
-        alert("📋 文案已複製！\n\n即將為您開啟 Facebook，請直接發文並「貼上」文案！");
-        window.location.href = "fb://";
-        // 備案：開網頁版
-        setTimeout(() => { window.open('https://www.facebook.com', '_blank'); }, 1500);
+        // 先下載圖片
+        downloadShareImage(() => {
+            setTimeout(() => {
+                alert("✅ 圖片已存入相簿！\n✅ 文案已複製！\n\n即將開啟 Facebook，請直接發文 > 選取剛下載的圖片 > 貼上文案！");
+                window.location.href = "fb://";
+                // 備案：如果沒裝 App，嘗試開網頁
+                setTimeout(() => { window.open('https://www.facebook.com', '_blank'); }, 1500);
+            }, 500);
+        });
     }
 
     function shareToThreads() {
@@ -1493,6 +1504,7 @@
         if (cardId === 'c6') {
             const bonus10TxSpend = relevantTx.filter(t => t.isBonus10).reduce((sum, t) => sum + t.amount, 0) + (addedIsBonus10 ? addedAmount : 0);
             const bonus10Reward = Math.min(bonus10TxSpend, 8000) * 0.10;
+            // 修正：精選通路 2.5% (上限40萬)
             const bonus25TxSpend = relevantTx.filter(t => t.isBonus25).reduce((sum, t) => sum + t.amount, 0) + (addedIsBonus25 ? addedAmount : 0);
             const selectedReward = Math.min(bonus25TxSpend, 400000) * 0.025;
             

@@ -95,6 +95,7 @@
         .btn-reset-visible { width: 100%; padding: 12px; background-color: #fff5f5; border: 1px solid #ffdede; color: #FF3B30; border-radius: 12px; font-weight: 600; font-size: 12px; cursor: pointer; margin-top: 10px;}
         .btn-ig { width: 100%; padding: 12px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 12px rgba(220, 39, 67, 0.3); display: flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-ig:active { transform: scale(0.98); }
+        .details-content { display: none; background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 10px; margin-top: 6px; font-size: 11px; color: #666; line-height: 1.6; }
         
         /* Modal 固定層級，防止模糊 */
         .modal { display: none; position: fixed !important; top: 0 !important; left: 0 !important; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 10000; align-items: center; justify-content: center; }
@@ -117,7 +118,7 @@
         #captureArea { position: fixed; top: -9999px; left: -9999px; z-index: -1; }
         .share-card-node {
             width: 320px;
-            /* 高度自動延伸 */
+            /* V123.97 修正：高度自動延伸 */
             height: auto; 
             background: linear-gradient(135deg, #1C1C1E, #2c3e50);
             color: white;
@@ -147,14 +148,12 @@
         .social-btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px; border-radius: 12px; border: none; font-size: 13px; font-weight: 700; color: white; cursor: pointer; transition: transform 0.1s; }
         .social-btn:active { transform: scale(0.97); }
         
-        /* 特別強調 原生分享按鈕 */
-        .social-btn.native { background: linear-gradient(135deg, #007AFF, #00C6FF); grid-column: span 2; font-size: 14px; padding: 14px; box-shadow: 0 4px 15px rgba(0,122,255,0.3); }
-        
-        .social-btn.instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+        .social-btn.instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); grid-column: span 2; }
         .social-btn.threads { background: #000000; border: 1px solid #333; }
         .social-btn.facebook { background: #1877F2; }
-        .social-btn.line { background: #06C755; }
-        
+        .social-btn.line { background: #06C755; grid-column: span 2;}
+        .social-btn.download { background: #555; grid-column: span 2; }
+
         .input-group label { display: block; font-size: 12px; font-weight: 600; color: #888; margin-bottom: 6px; margin-top: 10px; }
         input { width: 100%; padding: 10px; border: 2px solid #f0f0f0; background: #fff; border-radius: 12px; font-size: 18px; box-sizing: border-box; outline: none; font-weight: 600; color: #333; }
         .btn-group { display: flex; gap: 8px; margin-top: 20px; flex-shrink: 0; }
@@ -228,7 +227,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V123.95</div>
+            <div class="version-tag">V123.97</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -282,9 +281,7 @@
 
             <div style="background:white; border-radius:20px; padding:15px; width:100%; box-sizing:border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-top:10px;">
                 
-                <button class="social-btn native" onclick="shareNativeImage()">🚀 系統原生分享 (傳圖)</button>
-                
-                <div style="text-align:center; font-size:11px; color:#aaa; margin:10px 0 6px 0; border-top:1px solid #eee; padding-top:10px;">或是使用傳統方式：</div>
+                <div style="text-align:center; font-size:12px; color:#555; margin-bottom:10px; font-weight:700;">✨ 選擇分享方式</div>
                 
                 <div class="social-btn-grid">
                     <button class="social-btn instagram" onclick="shareToIG()">📸 Instagram</button>
@@ -293,8 +290,8 @@
                     <button class="social-btn line" onclick="shareToLine()">🟢 LINE</button>
                     <button class="social-btn download" onclick="downloadShareImage()">📥 下載圖片</button>
                 </div>
-                <div style="text-align:center; font-size:10px; color:#ccc; margin-top:8px; line-height:1.4;">
-                    (IG/FB：系統將先下載圖片並複製文案<br>接著會詢問您是否開啟 App)
+                <div style="text-align:center; font-size:10px; color:#999; margin-top:10px; line-height:1.4; background:#f5f5f5; padding:6px; border-radius:8px;">
+                    💡 點擊按鈕後，系統將自動存圖並複製文案<br>接著會<b>詢問您</b>是否開啟 App
                 </div>
             </div>
             <button style="margin-top:15px; background:none; border:none; color:white; font-size:14px; text-decoration:underline; cursor:pointer;" onclick="document.getElementById('sharePreviewModal').style.display='none'">關閉視窗</button>
@@ -580,7 +577,7 @@
         </div>
     </div>
   <script>
-    // 自動注入遠東樂家+卡完整通路 (防呆機制)
+    // 自動注入遠東樂家+卡完整通路 (防呆機制，防止 HTML 載入異常)
     function injectHappyDetails() {
         const petDiv = document.getElementById('happyPetDetails');
         if(petDiv && petDiv.innerHTML.trim() === "") {
@@ -592,7 +589,7 @@
         }
     }
 
-    // --- 曬戰績功能核心邏輯 (V123.95) ---
+    // --- 曬戰績功能核心邏輯 (V123.97) ---
     function openShareModal() {
         const totalAmount = document.getElementById('totalRewardDisplay').innerText;
         const date = new Date();
@@ -612,6 +609,7 @@
             }
         });
         
+        // 排序：金額高到低
         cardRewards.sort((a, b) => b.reward - a.reward);
         
         const listContainer = document.getElementById('shareCardList');
@@ -634,78 +632,42 @@
         document.getElementById('sharePreviewModal').style.display = 'flex';
     }
 
-    // 新增：系統原生分享 (直接傳圖)
-    function shareNativeImage() {
-        const node = document.getElementById('captureNode');
-        const originalTransform = node.style.transform;
-        node.style.transform = 'none';
-
-        const btn = document.querySelector('.social-btn.native');
-        const originalText = btn.innerText;
-        btn.innerText = "處理中...";
-
-        html2canvas(node, {
-            backgroundColor: null,
-            scale: 2
-        }).then(canvas => {
-            node.style.transform = originalTransform;
-            btn.innerText = originalText;
-            
-            canvas.toBlob(async (blob) => {
-                const file = new File([blob], `reward_${Date.now()}.png`, { type: "image/png" });
-                
-                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                    try {
-                        await navigator.share({
-                            files: [file],
-                            title: '我的刷卡戰績',
-                            text: getShareText()
-                        });
-                    } catch (err) {
-                        console.log('分享取消');
-                    }
-                } else {
-                    alert("您的裝置不支援直接傳圖，系統將自動下載圖片。");
-                    downloadShareImage(); 
-                }
-            });
-        });
-    }
-
-    // 下載圖片 (共用函式)
+    // 下載圖片 (共用函式，支援回調)
     function downloadShareImage(callback) {
         const node = document.getElementById('captureNode');
+        // 暫存樣式防止跑版
         const originalTransform = node.style.transform;
         node.style.transform = 'none'; 
         
         html2canvas(node, {
             backgroundColor: null,
-            scale: 2 
+            scale: 2 // 高解析度
         }).then(canvas => {
             node.style.transform = originalTransform; 
             const link = document.createElement('a');
             link.download = `我的回饋戰績_${new Date().getTime()}.png`;
             link.href = canvas.toDataURL();
             link.click();
-            if(callback) callback();
+            if(callback) callback(); // 下載完成後執行下一步
         });
     }
 
     function getShareText() {
         const totalAmount = document.getElementById('totalRewardDisplay').innerText;
-        return `💰 狂！快來看看你本月賺了多少回饋！\n我在刷卡回饋管家累積了 ${totalAmount}！\n👉 https://shawn2026-oss.github.io/shawn-2026-creditcard/`;
+        return `💰 狂！本月回饋 ${totalAmount}！\n快來試算 👉 https://shawn2026-oss.github.io/shawn-2026-creditcard/`;
     }
 
-    // V123.95 修正：加入 confirm() 詢問機制，不再強制跳轉
+    // --- 社群分享按鈕邏輯 (詢問制) ---
+
     function shareToIG() {
         copyShareText(false); 
+        // 流程：下載圖片 -> 複製文案 -> 詢問用戶
         downloadShareImage(() => {
             setTimeout(() => {
-                // 這裡改用 confirm 讓用戶選擇
-                if (confirm("✅ 圖片已存入相簿\n✅ 文案已複製\n\n是否開啟 Instagram？")) {
+                if (confirm("✅ 圖片已存入相簿\n✅ 文案已複製\n\n是否開啟 Instagram 發布限動？")) {
                     window.location.href = "instagram://app";
                 }
-                // 按取消則什麼都不做，停留在網頁
+                // 按取消則停留在原處
             }, 500);
         });
     }
@@ -714,22 +676,25 @@
         copyShareText(false);
         downloadShareImage(() => {
             setTimeout(() => {
-                // 這裡改用 confirm 讓用戶選擇
-                if (confirm("✅ 圖片已存入相簿\n✅ 文案已複製\n\n是否開啟 Facebook？")) {
-                    window.location.href = "fb://";
+                if (confirm("✅ 圖片已存入相簿\n✅ 文案已複製\n\n是否開啟 Facebook 發文？")) {
+                    // 嘗試開啟發文框，若無反應則開首頁
+                    window.location.href = "fb://composer";
+                    setTimeout(() => { window.location.href = "fb://"; }, 500);
                 }
-                // 按取消則什麼都不做，停留在網頁
+                // 按取消則停留在原處
             }, 500);
         });
     }
 
     function shareToThreads() {
         const text = getShareText();
+        // Threads 網頁版支援度較好，直接開連結
         window.open(`https://www.threads.net/intent/post?text=${encodeURIComponent(text)}`, '_blank');
     }
 
     function shareToLine() {
         const text = getShareText();
+        // Line 只能透過網址傳文字
         window.open(`https://line.me/R/msg/text/?${encodeURIComponent(text)}`, '_blank');
     }
 

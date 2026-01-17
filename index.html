@@ -23,7 +23,7 @@
     <meta name="theme-color" content="#F0F2F5">
     
     <meta property="og:title" content="刷卡回饋管家 - 您的信用卡最佳幫手">
-    <meta property="og:description" content="自動計算回饋、即時顯示上限、支援 html2canvas 戰績分享。快來看看你漏了多少回饋！">
+    <meta property="og:description" content="自動計算回饋、即時顯示上限、支援戰績圖分享。快來看看你本月賺了多少回饋！">
     <meta property="og:image" content="icon-192.png">
     <meta property="og:url" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/">
     <meta property="og:type" content="website">
@@ -221,7 +221,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V123.88</div>
+            <div class="version-tag">V123.89</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -565,7 +565,34 @@
         </div>
     </div>
   <script>
-    // 通路資料已在 Part 2 直接寫死在 HTML 中，這裡不再需要 JS 動態注入，確保資料絕對穩定。
+    // 自動注入遠東樂家+卡完整通路 (雙重保險)
+    function injectHappyDetails() {
+        const petDiv = document.getElementById('happyPetDetails');
+        if(petDiv) {
+            petDiv.innerHTML = `
+                <b>(1) 指定寵物連鎖：</b><br>寵物公園、東森寵物、魚中魚、貓狗隊長、毛孩市集、金吉利、好狗命、好狗運、金王子、愛貓園、福壽寵物旗艦館<br>
+                <b>(2) 2026 新增品牌：</b><br>汪喵星球、怪獸部落、超凝小姐、Hero Mama<br>
+                <b>(3) 醫療與美容：</b><br>獸醫診所、動物醫院、寵物旅館、寵物美容 (MCC 0742, 5995)
+            `;
+        }
+        const peaceDiv = document.getElementById('happyPeaceDetails');
+        if(peaceDiv) {
+            peaceDiv.innerHTML = `
+                <b>(1) 國內餐廳：</b><br>國內各大指定餐廳 (MCC 5811, 5812, 5813, 5814)<br>
+                <b>(2) 婦幼藥局/居家：</b><br>大樹、杏一、維康、躍獅、卡多摩、宜兒樂、營養銀行、麗兒采家、媽咪樂居家服務、潔客幫<br>
+                <b>(3) 運動健身：</b><br>佐登妮絲、健身工廠、World Gym、BEING spa、BEING sport、Curves可爾姿
+            `;
+        }
+        const lifeDiv = document.getElementById('happyLifeDetails');
+        if(lifeDiv) {
+            lifeDiv.innerHTML = `
+                <b>(1) 百貨/Outlet：</b><br>遠東百貨、SOGO、巨城、大遠百、南紡、夢時代、skmpark、尚順、大魯閣(湳雅)、桃知道、大江、台茂、新月、遠雄、宏匯、CITYLINK、美麗華、大葉高島屋、統一時代、故宮、秀泰、環球、IKEA、麗寶、LaLaport<br>
+                <b>(2) 超市量販/生機：</b><br>愛買、家樂福、美廉社、小北、大買家、喜互惠、棉花田、聖德科斯、永豐餘生技、里仁、台灣主婦聯盟、健康食彩、安麗、葡眾、美樂家<br>
+                <b>(3) 交通電信：</b><br>國內加油(中油/台亞/台塑)、gogoro、Tesla、台灣大車隊、yoxi、Uber(台灣)、GoShare、iRent、WeMo、遠傳/台哥大帳單<br>
+                <b>(4) 教育/書店：</b><br>台灣蔦屋、誠品、博客來、金石堂、巨匠、聯成、朱宗慶、雲門
+            `;
+        }
+    }
 
     // --- 曬戰績功能核心邏輯 ---
     function openShareModal() {
@@ -578,7 +605,7 @@
         document.getElementById('shareCardAmount').innerText = totalAmount;
         
         // 2. 找出前 3 名回饋最高的卡片
-        // 注意：calculateStats 預設只計算「當月」回饋，這符合「曬戰績」只曬當月的邏輯
+        // calculateStats 預設只計算「當月」回饋，這符合「曬戰績」只曬當月的邏輯 (不含旅人卡歷史存量)
         let cardRewards = [];
         cards.forEach(card => {
             if(card.type === 'placeholder') return;
@@ -587,7 +614,6 @@
                 cardRewards.push({ name: card.name, reward: stats.reward });
             }
         });
-        // 排序：高到低
         cardRewards.sort((a, b) => b.reward - a.reward);
         const top3 = cardRewards.slice(0, 3);
         
@@ -633,23 +659,23 @@
     // 社群分享功能 (優化版：複製文案 + 喚醒 App)
     function getShareText() {
         const totalAmount = document.getElementById('totalRewardDisplay').innerText;
-        return `💰 狂！我在刷卡回饋管家本月目前累積回饋 ${totalAmount}！\n快來看看你賺了多少 👉 https://shawn2026-oss.github.io/shawn-2026-creditcard/`;
+        // 修正文案，改為正向表述
+        return `💰 狂！我在刷卡回饋管家本月目前賺了 ${totalAmount} 回饋！\n快來看看你本月賺了多少 👉 https://shawn2026-oss.github.io/shawn-2026-creditcard/`;
     }
 
     function shareToIG() {
         copyShareText(false); 
-        // 嘗試喚醒 IG
-        alert("📋 文案已複製！\n\n即將為您開啟 Instagram，請直接發布限動並「貼上」文案！");
+        alert("📋 文案已複製！\n\n即將為您開啟 Instagram，請發布限動並「貼上」文案！");
         window.location.href = "instagram://app";
-        // 若無法喚醒 (如電腦版)，不做額外處理，因為 alert 已經提示複製了
+        // 若無法喚醒 (如電腦版)，不做額外處理
     }
 
     function shareToFB() {
         copyShareText(false);
-        alert("📋 文案已複製！\n\n即將為您開啟 Facebook，請直接發文並「貼上」文案！");
+        alert("📋 文案已複製！\n\n即將為您開啟 Facebook，請發文並「貼上」文案！");
         // 嘗試開啟 FB App
         window.location.href = "fb://";
-        // 備案：如果開啟 App 失敗 (例如電腦版)，稍微延遲後開網頁版，但不帶入 sharer.php 參數以免強制登入
+        // 備案：如果開啟 App 失敗 (例如電腦版)，稍微延遲後開網頁版
         setTimeout(() => { window.open('https://www.facebook.com', '_blank'); }, 1000);
     }
 
@@ -679,6 +705,7 @@
     let cardSettings = JSON.parse(localStorage.getItem('cardSettings')) || {};
 
     window.addEventListener('load', () => {
+        injectHappyDetails(); 
         setTimeout(() => { const ticker = document.querySelector('.ticker-content'); if(ticker) { ticker.style.animation = 'none'; void ticker.offsetWidth; ticker.style.animation = 'scroll-left 15s linear infinite'; } }, 100);
         
         const isSetupDone = localStorage.getItem('user_setup_done');
@@ -1298,6 +1325,7 @@
             });
             const bonusTx = txList.filter(t => t.isSinopacCurrencySelected);
             const totalBonusSpend = bonusTx.reduce((sum, t) => sum + t.amount, 0);
+            // 修正：依據prompt說明「精選/海外 +4%」，這裡計算bonus
             const actualBonus = Math.min(totalBonusSpend * 0.04, bonusCap);
             reward = baseReward + actualBonus;
             
@@ -1426,7 +1454,6 @@
         if (cardId === 'c6') {
             const bonus10TxSpend = relevantTx.filter(t => t.isBonus10).reduce((sum, t) => sum + t.amount, 0) + (addedIsBonus10 ? addedAmount : 0);
             const bonus10Reward = Math.min(bonus10TxSpend, 8000) * 0.10;
-            // 修正：精選通路 2.5% (上限40萬)
             const bonus25TxSpend = relevantTx.filter(t => t.isBonus25).reduce((sum, t) => sum + t.amount, 0) + (addedIsBonus25 ? addedAmount : 0);
             const selectedReward = Math.min(bonus25TxSpend, 400000) * 0.025;
             

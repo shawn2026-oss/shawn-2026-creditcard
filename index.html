@@ -21,6 +21,13 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="刷卡回饋管家">
     <meta name="theme-color" content="#F0F2F5">
+    
+    <meta property="og:title" content="刷卡回饋管家 - 您的信用卡最佳幫手">
+    <meta property="og:description" content="自動計算回饋、即時顯示上限、支援 html2canvas 戰績分享。快來看看你漏了多少回饋！">
+    <meta property="og:image" content="icon-192.png">
+    <meta property="og:url" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/">
+    <meta property="og:type" content="website">
+
     <title>刷卡回饋管家</title>
     
     <link rel="manifest" href="manifest.json">
@@ -130,6 +137,7 @@
         .share-item { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; font-weight: 500; }
         .share-item span:last-child { font-weight: 700; color: #FFD700; }
         
+        /* 5合1 按鈕區塊 */
         .social-btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 10px; }
         .social-btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px; border-radius: 12px; border: none; font-size: 13px; font-weight: 700; color: white; cursor: pointer; transition: transform 0.1s; }
         .social-btn:active { transform: scale(0.97); }
@@ -213,7 +221,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V123.87</div>
+            <div class="version-tag">V123.88</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -272,7 +280,7 @@
                     <button class="social-btn line" onclick="shareToLine()">🟢 LINE</button>
                     <button class="social-btn download" onclick="downloadShareImage()">📥 下載戰績圖</button>
                 </div>
-                <div style="text-align:center; font-size:10px; color:#aaa; margin-top:8px;">(IG/FB 會自動複製文案，請手動貼上)</div>
+                <div style="text-align:center; font-size:10px; color:#aaa; margin-top:8px;">(IG/FB 會自動複製文案，請開啟 App 後貼上)</div>
             </div>
             <button style="margin-top:15px; background:none; border:none; color:white; font-size:14px; text-decoration:underline; cursor:pointer;" onclick="document.getElementById('sharePreviewModal').style.display='none'">關閉視窗</button>
         </div>
@@ -557,34 +565,7 @@
         </div>
     </div>
   <script>
-    // 自動注入遠東樂家+卡完整通路 (雙重保險，防止資料遺失)
-    function injectHappyDetails() {
-        const petDiv = document.getElementById('happyPetDetails');
-        if(petDiv) {
-            petDiv.innerHTML = `
-                <b>(1) 指定寵物連鎖：</b><br>寵物公園、東森寵物、魚中魚、貓狗隊長、毛孩市集、金吉利、好狗命、好狗運、金王子、愛貓園、福壽寵物旗艦館<br>
-                <b>(2) 2026 新增品牌：</b><br>汪喵星球、怪獸部落、超凝小姐、Hero Mama<br>
-                <b>(3) 醫療與美容：</b><br>獸醫診所、動物醫院、寵物旅館、寵物美容 (MCC 0742, 5995)
-            `;
-        }
-        const peaceDiv = document.getElementById('happyPeaceDetails');
-        if(peaceDiv) {
-            peaceDiv.innerHTML = `
-                <b>(1) 國內餐廳：</b><br>國內各大指定餐廳 (MCC 5811, 5812, 5813, 5814)<br>
-                <b>(2) 婦幼藥局/居家：</b><br>大樹、杏一、維康、躍獅、卡多摩、宜兒樂、營養銀行、麗兒采家、媽咪樂居家服務、潔客幫<br>
-                <b>(3) 運動健身：</b><br>佐登妮絲、健身工廠、World Gym、BEING spa、BEING sport、Curves可爾姿
-            `;
-        }
-        const lifeDiv = document.getElementById('happyLifeDetails');
-        if(lifeDiv) {
-            lifeDiv.innerHTML = `
-                <b>(1) 百貨/Outlet：</b><br>遠東百貨、SOGO、巨城、大遠百、南紡、夢時代、skmpark、尚順、大魯閣(湳雅)、桃知道、大江、台茂、新月、遠雄、宏匯、CITYLINK、美麗華、大葉高島屋、統一時代、故宮、秀泰、環球、IKEA、麗寶、LaLaport<br>
-                <b>(2) 超市量販/生機：</b><br>愛買、家樂福、美廉社、小北、大買家、喜互惠、棉花田、聖德科斯、永豐餘生技、里仁、台灣主婦聯盟、健康食彩、安麗、葡眾、美樂家<br>
-                <b>(3) 交通電信：</b><br>國內加油(中油/台亞/台塑)、gogoro、Tesla、台灣大車隊、yoxi、Uber(台灣)、GoShare、iRent、WeMo、遠傳/台哥大帳單<br>
-                <b>(4) 教育/書店：</b><br>台灣蔦屋、誠品、博客來、金石堂、巨匠、聯成、朱宗慶、雲門
-            `;
-        }
-    }
+    // 通路資料已在 Part 2 直接寫死在 HTML 中，這裡不再需要 JS 動態注入，確保資料絕對穩定。
 
     // --- 曬戰績功能核心邏輯 ---
     function openShareModal() {
@@ -597,7 +578,7 @@
         document.getElementById('shareCardAmount').innerText = totalAmount;
         
         // 2. 找出前 3 名回饋最高的卡片
-        // calculateStats 預設只計算當月回饋，符合「曬戰績」只曬當月的邏輯
+        // 注意：calculateStats 預設只計算「當月」回饋，這符合「曬戰績」只曬當月的邏輯
         let cardRewards = [];
         cards.forEach(card => {
             if(card.type === 'placeholder') return;
@@ -606,13 +587,14 @@
                 cardRewards.push({ name: card.name, reward: stats.reward });
             }
         });
+        // 排序：高到低
         cardRewards.sort((a, b) => b.reward - a.reward);
         const top3 = cardRewards.slice(0, 3);
         
         const listContainer = document.getElementById('shareCardList');
         listContainer.innerHTML = '';
         if(top3.length === 0) {
-             listContainer.innerHTML = '<div style="text-align:center; opacity:0.6;">尚無回饋紀錄</div>';
+             listContainer.innerHTML = '<div style="text-align:center; opacity:0.6;">本月尚無回饋紀錄</div>';
         } else {
             top3.forEach(c => {
                 let unit = (c.name.includes('旅人')) ? '哩' : '元';
@@ -631,14 +613,16 @@
     // 下載圖片 (使用 html2canvas)
     function downloadShareImage() {
         const node = document.getElementById('captureNode');
+        // 暫存原始樣式，防止跑版
         const originalTransform = node.style.transform;
-        node.style.transform = 'none'; // 確保截圖時不偏移
+        node.style.transform = 'none'; 
         
         html2canvas(node, {
             backgroundColor: null,
-            scale: 2 // 提高解析度
+            scale: 2 // 提高解析度，讓文字清晰
         }).then(canvas => {
             node.style.transform = originalTransform; 
+            
             const link = document.createElement('a');
             link.download = `我的回饋戰績_${new Date().getTime()}.png`;
             link.href = canvas.toDataURL();
@@ -646,7 +630,7 @@
         });
     }
 
-    // 社群分享功能 (優化版：複製+開App)
+    // 社群分享功能 (優化版：複製文案 + 喚醒 App)
     function getShareText() {
         const totalAmount = document.getElementById('totalRewardDisplay').innerText;
         return `💰 狂！我在刷卡回饋管家本月目前累積回饋 ${totalAmount}！\n快來看看你賺了多少 👉 https://shawn2026-oss.github.io/shawn-2026-creditcard/`;
@@ -654,16 +638,19 @@
 
     function shareToIG() {
         copyShareText(false); 
-        alert("📋 文案已複製！\n\n即將為您開啟 Instagram，請直接貼上文案並選取圖片發布限動！");
+        // 嘗試喚醒 IG
+        alert("📋 文案已複製！\n\n即將為您開啟 Instagram，請直接發布限動並「貼上」文案！");
         window.location.href = "instagram://app";
+        // 若無法喚醒 (如電腦版)，不做額外處理，因為 alert 已經提示複製了
     }
 
     function shareToFB() {
         copyShareText(false);
-        alert("📋 文案已複製！\n\n即將為您開啟 Facebook，請直接貼上文案並選取圖片發布！");
-        // 嘗試開啟 FB App (若失敗則開網頁)
-        setTimeout(() => { window.open('https://www.facebook.com', '_blank'); }, 500);
+        alert("📋 文案已複製！\n\n即將為您開啟 Facebook，請直接發文並「貼上」文案！");
+        // 嘗試開啟 FB App
         window.location.href = "fb://";
+        // 備案：如果開啟 App 失敗 (例如電腦版)，稍微延遲後開網頁版，但不帶入 sharer.php 參數以免強制登入
+        setTimeout(() => { window.open('https://www.facebook.com', '_blank'); }, 1000);
     }
 
     function shareToThreads() {
@@ -692,7 +679,6 @@
     let cardSettings = JSON.parse(localStorage.getItem('cardSettings')) || {};
 
     window.addEventListener('load', () => {
-        injectHappyDetails(); 
         setTimeout(() => { const ticker = document.querySelector('.ticker-content'); if(ticker) { ticker.style.animation = 'none'; void ticker.offsetWidth; ticker.style.animation = 'scroll-left 15s linear infinite'; } }, 100);
         
         const isSetupDone = localStorage.getItem('user_setup_done');
@@ -774,7 +760,7 @@
         closeModal();
     });
 
-    // 核心資料庫
+    // 核心資料庫 (更新：幣倍卡與樂家卡邏輯文字)
     const defaultCards = [
         { 
             id: 'c10', name: '中信 UniOpen 卡', nickname: '2026 統一集團神卡', 
@@ -1440,6 +1426,7 @@
         if (cardId === 'c6') {
             const bonus10TxSpend = relevantTx.filter(t => t.isBonus10).reduce((sum, t) => sum + t.amount, 0) + (addedIsBonus10 ? addedAmount : 0);
             const bonus10Reward = Math.min(bonus10TxSpend, 8000) * 0.10;
+            // 修正：精選通路 2.5% (上限40萬)
             const bonus25TxSpend = relevantTx.filter(t => t.isBonus25).reduce((sum, t) => sum + t.amount, 0) + (addedIsBonus25 ? addedAmount : 0);
             const selectedReward = Math.min(bonus25TxSpend, 400000) * 0.025;
             

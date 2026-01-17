@@ -117,7 +117,7 @@
         #captureArea { position: fixed; top: -9999px; left: -9999px; z-index: -1; }
         .share-card-node {
             width: 320px;
-            /* V123.94 修正：高度自動延伸 */
+            /* 高度自動延伸 */
             height: auto; 
             background: linear-gradient(135deg, #1C1C1E, #2c3e50);
             color: white;
@@ -228,7 +228,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V123.94</div>
+            <div class="version-tag">V123.95</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -294,7 +294,7 @@
                     <button class="social-btn download" onclick="downloadShareImage()">📥 下載圖片</button>
                 </div>
                 <div style="text-align:center; font-size:10px; color:#ccc; margin-top:8px; line-height:1.4;">
-                    (IG/FB：系統將自動下載圖片並複製文案<br>請開啟 App 後直接貼上)
+                    (IG/FB：系統將先下載圖片並複製文案<br>接著會詢問您是否開啟 App)
                 </div>
             </div>
             <button style="margin-top:15px; background:none; border:none; color:white; font-size:14px; text-decoration:underline; cursor:pointer;" onclick="document.getElementById('sharePreviewModal').style.display='none'">關閉視窗</button>
@@ -590,10 +590,9 @@
                 <b>(3) 醫療與美容：</b><br>獸醫診所、動物醫院、寵物旅館、寵物美容 (MCC 0742, 5995)
             `;
         }
-        // 其他通路已在 HTML 中寫死，此處僅做備份檢查
     }
 
-    // --- 曬戰績功能核心邏輯 (V123.94) ---
+    // --- 曬戰績功能核心邏輯 (V123.95) ---
     function openShareModal() {
         const totalAmount = document.getElementById('totalRewardDisplay').innerText;
         const date = new Date();
@@ -694,17 +693,19 @@
 
     function getShareText() {
         const totalAmount = document.getElementById('totalRewardDisplay').innerText;
-        return `💰 狂！本月回饋 ${totalAmount}！\n快來試算 👉 https://shawn2026-oss.github.io/shawn-2026-creditcard/`;
+        return `💰 狂！快來看看你本月賺了多少回饋！\n我在刷卡回饋管家累積了 ${totalAmount}！\n👉 https://shawn2026-oss.github.io/shawn-2026-creditcard/`;
     }
 
-    // V123.94 修正：移除網頁版 fallback 跳轉
+    // V123.95 修正：加入 confirm() 詢問機制，不再強制跳轉
     function shareToIG() {
         copyShareText(false); 
         downloadShareImage(() => {
             setTimeout(() => {
-                alert("✅ 圖片已存入相簿\n✅ 文案已複製\n\n即將嘗試開啟 Instagram...\n(若未開啟，請手動打開 App 發布)");
-                window.location.href = "instagram://app";
-                // 移除 window.open fallback，避免跳轉
+                // 這裡改用 confirm 讓用戶選擇
+                if (confirm("✅ 圖片已存入相簿\n✅ 文案已複製\n\n是否開啟 Instagram？")) {
+                    window.location.href = "instagram://app";
+                }
+                // 按取消則什麼都不做，停留在網頁
             }, 500);
         });
     }
@@ -713,9 +714,11 @@
         copyShareText(false);
         downloadShareImage(() => {
             setTimeout(() => {
-                alert("✅ 圖片已存入相簿\n✅ 文案已複製\n\n即將嘗試開啟 Facebook...\n(若未開啟，請手動打開 App 發布)");
-                window.location.href = "fb://";
-                // 移除 window.open fallback，避免跳轉
+                // 這裡改用 confirm 讓用戶選擇
+                if (confirm("✅ 圖片已存入相簿\n✅ 文案已複製\n\n是否開啟 Facebook？")) {
+                    window.location.href = "fb://";
+                }
+                // 按取消則什麼都不做，停留在網頁
             }, 500);
         });
     }
@@ -1494,6 +1497,7 @@
         if (cardId === 'c6') {
             const bonus10TxSpend = relevantTx.filter(t => t.isBonus10).reduce((sum, t) => sum + t.amount, 0) + (addedIsBonus10 ? addedAmount : 0);
             const bonus10Reward = Math.min(bonus10TxSpend, 8000) * 0.10;
+            // 修正：精選通路 2.5% (上限40萬)
             const bonus25TxSpend = relevantTx.filter(t => t.isBonus25).reduce((sum, t) => sum + t.amount, 0) + (addedIsBonus25 ? addedAmount : 0);
             const selectedReward = Math.min(bonus25TxSpend, 400000) * 0.025;
             

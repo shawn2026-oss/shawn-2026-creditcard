@@ -90,12 +90,12 @@
         .btn-ig:active { transform: scale(0.98); }
         .details-content { display: none; background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 10px; margin-top: 6px; font-size: 11px; color: #666; line-height: 1.6; }
         
-        /* Modal 修正 - 強制 Fixed 置中 */
+        /* Modal 固定層級，防止模糊 */
         .modal { display: none; position: fixed !important; top: 0 !important; left: 0 !important; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 10000; align-items: center; justify-content: center; }
         .modal-content { background: white; width: 85%; max-width: 320px; border-radius: 20px; padding: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.25); animation: modalPop 0.2s; display: flex; flex-direction: column; max-height: 85vh; overflow-y: auto; position: relative; z-index: 10001; }
         .modal-body-input { flex-shrink: 0; }
         
-        /* 歡迎視窗修正 */
+        /* 歡迎視窗固定 */
         .welcome-overlay { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 20000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .welcome-content { background: white; width: 85%; max-width: 340px; border-radius: 24px; padding: 24px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .welcome-title { font-size: 22px; font-weight: 800; color: #333; margin-bottom: 10px; }
@@ -108,7 +108,6 @@
         .welcome-btn { background: #007AFF; color: white; border: none; padding: 14px; width: 100%; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(0,122,255,0.3); }
         .welcome-btn:active { transform: scale(0.98); }
         
-        /* 戰績卡截圖區 */
         #captureArea { position: fixed; top: -9999px; left: -9999px; z-index: -1; }
         .share-card-node {
             width: 320px;
@@ -131,7 +130,6 @@
         .share-item { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; font-weight: 500; }
         .share-item span:last-child { font-weight: 700; color: #FFD700; }
         
-        /* 5合1 按鈕區塊 */
         .social-btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 10px; }
         .social-btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px; border-radius: 12px; border: none; font-size: 13px; font-weight: 700; color: white; cursor: pointer; transition: transform 0.1s; }
         .social-btn:active { transform: scale(0.97); }
@@ -140,7 +138,7 @@
         .social-btn.threads { background: #000000; border: 1px solid #333; }
         .social-btn.facebook { background: #1877F2; }
         .social-btn.line { background: #06C755; }
-        .social-btn.download { background: #555; }
+        .social-btn.download { background: #555; grid-column: span 2; }
         
         .input-group label { display: block; font-size: 12px; font-weight: 600; color: #888; margin-bottom: 6px; margin-top: 10px; }
         input { width: 100%; padding: 10px; border: 2px solid #f0f0f0; background: #fff; border-radius: 12px; font-size: 18px; box-sizing: border-box; outline: none; font-weight: 600; color: #333; }
@@ -189,6 +187,17 @@
         .dash-bar-bg { background: #eee; height: 6px; border-radius: 3px; overflow: hidden; }
         .dash-bar-fill { height: 100%; background: #4cd964; transition: width 0.3s; }
         .dash-bar-fill.danger { background: #ff3b30; }
+        .welcome-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .welcome-content { background: white; width: 85%; max-width: 340px; border-radius: 24px; padding: 24px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .welcome-title { font-size: 22px; font-weight: 800; color: #333; margin-bottom: 10px; }
+        .welcome-desc { font-size: 14px; color: #666; margin-bottom: 20px; line-height: 1.5; }
+        .welcome-list { text-align: left; max-height: 300px; overflow-y: auto; margin-bottom: 20px; border: 1px solid #eee; border-radius: 12px; padding: 10px; }
+        .welcome-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #f9f9f9; }
+        .welcome-item:last-child { border-bottom: none; }
+        .welcome-item input { width: 20px; height: 20px; margin-right: 12px; margin-bottom: 0; padding: 0;}
+        .welcome-item label { margin: 0; font-size: 15px; font-weight: 600; color: #333; flex: 1; }
+        .welcome-btn { background: #007AFF; color: white; border: none; padding: 14px; width: 100%; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(0,122,255,0.3); }
+        .welcome-btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
@@ -204,7 +213,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V123.86</div>
+            <div class="version-tag">V123.87</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -263,6 +272,7 @@
                     <button class="social-btn line" onclick="shareToLine()">🟢 LINE</button>
                     <button class="social-btn download" onclick="downloadShareImage()">📥 下載戰績圖</button>
                 </div>
+                <div style="text-align:center; font-size:10px; color:#aaa; margin-top:8px;">(IG/FB 會自動複製文案，請手動貼上)</div>
             </div>
             <button style="margin-top:15px; background:none; border:none; color:white; font-size:14px; text-decoration:underline; cursor:pointer;" onclick="document.getElementById('sharePreviewModal').style.display='none'">關閉視窗</button>
         </div>
@@ -547,7 +557,7 @@
         </div>
     </div>
   <script>
-    // 自動注入遠東樂家+卡完整通路 (雙重保險)
+    // 自動注入遠東樂家+卡完整通路 (雙重保險，防止資料遺失)
     function injectHappyDetails() {
         const petDiv = document.getElementById('happyPetDetails');
         if(petDiv) {
@@ -587,7 +597,7 @@
         document.getElementById('shareCardAmount').innerText = totalAmount;
         
         // 2. 找出前 3 名回饋最高的卡片
-        // 注意：calculateStats 預設只計算當月回饋，這符合「曬戰績」只曬當月的邏輯
+        // calculateStats 預設只計算當月回饋，符合「曬戰績」只曬當月的邏輯
         let cardRewards = [];
         cards.forEach(card => {
             if(card.type === 'placeholder') return;
@@ -618,7 +628,7 @@
         document.getElementById('sharePreviewModal').style.display = 'flex';
     }
 
-    // 下載圖片 (html2canvas)
+    // 下載圖片 (使用 html2canvas)
     function downloadShareImage() {
         const node = document.getElementById('captureNode');
         const originalTransform = node.style.transform;
@@ -636,7 +646,7 @@
         });
     }
 
-    // 社群分享功能
+    // 社群分享功能 (優化版：複製+開App)
     function getShareText() {
         const totalAmount = document.getElementById('totalRewardDisplay').innerText;
         return `💰 狂！我在刷卡回饋管家本月目前累積回饋 ${totalAmount}！\n快來看看你賺了多少 👉 https://shawn2026-oss.github.io/shawn-2026-creditcard/`;
@@ -644,19 +654,21 @@
 
     function shareToIG() {
         copyShareText(false); 
-        alert("📋 文案已複製！正在開啟 Instagram...");
+        alert("📋 文案已複製！\n\n即將為您開啟 Instagram，請直接貼上文案並選取圖片發布限動！");
         window.location.href = "instagram://app";
-        setTimeout(() => { console.log("若未自動跳轉，請手動開啟 IG"); }, 1000);
+    }
+
+    function shareToFB() {
+        copyShareText(false);
+        alert("📋 文案已複製！\n\n即將為您開啟 Facebook，請直接貼上文案並選取圖片發布！");
+        // 嘗試開啟 FB App (若失敗則開網頁)
+        setTimeout(() => { window.open('https://www.facebook.com', '_blank'); }, 500);
+        window.location.href = "fb://";
     }
 
     function shareToThreads() {
         const text = getShareText();
         window.open(`https://www.threads.net/intent/post?text=${encodeURIComponent(text)}`, '_blank');
-    }
-
-    function shareToFB() {
-        const url = 'https://shawn2026-oss.github.io/shawn-2026-creditcard/';
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(getShareText())}`, '_blank');
     }
 
     function shareToLine() {
@@ -762,7 +774,7 @@
         closeModal();
     });
 
-    // 核心資料庫 (更新：幣倍卡與樂家卡邏輯)
+    // 核心資料庫
     const defaultCards = [
         { 
             id: 'c10', name: '中信 UniOpen 卡', nickname: '2026 統一集團神卡', 
@@ -1428,7 +1440,6 @@
         if (cardId === 'c6') {
             const bonus10TxSpend = relevantTx.filter(t => t.isBonus10).reduce((sum, t) => sum + t.amount, 0) + (addedIsBonus10 ? addedAmount : 0);
             const bonus10Reward = Math.min(bonus10TxSpend, 8000) * 0.10;
-            // 修正：精選通路 2.5% (上限40萬)
             const bonus25TxSpend = relevantTx.filter(t => t.isBonus25).reduce((sum, t) => sum + t.amount, 0) + (addedIsBonus25 ? addedAmount : 0);
             const selectedReward = Math.min(bonus25TxSpend, 400000) * 0.025;
             

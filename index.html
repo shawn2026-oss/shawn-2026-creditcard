@@ -95,7 +95,6 @@
         .btn-reset-visible { width: 100%; padding: 12px; background-color: #fff5f5; border: 1px solid #ffdede; color: #FF3B30; border-radius: 12px; font-weight: 600; font-size: 12px; cursor: pointer; margin-top: 10px;}
         .btn-ig { width: 100%; padding: 12px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 12px rgba(220, 39, 67, 0.3); display: flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-ig:active { transform: scale(0.98); }
-        .details-content { display: none; background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 10px; margin-top: 6px; font-size: 11px; color: #666; line-height: 1.6; }
         
         /* Modal 固定層級，防止模糊 */
         .modal { display: none; position: fixed !important; top: 0 !important; left: 0 !important; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 10000; align-items: center; justify-content: center; }
@@ -118,7 +117,7 @@
         #captureArea { position: fixed; top: -9999px; left: -9999px; z-index: -1; }
         .share-card-node {
             width: 320px;
-            /* V123.93 修正：高度自動延伸 */
+            /* V123.94 修正：高度自動延伸 */
             height: auto; 
             background: linear-gradient(135deg, #1C1C1E, #2c3e50);
             color: white;
@@ -229,7 +228,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V123.93</div>
+            <div class="version-tag">V123.94</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -581,16 +580,20 @@
         </div>
     </div>
   <script>
-    // 自動注入遠東樂家+卡完整通路 (雙重保險，防止資料遺失)
+    // 自動注入遠東樂家+卡完整通路 (防呆機制)
     function injectHappyDetails() {
-        // 雖然 Part 2 已經寫死 HTML，但保留此函式以防未來動態載入需求，確保不報錯
         const petDiv = document.getElementById('happyPetDetails');
         if(petDiv && petDiv.innerHTML.trim() === "") {
-            petDiv.innerHTML = `<b>(1) 指定寵物連鎖：</b><br>寵物公園、東森寵物、魚中魚...`;
+            petDiv.innerHTML = `
+                <b>(1) 指定寵物連鎖：</b><br>寵物公園、東森寵物、魚中魚、貓狗隊長、毛孩市集、金吉利、好狗命、好狗運、金王子、愛貓園、福壽寵物旗艦館<br>
+                <b>(2) 2026 新增品牌：</b><br>汪喵星球、怪獸部落、超凝小姐、Hero Mama<br>
+                <b>(3) 醫療與美容：</b><br>獸醫診所、動物醫院、寵物旅館、寵物美容 (MCC 0742, 5995)
+            `;
         }
+        // 其他通路已在 HTML 中寫死，此處僅做備份檢查
     }
 
-    // --- 曬戰績功能核心邏輯 (V123.93) ---
+    // --- 曬戰績功能核心邏輯 (V123.94) ---
     function openShareModal() {
         const totalAmount = document.getElementById('totalRewardDisplay').innerText;
         const date = new Date();
@@ -600,18 +603,16 @@
         document.getElementById('shareCardMonth').innerText = `${month} 月回饋戰績`;
         document.getElementById('shareCardAmount').innerText = totalAmount;
         
-        // 2. 找出所有回饋 > 0 的卡片 (修正：全部列出，不限前3)
+        // 2. 找出所有回饋 > 0 的卡片 (全列出)
         let cardRewards = [];
         cards.forEach(card => {
             if(card.type === 'placeholder') return;
-            // calculateStats 預設計算當月回饋，這符合戰績卡只看當月的需求
             const stats = calculateStats(card.id);
             if(stats.reward > 0) {
                 cardRewards.push({ name: card.name, reward: stats.reward });
             }
         });
         
-        // 排序：金額高到低
         cardRewards.sort((a, b) => b.reward - a.reward);
         
         const listContainer = document.getElementById('shareCardList');
@@ -637,40 +638,34 @@
     // 新增：系統原生分享 (直接傳圖)
     function shareNativeImage() {
         const node = document.getElementById('captureNode');
-        // 暫存樣式，防止跑版
         const originalTransform = node.style.transform;
         node.style.transform = 'none';
 
-        // 顯示載入中提示 (可選)
         const btn = document.querySelector('.social-btn.native');
         const originalText = btn.innerText;
         btn.innerText = "處理中...";
 
         html2canvas(node, {
             backgroundColor: null,
-            scale: 2 // 高解析度
+            scale: 2
         }).then(canvas => {
-            node.style.transform = originalTransform; // 恢復
+            node.style.transform = originalTransform;
             btn.innerText = originalText;
             
             canvas.toBlob(async (blob) => {
-                // 建立檔案物件
-                const file = new File([blob], `reward_card_${Date.now()}.png`, { type: "image/png" });
+                const file = new File([blob], `reward_${Date.now()}.png`, { type: "image/png" });
                 
-                // 檢查瀏覽器是否支援分享檔案 (iOS Safari / Android Chrome 大多支援)
                 if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
                     try {
                         await navigator.share({
                             files: [file],
-                            // 注意：FB/IG 原生分享時通常會忽略 title 和 text，只傳圖，所以我們把網址印在圖上了
                             title: '我的刷卡戰績',
-                            text: getShareText() 
+                            text: getShareText()
                         });
                     } catch (err) {
-                        console.log('分享取消或失敗', err);
+                        console.log('分享取消');
                     }
                 } else {
-                    // 若不支援 (例如電腦版)，降級為下載
                     alert("您的裝置不支援直接傳圖，系統將自動下載圖片。");
                     downloadShareImage(); 
                 }
@@ -678,7 +673,7 @@
         });
     }
 
-    // 下載圖片 (共用函式，支援回調)
+    // 下載圖片 (共用函式)
     function downloadShareImage(callback) {
         const node = document.getElementById('captureNode');
         const originalTransform = node.style.transform;
@@ -693,23 +688,23 @@
             link.download = `我的回饋戰績_${new Date().getTime()}.png`;
             link.href = canvas.toDataURL();
             link.click();
-            if(callback) callback(); // 下載完成後執行下一步
+            if(callback) callback();
         });
     }
 
-    // 社群分享功能 (優化版：下載 -> 複製 -> 提示 -> 開App)
     function getShareText() {
         const totalAmount = document.getElementById('totalRewardDisplay').innerText;
-        return `💰 狂！快來看看你本月賺了多少回饋！\n我在刷卡回饋管家累積了 ${totalAmount}！\n👉 https://shawn2026-oss.github.io/shawn-2026-creditcard/`;
+        return `💰 狂！本月回饋 ${totalAmount}！\n快來試算 👉 https://shawn2026-oss.github.io/shawn-2026-creditcard/`;
     }
 
+    // V123.94 修正：移除網頁版 fallback 跳轉
     function shareToIG() {
         copyShareText(false); 
-        // 流程：下載圖片 -> 延遲 -> 跳提示 -> 開App
         downloadShareImage(() => {
             setTimeout(() => {
-                alert("✅ 圖片已存入相簿 (最新那一張)\n✅ 文案已複製\n\n即將開啟 Instagram，請發布限動 > 選取圖片 > 貼上文案！");
+                alert("✅ 圖片已存入相簿\n✅ 文案已複製\n\n即將嘗試開啟 Instagram...\n(若未開啟，請手動打開 App 發布)");
                 window.location.href = "instagram://app";
+                // 移除 window.open fallback，避免跳轉
             }, 500);
         });
     }
@@ -718,24 +713,20 @@
         copyShareText(false);
         downloadShareImage(() => {
             setTimeout(() => {
-                alert("✅ 圖片已存入相簿 (最新那一張)\n✅ 文案已複製\n\n即將開啟 Facebook，請發文 > 選取圖片 > 貼上文案！");
-                // 嘗試開啟 FB 發文框 (Deep Link)
-                window.location.href = "fb://composer"; 
-                // 備案：如果 fb://composer 失敗，開首頁
-                setTimeout(() => { window.location.href = "fb://"; }, 500);
+                alert("✅ 圖片已存入相簿\n✅ 文案已複製\n\n即將嘗試開啟 Facebook...\n(若未開啟，請手動打開 App 發布)");
+                window.location.href = "fb://";
+                // 移除 window.open fallback，避免跳轉
             }, 500);
         });
     }
 
     function shareToThreads() {
         const text = getShareText();
-        // Threads 網頁版整合較好，直接開連結
         window.open(`https://www.threads.net/intent/post?text=${encodeURIComponent(text)}`, '_blank');
     }
 
     function shareToLine() {
         const text = getShareText();
-        // Line 只能傳文字，無法透過網頁傳圖，所以只傳文字連結
         window.open(`https://line.me/R/msg/text/?${encodeURIComponent(text)}`, '_blank');
     }
 
@@ -1503,7 +1494,6 @@
         if (cardId === 'c6') {
             const bonus10TxSpend = relevantTx.filter(t => t.isBonus10).reduce((sum, t) => sum + t.amount, 0) + (addedIsBonus10 ? addedAmount : 0);
             const bonus10Reward = Math.min(bonus10TxSpend, 8000) * 0.10;
-            // 修正：精選通路 2.5% (上限40萬)
             const bonus25TxSpend = relevantTx.filter(t => t.isBonus25).reduce((sum, t) => sum + t.amount, 0) + (addedIsBonus25 ? addedAmount : 0);
             const selectedReward = Math.min(bonus25TxSpend, 400000) * 0.025;
             

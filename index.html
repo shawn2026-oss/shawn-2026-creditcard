@@ -22,11 +22,12 @@
     <meta name="apple-mobile-web-app-title" content="刷卡回饋管家">
     <meta name="theme-color" content="#F0F2F5">
     
-    <meta property="og:title" content="刷卡回饋管家 - 您的信用卡最佳幫手">
-    <meta property="og:description" content="自動計算回饋、即時顯示上限、支援戰績圖分享。快來看看你本月賺了多少回饋！">
-    <meta property="og:image" content="icon-192.png">
+    <meta property="og:title" content="刷卡回饋管家 - 信用卡回饋試算神器">
+    <meta property="og:description" content="別讓回饋溜走了！自動計算上限、即時試算。快來看看這個月我賺了多少！">
+    <meta property="og:image" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/icon-192.png">
     <meta property="og:url" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/">
     <meta property="og:type" content="website">
+    <meta property="og:site_name" content="刷卡回饋管家">
 
     <title>刷卡回饋管家</title>
     
@@ -118,7 +119,7 @@
         #captureArea { position: fixed; top: -9999px; left: -9999px; z-index: -1; }
         .share-card-node {
             width: 320px;
-            /* 移除固定高度，改為自動適應，讓長條戰績不被切斷 */
+            /* V123.91 修正：高度自動延伸 */
             height: auto; 
             background: linear-gradient(135deg, #1C1C1E, #2c3e50);
             color: white;
@@ -225,7 +226,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V123.90</div>
+            <div class="version-tag">V123.91</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -276,7 +277,7 @@
 
             <div style="background:white; border-radius:20px; padding:15px; width:100%; box-sizing:border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-top:10px;">
                 
-                <button class="social-btn native" onclick="shareNativeImage()">🚀 系統原生分享 (推薦)</button>
+                <button class="social-btn native" onclick="shareNativeImage()">🚀 系統原生分享 (傳圖)</button>
                 
                 <div style="text-align:center; font-size:11px; color:#aaa; margin:10px 0 6px 0; border-top:1px solid #eee; padding-top:10px;">或是使用傳統方式：</div>
                 
@@ -572,7 +573,7 @@
         </div>
     </div>
   <script>
-    // 自動注入遠東樂家+卡完整通路 (雙重保險)
+    // 自動注入遠東樂家+卡完整通路 (確保資料穩定)
     function injectHappyDetails() {
         const petDiv = document.getElementById('happyPetDetails');
         if(petDiv) {
@@ -611,11 +612,11 @@
         document.getElementById('shareCardMonth').innerText = `${month} 月回饋戰績`;
         document.getElementById('shareCardAmount').innerText = totalAmount;
         
-        // 2. 找出所有回饋 > 0 的卡片 (修正：全部列出，不再只取前3)
+        // 2. 找出所有回饋 > 0 的卡片 (全列出)
+        // calculateStats 預設回傳「本週期」數值，這符合戰績卡只看當月的需求
         let cardRewards = [];
         cards.forEach(card => {
             if(card.type === 'placeholder') return;
-            // calculateStats 預設計算當月回饋
             const stats = calculateStats(card.id);
             if(stats.reward > 0) {
                 cardRewards.push({ name: card.name, reward: stats.reward });
@@ -643,11 +644,6 @@
 
         // 3. 顯示視窗
         document.getElementById('sharePreviewModal').style.display = 'flex';
-        
-        // 偵測是否支援原生分享，若不支援則隱藏原生按鈕 (選擇性優化，這裡先都顯示)
-        if (!navigator.share) {
-            // document.querySelector('.social-btn.native').style.display = 'none';
-        }
     }
 
     // 新增：系統原生分享 (直接傳圖)
@@ -675,10 +671,10 @@
                             text: getShareText() // 帶入文案
                         });
                     } catch (err) {
-                        console.log('分享取消');
+                        console.log('分享取消'); // 用戶取消不需報錯
                     }
                 } else {
-                    alert("您的裝置不支援直接傳圖，請改用下方按鈕下載圖片。");
+                    alert("您的裝置不支援直接傳圖，系統將自動為您下載圖片。\n請手動傳送。");
                     downloadShareImage(); // 自動降級為下載
                 }
             });

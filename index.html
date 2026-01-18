@@ -36,9 +36,12 @@
     <link rel="shortcut icon" href="icon-48.png">
 
     <style>
+        /* 修正：加入全域邊框計算，防止視窗左右滑動 */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         :root { --bg-color: #F0F2F5; --text-primary: #1C1C1E; --text-secondary: #8E8E93; }
         body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; background-color: #E0E5EC; color: var(--text-primary); margin: 0; display: flex; justify-content: center; min-height: 100vh; -webkit-font-smoothing: antialiased; }
-        .app-container { width: 100%; max-width: 480px; background-color: var(--bg-color); min-height: 100vh; padding: 16px 12px; padding-top: env(safe-area-inset-top, 20px); padding-bottom: env(safe-area-inset-bottom, 20px); box-shadow: 0 0 40px rgba(0,0,0,0.05); display: flex; flex-direction: column; box-sizing: border-box; }
+        .app-container { width: 100%; max-width: 480px; background-color: var(--bg-color); min-height: 100vh; padding: 16px 12px; padding-top: env(safe-area-inset-top, 20px); padding-bottom: env(safe-area-inset-bottom, 20px); box-shadow: 0 0 40px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
         @media (max-width: 480px) { body { background-color: var(--bg-color); } .app-container { box-shadow: none; width: 100%; max-width: 100%; } }
         .header-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; width: 100%; }
         .author-top { font-size: 12px; font-weight: 800; color: #007AFF; letter-spacing: 0.5px; }
@@ -103,6 +106,9 @@
         .welcome-desc { font-size: 14px; color: #666; margin-bottom: 20px; line-height: 1.5; }
         .welcome-list { text-align: left; max-height: 300px; overflow-y: auto; margin-bottom: 20px; border: 1px solid #eee; border-radius: 12px; padding: 10px; }
         .welcome-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #f9f9f9; }
+        .welcome-item:last-child { border-bottom: none; }
+        .welcome-item input { width: 20px; height: 20px; margin-right: 12px; margin-bottom: 0; padding: 0;}
+        .welcome-item label { margin: 0; font-size: 15px; font-weight: 600; color: #333; flex: 1; }
         .welcome-btn { background: #007AFF; color: white; border: none; padding: 14px; width: 100%; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(0,122,255,0.3); }
         .welcome-btn:active { transform: scale(0.98); }
         #captureArea { position: fixed; top: -9999px; left: -9999px; z-index: -1; }
@@ -1211,7 +1217,6 @@
         end.setHours(23, 59, 59, 999);
         return { start, end, isCustom: true };
     }
-    
     function calculateStats(cardId, addedAmount = 0, addedIsGreen = false, addedIsForeign = false, addedIsUniBonus = false, addedIsUniUp = false, addedIsHappyPet = false, addedIsHappyLife = false, addedIsHappyForeign = false, addedIsHappyPeace = false, addedIsHsbcForeign = false, addedIsUniGroup = false, addedIsUniIcash = false, addedIsUniOverseas = false, addedIsRichartPay = false, addedIsRichartOnline = false, addedIsRichartLine = false, addedIsRichartOverseas = false, addedIsBonus10 = false, addedIsBonus25 = false, addedIsBill = false, 
         addedIsFubonJJapan = false, addedIsFubonJPhysical = false, addedIsFubonJDomesticBonus = false, 
         addedIsJiheJapan = 

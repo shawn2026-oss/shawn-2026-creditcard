@@ -188,7 +188,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V124.01</div>
+            <div class="version-tag">V124.02</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -975,6 +975,7 @@
     function toggleFubonJPhysical() {
         if(document.getElementById('checkFubonJKorea').checked) {
             document.getElementById('checkFubonJGeneral').checked = true;
+            document.getElementById('checkFubonJSuica').checked = false; // 實體與交通互斥
             toggleFubonJGeneral();
         }
         updateRewardPreview();
@@ -983,6 +984,7 @@
     function toggleFubonJSuica() {
         if(document.getElementById('checkFubonJSuica').checked) {
             document.getElementById('checkFubonJGeneral').checked = true;
+            document.getElementById('checkFubonJKorea').checked = false; // 實體與交通互斥
             toggleFubonJGeneral();
         }
         updateRewardPreview();

@@ -188,7 +188,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V124.04</div>
+            <div class="version-tag">V124.05</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -267,7 +267,7 @@
                     <div class="option-row read-only"><label id="labelBaseRate">🔰 基本回饋 1% (無上限)</label><input type="checkbox" checked disabled></div>
                     <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0;">
                          <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkBonus10">⚡ 新戶加碼 +10% (限刷$8,000)</label>
+                            <label for="checkBonus10">⚡ 新戶加碼 +10% (刷$8,000封頂)</label>
                             <input type="checkbox" id="checkBonus10" checked onchange="updateRewardPreview()">
                         </div>
                         <button onclick="togglePigRichNewUser()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看 10% 定義</button>
@@ -280,7 +280,7 @@
 
                     <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0; border-top:1px dashed #ddd; padding-top:6px;">
                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkBonus25">🌟 精選通路 +2.5% (限刷$40萬)</label>
+                            <label for="checkBonus25">🌟 精選通路 +2.5% (刷$40萬封頂)</label>
                             <input type="checkbox" id="checkBonus25" checked onchange="toggleSelectedLogic()">
                         </div>
                         <button onclick="togglePigRichSelected()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看精選通路</button>
@@ -463,17 +463,17 @@
                        <div style="margin-bottom:4px; font-size:11px; color:#d32f2f;">⚠️ 實體/交通卡加碼 (各自獨立計算)</div>
                        
                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:6px;">
-                           <label for="checkFubonJKorea">🛍️ 日韓當地實體 +3% (需滿千)</label>
+                           <label for="checkFubonJKorea">🛍️ 日韓當地實體 +3% (刷$3.3萬封頂)</label>
                            <input type="checkbox" id="checkFubonJKorea" onchange="toggleFubonJPhysical()">
                        </div>
                        
                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:6px;">
-                            <label for="checkFubonJThai">🇹🇭 泰國當地實體 +5% (需滿千)</label>
+                            <label for="checkFubonJThai">🇹🇭 泰國當地實體 +5% (刷$2萬封頂)</label>
                             <input type="checkbox" id="checkFubonJThai" onchange="toggleFubonJThai()">
                        </div>
                        
                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkFubonJSuica">🍎 日本交通卡 +7% (需滿兩千)</label>
+                            <label for="checkFubonJSuica">🍎 日本交通卡 +7% (刷$2,857封頂)</label>
                             <input type="checkbox" id="checkFubonJSuica" onchange="toggleFubonJSuica()">
                        </div>
                    </div>
@@ -512,7 +512,7 @@
 
                     <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px; flex-direction:column; align-items:flex-start;">
                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="rbCurrencySelected">🛍️ 精選/海外 +4% (限刷$7,500/2萬)</label>
+                            <label for="rbCurrencySelected">🛍️ 精選/海外 +4% (見等級封頂)</label>
                             <input type="radio" name="currencyType" id="rbCurrencySelected" value="selected" onchange="toggleCurrencyLogic()">
                         </div>
                         <button onclick="toggleCurrencyDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:0 0 6px 0;">🔽 點擊查看精選通路</button>
@@ -774,7 +774,7 @@
 
     window.addEventListener('popstate', function(event) { closeModal(); });
 
-    // 核心資料庫 (V124.04: 修正封頂寫法與綠卡定位)
+    // 核心資料庫 (V124.05: 全面優化封頂文案與綠卡定位)
     const defaultCards = [
         { 
             id: 'c10', name: '中信 UniOpen 卡', nickname: '2026 統一集團神卡', 
@@ -963,10 +963,10 @@
         const isUp = document.getElementById('checkUniUp').checked;
         const label = document.getElementById('labelUniBase');
         if (isUp) {
-            label.innerHTML = "🆙 <b>UP 選 4.5%</b> (刷$14萬封頂)";
+            label.innerHTML = "🆙 <b>UP 選 4.5%</b> (上限14萬)";
             label.parentNode.style.background = "#fff3e0"; 
         } else {
-            label.innerHTML = "🔰 <b>任意選 3.5%</b> (刷$4萬封頂)";
+            label.innerHTML = "🔰 <b>任意選 3.5%</b> (上限4萬)";
             label.parentNode.style.background = "transparent";
         }
         updateRewardPreview();
@@ -1663,9 +1663,20 @@
                     if(remain < 1000) {statusText = `⚠️ 剩 $${remain.toLocaleString()}`; msgStyle='color:#FFD700;';} }
                     else { percent = 100; statusText = card.msgDanger; msgStyle = 'color: #ffcccc;'; }
                 }
-            } else { percent = (stats.validSpend / card.target) * 100;
-            statusText = stats.validSpend >= card.target ? card.msgSuccess : `差 $${(card.target - stats.validSpend).toLocaleString()} ${card.id==='c2'?'享免費停車':'達標'}`;
-            if(card.id==='c2' && stats.validSpend >= card.target) msgStyle = 'color:#38ef7d;';
+            } else if (card.id === 'c2') {
+                // c2 (Green) is now floor type targeting 12000
+                percent = (stats.validSpend / 12000) * 100;
+                if (stats.validSpend >= 12000) {
+                    statusText = '已達標 (下月免停)';
+                    msgStyle = 'color: #38ef7d; font-weight:bold;';
+                    percent = 100;
+                } else {
+                    statusText = `差 $${(12000 - stats.validSpend).toLocaleString()} 享免費停車`;
+                    msgStyle = 'color: #FFD700;';
+                }
+            } else { 
+                percent = (stats.validSpend / card.target) * 100;
+                statusText = stats.validSpend >= card.target ? '任務達成' : `差 $${(card.target - stats.validSpend).toLocaleString()}`;
             }
 
             if (card.id === 'c6') displayRate = '13.5%';
@@ -1679,7 +1690,7 @@
             if (card.id === 'c9') displayRate = '哩程';
             if (card.id === 'c10') displayRate = '11.0%';
             if (card.id === 'c11') displayRate = '3.8%';
-            if (card.id === 'j1') displayRate = '6.0%';
+            if (card.id === 'j1') displayRate = '10.0%';
             if (card.id === 'j2') displayRate = '4.5%';
             if (card.id === 'j3') displayRate = '8.5%';
             if (card.id === 'j4') displayRate = '6.0%';

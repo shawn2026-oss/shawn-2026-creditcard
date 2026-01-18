@@ -447,24 +447,26 @@
                 </div>
 
                 <div id="fubonJOptions">
-                   <div class="option-row read-only"><label>🔰 國內一般 1% (無上限)</label><input type="checkbox" checked disabled></div>
+                   <div class="option-row read-only"><label id="labelFubonBase">🔰 國內消費 1% (無上限)</label><input type="checkbox" checked disabled></div>
                    
+                   <div class="option-row"><label for="checkFubonJGeneral">🇯🇵🇰🇷 日韓一般消費 (3%)</label><input type="checkbox" id="checkFubonJGeneral" onchange="toggleFubonJGeneral()"></div>
+
                    <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px; flex-direction:column; align-items:flex-start;">
                        <div style="margin-bottom:4px; font-size:11px; color:#d32f2f;">⚠️ 實體/交通卡加碼 (各自獨立計算)</div>
                        
                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:6px;">
-                           <label for="checkFubonJKorea">🇯🇵🇰🇷 日韓實體 +3% (需滿千)</label>
-                           <input type="checkbox" id="checkFubonJKorea" onchange="updateRewardPreview()">
+                           <label for="checkFubonJKorea">🛍️ 日韓當地實體 +3% (需滿千)</label>
+                           <input type="checkbox" id="checkFubonJKorea" onchange="toggleFubonJPhysical()">
                        </div>
                        
                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:6px;">
-                            <label for="checkFubonJThai">🇹🇭 泰國實體 +5% (需滿千)</label>
-                            <input type="checkbox" id="checkFubonJThai" onchange="updateRewardPreview()">
+                            <label for="checkFubonJThai">🇹🇭 泰國當地實體 +5% (需滿千)</label>
+                            <input type="checkbox" id="checkFubonJThai" onchange="toggleFubonJThai()">
                        </div>
                        
                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
                             <label for="checkFubonJSuica">🍎 日本交通卡 +7% (需滿兩千)</label>
-                            <input type="checkbox" id="checkFubonJSuica" onchange="updateRewardPreview()">
+                            <input type="checkbox" id="checkFubonJSuica" onchange="toggleFubonJSuica()">
                        </div>
                    </div>
                 </div>
@@ -758,7 +760,7 @@
 
     window.addEventListener('popstate', function(event) { closeModal(); });
 
-    // 核心資料庫 (更新：J卡與綠卡邏輯)
+    // 核心資料庫
     const defaultCards = [
         { 
             id: 'c10', name: '中信 UniOpen 卡', nickname: '2026 統一集團神卡', 
@@ -807,7 +809,7 @@
         { 
             id: 'j1', name: '富邦 J 卡', 
             nickname: '日韓泰/交通', 
-            note: '日韓+3% / 泰國+5% / 交通+7% (各設上限)', 
+            note: '日韓+3% / 泰國+5% / 交通+7% (獨立計算)', 
             type: 'custom_j', limit: 0, 
             gradient: 'linear-gradient(135deg, #FF7E5F 0%, #FEB47B 100%)', textColor: 'white', msgDanger: '', 
             parking: `🇯🇵🇰🇷 <b>日韓實體 +3%</b><br>每季上限$1,000，需單筆滿千<br>🇹🇭 <b>泰國實體 +5%</b><br>每季上限$1,000，需單筆滿千<br>🍎 <b>日本交通卡 +7%</b><br>每季上限$200，需單筆滿兩千`
@@ -956,6 +958,44 @@
         updateRewardPreview();
     }
 
+    function toggleFubonJGeneral() {
+        const isGeneral = document.getElementById('checkFubonJGeneral').checked;
+        const labelBase = document.getElementById('labelFubonBase');
+        if (isGeneral) {
+            labelBase.innerHTML = "🇯🇵🇰🇷 <b>日韓基本 3%</b> (無上限)";
+            document.getElementById('checkFubonJThai').checked = false;
+        } else {
+            labelBase.innerHTML = "🔰 <b>國內消費 1%</b> (無上限)";
+            document.getElementById('checkFubonJKorea').checked = false;
+            document.getElementById('checkFubonJSuica').checked = false;
+        }
+        updateRewardPreview();
+    }
+
+    function toggleFubonJPhysical() {
+        if(document.getElementById('checkFubonJKorea').checked) {
+            document.getElementById('checkFubonJGeneral').checked = true;
+            toggleFubonJGeneral();
+        }
+        updateRewardPreview();
+    }
+
+    function toggleFubonJSuica() {
+        if(document.getElementById('checkFubonJSuica').checked) {
+            document.getElementById('checkFubonJGeneral').checked = true;
+            toggleFubonJGeneral();
+        }
+        updateRewardPreview();
+    }
+
+    function toggleFubonJThai() {
+        if(document.getElementById('checkFubonJThai').checked) {
+            document.getElementById('checkFubonJGeneral').checked = false;
+            toggleFubonJGeneral();
+        }
+        updateRewardPreview();
+    }
+
     function toggleJiheLogic() {
         const isJapan = document.getElementById('checkJiheJapan').checked;
         const labelBase = document.getElementById('labelJiheBase');
@@ -1056,6 +1096,7 @@
         let isBill = document.getElementById('checkIsBill') ? document.getElementById('checkIsBill').checked : false;
         
         // J1 新邏輯
+        let isFubonJGeneral = document.getElementById('checkFubonJGeneral') ? document.getElementById('checkFubonJGeneral').checked : false;
         let isFubonJKorea = document.getElementById('checkFubonJKorea') ? document.getElementById('checkFubonJKorea').checked : false;
         let isFubonJThai = document.getElementById('checkFubonJThai') ? document.getElementById('checkFubonJThai').checked : false;
         let isFubonJSuica = document.getElementById('checkFubonJSuica') ? document.getElementById('checkFubonJSuica').checked : false;
@@ -1089,7 +1130,7 @@
             isUniGroup, isUniIcash, isUniOverseas,
             isRichartPay, isRichartOnline, isRichartLine, isRichartOverseas,
             isBonus10, isBonus25, isBill,
-            isFubonJKorea, isFubonJThai, isFubonJSuica,
+            isFubonJGeneral, isFubonJKorea, isFubonJThai, isFubonJSuica,
             isJiheJapan, isJiheApple, isJiheDomesticJapanese,
             isKumamonJapan, isKumamonDesignated, isKumamonPayPay, isKumamonDomesticGreen,
             isSinopacCurrencyOverseas: isSinopacCurrencyOverseasFinal, 
@@ -1148,7 +1189,7 @@
     }
 
     function calculateStats(cardId, addedAmount = 0, addedIsGreen = false, addedIsForeign = false, addedIsUniBonus = false, addedIsUniUp = false, addedIsHappyPet = false, addedIsHappyLife = false, addedIsHappyForeign = false, addedIsHappyPeace = false, addedIsHsbcForeign = false, addedIsUniGroup = false, addedIsUniIcash = false, addedIsUniOverseas = false, addedIsRichartPay = false, addedIsRichartOnline = false, addedIsRichartLine = false, addedIsRichartOverseas = false, addedIsBonus10 = false, addedIsBonus25 = false, addedIsBill = false, 
-        addedIsFubonJKorea = false, addedIsFubonJThai = false, addedIsFubonJSuica = false,
+        addedIsFubonJGeneral = false, addedIsFubonJKorea = false, addedIsFubonJThai = false, addedIsFubonJSuica = false,
         addedIsJiheJapan = false, addedIsJiheApple = false, addedIsJiheDomesticJapanese = false,
         addedIsKumamonJapan = false, addedIsKumamonDesignated = false, addedIsKumamonPayPay = false, addedIsKumamonDomesticGreen = false,
         addedIsSinopacCurrencyOverseas = false, addedIsSinopacCurrencySelected = false, 
@@ -1169,22 +1210,26 @@
         // 富邦 J 卡 (J1) 新邏輯
         if (cardId === 'j1') {
             const txList = [...relevantTx];
-            if (addedAmount > 0) txList.push({ amount: addedAmount, isFubonJKorea: addedIsFubonJKorea, isFubonJThai: addedIsFubonJThai, isFubonJSuica: addedIsFubonJSuica });
+            if (addedAmount > 0) txList.push({ amount: addedAmount, isFubonJGeneral: addedIsFubonJGeneral, isFubonJKorea: addedIsFubonJKorea, isFubonJThai: addedIsFubonJThai, isFubonJSuica: addedIsFubonJSuica });
             
-            // 1. 基本 1%
-            let baseReward = totalSpend * 0.01;
+            // 1. 基本回饋：如果有勾一般日韓/實體/交通，則基本為3%，否則1%
+            let baseReward = 0;
+            txList.forEach(t => {
+                if(t.isFubonJGeneral) baseReward += t.amount * 0.03;
+                else baseReward += t.amount * 0.01;
+            });
             
-            // 2. 日韓實體 +3% (單筆需滿1000, 季上限1000)
+            // 2. 日韓實體 +3% (需滿千, 季上限1000)
             let jkBonusTotal = 0;
             txList.forEach(t => { if(t.isFubonJKorea && t.amount >= 1000) jkBonusTotal += t.amount * 0.03; });
             jkBonusTotal = Math.min(jkBonusTotal, 1000);
             
-            // 3. 泰國實體 +5% (單筆需滿1000, 季上限1000)
+            // 3. 泰國實體 +5% (需滿千, 季上限1000)
             let thaiBonusTotal = 0;
             txList.forEach(t => { if(t.isFubonJThai && t.amount >= 1000) thaiBonusTotal += t.amount * 0.05; });
             thaiBonusTotal = Math.min(thaiBonusTotal, 1000);
             
-            // 4. 日本交通 +7% (單筆需滿2000, 季上限200)
+            // 4. 日本交通 +7% (需滿兩千, 季上限200)
             let suicaBonusTotal = 0;
             txList.forEach(t => { if(t.isFubonJSuica && t.amount >= 2000) suicaBonusTotal += t.amount * 0.07; });
             suicaBonusTotal = Math.min(suicaBonusTotal, 200);
@@ -1192,9 +1237,11 @@
             reward = baseReward + jkBonusTotal + thaiBonusTotal + suicaBonusTotal;
             
             let displayRate = "1.0";
-            if(addedIsFubonJKorea && addedAmount >= 1000) displayRate = "4.0";
-            else if(addedIsFubonJThai && addedAmount >= 1000) displayRate = "6.0";
-            else if(addedIsFubonJSuica && addedAmount >= 2000) displayRate = "8.0";
+            if(addedIsFubonJGeneral) displayRate = "3.0";
+            
+            if(addedIsFubonJKorea && addedAmount >= 1000) displayRate = "6.0"; // 3+3
+            else if(addedIsFubonJThai && addedAmount >= 1000) displayRate = "6.0"; // 1+5
+            else if(addedIsFubonJSuica && addedAmount >= 2000) displayRate = "10.0"; // 3+7
             
             return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: displayRate, isCustom, cycleStart, cycleEnd };
         }
@@ -1486,6 +1533,8 @@
         let isBonus25 = document.getElementById('checkBonus25') ? document.getElementById('checkBonus25').checked : false;
         let isBill = document.getElementById('checkIsBill') ? document.getElementById('checkIsBill').checked : false;
         
+        // J1
+        let isFubonJGeneral = document.getElementById('checkFubonJGeneral') ? document.getElementById('checkFubonJGeneral').checked : false;
         let isFubonJKorea = document.getElementById('checkFubonJKorea') ? document.getElementById('checkFubonJKorea').checked : false;
         let isFubonJThai = document.getElementById('checkFubonJThai') ? document.getElementById('checkFubonJThai').checked : false;
         let isFubonJSuica = document.getElementById('checkFubonJSuica') ? document.getElementById('checkFubonJSuica').checked : false;
@@ -1511,7 +1560,7 @@
 
         const currentStats = calculateStats(cardId, 0);
         const newStats = calculateStats(cardId, amount, isGreen, isForeign, isUniBonus, isUniUp, isHappyPet, isHappyLife, isHappyForeign, isHappyPeace, isHsbcForeign, isUniGroup, isUniIcash, isUniOverseas, isRichartPay, isRichartOnline, isRichartLine, isRichartOverseas, isBonus10, isBonus25, isBill,
-            isFubonJKorea, isFubonJThai, isFubonJSuica,
+            isFubonJGeneral, isFubonJKorea, isFubonJThai, isFubonJSuica,
             isJiheJapan, isJiheApple, isJiheDomesticJapanese,
             isKumamonJapan, isKumamonDesignated, isKumamonPayPay, isKumamonDomesticGreen,
             isSinopacCurrencyOverseasFinal, isSinopacCurrencySelectedFinal,
@@ -1606,7 +1655,7 @@
             if (card.id === 'c9') displayRate = '哩程';
             if (card.id === 'c10') displayRate = '11.0%';
             if (card.id === 'c11') displayRate = '3.8%';
-            if (card.id === 'j1') displayRate = '7.0%';
+            if (card.id === 'j1') displayRate = '6.0%';
             if (card.id === 'j2') displayRate = '4.5%';
             if (card.id === 'j3') displayRate = '8.5%';
             if (card.id === 'j4') displayRate = '6.0%';
@@ -1743,7 +1792,7 @@
             document.getElementById('rbRichartGeneral').checked = true;
         }
 
-        if (cardId === 'j1') { document.getElementById('fubonJOptions').style.display = 'block'; }
+        if (cardId === 'j1') { document.getElementById('fubonJOptions').style.display = 'block'; toggleFubonJGeneral(); }
         if (cardId === 'j2') { document.getElementById('jiheOptions').style.display = 'block'; toggleJiheLogic(); }
         if (cardId === 'j3') { document.getElementById('kumamonOptions').style.display = 'block'; toggleKumamonLogic(); }
         if (cardId === 'j4') { 
@@ -1905,6 +1954,10 @@
         if(document.getElementById('checkIsBill')) document.getElementById('checkIsBill').checked = tx.isBill;
 
         // J1 logic restore
+        if(document.getElementById('checkFubonJGeneral')) {
+            document.getElementById('checkFubonJGeneral').checked = tx.isFubonJGeneral;
+            toggleFubonJGeneral();
+        }
         if(document.getElementById('checkFubonJKorea')) document.getElementById('checkFubonJKorea').checked = tx.isFubonJKorea;
         if(document.getElementById('checkFubonJThai')) document.getElementById('checkFubonJThai').checked = tx.isFubonJThai;
         if(document.getElementById('checkFubonJSuica')) document.getElementById('checkFubonJSuica').checked = tx.isFubonJSuica;

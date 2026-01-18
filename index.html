@@ -188,7 +188,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V124.03</div>
+            <div class="version-tag">V124.04</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -300,7 +300,7 @@
                     
                     <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0;">
                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkGreenChannel">🌿 綠色通路 +5% (月刷$3,000封頂)</label>
+                            <label for="checkGreenChannel">🌿 綠色通路 6% (刷$3,000封頂)</label>
                             <input type="checkbox" id="checkGreenChannel" onchange="toggleGreenLogic()">
                         </div>
                         <button onclick="toggleGreenDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看綠色通路</button>
@@ -310,20 +310,28 @@
                             <b>(3) 綠色購/捐：</b><br>中華電信(電子帳單)、台灣大哥大(電子帳單)、遠傳(電子帳單)、Tesla充電、慈濟、世界展望會
                         </div>
                     </div>
+                    
+                    <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0; border-top:1px dashed #ddd; padding-top:6px; margin-top:6px;">
+                         <button onclick="toggleParkingDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0; font-weight:700;">🅿️ 查看免費停車適用名單 (需上月滿額)</button>
+                         <div id="greenParkingDetails" class="details-content">
+                            <b>台灣聯通、詮營、ViVi PARK、嘟嘟房、車麻吉</b><br>
+                            <span style="font-size:10px; color:#555;">(每日1次、每次2小時、每月最高5次)</span>
+                         </div>
+                    </div>
 
                     <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;"><label for="checkForeign">✈️ 國外消費 2% (無上限)</label><input type="checkbox" id="checkForeign" onchange="toggleForeignLogic()"></div>
                 </div>
                 
                 <div id="uniOptions">
-                    <div class="option-row read-only"><label id="labelUniBase">🔰 任意選 3.5% (限刷$4萬)</label><input type="checkbox" checked disabled></div>
-                    <div class="option-row"><label for="checkUniUp">🆙 訂閱 UP 選 4.5% (限刷$14萬)</label><input type="checkbox" id="checkUniUp" onchange="toggleUniUpLogic()"></div>
-                    <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;"><label for="checkUniBonus">🔥 統一時代任務 +3% (限刷$1.6萬)</label><input type="checkbox" id="checkUniBonus" onchange="updateRewardPreview()"></div>
+                    <div class="option-row read-only"><label id="labelUniBase">🔰 任意選 3.5% (刷$4萬封頂)</label><input type="checkbox" checked disabled></div>
+                    <div class="option-row"><label for="checkUniUp">🆙 訂閱 UP 選 4.5% (刷$14萬封頂)</label><input type="checkbox" id="checkUniUp" onchange="toggleUniUpLogic()"></div>
+                    <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;"><label for="checkUniBonus">🔥 統一時代任務 +3% (刷$1.6萬封頂)</label><input type="checkbox" id="checkUniBonus" onchange="updateRewardPreview()"></div>
                 </div>
                 
                 <div id="uniOpenOptions">
                     <div class="option-row read-only"><label>🔰 基本回饋 1% (無上限)</label><input type="checkbox" checked disabled></div>
-                    <div class="option-row"><label for="checkUniGroup">🏪 統一集團 +2% (限刷$2.5萬)</label><input type="checkbox" id="checkUniGroup" onchange="toggleUniGroup()"></div>
-                    <div class="option-row"><label for="checkUniIcash">📱 icash Pay +4% (限刷$3,750)</label><input type="checkbox" id="checkUniIcash" onchange="toggleUniIcash()"></div>
+                    <div class="option-row"><label for="checkUniGroup">🏪 統一集團 +2% (刷$2.5萬封頂)</label><input type="checkbox" id="checkUniGroup" onchange="toggleUniGroup()"></div>
+                    <div class="option-row"><label for="checkUniIcash">📱 icash Pay +4% (刷$3,750封頂)</label><input type="checkbox" id="checkUniIcash" onchange="toggleUniIcash()"></div>
                     
                     <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px; margin-top:6px; flex-direction:column; align-items:flex-start;">
                         <label style="margin-bottom:4px;">🏃 踩點任務 (2家起跳，最高+4%)</label>
@@ -331,7 +339,7 @@
                         <div style="font-size:10px; color:#FF9800; margin-top:6px; font-weight:700;" id="taskBonusDisplay">目前 0 家 (加碼 0%)</div>
                     </div>
                     <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px;">
-                        <label for="checkUniOverseas">✈️ 海外實體 11% (限刷$6,250)</label>
+                        <label for="checkUniOverseas">✈️ 海外實體 11% (刷$6,250封頂)</label>
                         <input type="checkbox" id="checkUniOverseas" onchange="toggleUniOverseas()">
                     </div>
                 </div>
@@ -341,7 +349,7 @@
                     
                     <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0px; border-top:1px dashed #ddd; padding-top:8px;">
                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:4px;">
-                            <label for="rbJiangSelected">🛍️ 生活升級 +4.5% (限刷$6,666)</label>
+                            <label for="rbJiangSelected">🛍️ 生活升級 +4.5% (刷$6,666封頂)</label>
                             <input type="radio" name="jiangMode" id="rbJiangSelected" value="selected" onchange="updateRewardPreview()">
                         </div>
                         <button onclick="toggleJiangDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:0 0 6px 0;">🔽 點擊查看指定通路清單</button>
@@ -360,7 +368,7 @@
                     
                     <div class="option-row" id="jiangTravelRow" style="border-top:1px dashed #ddd; padding-top:8px; margin-top:4px; flex-direction:column; align-items:flex-start;">
                          <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="rbJiangTravel">✈️ 旅遊加碼 +4.5% (限刷$1.1萬)</label>
+                            <label for="rbJiangTravel">✈️ 旅遊加碼 +4.5% (刷$1.1萬封頂)</label>
                             <input type="radio" name="jiangMode" id="rbJiangTravel" value="travel" onchange="updateRewardPreview()">
                         </div>
                         <button onclick="toggleJiangTravelDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看旅遊/航空/旅行社</button>
@@ -377,7 +385,7 @@
                      
                      <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0;">
                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkHappyPet">🐶 寵物通路 +9.5% (限刷$5,263)</label>
+                            <label for="checkHappyPet">🐶 寵物通路 +9.5% (刷$5,263封頂)</label>
                             <input type="checkbox" id="checkHappyPet" onchange="toggleHappyPet()">
                         </div>
                         <button onclick="toggleHappyPetDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看寵物通路</button>
@@ -390,7 +398,7 @@
 
                      <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0; border-top:1px dashed #ddd; padding-top:6px;">
                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkHappyPeace">🍽️ 大小安心刷 +3.5% (限刷$5,714)</label>
+                            <label for="checkHappyPeace">🍽️ 大小安心刷 +3.5% (刷$5,714封頂)</label>
                             <input type="checkbox" id="checkHappyPeace" onchange="toggleHappyPeace()">
                         </div>
                         <button onclick="toggleHappyPeaceDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看餐廳/藥局/居家</button>
@@ -403,7 +411,7 @@
 
                      <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0; border-top:1px dashed #ddd; padding-top:6px;">
                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkHappyLife">🛒 生活禮遇 +3.5% (限刷$5,714)</label>
+                            <label for="checkHappyLife">🛒 生活禮遇 +3.5% (刷$5,714封頂)</label>
                             <input type="checkbox" id="checkHappyLife" onchange="toggleHappyLife()">
                         </div>
                         <button onclick="toggleHappyLifeDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看百貨/量販/交通</button>
@@ -474,19 +482,19 @@
                 <div id="jiheOptions">
                     <div class="option-row read-only"><label id="labelJiheBase">🔰 國內消費 1% (無上限)</label><input type="checkbox" checked disabled></div>
                     <div class="option-row"><label for="checkJiheJapan">🇯🇵 切換為日本消費 (2.5%)</label><input type="checkbox" id="checkJiheJapan" onchange="toggleJiheLogic()"></div>
-                    <div class="option-row" id="rowJiheApple" style="border-top:1px dashed #ddd; padding-top:6px;"><label for="checkJiheApple">🍎 Apple Pay +1.5% (限刷$4萬)</label><input type="checkbox" id="checkJiheApple" onchange="updateRewardPreview()"></div>
-                    <div class="option-row" id="rowJiheDomesticJapanese" style="border-top:1px dashed #ddd; padding-top:6px;"><label for="checkJiheDomesticJapanese">🇹🇼 國內日系 +4% (限刷$1.25萬)</label><input type="checkbox" id="checkJiheDomesticJapanese" onchange="updateRewardPreview()"></div>
+                    <div class="option-row" id="rowJiheApple" style="border-top:1px dashed #ddd; padding-top:6px;"><label for="checkJiheApple">🍎 Apple Pay +1.5% (刷$4萬封頂)</label><input type="checkbox" id="checkJiheApple" onchange="updateRewardPreview()"></div>
+                    <div class="option-row" id="rowJiheDomesticJapanese" style="border-top:1px dashed #ddd; padding-top:6px;"><label for="checkJiheDomesticJapanese">🇹🇼 國內日系 +4% (刷$1.25萬封頂)</label><input type="checkbox" id="checkJiheDomesticJapanese" onchange="updateRewardPreview()"></div>
                 </div>
                 <div id="kumamonOptions">
                     <div class="option-row read-only"><label id="labelKumamonBase">🔰 國內消費 1% (無上限)</label><input type="checkbox" checked disabled></div>
                     <div class="option-row"><label for="checkKumamonJapan">🇯🇵 切換為日本消費 (2%)</label><input type="checkbox" id="checkKumamonJapan" onchange="toggleKumamonLogic()"></div>
                     <div id="groupKumamonJapan" style="display:none;">
-                        <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px;"><label for="checkKumamonDesignated">🐻 指定/Suica +6.5% (限刷$1萬)</label><input type="checkbox" id="checkKumamonDesignated" onchange="toggleKumamonSub()"></div>
-                        <div class="option-row"><label for="checkKumamonPayPay">📱 PayPay支付 +3% (限刷$1萬)</label><input type="checkbox" id="checkKumamonPayPay" onchange="toggleKumamonSub()"></div>
+                        <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px;"><label for="checkKumamonDesignated">🐻 指定/Suica +6.5% (刷$1萬封頂)</label><input type="checkbox" id="checkKumamonDesignated" onchange="toggleKumamonSub()"></div>
+                        <div class="option-row"><label for="checkKumamonPayPay">📱 PayPay支付 +3% (刷$1萬封頂)</label><input type="checkbox" id="checkKumamonPayPay" onchange="toggleKumamonSub()"></div>
                     </div>
                     
                     <div id="groupKumamonDomestic">
-                        <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px;"><label for="checkKumamonDomesticGreen">🇹🇼 國內指定 +1% (限刷$1萬)</label><input type="checkbox" id="checkKumamonDomesticGreen" onchange="updateRewardPreview()"></div>
+                        <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px;"><label for="checkKumamonDomesticGreen">🇹🇼 國內指定 +1% (刷$1萬封頂)</label><input type="checkbox" id="checkKumamonDomesticGreen" onchange="updateRewardPreview()"></div>
                     </div>
                 </div>
                 
@@ -521,7 +529,7 @@
                     
                     <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px; display:flex; flex-direction:column; align-items:flex-start;">
                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkSinopacMitsuiSelected">🍽️ 特選通路 7% (限刷$1,428)</label>
+                            <label for="checkSinopacMitsuiSelected">🍽️ 特選通路 7% (刷$1,428封頂)</label>
                             <input type="checkbox" id="checkSinopacMitsuiSelected" onchange="updateRewardPreview()">
                         </div>
                         <div style="font-size:10px; color:#aaa; margin-top:2px; line-height:1.3;">
@@ -580,6 +588,12 @@
     // 切換綠色通路詳情折疊
     function toggleGreenDetails() {
         const el = document.getElementById('greenDetails');
+        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
+    
+    // 切換停車名單詳情折疊
+    function toggleParkingDetails() {
+        const el = document.getElementById('greenParkingDetails');
         el.style.display = (el.style.display === 'block') ? 'none' : 'block';
     }
 
@@ -760,84 +774,84 @@
 
     window.addEventListener('popstate', function(event) { closeModal(); });
 
-    // 核心資料庫 (簡介全面更新為總回饋率)
+    // 核心資料庫 (V124.04: 修正封頂寫法與綠卡定位)
     const defaultCards = [
         { 
             id: 'c10', name: '中信 UniOpen 卡', nickname: '2026 統一集團神卡', 
-            note: '集團 3% / icashPay 7% / 海外 11%', 
+            note: 'icashPay 11% (刷 $3,750 封頂)', 
             type: 'uniopen_special', gradient: 'linear-gradient(135deg, #FF512F 0%, #F09819 100%)', textColor: 'white', msgDanger: '', 
             parking: `🏪 <b>統一集團 2026 新權益</b><br>1. <b>基本回饋</b>：1% (無上限)<br>2. <b>集團加碼</b>：+2% (限刷$2.5萬)<br>3. <b>踩點任務</b>：滿 5 家 +4% (限刷$1.25萬)<br>4. <b>icash Pay</b>：加碼 +4% (限刷$3,750)`
         },
         { 
             id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', 
-            note: '新戶 10% / 精選 13.5% (含新戶)', 
+            note: '新戶 10% (刷 8千封頂) | 精選 2.5% (刷 40萬封頂)', 
             rule: '', type: 'ceiling', limit: 8000, tier1Rate: 0.135, tier2Rate: 0.035, 
             gradient: 'linear-gradient(135deg, #e60012 0%, #FFD700 100%)', 
             textColor: 'white', msgDanger: '新戶10%已封頂',
             parking: `🐷 <b>新戶限定神卡</b><br>新戶 +10% (限刷$8,000)<br>🌟 <b>精選通路 +2.5%</b><br>上限 $40 萬`
         },
-        { id: 'c1', name: '星展傳說對決卡', nickname: 'Line Pay神卡', note: 'LinePay 10% / 外送 10% (封頂)', rule: '', type: 'ceiling', limit: 11363, tier1Rate: 0.10, tier2Rate: 0.012, gradient: 'linear-gradient(135deg, #43cea2 0%, #185a9d 100%)', textColor: 'white', msgDanger: '已封頂 (變1.2%)' },
-        { id: 'c5', name: '聯邦賴點卡', nickname: 'Line Pay優等生', note: 'Line Pay 6% (需單筆滿百)', rule: '⚠️ 單筆需滿$100', type: 'ceiling', limit: 3000, tier1Rate: 0.06, tier2Rate: 0.01, threshold: 100, gradient: 'linear-gradient(135deg, #00B900 0%, #33CC33 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)', parking: `⚠️ <b>單筆需滿 $100</b> (回饋 6%)`},
-        { id: 'c3', name: '永豐 Sport 卡', nickname: 'Apple Pay優等生', note: 'Apple Pay 5% (需運動達標)', rule: '', type: 'ceiling', limit: 5000, tier1Rate: 0.05, tier2Rate: 0.02, gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)' },
+        { id: 'c1', name: '星展傳說對決卡', nickname: 'Line Pay神卡', note: 'LinePay 10% (刷 1.1萬封頂)', rule: '', type: 'ceiling', limit: 11363, tier1Rate: 0.10, tier2Rate: 0.012, gradient: 'linear-gradient(135deg, #43cea2 0%, #185a9d 100%)', textColor: 'white', msgDanger: '已封頂 (變1.2%)' },
+        { id: 'c5', name: '聯邦賴點卡', nickname: 'Line Pay優等生', note: 'Line Pay 6% (刷 3千封頂)', rule: '⚠️ 單筆需滿$100', type: 'ceiling', limit: 3000, tier1Rate: 0.06, tier2Rate: 0.01, threshold: 100, gradient: 'linear-gradient(135deg, #00B900 0%, #33CC33 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)', parking: `⚠️ <b>單筆需滿 $100</b> (回饋 6%)`},
+        { id: 'c3', name: '永豐 Sport 卡', nickname: 'Apple Pay優等生', note: 'Apple Pay 5% (刷 5千封頂)', rule: '', type: 'ceiling', limit: 5000, tier1Rate: 0.05, tier2Rate: 0.02, gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)' },
         { 
             id: 'c4', name: '將來將將卡', nickname: '行支/餐廳/外送', 
-            note: '生活 5% / 旅遊 5% (需月刷滿 $3,000)', 
+            note: '生活 5% (刷 6千6封頂)', 
             rule: '', type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, 
             gradient: 'linear-gradient(135deg, #ffe259 0%, #ffa751 100%)', textColor: '#333', msgDanger: '已封頂 (變0.5%)', 
             parking: `🎯 <b>低消任務</b>：當月累積滿 <b>$3,000</b> 才享加碼<br><br>🛍️ <b>生活升級 5%</b> (限刷$6,666)<br>行動支付/外送/餐廳/購物<br><br>✈️ <b>旅遊加碼 5%</b> (限刷$11,111)<br>海外/航空/旅行社/高鐵`
         },
         { 
-            id: 'c2', name: '聯邦綠卡', nickname: '綠色通路優選', 
-            note: '綠色通路 6% / 國外 2%', 
-            rule: '', type: 'ceiling', limit: 3000, tier1Rate: 0.06, tier2Rate: 0.01, 
-            gradient: 'linear-gradient(135deg, #20B2AA 0%, #008B8B 100%)', textColor: 'white', msgDanger: '加碼已封頂', 
-            parking: `🌿 <b>綠色通路 6%</b><br>基本 1% + 加碼 5%<br>⚠️ 加碼適用月刷 $3,000 封頂 (回饋 $150)`
+            id: 'c2', name: '聯邦綠卡', nickname: '綠色/市區停車神卡', 
+            note: '綠色 6% (刷 3千封頂) | 停車 (刷 1.2萬達標)', 
+            rule: '', type: 'floor', target: 12000, tier1Rate: 0.02, tier2Rate: 0.02, 
+            gradient: 'linear-gradient(135deg, #20B2AA 0%, #008B8B 100%)', textColor: 'white', msgSuccess: '已達標 (下月免停)', 
+            parking: `🅿️ <b>免費停車：</b>需上月刷滿1.2萬<br>🌿 <b>綠色通路 6%</b><br>基本 1% + 加碼 5%<br>⚠️ 加碼適用月刷 $3,000 封頂 (回饋 $150)`
         },
-        { id: 'c7', name: '玉山 UNI 卡', nickname: '行支/百貨優等生', note: '任意 3.5% / UP 4.5% (封頂高)', type: 'ceiling', limit: 40000, tier1Rate: 0.035, tier2Rate: 0.01, gradient: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)', 
+        { id: 'c7', name: '玉山 UNI 卡', nickname: '行支/百貨優等生', note: 'UP 4.5% (刷 14萬封頂)', type: 'ceiling', limit: 40000, tier1Rate: 0.035, tier2Rate: 0.01, gradient: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)', 
           parking: `🔥 <b>任意選 3.5%</b> (限刷$4萬)<br>🆙 <b>UP 選 4.5%</b> (限刷$14萬)<br>🏬 <b>統一時代 +3%</b> (限刷$1.6萬)`},
         { 
             id: 'c8', name: '遠東樂家+卡', nickname: '生活/寵物神卡', 
-            note: '寵物 10% / 生活 4% (需一般消費滿3千)', 
+            note: '寵物 10% (刷 5千封頂)', 
             type: 'ceiling', limit: 5263, tier1Rate: 0.1, tier2Rate: 0.005, 
             gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)', 
             textColor: 'white', msgDanger: '已封頂 (變0.5%)', 
             parking: `🐶 <b>寵物 10%</b> (限刷$5,263)<br>🍽️ <b>安心/生活 4%</b> (限刷$5,714)<br>✈️ <b>國外 2.5%</b> (無上限)`
         },
         { id: 'c9', name: '滙豐旅人卡', nickname: '哩程累積', note: '無限:國內18/國外10 | 御璽:國內18/國外15', type: 'miles', gradient: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)', textColor: 'white', msgDanger: '', parking: `✈️ <b>哩程累積神卡</b>`},
-        { id: 'c11', name: '台新 Richart 卡', nickname: '權益自由選', note: '台新Pay 3.8% / 網購 3.3% (無上限)', type: 'ceiling', limit: 99999999, tier1Rate: 0.038, tier2Rate: 0.003, gradient: 'linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%)', textColor: 'white', msgDanger: '', parking: `🐶 <b>權益自由選 (無上限回饋)</b>`},
+        { id: 'c11', name: '台新 Richart 卡', nickname: '權益自由選', note: '台新Pay 3.8% (無上限)', type: 'ceiling', limit: 99999999, tier1Rate: 0.038, tier2Rate: 0.003, gradient: 'linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%)', textColor: 'white', msgDanger: '', parking: `🐶 <b>權益自由選 (無上限回饋)</b>`},
         
         { 
             id: 'j1', name: '富邦 J 卡', 
-            nickname: '日韓泰/交通', 
-            note: '日韓實體 6% / 交通 10% / 泰國 6%', 
+            nickname: '日韓旅遊優等生', 
+            note: '日韓實體 6% (刷 3.3萬封頂)', 
             type: 'custom_j', limit: 0, 
             gradient: 'linear-gradient(135deg, #FF7E5F 0%, #FEB47B 100%)', textColor: 'white', msgDanger: '', 
             parking: `🇯🇵🇰🇷 <b>日韓實體 6%</b> (3%+3%)<br>每季上限$1,000，需單筆滿千<br>🍎 <b>日本交通卡 10%</b> (3%+7%)<br>每季上限$200，需單筆滿兩千<br>🇹🇭 <b>泰國實體 6%</b> (1%+5%)<br>每季上限$1,000，需單筆滿千`
         },
         { 
             id: 'j2', name: '聯邦吉鶴卡', nickname: '日本/ApplePay專武', 
-            note: '日本 AP 4% / 國內日系 5% (封頂)', 
+            note: '日本 AP 4% (刷 4萬封頂)', 
             type: 'ceiling', limit: 40000, tier1Rate: 0.04, tier2Rate: 0.025, 
             gradient: 'linear-gradient(135deg, #DC143C 0%, #FFFFFF 150%)', textColor: 'white', msgDanger: '加碼已封頂 (變2.5%)', 
             parking: `🍎 <b>日本 QUICPay (Apple Pay)</b><br>日本 2.5% + 加碼 1.5% = 4%<br>⚠️ 加碼上限 $600/月 (約刷$4萬)`
         },
         { 
             id: 'j3', name: '玉山熊本熊卡', nickname: '藥妝/Suica 神卡', 
-            note: '指定通路 8.5% (含Suica/藥妝)', 
+            note: '指定通路 8.5% (刷 1萬封頂)', 
             type: 'ceiling', limit: 10000, tier1Rate: 0.085, tier2Rate: 0.025, 
             gradient: 'linear-gradient(135deg, #BDC3C7 0%, #2C3E50 100%)', textColor: 'white', msgDanger: '加碼已封頂 (變2.5%)', 
             parking: `🐻 <b>指定通路 8.5%</b><br>(基本1% + 免手續費1.5% + 加碼5% + 雙幣1%)<br>含 Suica 加值、唐吉訶德、大國藥妝等<br>⚠️ 加碼上限 $500/期 (約刷$1萬)`
         },
         { 
             id: 'j4', name: '永豐幣倍卡', nickname: '海外雙幣神卡', 
-            note: '海外精選 6% / 國外 3% (雙幣)', 
+            note: '海外精選 6% (刷 2萬封頂)', 
             type: 'ceiling', limit: 80000, tier1Rate: 0.06, tier2Rate: 0.02, 
             gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: 'white', msgDanger: '加碼已封頂',
             parking: `💰 <b>幣倍卡 2026</b><br><b>Level 1 (限刷$7,500)</b>：自動扣繳+電子帳單<br><b>Level 2 (限刷$20,000)</b>：資產≥10萬 或 大戶`
         },
         { 
             id: 'j5', name: '永豐三井聯名卡', nickname: '餐飲/日韓神卡', 
-            note: '館外餐飲 7.3% / 日韓滿額禮', 
+            note: '餐飲 7.3% (刷 1,428 封頂)', 
             type: 'floor', target: 30000, tier1Rate: 0.073, tier2Rate: 0.003, 
             gradient: 'linear-gradient(135deg, #00C9FF 0%, #92FE9D 100%)', textColor: '#333', msgSuccess: '已達標 (領$2000)',
             parking: `🍽️ <b>特選通路 7% (上限100元)</b><br>通路：館外餐飲(MCC 58xx) / 全盈+PAY<br>⚠️ 加碼上限僅 100 元 (約刷 $1,428)<br><br>🇯🇵 <b>日韓泰滿額禮 (JCB限定)</b><br>每季累積滿 30,000 送 2,000`
@@ -949,10 +963,10 @@
         const isUp = document.getElementById('checkUniUp').checked;
         const label = document.getElementById('labelUniBase');
         if (isUp) {
-            label.innerHTML = "🆙 <b>UP 選 4.5%</b> (上限14萬)";
+            label.innerHTML = "🆙 <b>UP 選 4.5%</b> (刷$14萬封頂)";
             label.parentNode.style.background = "#fff3e0"; 
         } else {
-            label.innerHTML = "🔰 <b>任意選 3.5%</b> (上限4萬)";
+            label.innerHTML = "🔰 <b>任意選 3.5%</b> (刷$4萬封頂)";
             label.parentNode.style.background = "transparent";
         }
         updateRewardPreview();
@@ -1388,11 +1402,16 @@
             // 修正：上限是消費 3000 元（回饋 150 元）
             const bonusGreen = Math.min(greenSpend, 3000) * 0.05;
             
-            reward = baseReward + bonusGreen;
+            // 修正：國外消費 2% (基本1% + 國外1%)
+            const foreignSpend = relevantTx.filter(t => t.isForeign).reduce((sum, t) => sum + t.amount, 0) + (addedIsForeign ? addedAmount : 0);
+            const bonusForeign = foreignSpend * 0.01;
+
+            reward = baseReward + bonusGreen + bonusForeign;
             let displayRate = "1.0";
-            if (addedIsGreen) {
-                if (greenSpend <= 3000) displayRate = "6.0";
-            }
+            if (addedIsGreen && greenSpend <= 3000) displayRate = "6.0";
+            else if (addedIsForeign) displayRate = "2.0";
+            
+            // 停車任務進度 (C2 是 floor 類型，由 renderGrid 處理顯示，但這邊回傳資料)
             return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: displayRate, isCustom, cycleStart, cycleEnd };
         }
         
@@ -1645,7 +1664,8 @@
                     else { percent = 100; statusText = card.msgDanger; msgStyle = 'color: #ffcccc;'; }
                 }
             } else { percent = (stats.validSpend / card.target) * 100;
-            statusText = stats.validSpend >= card.target ? '任務達成' : `差 $${(card.target - stats.validSpend).toLocaleString()}`;
+            statusText = stats.validSpend >= card.target ? card.msgSuccess : `差 $${(card.target - stats.validSpend).toLocaleString()} ${card.id==='c2'?'享免費停車':'達標'}`;
+            if(card.id==='c2' && stats.validSpend >= card.target) msgStyle = 'color:#38ef7d;';
             }
 
             if (card.id === 'c6') displayRate = '13.5%';
@@ -1881,6 +1901,7 @@
             if (tx.isRichartPay) noteText = '📱 ' + noteText; if (tx.isRichartOnline) noteText = '🛍️ ' + noteText; if (tx.isRichartLine) noteText = '🟢 ' + noteText; if (tx.isRichartOverseas) noteText = '✈️ ' + noteText;
             if (tx.isBill) noteText = '🧾 ' + noteText;
             if (tx.isBonus25) noteText = '🌟 ' + noteText; if (tx.isBonus10) noteText = '⚡ ' + noteText;
+            if (tx.isFubonJJapan) noteText = '🇯🇵 ' + noteText;
             if (tx.isJiheJapan) noteText = '🇯🇵 ' + noteText;
             if (tx.isKumamonJapan) noteText = '🇯🇵 ' + noteText;
             if (tx.isSinopacCurrencyOverseas) noteText = '✈️ ' + noteText;

@@ -29,7 +29,7 @@
     <meta property="og:type" content="website">
 
     <title>刷卡回饋管家</title>
-    
+ 
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
     <link rel="icon" type="image/png" sizes="48x48" href="icon-48.png">
@@ -55,10 +55,8 @@
         .total-info { display: flex; flex-direction: column; gap: 2px; }
         .total-reward-label { font-size: 13px; font-weight: 600; opacity: 0.9; }
         .total-reward-amount { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; }
-        
         .btn-share-result { background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; z-index: 2; }
         .btn-share-result:active { transform: scale(0.95); background: rgba(255,255,255,0.3); }
-
         #urgent-alert-area { display: none; margin-bottom: 12px; }
         .urgent-card { background: linear-gradient(135deg, #FF3B30, #FF2D55); color: white; border-radius: 12px; padding: 10px 14px; box-shadow: 0 4px 10px rgba(255, 59, 48, 0.25); animation: pulse 2s infinite; }
         .urgent-title { font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 6px; }
@@ -96,127 +94,38 @@
         .btn-ig { width: 100%; padding: 12px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 12px rgba(220, 39, 67, 0.3); display: flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-ig:active { transform: scale(0.98); }
         .details-content { display: none; background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 10px; margin-top: 6px; font-size: 11px; color: #666; line-height: 1.6; }
-        
-        /* Modal 固定層級，防止模糊 */
         .modal { display: none; position: fixed !important; top: 0 !important; left: 0 !important; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 10000; align-items: center; justify-content: center; }
         .modal-content { background: white; width: 85%; max-width: 320px; border-radius: 20px; padding: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.25); animation: modalPop 0.2s; display: flex; flex-direction: column; max-height: 85vh; overflow-y: auto; position: relative; z-index: 10001; }
         .modal-body-input { flex-shrink: 0; }
-        
-        /* 歡迎視窗固定 */
         .welcome-overlay { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 20000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .welcome-content { background: white; width: 85%; max-width: 340px; border-radius: 24px; padding: 24px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .welcome-title { font-size: 22px; font-weight: 800; color: #333; margin-bottom: 10px; }
         .welcome-desc { font-size: 14px; color: #666; margin-bottom: 20px; line-height: 1.5; }
         .welcome-list { text-align: left; max-height: 300px; overflow-y: auto; margin-bottom: 20px; border: 1px solid #eee; border-radius: 12px; padding: 10px; }
         .welcome-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #f9f9f9; }
-        .welcome-item:last-child { border-bottom: none; }
-        .welcome-item input { width: 20px; height: 20px; margin-right: 12px; margin-bottom: 0; padding: 0;}
-        .welcome-item label { margin: 0; font-size: 15px; font-weight: 600; color: #333; flex: 1; }
         .welcome-btn { background: #007AFF; color: white; border: none; padding: 14px; width: 100%; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(0,122,255,0.3); }
         .welcome-btn:active { transform: scale(0.98); }
-        
         #captureArea { position: fixed; top: -9999px; left: -9999px; z-index: -1; }
-        .share-card-node {
-            width: 320px;
-            /* V123.99 修正：高度自動延伸 */
-            height: auto; 
-            background: linear-gradient(135deg, #1C1C1E, #2c3e50);
-            color: white;
-            border-radius: 20px;
-            padding: 24px;
-            box-sizing: border-box;
-            font-family: -apple-system, sans-serif;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            margin-bottom: 20px;
-        }
+        .share-card-node { width: 320px; height: auto; background: linear-gradient(135deg, #1C1C1E, #2c3e50); color: white; border-radius: 20px; padding: 24px; box-sizing: border-box; font-family: -apple-system, sans-serif; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3); margin-bottom: 20px; }
         .share-header { font-size: 14px; opacity: 0.8; letter-spacing: 1px; margin-bottom: 4px; text-transform: uppercase; }
         .share-month { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
         .share-amount { font-size: 48px; font-weight: 800; margin-bottom: 20px; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
         .share-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 15px 0; }
-        .share-footer { 
-            font-size: 11px; opacity: 0.8; margin-top: 15px; 
-            background: rgba(255,255,255,0.1); padding: 8px; border-radius: 8px;
-            font-weight: 600;
-        }
+        .share-footer { font-size: 11px; opacity: 0.8; margin-top: 15px; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 8px; font-weight: 600; }
         .share-list { text-align: left; margin-top: 10px; }
         .share-item { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; font-weight: 500; }
         .share-item span:last-child { font-weight: 700; color: #FFD700; }
-        
-        /* 5合1 按鈕區塊 - 調整為原生按鈕 */
         .social-btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 10px; }
         .social-btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px; border-radius: 12px; border: none; font-size: 13px; font-weight: 700; color: white; cursor: pointer; transition: transform 0.1s; }
         .social-btn:active { transform: scale(0.97); }
-        
-        /* 統一按鈕樣式 */
         .social-btn.instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
         .social-btn.threads { background: #000000; border: 1px solid #333; }
         .social-btn.facebook { background: #1877F2; }
         .social-btn.line { background: #06C755; }
-        /* 僅保存圖片按鈕 */
         .social-btn.download { background: #555; grid-column: span 2; }
-
-        .input-group label { display: block; font-size: 12px; font-weight: 600; color: #888; margin-bottom: 6px; margin-top: 10px; }
-        input { width: 100%; padding: 10px; border: 2px solid #f0f0f0; background: #fff; border-radius: 12px; font-size: 18px; box-sizing: border-box; outline: none; font-weight: 600; color: #333; }
-        .btn-group { display: flex; gap: 8px; margin-top: 20px; flex-shrink: 0; }
-        .btn { flex: 1; padding: 10px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center;}
-        .btn-cancel { background: #f5f5f5; color: #333; }
-        .btn-confirm { background: #007AFF; color: white; flex: 2; }
-        .btn-again { background: #E3F2FD; color: #007AFF; border: 1px solid #b3e5fc; }
-        #liveRewardCalc { text-align: center; font-size: 16px; color: #0056b3; font-weight: 700; margin-top: 12px; min-height: 20px; background: #E3F2FD; padding: 8px; border-radius: 8px; display: none; }
-        .modal-history-section { margin-top: 15px; border-top: 2px solid #f0f0f0; padding-top: 10px; height: auto; overflow: visible; }
-        .modal-history-title { font-size: 12px; font-weight: 700; color: #555; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .history-item { padding: 10px 0; border-bottom: 1px solid #f9f9f9; display: flex; justify-content: space-between; align-items: center; font-size: 12px; cursor: pointer; }
-        .history-item:active { background: #f5f5f5; }
-        .history-item:last-child { border-bottom: none; }
-        .h-name { font-weight: 600; color: #555; }
-        .h-date { font-size: 10px; color: #aaa; margin-top: 2px;}
-        .h-amount { font-weight: 700; color: #333; font-size: 13px; }
-        .btn-delete-single { background: none; border: none; color: #ccc; font-size: 14px; padding: 0 5px; cursor: pointer; margin-left: 8px;}
-        .btn-delete-single:hover { color: #FF3B30; }
-        #pigRichOptions, #greenCardOptions, #uniOptions, #happyOptions, #hsbcOptions, #uniOpenOptions, #richartOptions, #fubonJOptions, #jiheOptions, #kumamonOptions, #sinopacCurrencyOptions, #sinopacMitsuiOptions, #jiangOptions { display: none; background: #f9f9f9; padding: 10px; border-radius: 10px; margin-top: 10px; border: 1px dashed #ddd; }
-        .option-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #555; }
-        .option-row input[type="checkbox"], .option-row input[type="radio"], .option-row input[type="number"] { margin: 0; }
-        .option-row input[type="checkbox"], .option-row input[type="radio"] { width: 20px; height: 20px; }
-        .option-row.read-only { opacity: 0.8; pointer-events: none; }
-        .option-row.read-only input { opacity: 0.6; }
-        .option-row.expired { opacity: 0.5; pointer-events: none; background: #eee; padding: 4px; border-radius: 4px; }
-        .brand-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
-        .brand-btn { border: 1px solid #ddd; background: white; border-radius: 6px; padding: 6px 2px; font-size: 11px; color: #666; text-align: center; cursor: pointer; transition: 0.2s; font-weight: 600; display: flex; align-items: center; justify-content: center; }
-        .brand-btn.active { background: #FF9800; color: white; border-color: #F57C00; box-shadow: 0 2px 4px rgba(255, 152, 0, 0.3); }
-        .manage-item { display: flex; align-items: center; justify-content: space-between; padding: 16px 12px; border-bottom: 1px solid #f0f0f0; background: #fff; cursor: pointer; transition: background 0.2s; }
-        .manage-item:active { background: #f9f9f9; }
-        .manage-info { display: flex; flex-direction: column; gap: 4px; }
-        .manage-name { font-size: 15px; font-weight: 700; color: #333; }
-        .manage-desc { font-size: 12px; color: #999; }
-        .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        input:checked + .slider { background-color: #34C759; }
-        input:checked + .slider:before { transform: translateX(20px); }
-        .btn-card-setting { background: #f0f0f0; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; margin-right: 12px; color: #555; }
-        .btn-card-setting:hover { background: #e0e0e0; }
-        .happy-dashboard { background: transparent; border: none; padding: 0; margin-top: 10px; display: none; }
-        .dash-row { margin-bottom: 8px; }
-        .dash-label { font-size: 12px; font-weight: 700; color: #555; display: flex; justify-content: space-between; margin-bottom: 2px;}
-        .dash-bar-bg { background: #eee; height: 6px; border-radius: 3px; overflow: hidden; }
-        .dash-bar-fill { height: 100%; background: #4cd964; transition: width 0.3s; }
-        .dash-bar-fill.danger { background: #ff3b30; }
-        .welcome-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .welcome-content { background: white; width: 85%; max-width: 340px; border-radius: 24px; padding: 24px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .welcome-title { font-size: 22px; font-weight: 800; color: #333; margin-bottom: 10px; }
-        .welcome-desc { font-size: 14px; color: #666; margin-bottom: 20px; line-height: 1.5; }
-        .welcome-list { text-align: left; max-height: 300px; overflow-y: auto; margin-bottom: 20px; border: 1px solid #eee; border-radius: 12px; padding: 10px; }
-        .welcome-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #f9f9f9; }
-        .welcome-item:last-child { border-bottom: none; }
-        .welcome-item input { width: 20px; height: 20px; margin-right: 12px; margin-bottom: 0; padding: 0;}
-        .welcome-item label { margin: 0; font-size: 15px; font-weight: 600; color: #333; flex: 1; }
-        .welcome-btn { background: #007AFF; color: white; border: none; padding: 14px; width: 100%; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(0,122,255,0.3); }
-        .welcome-btn:active { transform: scale(0.98); }
     </style>
 </head>
-<body>
+  <body>
     <div id="welcomeModal" class="welcome-overlay">
         <div class="welcome-content">
             <div class="welcome-title">👋 歡迎使用回饋管家</div>
@@ -229,14 +138,14 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V123.99</div>
+            <div class="version-tag">V124.01</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
             <div class="subtitle"><span class="today-date" id="dateDisplay"></span></div>
         </div>
         <div class="news-ticker">
-            <div class="ticker-content" id="news-text">🎉 歡迎使用刷卡回饋管家！幣倍卡2026/將將卡2026 最新權益已更新。</div>
+            <div class="ticker-content" id="news-text">🎉 歡迎使用刷卡回饋管家！聯邦綠卡/幣倍卡2026/將將卡2026 最新權益已更新。</div>
         </div>
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
         <div class="total-reward-card">
@@ -263,11 +172,12 @@
             <button class="btn-reset-visible" onclick="resetAllData()">🗑️ 重置所有資料</button>
         </div>
     
-    <div style="text-align:center; font-size:11px; color:#555; background:#ebebeb; padding:10px; border-radius:8px; margin-top:15px; margin-bottom:10px; line-height:1.4; font-weight:600;">
+        <div style="text-align:center; font-size:11px; color:#555; background:#ebebeb; padding:10px; border-radius:8px; margin-top:15px; margin-bottom:10px; line-height:1.4; font-weight:600;">
             ⚠️ 本工具僅協助用戶監控刷卡進度<br>實際入帳需以各家銀行判定為主
         </div>
         <div style="height:20px;"></div>
     </div>
+    
     <div id="sharePreviewModal" class="modal" onclick="if(event.target===this) document.getElementById('sharePreviewModal').style.display='none'">
         <div class="modal-content" style="background:transparent; box-shadow:none; align-items:center; padding:0; width:100%; max-width:340px;">
             <div id="captureNode" class="share-card-node">
@@ -275,25 +185,21 @@
                 <div class="share-month" id="shareCardMonth">戰績報告</div>
                 <div class="share-amount" id="shareCardAmount">$0</div>
                 <div class="share-divider"></div>
-                <div class="share-list" id="shareCardList"></div> <div class="share-footer">
+                <div class="share-list" id="shareCardList"></div> 
+                <div class="share-footer">
                     <div>Generated by 刷卡回饋管家</div>
                 </div>
             </div>
 
             <div style="background:white; border-radius:20px; padding:15px; width:100%; box-sizing:border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-top:10px;">
-                
                 <div style="text-align:center; font-size:12px; color:#333; margin-bottom:12px; font-weight:700;">✨ 請選擇分享方式</div>
-                
                 <div class="social-btn-grid">
                     <button class="social-btn instagram" onclick="shareToIG()">📸 Instagram</button>
                     <button class="social-btn facebook" onclick="shareToFB()">📘 Facebook</button>
-                    
                     <button class="social-btn threads" onclick="shareToThreads()">🧵 Threads</button>
                     <button class="social-btn line" onclick="shareToLine()">🟢 LINE</button>
-                    
                     <button class="social-btn download" onclick="downloadShareImage()">📥 僅保存圖片</button>
                 </div>
-                
                 <div style="text-align:center; font-size:10px; color:#999; margin-top:10px; line-height:1.4;">
                     (FB/IG 為傳圖模式；LINE/Threads 為連結模式)
                 </div>
@@ -312,7 +218,6 @@
                 
                 <div id="pigRichOptions">
                     <div class="option-row read-only"><label id="labelBaseRate">🔰 基本回饋 1% (無上限)</label><input type="checkbox" checked disabled></div>
-                    
                     <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0;">
                          <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
                             <label for="checkBonus10">⚡ 新戶加碼 +10% (限刷$8,000)</label>
@@ -333,20 +238,31 @@
                         </div>
                         <button onclick="togglePigRichSelected()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看精選通路</button>
                         <div id="pigRichSelectedDetails" class="details-content">
-                            <b>(1) 旅遊交通：</b><br>日本PayPay(限街口)、韓國、Klook、KKday、易遊網、Agoda、Airbnb、DJB、酷遊卡、高鐵、Uber、叫車吧、台灣快綫、聯通、USPACE、俥亭停車<br>
-                            <b>(2) 生活購物：</b><br>新光三越、遠東百貨、遠東巨城、LaLaport、三井Outlet、康是美、美廉社、聖德科斯<br>
-                            <b>(3) 外送美食：</b><br>Uber Eats、foodpanda、Foodomo、EZTABLE、85度C、清心福全、三商餐飲<br>
-                            <b>(4) 影城K歌：</b><br>威秀、國賓、新光、喜樂時代、秀泰、錢櫃、好樂迪、享溫馨、凱悅、星聚點、Sing Go、ONCOR
+                            <b>(1) 旅遊交通 (2) 生活購物 (3) 外送美食 (4) 影城K歌</b>
                         </div>
                     </div>
-
                     <div class="option-row" style="margin-bottom:0; border-top:1px dashed #ddd; padding-top:6px;"><label for="checkIsBill">🧾 APP繳費 (底1%→0.15%)</label><input type="checkbox" id="checkIsBill" onchange="toggleBillLogic()"></div>
                 </div>
 
                 <div id="greenCardOptions">
-                    <div class="option-row read-only"><label>🔰 國內 1% / 國外 2%</label><input type="checkbox" checked disabled></div>
-                    <div class="option-row" style="margin-bottom:0;"><label for="checkGreenChannel">🌿 綠色通路 +10% (限刷$2,500)</label><input type="checkbox" id="checkGreenChannel" onchange="toggleGreenLogic()"></div>
-                    <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;"><label for="checkForeign">✈️ 國外消費 2% (無上限)</label><input type="checkbox" id="checkForeign" onchange="toggleForeignLogic()"></div>
+                    <div class="option-row read-only"><label>🔰 國內基本 1% (無上限)</label><input type="checkbox" checked disabled></div>
+                    <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0; border-top:1px dashed #ddd; padding-top:6px;">
+                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                            <label for="checkGreenChannel">🌿 綠色通路加碼 +5% (限刷$3,000)</label>
+                            <input type="checkbox" id="checkGreenChannel" onchange="toggleGreenLogic()">
+                        </div>
+                        <button onclick="toggleGreenDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看綠色通路清單</button>
+                        <div id="greenDetails" class="details-content">
+                            <b>★ 電動汽/機車：</b><br>全國特急電、EVALUE、EVOASIS、TESLA充電、Gogoro電池資費、eMoving電池資費<br>
+                            <b>★ 共享交通：</b><br>iRent、GoShare、WeMo Scooter<br>
+                            <b>★ 生機選品：</b><br>里仁、聖德科斯、AESOP、10/10 HOPE<br>
+                            <b>★ 綠色捐贈：</b><br>中華民國荒野保護協會、台灣千里步道協會、看見齊柏林基金會、主婦聯盟環境保護基金會
+                        </div>
+                    </div>
+                    <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;">
+                        <label for="checkForeign">✈️ 國外消費 2% (基本1%+加碼1%)</label>
+                        <input type="checkbox" id="checkForeign" onchange="toggleForeignLogic()">
+                    </div>
                 </div>
                 
                 <div id="uniOptions">
@@ -533,7 +449,7 @@
                 </div>
 
                 <div id="sinopacMitsuiOptions">
-                     <div class="option-row read-only"><label id="labelMitsuiBase">🔰 一般消費 0.3% (館外/國外)</label><input type="checkbox" checked disabled></div>
+                    <div class="option-row read-only"><label id="labelMitsuiBase">🔰 一般消費 0.3% (館外/國外)</label><input type="checkbox" checked disabled></div>
                     
                     <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px; display:flex; flex-direction:column; align-items:flex-start;">
                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
@@ -580,7 +496,7 @@
             <button class="btn btn-confirm" style="width:100%; margin-top:20px;" onclick="document.getElementById('manageModal').style.display='none'">完成</button>
         </div>
     </div>
-  <script>
+    <script>
     // 自動注入遠東樂家+卡完整通路 (防呆保險)
     function injectHappyDetails() {
         const petDiv = document.getElementById('happyPetDetails');
@@ -593,7 +509,27 @@
         }
     }
 
-    // --- 曬戰績功能核心邏輯 (V123.99 混合分流版) ---
+    // --- 聯邦綠卡專用介面邏輯 (新增折疊功能) ---
+    function toggleGreenDetails() {
+        const el = document.getElementById('greenDetails');
+        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function toggleGreenLogic() {
+        if(document.getElementById('checkGreenChannel').checked) {
+            document.getElementById('checkForeign').checked = false; // 綠色與國外不併行
+        }
+        updateRewardPreview();
+    }
+
+    function toggleForeignLogic() {
+        if(document.getElementById('checkForeign').checked) {
+            document.getElementById('checkGreenChannel').checked = false;
+        }
+        updateRewardPreview();
+    }
+
+    // --- 曬戰績功能核心邏輯 ---
     function openShareModal() {
         const totalAmount = document.getElementById('totalRewardDisplay').innerText;
         const date = new Date();
@@ -603,7 +539,7 @@
         document.getElementById('shareCardMonth').innerText = `${month} 月回饋戰績`;
         document.getElementById('shareCardAmount').innerText = totalAmount;
         
-        // 2. 找出所有回饋 > 0 的卡片 (全列出)
+        // 2. 找出所有回饋 > 0 的卡片
         let cardRewards = [];
         cards.forEach(card => {
             if(card.type === 'placeholder') return;
@@ -636,15 +572,15 @@
         document.getElementById('sharePreviewModal').style.display = 'flex';
     }
 
-    // --- 分流邏輯開始 ---
+    // --- 分流邏輯 (修正 FB 為傳圖模式) ---
 
-    // 1. 視覺組：FB / IG (走原生傳圖，最快，但可能沒文字)
+    // 1. 視覺組：FB / IG (走原生傳圖，解決 FB 沒有戰績卡的問題)
     function shareToIG() {
         shareImageNative();
     }
 
     function shareToFB() {
-        shareImageNative();
+        shareImageNative(); // 改回原生分享圖片
     }
 
     // 2. 文字組：LINE / Threads (走連結分享，保留完整文案)
@@ -658,7 +594,7 @@
         window.open(`https://www.threads.net/intent/post?text=${encodeURIComponent(text)}`, '_blank');
     }
 
-    // 共用函式：原生圖片分享 (FB/IG 用)
+    // 共用函式：原生圖片分享
     function shareImageNative() {
         const node = document.getElementById('captureNode');
         const originalTransform = node.style.transform;
@@ -721,7 +657,7 @@
         return `💰 狂！本月回饋 ${totalAmount}！\n快來試算 👉 https://shawn2026-oss.github.io/shawn-2026-creditcard/`;
     }
 
-    // --- 結束 曬戰績功能 ---
+    // --- 核心資料庫與邏輯 ---
 
     fetch('config.json?t=' + Date.now()).then(response => response.json()).then(data => { if(data.news) document.getElementById('news-text').innerHTML = data.news; }).catch(error => {});
     let cardSettings = JSON.parse(localStorage.getItem('cardSettings')) || {};
@@ -809,7 +745,9 @@
         closeModal();
     });
 
-    // 核心資料庫 (更新：幣倍卡與樂家卡邏輯文字)
+    // 核心資料庫 (c2 已在 HTML Part 2 中使用新文字，此處為 ID 參照)
+    // 注意：此處僅用於 calculateStats 讀取預設值，實際文字渲染已在 HTML Modal 寫死
+    // 但為了一致性，我們不更動 defaultCards 的結構，確保相容性
     const defaultCards = [
         { 
             id: 'c10', name: '中信 UniOpen 卡', nickname: '2026 統一集團神卡', 
@@ -835,7 +773,14 @@
             gradient: 'linear-gradient(135deg, #ffe259 0%, #ffa751 100%)', textColor: '#333', msgDanger: '已封頂 (變0.5%)', 
             parking: `🎯 <b>低消任務</b>：當月累積滿 <b>$3,000</b> 才享加碼<br><br>🛍️ <b>生活升級 5%</b> (限刷$6,666)<br>行動支付/外送/餐廳/購物<br><br>✈️ <b>旅遊加碼 5%</b> (限刷$11,111)<br>海外/航空/旅行社/高鐵`
         },
-        { id: 'c2', name: '聯邦綠卡', nickname: '免費市區停車', note: '國內1% / 國外2% / 綠色6% (低消$12000)', rule: '', type: 'floor', target: 12000, tier1Rate: 0.02, tier2Rate: 0.02, gradient: 'linear-gradient(135deg, #20B2AA 0%, #008B8B 100%)', textColor: 'white', msgSuccess: '已達標 (免停)', parking: `🅿️ <b>免費停車：</b>需上月刷滿1.2萬`},
+        // 聯邦綠卡：更新 Note 與 Limit 
+        { 
+            id: 'c2', name: '聯邦綠卡', nickname: '綠色通路 +5%', 
+            note: '國內1% / 國外2% / 綠色6% (限刷$3000)', 
+            rule: '', type: 'ceiling', limit: 3000, tier1Rate: 0.06, tier2Rate: 0.01, 
+            gradient: 'linear-gradient(135deg, #20B2AA 0%, #008B8B 100%)', textColor: 'white', msgDanger: '加碼已封頂 (變1%)', 
+            parking: `🌿 <b>綠色通路</b><br>加碼 5% (上限150元)<br>等於刷 3,000 元封頂`
+        },
         { id: 'c7', name: '玉山 UNI 卡', nickname: '行支/百貨優等生', note: '任意3.5% / UP 4.5% (刷 4~14萬 封頂)', type: 'ceiling', limit: 40000, tier1Rate: 0.035, tier2Rate: 0.01, gradient: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)', 
           parking: `🔥 <b>任意選 3.5%</b> (限刷$4萬)<br>🆙 <b>UP 選 4.5%</b> (限刷$14萬)<br>🏬 <b>統一時代 +3%</b> (限刷$1.6萬)`},
         { 
@@ -1172,7 +1117,8 @@
         let isRichartOverseas = richartMode === 'overseas';
 
         let isBonus10 = document.getElementById('checkBonus10') ? document.getElementById('checkBonus10').checked : false;
-        let isBonus25 = document.getElementById('checkBonus25') ? document.getElementById('checkBonus25').checked : false;
+        let isBonus25 = document.getElementById('checkBonus25') ?
+        document.getElementById('checkBonus25').checked : false;
         let isBill = document.getElementById('checkIsBill') ? document.getElementById('checkIsBill').checked : false;
         
         let isFubonJJapan = document.getElementById('checkFubonJJapan') ? document.getElementById('checkFubonJJapan').checked : false;
@@ -1265,6 +1211,7 @@
         end.setHours(23, 59, 59, 999);
         return { start, end, isCustom: true };
     }
+    
     function calculateStats(cardId, addedAmount = 0, addedIsGreen = false, addedIsForeign = false, addedIsUniBonus = false, addedIsUniUp = false, addedIsHappyPet = false, addedIsHappyLife = false, addedIsHappyForeign = false, addedIsHappyPeace = false, addedIsHsbcForeign = false, addedIsUniGroup = false, addedIsUniIcash = false, addedIsUniOverseas = false, addedIsRichartPay = false, addedIsRichartOnline = false, addedIsRichartLine = false, addedIsRichartOverseas = false, addedIsBonus10 = false, addedIsBonus25 = false, addedIsBill = false, 
         addedIsFubonJJapan = false, addedIsFubonJPhysical = false, addedIsFubonJDomesticBonus = false, 
         addedIsJiheJapan = 
@@ -1284,6 +1231,28 @@
         let totalSpend = relevantTx.reduce((sum, t) => sum + parseFloat(t.amount), 0);
         totalSpend += addedAmount;
         let reward = 0;
+        
+        // 修正後的 c2 綠卡邏輯：1% + 5% (上限150 -> 3000 spend) + 國外1% (共2%)
+        if (cardId === 'c2') {
+            let baseReward = totalSpend * 0.01; 
+            const greenSpend = relevantTx.filter(t => t.isGreen).reduce((sum, t) => sum + t.amount, 0) + (addedIsGreen ? addedAmount : 0);
+            const foreignSpend = relevantTx.filter(t => t.isForeign).reduce((sum, t) => sum + t.amount, 0) + (addedIsForeign ? addedAmount : 0);
+            
+            // 綠色通路加碼 5% (上限 150 元，即 3000 元)
+            const bonusGreen = Math.min(greenSpend, 3000) * 0.05;
+            // 國外加碼 1% (合計 2%)
+            const bonusForeign = foreignSpend * 0.01;
+            
+            reward = baseReward + bonusGreen + bonusForeign;
+            
+            let displayRate = "1.0";
+            if(addedIsGreen) displayRate = "6.0";
+            else if(addedIsForeign) displayRate = "2.0";
+            
+            // validSpend 回傳 greenSpend 供進度條使用
+            return { spend: totalSpend, validSpend: greenSpend, reward: Math.round(reward), rate: displayRate, isCustom, cycleStart, cycleEnd };
+        }
+
         if (cardId === 'j1') {
             const txList = [...relevantTx];
             if (addedAmount > 0) txList.push({ amount: addedAmount, isFubonJJapan: addedIsFubonJJapan, isFubonJPhysical: addedIsFubonJPhysical, isFubonJDomesticBonus: addedIsFubonJDomesticBonus });
@@ -1422,7 +1391,6 @@
                 const peaceSpend = relevantTx.filter(t => t.isHappyPeace).reduce((sum, t) => sum + t.amount, 0) + (addedIsHappyPeace ? addedAmount : 0);
                 const foreignSpend = relevantTx.filter(t => t.isHappyForeign).reduce((sum, t) => sum + t.amount, 0) + (addedIsHappyForeign ? addedAmount : 0);
                 const bonusPet = Math.min(petSpend, 5263) * 0.095;
-                // 修正：生活/安心刷 3.5% (上限$5714)
                 const bonusLife = Math.min(lifeSpend, 5714) * 0.035;
                 const bonusPeace = Math.min(peaceSpend, 5714) * 0.035;
                 const bonusForeign = foreignSpend * 0.02;
@@ -1433,21 +1401,6 @@
                 else if (addedIsHappyLife || addedIsHappyPeace) displayRate = "4.0";
                 else if (addedIsHappyForeign) displayRate = "2.5";
                 return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: displayRate, isCustom, cycleStart, cycleEnd };
-            }
-        }
-        
-        if (cardId === 'c2') {
-            if (totalSpend < 12000) {
-                reward = totalSpend * 0.01;
-                return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "1.0", isCustom, cycleStart, cycleEnd };
-            } else {
-                let baseReward = totalSpend * 0.01;
-                const greenSpend = relevantTx.filter(t => t.isGreen).reduce((sum, t) => sum + t.amount, 0) + (addedIsGreen ? addedAmount : 0);
-                const foreignSpend = relevantTx.filter(t => t.isForeign).reduce((sum, t) => sum + t.amount, 0) + (addedIsForeign ? addedAmount : 0);
-                const bonusGreen = Math.min(greenSpend, 2500) * 0.05;
-                const bonusForeign = foreignSpend * 0.01;
-                reward = baseReward + bonusGreen + bonusForeign;
-                return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "6.0", isCustom, cycleStart, cycleEnd };
             }
         }
         
@@ -1475,7 +1428,6 @@
         if (cardId === 'c6') {
             const bonus10TxSpend = relevantTx.filter(t => t.isBonus10).reduce((sum, t) => sum + t.amount, 0) + (addedIsBonus10 ? addedAmount : 0);
             const bonus10Reward = Math.min(bonus10TxSpend, 8000) * 0.10;
-            // 修正：精選通路 2.5% (上限40萬)
             const bonus25TxSpend = relevantTx.filter(t => t.isBonus25).reduce((sum, t) => sum + t.amount, 0) + (addedIsBonus25 ? addedAmount : 0);
             const selectedReward = Math.min(bonus25TxSpend, 400000) * 0.025;
             
@@ -1483,7 +1435,6 @@
             if (addedAmount > 0) baseReward += addedAmount * (addedIsBill ? 0.0015 : 0.01);
             
             reward = baseReward + selectedReward + bonus10Reward;
-            
             let currentRate = 13.5;
             if (totalSpend > 0) currentRate = (reward / totalSpend) * 100;
             return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: currentRate.toFixed(1), isCustom, cycleStart, cycleEnd };
@@ -1492,7 +1443,6 @@
         if (cardId === 'c10') {
             const currentOverseasSpend = relevantTx.filter(t => t.isUniOverseas).reduce((sum, t) => sum + t.amount, 0) + (addedIsUniOverseas ? addedAmount : 0);
             const overseasReward = (currentOverseasSpend * 0.03) + Math.min(currentOverseasSpend, 6250) * 0.08;
-            
             const icashSpend = relevantTx.filter(t => t.isUniIcash && !t.isUniOverseas).reduce((sum, t) => sum + t.amount, 0) + (addedIsUniIcash && !addedIsUniOverseas ? addedAmount : 0);
             const icashReward = Math.min(icashSpend, 3750) * 0.04;
             
@@ -1510,7 +1460,6 @@
             else if (count === 3) taskRate = 0.02;
             else if (count === 2) taskRate = 0.01;
             const taskBonus = Math.min(currentGroupSpend, 12500) * taskRate;
-            
             const domesticSpend = totalSpend - currentOverseasSpend;
             const baseDomesticReward = domesticSpend * 0.01;
             reward = overseasReward + baseDomesticReward + groupBonus + taskBonus + icashReward;
@@ -1553,8 +1502,7 @@
             if (addedAmount > 0) { const currentRate = addedIsHsbcForeign ? rateForeign : rateDomestic; totalMiles += Math.floor(addedAmount / currentRate);
             }
             reward = totalMiles - redeemedMiles;
-            // 修正：calculateStats 僅計算本期，此處計算供 grid 使用
-            let cycleReward = 0; // 暫時變數
+            let cycleReward = 0;
             const { start, end } = getBillingCycle(cardId);
             const cycleTx = transactions.filter(t => {
                 const tDate = new Date(t.date);
@@ -1565,7 +1513,8 @@
                  cycleReward += Math.floor(tx.amount / rate);
             });
             if(addedAmount > 0) {
-                 const currentRate = addedIsHsbcForeign ? rateForeign : rateDomestic;
+                 const currentRate = addedIsHsbcForeign ?
+                 rateForeign : rateDomestic;
                  cycleReward += Math.floor(addedAmount / currentRate);
             }
             return { spend: totalSpend, validSpend: totalSpend, reward: cycleReward, rate: (totalSpend>0?(totalSpend/totalMiles).toFixed(1):0), isCustom, cycleStart, cycleEnd };
@@ -1705,13 +1654,12 @@
                 : '滙豐旅人御璽卡';
                 card.note = (tier === 'infinite') ? '國內18/國外10 (哩)' : '國內18/國外15 (哩)';
                 
-                // 主畫面顯示總哩程
-                let totalMiles = parseInt(localStorage.getItem('hsbc_initial_miles') || 0);
+                let totalMiles = parseInt(localStorage.getItem('hsbc_initial_miles') ||
+                0);
                 let redeemedMiles = parseInt(localStorage.getItem('hsbc_redeemed_miles') || 0);
                 const allHistoryTx = transactions.filter(t => t.cardId === 'c9');
                 const rateDomestic = (tier === 'infinite') ? 18 : 18;
                 const rateForeign = (tier === 'infinite') ? 10 : 15;
-                
                 allHistoryTx.forEach(tx => { 
                     const rate = tx.isHsbcForeign ? rateForeign : rateDomestic; 
                     totalMiles += Math.floor(tx.amount / rate); 
@@ -1781,7 +1729,7 @@
             tile.onclick = () => card.type === 'placeholder' ? openManageModal() : openQuickAdd(card.id);
             let earnedText = `+$${stats.reward.toLocaleString()}`;
             if (card.id === 'c9') {
-                earnedText = `+${stats.reward.toLocaleString()} 哩`; // 主畫面 tile 仍顯示本月獲得
+                earnedText = `+${stats.reward.toLocaleString()} 哩`;
             }
             if (card.id === 'c11') displayRate = '3.8%';
             let cycleHint = '';
@@ -1999,7 +1947,8 @@
             noteText = '🐶 ' 
             + noteText; if (tx.isHappyPeace) noteText = '🍽️ ' + noteText; if (tx.isHappyLife) noteText = '🛒 ' + noteText; if (tx.isHappyForeign) noteText = '✈️ ' + noteText; if (tx.isHsbcForeign) noteText = '✈️ ' + noteText;
             if (tx.isUniGroup) noteText = '🏪 ' + noteText; if (tx.isUniIcash) noteText = '📱 ' + noteText; if (tx.isUniOverseas) noteText = '✈️ ' + noteText;
-            if (tx.isRichartPay) noteText = '📱 ' + noteText; if (tx.isRichartOnline) noteText = '🛍️ ' + noteText; if (tx.isRichartLine) noteText = 
+            if (tx.isRichartPay) noteText = '📱 ' + noteText; 
+            if (tx.isRichartOnline) noteText = '🛍️ ' + noteText; if (tx.isRichartLine) noteText = 
             '🟢 ' + noteText; if (tx.isRichartOverseas) noteText = '✈️ ' + noteText;
             if (tx.isBill) noteText = '🧾 ' + noteText;
             if (tx.isBonus25) noteText = '🌟 ' + noteText; if (tx.isBonus10) noteText = '⚡ ' + noteText;

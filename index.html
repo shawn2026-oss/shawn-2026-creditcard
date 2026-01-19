@@ -188,14 +188,14 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V124.05</div>
+            <div class="version-tag">V124.08</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
             <div class="subtitle"><span class="today-date" id="dateDisplay"></span></div>
         </div>
         <div class="news-ticker">
-             <div class="ticker-content" id="news-text">🎉 歡迎使用刷卡回饋管家！富邦J卡/聯邦綠卡 2026 最新權益已更新。</div>
+             <div class="ticker-content" id="news-text">🎉 歡迎使用刷卡回饋管家！吉鶴卡/富邦J卡 2026 最新權益已更新。</div>
         </div>
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
         <div class="total-reward-card">
@@ -482,9 +482,22 @@
                 <div id="jiheOptions">
                     <div class="option-row read-only"><label id="labelJiheBase">🔰 國內消費 1% (無上限)</label><input type="checkbox" checked disabled></div>
                     <div class="option-row"><label for="checkJiheJapan">🇯🇵 切換為日本消費 (2.5%)</label><input type="checkbox" id="checkJiheJapan" onchange="toggleJiheLogic()"></div>
+                    
                     <div class="option-row" id="rowJiheApple" style="border-top:1px dashed #ddd; padding-top:6px;"><label for="checkJiheApple">🍎 Apple Pay +1.5% (刷$4萬封頂)</label><input type="checkbox" id="checkJiheApple" onchange="updateRewardPreview()"></div>
-                    <div class="option-row" id="rowJiheDomesticJapanese" style="border-top:1px dashed #ddd; padding-top:6px;"><label for="checkJiheDomesticJapanese">🇹🇼 國內日系 +4% (刷$1.25萬封頂)</label><input type="checkbox" id="checkJiheDomesticJapanese" onchange="updateRewardPreview()"></div>
+                    
+                    <div class="option-row" id="rowJiheDomesticJapanese" style="border-top:1px dashed #ddd; padding-top:6px; flex-direction:column; align-items:flex-start;">
+                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                             <label for="checkJiheDomesticJapanese">🇹🇼 國內日系名店 +4% (刷$1.25萬封頂)</label>
+                             <input type="checkbox" id="checkJiheDomesticJapanese" onchange="updateRewardPreview()">
+                        </div>
+                        <button onclick="toggleJiheDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看指定通路</button>
+                        <div id="jiheDetails" class="details-content">
+                            <b>(1) 服飾：</b><br>UNIQLO、GU、思夢樂、GLOBAL WORK、niko and …、LOWRYS FARM、LAKOLE、studio CLIP、repipi armario、HARE、Heather、PAGEBOY、RAGEBLUE、LEPSIM、JEANASIS<br>
+                            <b>(2) 生活/藥妝：</b><br>DAISO大創、Standard Products、THREEPPY、日藥本舖、松本清、Tomod's、札幌藥妝、TSUTAYA BOOKSTORE、HANDS台隆手創館、宜得利家居
+                        </div>
+                    </div>
                 </div>
+                
                 <div id="kumamonOptions">
                     <div class="option-row read-only"><label id="labelKumamonBase">🔰 國內消費 1% (無上限)</label><input type="checkbox" checked disabled></div>
                     <div class="option-row"><label for="checkKumamonJapan">🇯🇵 切換為日本消費 (2%)</label><input type="checkbox" id="checkKumamonJapan" onchange="toggleKumamonLogic()"></div>
@@ -594,6 +607,12 @@
     // 切換停車名單詳情折疊
     function toggleParkingDetails() {
         const el = document.getElementById('greenParkingDetails');
+        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
+    
+    // 切換吉鶴卡日系名店詳情折疊
+    function toggleJiheDetails() {
+        const el = document.getElementById('jiheDetails');
         el.style.display = (el.style.display === 'block') ? 'none' : 'block';
     }
 
@@ -774,7 +793,7 @@
 
     window.addEventListener('popstate', function(event) { closeModal(); });
 
-    // 核心資料庫 (V124.05: 全面優化封頂文案與綠卡定位)
+    // 核心資料庫 (V124.08: J2 修正, 全卡刷額封頂文案)
     const defaultCards = [
         { 
             id: 'c10', name: '中信 UniOpen 卡', nickname: '2026 統一集團神卡', 
@@ -830,10 +849,10 @@
         },
         { 
             id: 'j2', name: '聯邦吉鶴卡', nickname: '日本/ApplePay專武', 
-            note: '日本 AP 4% (刷 4萬封頂)', 
+            note: '日本 AP 4% (刷 4萬封頂) | 國內日系 5%', 
             type: 'ceiling', limit: 40000, tier1Rate: 0.04, tier2Rate: 0.025, 
             gradient: 'linear-gradient(135deg, #DC143C 0%, #FFFFFF 150%)', textColor: 'white', msgDanger: '加碼已封頂 (變2.5%)', 
-            parking: `🍎 <b>日本 QUICPay (Apple Pay)</b><br>日本 2.5% + 加碼 1.5% = 4%<br>⚠️ 加碼上限 $600/月 (約刷$4萬)`
+            parking: `🍎 <b>日本 QUICPay (Apple Pay)</b><br>日本 2.5% + 加碼 1.5% = 4%<br>⚠️ 加碼上限 $600/月 (約刷$4萬)<br>🇹🇼 <b>國內日系名店 5%</b><br>國內 1% + 加碼 4% (刷$1.25萬封頂)`
         },
         { 
             id: 'j3', name: '玉山熊本熊卡', nickname: '藥妝/Suica 神卡', 
@@ -963,10 +982,10 @@
         const isUp = document.getElementById('checkUniUp').checked;
         const label = document.getElementById('labelUniBase');
         if (isUp) {
-            label.innerHTML = "🆙 <b>UP 選 4.5%</b> (上限14萬)";
+            label.innerHTML = "🆙 <b>UP 選 4.5%</b> (刷$14萬封頂)";
             label.parentNode.style.background = "#fff3e0"; 
         } else {
-            label.innerHTML = "🔰 <b>任意選 3.5%</b> (上限4萬)";
+            label.innerHTML = "🔰 <b>任意選 3.5%</b> (刷$4萬封頂)";
             label.parentNode.style.background = "transparent";
         }
         updateRewardPreview();
@@ -1265,17 +1284,32 @@
         if (cardId === 'j2') {
             const txList = [...relevantTx];
             if (addedAmount > 0) txList.push({ amount: addedAmount, isJiheJapan: addedIsJiheJapan, isJiheApple: addedIsJiheApple, isJiheDomesticJapanese: addedIsJiheDomesticJapanese });
-            reward = txList.reduce((sum, t) => {
-                if (t.isJiheJapan) return sum + (t.amount * 0.025);
-                else return sum + (t.amount * 0.01);
-            }, 0);
+            
+            // 基礎回饋 (日2.5 / 國1)
+            let baseReward = 0;
+            txList.forEach(t => {
+                if (t.isJiheJapan) baseReward += t.amount * 0.025;
+                else baseReward += t.amount * 0.01;
+            });
+
+            // Apple Pay 加碼 (日本模式)
             const appleSpend = relevantTx.filter(t => t.isJiheApple).reduce((sum, t) => sum + t.amount, 0) + (addedIsJiheApple ? addedAmount : 0);
             const bonusApple = Math.min(appleSpend, 40000) * 0.015;
-            reward += bonusApple;
+
+            // 國內日系名店 加碼 (國內模式)
             const domesticJpSpend = relevantTx.filter(t => t.isJiheDomesticJapanese).reduce((sum, t) => sum + t.amount, 0) + (addedIsJiheDomesticJapanese ? addedAmount : 0);
             const bonusDom = Math.min(domesticJpSpend, 12500) * 0.04;
-            reward += bonusDom;
-            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "4.5", isCustom, cycleStart, cycleEnd };
+
+            reward = baseReward + bonusApple + bonusDom;
+            
+            let displayRate = "1.0";
+            if (addedIsJiheJapan) {
+                displayRate = "2.5";
+                if(addedIsJiheApple) displayRate = "4.0";
+            } else {
+                if(addedIsJiheDomesticJapanese) displayRate = "5.0";
+            }
+            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: displayRate, isCustom, cycleStart, cycleEnd };
         }
 
         if (cardId === 'j3') {
@@ -1691,7 +1725,7 @@
             if (card.id === 'c10') displayRate = '11.0%';
             if (card.id === 'c11') displayRate = '3.8%';
             if (card.id === 'j1') displayRate = '10.0%';
-            if (card.id === 'j2') displayRate = '4.5%';
+            if (card.id === 'j2') displayRate = '4.0%'; // J2 修正
             if (card.id === 'j3') displayRate = '8.5%';
             if (card.id === 'j4') displayRate = '6.0%';
             if (card.id === 'j5') displayRate = '7.3%';

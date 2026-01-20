@@ -311,23 +311,28 @@
             // 修正：完整偵測常見 App 內瀏覽器 (含 Threads)
             var isInApp = ua.indexOf('line') > -1 || 
                           ua.indexOf('fban') > -1 || 
+                          ua.indexOf('fbav') > -1 || 
                           ua.indexOf('instagram') > -1 || 
-                          ua.indexOf('threads') > -1; // 關鍵修正
+                          ua.indexOf('threads') > -1;
                           
+            // 嚴格 Safari 偵測：排除 Chrome (crios) 和 App 內瀏覽器
+            var isChrome = ua.indexOf('crios') > -1;
+            var isRealSafari = isIOS && ua.indexOf('safari') > -1 && !isChrome && !isInApp;
+            
             var isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
 
-            // 1. App 內瀏覽器偵測 -> 顯示頂部黃條
+            // 1. App 內瀏覽器偵測 -> 顯示頂部黃條 (專業文案)
             if (isInApp) {
                 var tipBar = document.getElementById('line-tip-bar');
                 var tipText = document.getElementById('line-tip-text');
                 
                 if(tipBar && tipText) {
                     if (isIOS) {
-                        // iPhone: 建議 Safari，使用「角落點點點」
-                        tipText.innerHTML = '⚠️ 內建瀏覽器無法存檔，請點擊<strong>角落點點點</strong>，選擇<strong>「在 Safari 開啟」</strong>';
+                        // iPhone: 建議 Safari
+                        tipText.innerHTML = '⚠️ 內建瀏覽器無法存檔，請點擊角落選單「...」，選擇<strong>「在 Safari 開啟」</strong>';
                     } else {
                         // Android: 建議 Chrome
-                        tipText.innerHTML = '⚠️ 內建瀏覽器無法存檔，請點擊<strong>角落點點點</strong>，選擇<strong>「在 Chrome 開啟」</strong>';
+                        tipText.innerHTML = '⚠️ 內建瀏覽器無法存檔，請點擊角落選單「...」，選擇<strong>「在 Chrome 開啟」</strong>';
                     }
                     
                     tipBar.style.display = 'flex';
@@ -335,9 +340,8 @@
                     if(appContainer) appContainer.style.marginTop = '45px';
                 }
             }
-            // 2. iOS Safari 偵測 -> 顯示底部氣泡
-            // 只有在 iOS 且 不是 App 內 且 不是已安裝模式 才顯示
-            else if (isIOS && !isStandalone) {
+            // 2. iOS Safari 偵測 (嚴格版，排除 Threads) -> 顯示底部氣泡
+            else if (isRealSafari && !isStandalone) {
                 setTimeout(function() {
                     var bubble = document.getElementById('safari-install-bubble');
                     if(bubble) bubble.style.display = 'block';
@@ -380,7 +384,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V124.21(Fix)</div>
+            <div class="version-tag">V124.23(Fix)</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -960,7 +964,7 @@
             btns.forEach(b => b.style.opacity = '1'); 
             
             canvas.toBlob(async (blob) => {
-                // 檔名設定：全英文
+                // [修正] 檔名改為全英文
                 const file = new File([blob], `Reward_Report_${Date.now()}.png`, { type: "image/png" });
         
                 if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -983,7 +987,7 @@
         html2canvas(node, { backgroundColor: null, scale: 2 }).then(canvas => {
             node.style.transform = originalTransform; 
             const link = document.createElement('a');
-            // 檔名設定：全英文
+            // [修正] 檔名改為全英文
             link.download = `Reward_Report_${new Date().getTime()}.png`;
             link.href = canvas.toDataURL();
             link.click();

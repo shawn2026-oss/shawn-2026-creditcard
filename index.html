@@ -243,14 +243,14 @@
         }
         #line-tip-bar button { background: none; border: none; font-size: 16px; color: #856404; cursor: pointer; padding: 0 5px; }
 
-        /* Safari 安裝氣泡 (修正為右下角) */
+        /* Safari 安裝氣泡 (極右下角修正版) */
         #safari-install-bubble {
             position: fixed; 
-            /* 靠右下角 */
-            bottom: calc(40px + env(safe-area-inset-bottom)); 
-            right: 15px;
-            left: auto; /* 取消置中 */
-            transform: none; /* 取消置中 */
+            /* 緊貼底部安全區，僅留 5px 間隙，確保最靠近按鈕 */
+            bottom: calc(5px + env(safe-area-inset-bottom)); 
+            right: 10px; /* 靠右 */
+            left: auto; 
+            transform: none; 
             z-index: 10000; animation: bounce 2s infinite;
             cursor: pointer;
         }
@@ -263,9 +263,9 @@
         /* 箭頭指向右邊 */
         .bubble-arrow {
             position: absolute; bottom: -8px; 
-            right: 20px; /* 箭頭靠右 */
-            left: auto; /* 取消置中 */
-            transform: none; /* 取消置中 */
+            right: 20px; /* 箭頭靠右對齊按鈕 */
+            left: auto;
+            transform: none;
             width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid #007AFF;
         }
         .bubble-close {
@@ -360,7 +360,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V124.14(RightBubble)</div>
+            <div class="version-tag">V124.15(RightBubble)</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>

@@ -233,7 +233,7 @@
         /* 共用：隱藏預設 */
         #line-tip-bar, #safari-install-bubble, #android-install-bar { display: none; }
 
-        /* LINE 提示條 */
+        /* LINE/FB/Threads 提示條 */
         #line-tip-bar {
             background: #FFF9C4; color: #856404;
             padding: 12px 15px; font-size: 13px; font-weight: 600;
@@ -245,7 +245,7 @@
         #line-tip-bar strong { color: #d32f2f; text-decoration: underline; }
         #line-tip-bar button { background: none; border: none; font-size: 18px; color: #856404; cursor: pointer; padding: 0 0 0 10px; flex-shrink: 0; }
 
-        /* Safari 安裝氣泡 (客製化版) */
+        /* Safari 安裝氣泡 (極右下角 + 客製化版) */
         #safari-install-bubble {
             position: fixed; 
             /* 緊貼底部安全區，僅留 5px 間隙 */
@@ -259,7 +259,7 @@
         .bubble-content {
             background: #007AFF; color: white; padding: 10px 16px; border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,122,255,0.4); position: relative; text-align: center; 
-            min-width: 240px; /* 加寬以容納您的長文案 */
+            min-width: 260px; /* 加寬以容納長文案 */
         }
         .bubble-text { font-size: 13px; line-height: 1.4; display: block; pointer-events: none; font-weight: 600; } 
         
@@ -307,17 +307,23 @@
         (function() {
             var ua = navigator.userAgent.toLowerCase();
             var isIOS = /iphone|ipad|ipod/.test(ua);
-            var isInApp = ua.indexOf('line') > -1 || ua.indexOf('fban') > -1 || ua.indexOf('instagram') > -1;
+            
+            // 修正：加入 'threads' 關鍵字偵測
+            var isInApp = ua.indexOf('line') > -1 || 
+                          ua.indexOf('fban') > -1 || 
+                          ua.indexOf('instagram') > -1 || 
+                          ua.indexOf('threads') > -1;
+                          
             var isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
 
-            // 1. LINE/FB 偵測 -> 顯示頂部黃條 (分流文案)
+            // 1. App 內瀏覽器偵測 -> 顯示頂部黃條 (分流文案)
             if (isInApp) {
                 var tipBar = document.getElementById('line-tip-bar');
                 var tipText = document.getElementById('line-tip-text');
                 
                 if(tipBar && tipText) {
                     if (isIOS) {
-                        tipText.innerHTML = '⚠️ LINE/FB 無法存檔，請點擊角落選單，選擇<strong>「在 Safari 開啟」</strong>';
+                        tipText.innerHTML = '⚠️ App 內建瀏覽器無法存檔，請點擊角落選單，選擇<strong>「在 Safari 開啟」</strong>';
                     } else {
                         tipText.innerHTML = '⚠️ 內建瀏覽器無法存檔，請點擊角落選單，選擇<strong>「在 Chrome 開啟」</strong>';
                     }
@@ -370,7 +376,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V124.17(TextFix)</div>
+            <div class="version-tag">V124.18(Final)</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>

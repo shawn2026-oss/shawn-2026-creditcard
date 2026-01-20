@@ -245,7 +245,7 @@
         #line-tip-bar strong { color: #d32f2f; text-decoration: underline; }
         #line-tip-bar button { background: none; border: none; font-size: 18px; color: #856404; cursor: pointer; padding: 0 0 0 10px; flex-shrink: 0; }
 
-        /* Safari 安裝氣泡 (極右下角 + 客製化版) */
+        /* Safari 安裝氣泡 (極右下角版) */
         #safari-install-bubble {
             position: fixed; 
             /* 緊貼底部安全區，僅留 5px 間隙 */
@@ -308,7 +308,7 @@
             var ua = navigator.userAgent.toLowerCase();
             var isIOS = /iphone|ipad|ipod/.test(ua);
             
-            // 修正：加入 'threads' 關鍵字偵測
+            // 修正：完整偵測常見 App 內瀏覽器 (含 Threads)
             var isInApp = ua.indexOf('line') > -1 || 
                           ua.indexOf('fban') > -1 || 
                           ua.indexOf('instagram') > -1 || 
@@ -316,17 +316,20 @@
                           
             var isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
 
-            // 1. App 內瀏覽器偵測 -> 顯示頂部黃條 (分流文案)
+            // 1. App 內瀏覽器偵測 -> 顯示頂部黃條 (智慧文案)
             if (isInApp) {
                 var tipBar = document.getElementById('line-tip-bar');
                 var tipText = document.getElementById('line-tip-text');
                 
                 if(tipBar && tipText) {
                     if (isIOS) {
-                        tipText.innerHTML = '⚠️ App 內建瀏覽器無法存檔，請點擊角落選單，選擇<strong>「在 Safari 開啟」</strong>';
+                        // iPhone: 建議 Safari，使用「角落選單」涵蓋右上/右下
+                        tipText.innerHTML = '⚠️ 內建瀏覽器無法存檔，請點擊<strong>角落選單</strong>，選擇<strong>「在 Safari 開啟」</strong>';
                     } else {
-                        tipText.innerHTML = '⚠️ 內建瀏覽器無法存檔，請點擊角落選單，選擇<strong>「在 Chrome 開啟」</strong>';
+                        // Android: 建議 Chrome
+                        tipText.innerHTML = '⚠️ 內建瀏覽器無法存檔，請點擊<strong>角落選單</strong>，選擇<strong>「在 Chrome 開啟」</strong>';
                     }
+                    
                     tipBar.style.display = 'flex';
                     var appContainer = document.querySelector('.app-container');
                     if(appContainer) appContainer.style.marginTop = '45px';
@@ -376,7 +379,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V124.18(Final)</div>
+            <div class="version-tag">V124.19(Final)</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>

@@ -203,13 +203,13 @@
   </head>
   <body>
     <div id="line-tip-bar">
-        <span>⚠️ LINE 瀏覽器無法存檔，建議點角落 <strong>...</strong> 切換瀏覽器開啟</span>
+        <span id="line-tip-text">⚠️ 偵測中...</span>
         <button onclick="this.parentElement.style.display='none'">✕</button>
     </div>
 
     <div id="safari-install-bubble" onclick="closeBubble()">
         <div class="bubble-content">
-            <span class="bubble-text"> <strong>請點擊右下角「...」後點「分享」再下滑加入「主畫面」👇</strong><br></span>
+            <span class="bubble-text">請點擊右下角「...」後點「分享」再下滑加入「主畫面」👇</span>
             <div class="bubble-arrow"></div>
         </div>
         <button class="bubble-close">✕</button>
@@ -236,17 +236,19 @@
         /* LINE 提示條 */
         #line-tip-bar {
             background: #FFF9C4; color: #856404;
-            padding: 10px 15px; font-size: 12px; font-weight: 600;
+            padding: 12px 15px; font-size: 13px; font-weight: 600;
             position: fixed; top: 0; left: 0; width: 100%;
             z-index: 99999; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             justify-content: space-between; align-items: center; box-sizing: border-box;
+            line-height: 1.4;
         }
-        #line-tip-bar button { background: none; border: none; font-size: 16px; color: #856404; cursor: pointer; padding: 0 5px; }
+        #line-tip-bar strong { color: #d32f2f; text-decoration: underline; }
+        #line-tip-bar button { background: none; border: none; font-size: 18px; color: #856404; cursor: pointer; padding: 0 0 0 10px; flex-shrink: 0; }
 
-        /* Safari 安裝氣泡 (極右下角修正版) */
+        /* Safari 安裝氣泡 (客製化版) */
         #safari-install-bubble {
             position: fixed; 
-            /* 緊貼底部安全區，僅留 5px 間隙，確保最靠近按鈕 */
+            /* 緊貼底部安全區，僅留 5px 間隙 */
             bottom: calc(5px + env(safe-area-inset-bottom)); 
             right: 10px; /* 靠右 */
             left: auto; 
@@ -256,11 +258,12 @@
         }
         .bubble-content {
             background: #007AFF; color: white; padding: 10px 16px; border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,122,255,0.4); position: relative; text-align: center; min-width: 160px;
+            box-shadow: 0 4px 15px rgba(0,122,255,0.4); position: relative; text-align: center; 
+            min-width: 240px; /* 加寬以容納您的長文案 */
         }
-        .bubble-text { font-size: 13px; line-height: 1.4; display: block; pointer-events: none; } 
+        .bubble-text { font-size: 13px; line-height: 1.4; display: block; pointer-events: none; font-weight: 600; } 
         
-        /* 箭頭指向右邊 */
+        /* 箭頭 */
         .bubble-arrow {
             position: absolute; bottom: -8px; 
             right: 20px; /* 箭頭靠右對齊按鈕 */
@@ -307,13 +310,20 @@
             var isInApp = ua.indexOf('line') > -1 || ua.indexOf('fban') > -1 || ua.indexOf('instagram') > -1;
             var isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
 
-            // 1. LINE/FB 偵測 -> 顯示頂部黃條
+            // 1. LINE/FB 偵測 -> 顯示頂部黃條 (分流文案)
             if (isInApp) {
                 var tipBar = document.getElementById('line-tip-bar');
-                if(tipBar) {
+                var tipText = document.getElementById('line-tip-text');
+                
+                if(tipBar && tipText) {
+                    if (isIOS) {
+                        tipText.innerHTML = '⚠️ LINE/FB 無法存檔，請點擊角落選單，選擇<strong>「在 Safari 開啟」</strong>';
+                    } else {
+                        tipText.innerHTML = '⚠️ 內建瀏覽器無法存檔，請點擊角落選單，選擇<strong>「在 Chrome 開啟」</strong>';
+                    }
                     tipBar.style.display = 'flex';
                     var appContainer = document.querySelector('.app-container');
-                    if(appContainer) appContainer.style.marginTop = '40px';
+                    if(appContainer) appContainer.style.marginTop = '45px';
                 }
             }
             // 2. iOS Safari 偵測 -> 顯示底部氣泡
@@ -360,7 +370,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V124.15(RightBubble)</div>
+            <div class="version-tag">V124.17(TextFix)</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -985,7 +995,7 @@
         const tipBar = document.getElementById('line-tip-bar');
         if (tipBar && window.getComputedStyle(tipBar).display !== 'none') {
              const container = document.querySelector('.app-container');
-             if(container) container.style.marginTop = '40px';
+             if(container) container.style.marginTop = '45px';
         }
 
         setTimeout(() => { const ticker = document.querySelector('.ticker-content'); if(ticker) { ticker.style.animation = 'none'; void ticker.offsetWidth; ticker.style.animation = 'scroll-left 15s linear infinite'; } }, 100);

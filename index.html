@@ -392,7 +392,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V124.28</div>
+            <div class="version-tag">V124.29</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -400,7 +400,7 @@
         </div>
         
         <div class="news-ticker">
-            <div class="ticker-content" id="news-text">🎉 歡迎使用刷卡回饋管家！新增永豐 JCB 現金回饋卡 (日本/特選神卡)。</div>
+            <div class="ticker-content" id="news-text">🎉 歡迎使用刷卡回饋管家！新增永豐 JCB 現金回饋卡 (旅日神卡)。</div>
         </div>
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
         <div class="total-reward-card">
@@ -822,7 +822,7 @@
                              <label for="checkSinopacJcbBonus">🇯🇵 日本 / 🛍️ 特選 +3% (刷1萬封頂)</label>
                              <input type="checkbox" id="checkSinopacJcbBonus" onchange="updateRewardPreview()">
                         </div>
-                        <button onclick="document.getElementById('sinopacJcbDetails').style.display = (document.getElementById('sinopacJcbDetails').style.display === 'block') ? 'none' : 'block'" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看通路 (網購/百貨/餐廳)</button>
+                        <button onclick="toggleSinopacJcbDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看通路 (網購/百貨/餐廳)</button>
                         <div id="sinopacJcbDetails" class="details-content">
                             <b>(1) 網購：</b><br>蝦皮、momo、PChome、Yahoo、東森、博客來...<br>
                             <b>(2) 百貨：</b><br>漢神、遠東、SOGO、101...<br>
@@ -1002,7 +1002,7 @@
             btns.forEach(b => b.style.opacity = '1'); 
             
             canvas.toBlob(async (blob) => {
-                // 檔名設定：全英文
+                // [修正] 檔名改為全英文
                 const file = new File([blob], `Reward_Report_${Date.now()}.png`, { type: "image/png" });
         
                 if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -1025,7 +1025,7 @@
         html2canvas(node, { backgroundColor: null, scale: 2 }).then(canvas => {
             node.style.transform = originalTransform; 
             const link = document.createElement('a');
-            // 檔名設定：全英文
+            // [修正] 檔名改為全英文
             link.download = `Reward_Report_${new Date().getTime()}.png`;
             link.href = canvas.toDataURL();
             link.click();
@@ -1212,7 +1212,7 @@
     }
 
     window.addEventListener('popstate', function(event) { closeModal(); });
-    // 核心資料庫 (V124.28 - 永豐JCB 加入)
+    // 核心資料庫 (V124.29 - 永豐JCB 加入)
     const defaultCards = [
         { 
             id: 'c10', name: '中信 UniOpen 卡', nickname: '2026 統一集團神卡', 
@@ -1307,8 +1307,8 @@
         },
         // [New] 永豐 JCB 現金回饋
         { 
-            id: 'c12', name: '永豐現金回饋 JCB', nickname: '日本/網購神卡', 
-            note: '特選 5% (刷 1萬封頂) | 日本 6%', 
+            id: 'c12', name: '永豐現金回饋 JCB', nickname: '旅日神卡', 
+            note: '國內特選 4% | 日本 5%~10%', 
             type: 'ceiling', limit: 10000, // 300 / 0.03
             tier1Rate: 0.04, // 1% + 3% 
             tier2Rate: 0.01, 
@@ -2921,6 +2921,12 @@
             if(isCard('dbs1') && t.isDbsLinePay) tags.push('⚡');
             if(isCard('dbs1') && t.isDbsGreen) tags.push('🌿');
 
+            // C12 JCB
+            if(isCard('c12') && t.isSinopacJcbForeign) tags.push('✈️');
+            if(isCard('c12') && t.isSinopacJcbJapan) tags.push('🇯🇵');
+            if(isCard('c12') && t.isSinopacJcbSelected) tags.push('🛍️');
+            if(isCard('c12') && t.isSinopacJcbQuarterly) tags.push('🔥');
+
             const tagStr = tags.length > 0 ? tags.join('') + ' ' : '';
             item.innerHTML = `
                 <div style="flex:1" onclick="loadTransaction(${t.id})">
@@ -2996,6 +3002,12 @@
         // DBS
         if(document.getElementById('checkDbsLinePay')) document.getElementById('checkDbsLinePay').checked = !!tx.isDbsLinePay;
         if(document.getElementById('checkDbsGreen')) document.getElementById('checkDbsGreen').checked = !!tx.isDbsGreen;
+        // C12 JCB
+        if(document.getElementById('checkSinopacJcbForeign')) document.getElementById('checkSinopacJcbForeign').checked = !!tx.isSinopacJcbForeign;
+        if(document.getElementById('checkSinopacJcbJapan')) document.getElementById('checkSinopacJcbJapan').checked = !!tx.isSinopacJcbJapan;
+        if(document.getElementById('checkSinopacJcbBonus')) document.getElementById('checkSinopacJcbBonus').checked = !!tx.isSinopacJcbBonus;
+        if(document.getElementById('checkSinopacJcbQuarterly')) document.getElementById('checkSinopacJcbQuarterly').checked = !!tx.isSinopacJcbQuarterly;
+
         // 觸發 UI 更新
         if (tx.cardId === 'j3') toggleKumamonSub('none');
         if (tx.cardId === 'j2') toggleJiheLogic();

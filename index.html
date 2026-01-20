@@ -181,8 +181,26 @@
         .btn-scene { padding: 6px 12px; background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; flex-shrink: 0;}
         .btn-scene:active { transform: scale(0.95); }
         .btn-scene-del { width: 16px; height: 16px; background: rgba(0,0,0,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; margin-left: 4px; color: #2e7d32; }
+        
+        /* 雙欄網格 + 搜尋 CSS */
+        .manage-search-container { position: sticky; top: 0; background: white; z-index: 10; padding-bottom: 12px; margin-bottom: 8px; border-bottom: 1px solid #f0f0f0; }
+        .manage-search-wrapper { position: relative; width: 100%; }
+        .manage-search-input { width: 100%; padding: 12px 40px 12px 12px; border-radius: 12px; border: 1px solid #e0e0e0; background: #f9f9f9; font-size: 15px; font-weight: 600; color: #333; transition: all 0.2s; box-sizing: border-box; outline: none; }
+        .manage-search-input:focus { background: white; border-color: #007AFF; box-shadow: 0 0 0 3px rgba(0,122,255,0.1); }
+        .btn-search-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; background: #ccc; color: white; border-radius: 50%; border: none; font-size: 14px; display: none; align-items: center; justify-content: center; cursor: pointer; }
+        .manage-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-bottom: 20px; }
+        .manage-card-btn { position: relative; border-radius: 16px; padding: 12px; background: #f5f5f5; border: 2px solid transparent; text-align: left; transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; min-height: 80px; user-select: none; -webkit-tap-highlight-color: transparent; opacity: 0.7; filter: grayscale(100%); }
+        .manage-card-btn.active { opacity: 1; filter: grayscale(0%); background: white; border-color: #007AFF; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-1px); }
+        .manage-card-btn:active { transform: scale(0.96); }
+        .m-card-name { font-size: 14px; font-weight: 800; color: #333; line-height: 1.3; margin-bottom: 4px; padding-right: 20px; }
+        .m-card-nick { font-size: 11px; color: #888; font-weight: 500; }
+        .m-check-mark { position: absolute; top: 10px; right: 10px; width: 18px; height: 18px; background: #007AFF; color: white; border-radius: 50%; font-size: 12px; display: none; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 2; }
+        .manage-card-btn.active .m-check-mark { display: flex; }
+        .m-setting-btn { position: absolute; bottom: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(0,0,0,0.05); color: #666; border: 1px solid rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; font-size: 14px; z-index: 3; transition: all 0.2s; }
+        .manage-card-btn.active .m-setting-btn { background: rgba(0,0,0,0.03); color: #333; }
+        .m-setting-btn:active { background: #e0e0e0; transform: scale(0.9); }
     </style>
-</head>
+  </head>
 <body>
     <div id="welcomeModal" class="welcome-overlay">
         <div class="welcome-content">
@@ -197,7 +215,7 @@
         
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V124.13</div>
+            <div class="version-tag">V124.13(Eco)</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -225,6 +243,7 @@
                 <button class="btn-tool" onclick="triggerImport()">📥 讀檔還原</button>
                 <input type="file" id="fileInput" style="display:none" accept=".json, .txt" onchange="importFile(this)">
             </div>
+        
             <button class="btn-ig" onclick="window.open('https://www.instagram.com/pocket_lab_tw', '_blank')">
               📸 歡迎追蹤口袋實驗室
             </button>
@@ -515,7 +534,6 @@
                 <div id="jiheOptions">
                     <div class="option-row read-only"><label id="labelJiheBase">🔰 國內消費 1% (無上限)</label><input type="checkbox" checked disabled></div>
                    <div class="option-row"><label for="checkJiheJapan">🇯🇵 切換為日本消費 (2.5%)</label><input type="checkbox" id="checkJiheJapan" onchange="toggleJiheLogic()"></div>
-    
                    <div class="option-row" id="rowJiheApple" style="border-top:1px dashed #ddd; padding-top:6px;"><label for="checkJiheApple">🍎 Apple Pay +1.5% (刷$4萬封頂)</label><input type="checkbox" id="checkJiheApple" onchange="updateRewardPreview()"></div>
                     
                     <div class="option-row" id="rowJiheDomesticJapanese" style="border-top:1px dashed #ddd; padding-top:6px; flex-direction:column; align-items:flex-start;">
@@ -524,11 +542,11 @@
                              <input type="checkbox" id="checkJiheDomesticJapanese" onchange="updateRewardPreview()">
                         </div>
 
-                       <button onclick="toggleJiheDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看指定通路</button>
+                        <button onclick="toggleJiheDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看指定通路</button>
                         <div id="jiheDetails" class="details-content">
                             <b>(1) 服飾：</b><br>UNIQLO、GU、思夢樂、GLOBAL WORK、niko and …、LOWRYS FARM、LAKOLE、studio CLIP、repipi armario、HARE、Heather、PAGEBOY、RAGEBLUE、LEPSIM、JEANASIS<br>
                             <b>(2) 生活/藥妝：</b><br>DAISO大創、Standard Products、THREEPPY、日藥本舖、松本清、Tomod's、札幌藥妝、TSUTAYA BOOKSTORE、HANDS台隆手創館、宜得利家居
-                          </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -540,7 +558,7 @@
                             <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
                                 <label for="checkKumamonDesignated">🐻 指定通路 +6% (刷$8,333封頂)</label>
                                 <input type="checkbox" id="checkKumamonDesignated" onchange="toggleKumamonSub('designated')">
-                           </div>
+                            </div>
                             <button onclick="toggleKumamonDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看指定通路 (熊好系列)</button>
                             <div id="kumamonDetails" class="details-content">
                                 <b>(1) 熊好遊 (交通/住宿)：</b><br>
@@ -556,7 +574,7 @@
                                 燒肉：勝烈亭、敘敘苑、牛角、力丸燒肉、六歌仙<br>
                                 漢堡/咖啡：shake shack、DOUTOR Coffee、Fuglen<br>
                                 其他：鳥貴族、一蘭拉麵、松屋、SUKIYA、壽司郎、藏壽司<br><br>
-                              
+                                
                                 <b>(4) 熊好買 (購物)：</b><br>
                                 家電/藥妝：BicCamera、Yodobashi、松本清、唐吉軻德、大國藥妝<br>
                                 生活/商城：無印良品、日本MITSUI購物園區<br>
@@ -588,7 +606,7 @@
                             <input type="radio" name="currencyType" id="rbCurrencySelected" value="selected" onchange="toggleCurrencyLogic()">
                         </div>
 
-                       <button onclick="toggleCurrencyDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:0 0 6px 0;">🔽 點擊查看精選通路</button>
+                        <button onclick="toggleCurrencyDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:0 0 6px 0;">🔽 點擊查看精選通路</button>
                         <div id="currencyDetails" class="details-content">
                             <b>(1) 國外實體：</b><br>非台灣地區且非台幣之一般交易<br>
                             <b>(2) 網購消費：</b><br>Suica/PASMO/ICOCA儲值、Amazon、Rakuten、淘寶、eBay、Gmarket、iHerb、Selfridge、Mercari、大國藥妝、Sugi藥妝、Olive Young<br>
@@ -598,8 +616,7 @@
                 </div>
 
                 <div id="sinopacMitsuiOptions">
-  
-                   <div class="option-row read-only"><label id="labelMitsuiBase">🔰 一般消費 0.3% (館外/國外)</label><input type="checkbox" checked disabled></div>
+                    <div class="option-row read-only"><label id="labelMitsuiBase">🔰 一般消費 0.3% (館外/國外)</label><input type="checkbox" checked disabled></div>
                     
                     <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px; display:flex; flex-direction:column; align-items:flex-start;">
                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
@@ -607,7 +624,7 @@
                             <input type="checkbox" id="checkSinopacMitsuiSelected" onchange="toggleSinopacMitsui('selected')">
                         </div>
 
-            <div style="font-size:10px; color:#aaa; margin-top:2px; line-height:1.3;">
+                        <div style="font-size:10px; color:#aaa; margin-top:2px; line-height:1.3;">
                             通路：館外餐飲(MCC 58xx) / 全盈+PAY<br>
                             <span style="color:#d32f2f; font-weight:bold;">⚠️ 上限僅 100 元 (約刷 $1,428)</span>
                         </div>
@@ -633,15 +650,15 @@
                     <button class="btn btn-confirm" id="btn-confirm" onclick="addTransaction(true)">確認</button>
                 </div>
             </div>
-   
-          <div class="modal-history-section">
+            <div class="modal-history-section">
                 <div class="modal-history-title" id="modalHistoryTitle"><span>📅 本月消費紀錄</span><span style="font-weight:normal; font-size:10px; color:#aaa;">(點擊文字修改 / ✕ 刪除)</span></div>
                 <div id="modalHistoryList"></div>
             </div>
         </div>
     </div>
+    
     <div id="manageModal" class="modal" onclick="if(event.target===this) document.getElementById('manageModal').style.display='none'">
-        <div class="modal-content" style="max-height:80vh; overflow-y:auto;">
+        <div class="modal-content" style="max-height:80vh; overflow-y:auto; padding-top:15px;">
             <h2 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 800; color:#333;">管理我的卡片</h2>
             
             <div class="manage-tools">
@@ -655,9 +672,18 @@
                  <div id="sceneList" class="scene-container"></div>
             </div>
             
-            <div style="font-size:12px; color:#888; margin-bottom:12px;">開啟 / 隱藏您的卡片 (即時生效)</div>
-            <div id="manageCardList" style="border-top:1px solid #eee;"></div>
-            <button class="btn btn-confirm" style="width:100%; margin-top:20px;" onclick="document.getElementById('manageModal').style.display='none'">完成</button>
+            <div class="manage-search-container">
+                <div class="manage-search-wrapper">
+                     <input type="text" id="cardSearchInput" class="manage-search-input" placeholder="搜尋卡片 (如: 吉鶴, 旅人...)" oninput="filterManageCards()">
+                     <button id="btnSearchClear" class="btn-search-clear" onclick="clearCardSearch()">✕</button>
+                </div>
+            </div>
+            
+            <div style="font-size:12px; color:#888; margin-bottom:12px;">點擊卡片即可 啟用 / 隱藏</div>
+            
+            <div id="manageCardList" class="manage-grid"></div>
+            
+            <button class="btn btn-confirm" style="width:100%; margin-top:10px;" onclick="document.getElementById('manageModal').style.display='none'">完成</button>
         </div>
     </div>
   <script>
@@ -697,7 +723,7 @@
         el.style.display = (el.style.display === 'block') ? 'none' : 'block';
     }
 
-    // 新增：切換星展eco卡詳情折疊
+    // 切換星展eco卡詳情折疊
     function toggleDbsDetails() {
         const el = document.getElementById('dbsDetails');
         el.style.display = (el.style.display === 'block') ? 'none' : 'block';
@@ -820,7 +846,7 @@
                 initWelcomeModal();
             }
         } else {
-            loadAndRenderApp();
+             loadAndRenderApp();
         }
     });
     function initWelcomeModal() {
@@ -963,7 +989,6 @@
     }
 
     window.addEventListener('popstate', function(event) { closeModal(); });
-    
     // 核心資料庫 (V124.13 - 資料防護升級版)
     const defaultCards = [
         { 
@@ -1511,23 +1536,19 @@
         const refDate = (addedAmount > 0 && dateInputVal) ? new Date(dateInputVal) : new Date();
         const { start: cycleStart, end: cycleEnd, isCustom } = getBillingCycle(cardId, refDate);
         const { start: quarterStart, end: quarterEnd } = getQuarterRange(refDate);
-        
         // 月週期交易 (大部分卡片用)
         const relevantTx = transactions.filter(t => {
             const tDate = new Date(t.date);
             return t.cardId === cardId && tDate >= cycleStart && tDate <= cycleEnd;
         });
-        
         // 季週期交易 (富邦J/熊本熊/三井用)
         const quarterTx = transactions.filter(t => {
             const tDate = new Date(t.date);
             return t.cardId === cardId && tDate >= quarterStart && tDate <= quarterEnd;
         });
-
         let totalSpend = relevantTx.reduce((sum, t) => sum + parseFloat(t.amount), 0);
         totalSpend += addedAmount;
         let reward = 0;
-
         // --- 星展 eco 永續卡 (DBS) - 修正版 ---
         if (cardId === 'dbs1') {
              const txList = [...relevantTx];
@@ -1551,13 +1572,10 @@
                      linePayBonusSpend += t.amount;
                  }
              });
-             
              // 計算 LinePay 加碼 (上限 1000 點)
              const linePayBonus = Math.min(linePayBonusSpend * 0.09, 1000);
-             
              // 計算 綠色 加碼 (上限 300 點)
              const greenBonus = Math.min(greenBonusSpend * 0.09, 300);
-             
              reward = baseReward + linePayBonus + greenBonus;
              
              let displayRate = "1.0";
@@ -1595,8 +1613,10 @@
 
         // J1: 富邦 J 卡 (季回饋修正版)
         if (cardId === 'j1') {
-            const txList = [...relevantTx]; // 用於算基本回饋(月)
-            const qTxList = [...quarterTx]; // 用於算加碼回饋(季)
+            const txList = [...relevantTx];
+            // 用於算基本回饋(月)
+            const qTxList = [...quarterTx];
+            // 用於算加碼回饋(季)
             
             if (addedAmount > 0) {
                 txList.push({ amount: addedAmount, isFubonJGeneral: addedIsFubonJGeneral });
@@ -1609,10 +1629,11 @@
                 if(t.isFubonJGeneral) baseReward += t.amount * 0.03;
                 else baseReward += t.amount * 0.01;
             });
-            
             // 2. 季加碼計算
-            let jkBonusTotal = 0;   // 日韓實體 +3%
-            let thaiBonusTotal = 0; // 泰國實體 +5%
+            let jkBonusTotal = 0;
+            // 日韓實體 +3%
+            let thaiBonusTotal = 0;
+            // 泰國實體 +5%
             let suicaBonusTotal = 0;// 交通卡 +7%
             
             qTxList.forEach(t => { 
@@ -1620,20 +1641,20 @@
                 if(t.isFubonJThai && t.amount >= 1000) thaiBonusTotal += t.amount * 0.05; 
                 if(t.isFubonJSuica && t.amount >= 2000) suicaBonusTotal += t.amount * 0.07; 
             });
-
             // 應用季上限
-            jkBonusTotal = Math.min(jkBonusTotal, 1000);   // 季上限 1000
-            thaiBonusTotal = Math.min(thaiBonusTotal, 1000); // 季上限 1000
-            suicaBonusTotal = Math.min(suicaBonusTotal, 200); // 季上限 200
+            jkBonusTotal = Math.min(jkBonusTotal, 1000);
+            // 季上限 1000
+            thaiBonusTotal = Math.min(thaiBonusTotal, 1000);
+            // 季上限 1000
+            suicaBonusTotal = Math.min(suicaBonusTotal, 200);
+            // 季上限 200
 
             reward = baseReward + jkBonusTotal + thaiBonusTotal + suicaBonusTotal;
-            
             let displayRate = "1.0";
             let statusText = `本月累積 $${totalSpend.toLocaleString()}`;
             let msgStyle = '';
             
             if(addedIsFubonJGeneral) displayRate = "3.0";
-            
             if(addedIsFubonJKorea) {
                 displayRate = "6.0";
                 const used = Math.min(qTxList.filter(t=>t.isFubonJKorea).reduce((a,b)=>a+b.amount,0) * 0.03, 1000);
@@ -1686,8 +1707,10 @@
 
         // J3: 熊本熊 (PayPay 季上限修正版)
         if (cardId === 'j3') {
-            const txList = [...relevantTx]; // 月
-            const qTxList = [...quarterTx]; // 季
+            const txList = [...relevantTx];
+            // 月
+            const qTxList = [...quarterTx];
+            // 季
             if (addedAmount > 0) {
                 txList.push({ amount: addedAmount, isKumamonJapan: addedIsKumamonJapan, isKumamonDesignated: addedIsKumamonDesignated });
                 qTxList.push({ amount: addedAmount, isKumamonPayPay: addedIsKumamonPayPay });
@@ -1704,12 +1727,11 @@
                  
                  if (t.isKumamonDesignated) designatedSpend += t.amount;
             });
-            
             const designatedBonus = Math.min(designatedSpend, 8333) * 0.06;
             
             // 2. PayPay (季計算)
             // 3.5% 加碼部分，季上限100元。1.5%免手續費部分無上限。
-            const paypayBonusRate = 0.035; 
+            const paypayBonusRate = 0.035;
             const paypayFeeWaiver = 0.015;
             
             // 找出本「月」的 PayPay 交易算免手續費 (假設也包含在月交易清單中)
@@ -1717,9 +1739,9 @@
             const feeWaiverReward = monthlyPayPaySpend * paypayFeeWaiver;
             
             // 找出本「季」的 PayPay 交易算加碼
-            const quarterlyPayPaySpend = qTxList.filter(t => t.isKumamonPayPay).reduce((sum,t) => sum + t.amount, 0); // 已包含 addedAmount
+            const quarterlyPayPaySpend = qTxList.filter(t => t.isKumamonPayPay).reduce((sum,t) => sum + t.amount, 0);
+            // 已包含 addedAmount
             const paypayBonus = Math.min(quarterlyPayPaySpend * paypayBonusRate, 100);
-            
             reward = baseAndDesignatedReward + designatedBonus + feeWaiverReward + paypayBonus;
 
             let validSpend = designatedSpend;
@@ -1743,7 +1765,6 @@
             if (addedIsKumamonPayPay) displayRate = "5.0";
             else if (addedIsKumamonDesignated) displayRate = "8.5";
             else if (addedIsKumamonJapan) displayRate = "2.5";
-            
             return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: displayRate, isCustom, cycleStart, cycleEnd, msgDanger: msg, customLimit: limit };
         }
 
@@ -1811,7 +1832,8 @@
                     if (addedIsSinopacMitsuiTarget) displayRate = "0.3";
                 }
             } else {
-                if (addedIsSinopacMitsuiSelected) displayRate = (selectedSpend < spendingCap) ? "7.3" : "0.3";
+                if (addedIsSinopacMitsuiSelected) displayRate = (selectedSpend < spendingCap) ?
+                "7.3" : "0.3";
                 if (selectedSpend >= spendingCap) { statusText = '特選已封頂';
                 } 
                 else { statusText = `剩 $${Math.floor(spendingCap - selectedSpend).toLocaleString()} (特選)`;
@@ -2006,9 +2028,11 @@
         return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: currentRate.toFixed(1), isCustom, cycleStart, cycleEnd };
     }
 
-    function toggleBillLogic() { const isBill = document.getElementById('checkIsBill').checked; document.getElementById('labelBaseRate').innerText = isBill ? "🔰 基本回饋 0.15% (無上限)" : "🔰 基本回饋 1% (無上限)"; if(isBill) document.getElementById('checkBonus25').checked = false; updateRewardPreview();
+    function toggleBillLogic() { const isBill = document.getElementById('checkIsBill').checked; document.getElementById('labelBaseRate').innerText = isBill ?
+    "🔰 基本回饋 0.15% (無上限)" : "🔰 基本回饋 1% (無上限)"; if(isBill) document.getElementById('checkBonus25').checked = false; updateRewardPreview();
     }
-    function toggleSelectedLogic() { const isSelected = document.getElementById('checkBonus25').checked; document.getElementById('labelBaseRate').innerText = isSelected ? "🔰 基本回饋 1% (無上限)" : "🔰 基本回饋 1% (無上限)"; if(isSelected) document.getElementById('checkIsBill').checked = false; updateRewardPreview();
+    function toggleSelectedLogic() { const isSelected = document.getElementById('checkBonus25').checked; document.getElementById('labelBaseRate').innerText = isSelected ?
+    "🔰 基本回饋 1% (無上限)" : "🔰 基本回饋 1% (無上限)"; if(isSelected) document.getElementById('checkIsBill').checked = false; updateRewardPreview();
     }
     function toggleGreenLogic() { if(document.getElementById('checkGreenChannel').checked) document.getElementById('checkForeign').checked = false; updateRewardPreview();
     }
@@ -2075,7 +2099,6 @@
         let isJiangTravel = jiangMode === 'travel';
         let currencyType = document.querySelector('input[name="currencyType"]:checked') ? document.querySelector('input[name="currencyType"]:checked').value : 'domestic';
         let isSinopacCurrencySelectedFinal = (currencyType === 'selected');
-        
         // DBS
         let isDbsLinePay = document.getElementById('checkDbsLinePay') ? document.getElementById('checkDbsLinePay').checked : false;
         let isDbsGreen = document.getElementById('checkDbsGreen') ? document.getElementById('checkDbsGreen').checked : false;
@@ -2161,7 +2184,7 @@
                     if (stats.msgDanger) {
                         statusText = stats.msgDanger;
                         if(stats.msgDanger.includes('已封頂')) msgStyle = stats.msgStyle || 'color: #ffcccc;';
-                        percent = 100; 
+                        percent = 100;
                     } else {
                         statusText = `本月累積 $${stats.spend.toLocaleString()}`;
                         percent = 0; 
@@ -2239,40 +2262,90 @@
         checkUrgentTasks(); initSortable();
     }
     
+    // [專家優化] 雙欄網格 + 搜尋功能版
     function openManageModal() {
         const list = document.getElementById('manageCardList');
         list.innerHTML = '';
+        
+        // 保留原有的邏輯：判斷真實卡片數量
         const realCardIds = ['c6', 'c1', 'c5', 'c3', 'c4', 'c2', 'c7', 'c8', 'c9', 'c10', 'c11', 'j1', 'j2', 'j3', 'j4', 'j5', 'dbs1'];
         const currentRealCardsCount = visibleCards.filter(id => realCardIds.includes(id)).length;
+        
+        // 搜尋功能初始化
+        clearCardSearch(); 
+
         cards.forEach(card => {
-            if (card.id === 'add1') return; 
+            if (card.id === 'add1') return; // 跳過佔位符
             const isVisible = visibleCards.includes(card.id);
-            const item = document.createElement('div'); item.className = 'manage-item';
             
-            const settingBtn = document.createElement('button');
-            settingBtn.className = 'btn-card-setting';
+            // 建立卡片按鈕 (Div)
+            const btn = document.createElement('div');
+            btn.className = `manage-card-btn ${isVisible ? 'active' : ''}`;
+            
+            // 點擊事件：切換顯示/隱藏
+            btn.onclick = function(e) {
+                if (e.target.classList.contains('m-setting-btn')) return; // 點到設定不觸發
+                
+                // 檢查是否超過8張限制
+                if (!isVisible && currentRealCardsCount >= 8) { 
+                    alert('⚠️ 最多只能顯示 8 張卡片，請先隱藏一張！'); 
+                    return; 
+                }
+                toggleCardVisibility(card.id); 
+            };
+            
+            // 內部 HTML 結構
+            btn.innerHTML = `
+                <div class="m-check-mark">✓</div>
+                <div class="m-card-name">${card.name}</div>
+                <div class="m-card-nick">${card.nickname}</div>
+            `;
+            
+            // 設定按鈕 (齒輪)
+            const settingBtn = document.createElement('div');
+            settingBtn.className = 'm-setting-btn';
             settingBtn.innerHTML = '⚙️';
-            settingBtn.onclick = (e) => { e.stopPropagation(); editCardSettings(card.id); };
-
-            const label = document.createElement('label'); label.className = 'switch'; label.onclick = function(e) { e.stopPropagation(); }; 
-            const input = document.createElement('input'); input.type = 'checkbox'; input.checked = isVisible;
-            input.onchange = function() { if (this.checked && currentRealCardsCount >= 8) 
-            { alert('⚠️ 最多只能顯示 8 張卡片，請先隱藏一張！'); this.checked = false; return; } toggleCardVisibility(card.id); };
-            const slider = document.createElement('span');
-            slider.className = 'slider'; label.appendChild(input); label.appendChild(slider);
+            settingBtn.onclick = (e) => { 
+                e.stopPropagation(); 
+                editCardSettings(card.id); 
+            };
             
-            item.onclick = function(e) { if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
-            const checkbox = this.querySelector('input[type="checkbox"]'); if (!checkbox.checked && currentRealCardsCount >= 8) { alert('⚠️ 最多只能顯示 8 張卡片，請先隱藏一張！'); return; } checkbox.checked = !checkbox.checked;
-            toggleCardVisibility(card.id); };
-
-            item.innerHTML = `<div class="manage-info"><div class="manage-name">${card.name}</div><div class="manage-desc">${card.nickname}</div></div>`; 
-            item.appendChild(settingBtn);
-            item.appendChild(label); 
-            list.appendChild(item);
+            btn.appendChild(settingBtn);
+            list.appendChild(btn);
         });
+        
         document.getElementById('manageModal').style.display = 'flex';
         renderScenes();
-        // 確保打開管理視窗時刷新情境列表
+    }
+    
+    // [新增] 搜尋過濾功能
+    function filterManageCards() {
+        const input = document.getElementById('cardSearchInput');
+        const filter = input.value.toLowerCase();
+        const btnClear = document.getElementById('btnSearchClear');
+        
+        // 控制清除按鈕顯示
+        btnClear.style.display = filter.length > 0 ? 'flex' : 'none';
+        
+        const cards = document.querySelectorAll('.manage-card-btn');
+        cards.forEach(card => {
+            const name = card.querySelector('.m-card-name').innerText.toLowerCase();
+            const nick = card.querySelector('.m-card-nick').innerText.toLowerCase();
+            if (name.includes(filter) || nick.includes(filter)) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    // [新增] 清除搜尋
+    function clearCardSearch() {
+        const input = document.getElementById('cardSearchInput');
+        if(input) {
+            input.value = '';
+            filterManageCards();
+        }
     }
 
     function editCardSettings(cardId) {
@@ -2454,7 +2527,7 @@
             
             // 優化點：如果沒有 note，就給空字串 (CSS h-name 已設定 min-height 防止塌陷)
             let displayText = t.note || ''; 
-           
+            
             let tags = [];
             const isCard = (id) => t.cardId === id;
 
@@ -2583,17 +2656,16 @@
         // 將將
         if(tx.isJiangSelected) document.getElementById('rbJiangSelected').checked = true;
         else if(tx.isJiangTravel) document.getElementById('rbJiangTravel').checked = true;
-        
         // DBS
         if(document.getElementById('checkDbsLinePay')) document.getElementById('checkDbsLinePay').checked = !!tx.isDbsLinePay;
         if(document.getElementById('checkDbsGreen')) document.getElementById('checkDbsGreen').checked = !!tx.isDbsGreen;
-
         // 觸發 UI 更新
         if (tx.cardId === 'j3') toggleKumamonSub('none');
         if (tx.cardId === 'j2') toggleJiheLogic();
         if (cardId === 'c6') toggleBillLogic();
         if (cardId === 'c7') toggleUniUpLogic();
-        if (cardId === 'dbs1') toggleDbsLogic('none'); // Update preview for DBS
+        if (cardId === 'dbs1') toggleDbsLogic('none');
+        // Update preview for DBS
         
         updateRewardPreview();
     }

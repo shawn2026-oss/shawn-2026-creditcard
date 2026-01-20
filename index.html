@@ -1,692 +1,4 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FMD1PV6QZV"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-FMD1PV6QZV');
-    </script>
-
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="刷卡回饋管家">
-    <meta name="theme-color" content="#F0F2F5">
-    
-    <meta property="og:title" content="刷卡回饋管家 - 您的信用卡最佳幫手">
-    <meta property="og:description" content="自動計算回饋、即時顯示上限、支援戰績圖分享。快來看看你本月賺了多少回饋！">
-    <meta property="og:image" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/icon-192.png">
-    <meta property="og:url" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/">
-    <meta property="og:type" content="website">
-
-    <title>刷卡回饋管家</title>
-    
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
-    <link rel="icon" type="image/png" sizes="48x48" href="icon-48.png">
-    <link rel="shortcut icon" href="icon-48.png">
-
-    <style>
-        :root { --bg-color: #F0F2F5; --text-primary: #1C1C1E; --text-secondary: #8E8E93; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; background-color: #E0E5EC; color: var(--text-primary); margin: 0; display: flex; justify-content: center; min-height: 100vh; -webkit-font-smoothing: antialiased; }
-        .app-container { width: 100%; max-width: 480px; background-color: var(--bg-color); min-height: 100vh; padding: 16px 12px; padding-top: env(safe-area-inset-top, 20px); padding-bottom: env(safe-area-inset-bottom, 20px); box-shadow: 0 0 40px rgba(0,0,0,0.05); display: flex; flex-direction: column; box-sizing: border-box; }
-        @media (max-width: 480px) { body { background-color: var(--bg-color); } .app-container { box-shadow: none; width: 100%; max-width: 100%; } }
-        .header-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; width: 100%; }
-        .author-top { font-size: 12px; font-weight: 800; color: #007AFF; letter-spacing: 0.5px; }
-        .version-tag { font-size: 10px; color: #888; font-weight: 600; background: rgba(0,0,0,0.05); padding: 2px 8px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; display: inline-block; min-width: 36px; text-align: center; }
-        .header-section { margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-end; }
-        h1 { font-size: 22px; font-weight: 800; margin: 0; color: #333; letter-spacing: -0.5px; line-height: 1.2;}
-        .subtitle { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
-        .today-date { background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; color: #555; margin-left: 5px;}
-        .news-ticker { background: #FFF9C4; color: #856404; border-radius: 8px; margin-bottom: 12px; height: 36px; display: block; overflow: hidden; white-space: nowrap; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.05); width: 100%; transform: translate3d(0,0,0); }
-        .ticker-content { display: inline-block; height: 36px; line-height: 36px; padding-left: 100%; min-width: 100%; box-sizing: content-box; animation: scroll-left 15s linear infinite; will-change: transform; transform: translate3d(0, 0, 0); }
-        @keyframes scroll-left { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
-        .total-reward-card { background: #2c3e50; color: white; border-radius: 16px; padding: 16px 20px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(44, 62, 80, 0.2); }
-        .total-reward-card::after { content: ''; position: absolute; top: -50%; right: -50%; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%; pointer-events: none; }
-        .total-info { display: flex; flex-direction: column; gap: 2px; }
-        .total-reward-label { font-size: 13px; font-weight: 600; opacity: 0.9; }
-        .total-reward-amount { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; }
-        .btn-share-result { background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; z-index: 2; }
-        .btn-share-result:active { transform: scale(0.95); background: rgba(255,255,255,0.3); }
-        #urgent-alert-area { display: none; margin-bottom: 12px; }
-        .urgent-card { background: linear-gradient(135deg, #FF3B30, #FF2D55); color: white; border-radius: 12px; padding: 10px 14px; box-shadow: 0 4px 10px rgba(255, 59, 48, 0.25); animation: pulse 2s infinite; }
-        .urgent-title { font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 6px; }
-        .urgent-item { background: rgba(255,255,255,0.25); border-radius: 8px; padding: 6px 10px; margin-top: 6px; font-size: 12px; font-weight: 600; line-height: 1.3; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.01); } 100% { transform: scale(1); } }
-        #card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; flex: 1; align-content: start;}
-        .card-tile { border-radius: 16px; padding: 12px; min-height: 135px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; transition: transform 0.1s; cursor: pointer; color: white; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: pan-y; }
-        .card-tile:active { transform: scale(0.97); }
-        .sortable-ghost { opacity: 0.4; transform: scale(0.95); }
-        .sortable-drag { cursor: grabbing; }
-        .tile-header { display: flex; justify-content: space-between; align-items: flex-start; z-index: 2; margin-bottom: 2px;}
-        .tile-name { font-size: 15px; font-weight: 800; line-height: 1.2; text-shadow: 0 1px 2px rgba(0,0,0,0.15); }
-        .tile-nickname-badge { display: inline-block; font-size: 10px; font-weight: 800; background: rgba(0,0,0,0.2); color: #FFD700; padding: 2px 6px; border-radius: 4px; margin-bottom: 4px; z-index: 2; width: fit-content; }
-        .tile-nickname-badge.placeholder { background: rgba(0,0,0,0.1); color: #aaa; }
-        .tile-note { font-size: 10px; font-weight: 500; opacity: 0.9; margin-bottom: 4px; display: block; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2; letter-spacing: -0.2px; }
-        .tile-rule { font-size: 10px; font-weight: 700; background: rgba(0,0,0,0.25); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 6px; color: #FFD700; z-index: 2; }
-        .rate-badge { background: rgba(255,255,255,0.3); font-size: 10px; font-weight: 800; padding: 2px 5px; border-radius: 5px; white-space: nowrap; backdrop-filter: blur(4px); margin-left: 2px; flex-shrink: 0; }
-        .tile-body { z-index: 2; flex:1; display:flex; flex-direction:column; justify-content:center; }
-        .tile-stat { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 2px;}
-        .tile-earned { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.95); display: flex; align-items: center; gap: 3px;}
-        .tile-earned::before { content: '賺'; font-size: 9px; opacity: 0.8; border: 1px solid rgba(255,255,255,0.7); padding: 0 2px; border-radius: 3px;}
-        .tile-footer { z-index: 2; margin-top: 6px; position: relative; }
-        .progress-track { background: rgba(0,0,0,0.2); height: 4px; border-radius: 2px; overflow: hidden; margin-bottom: 4px; }
-        .progress-fill { height: 100%; background: rgba(255,255,255,0.95); transition: width 0.5s ease; }
-        .tile-msg { font-size: 11px; font-weight: 700; opacity: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
-        .tile-cycle-hint { font-size: 9px; color: #fff; opacity: 0.95; margin-top: 3px; text-align: right; text-shadow: 0 1px 2px rgba(0,0,0,0.5); font-weight: 700; letter-spacing: 0.3px; }
-        .tile-cycle-hint.dark-text { color: rgba(0,0,0,0.6); text-shadow: none; }
-        .history-section { flex: 1; display: flex; flex-direction: column; }
-        .history-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #555; }
-        .settings-area { margin-top: auto; display: flex; gap: 8px; flex-direction: column; padding-top: 20px;}
-        .settings-row { display: flex; gap: 8px; }
-        .btn-tool { flex: 1; padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 600; border: 1px solid #eee; background: white; color: #555; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
-        .btn-manage { background: #333; color: white; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-        .btn-reset-visible { width: 100%; padding: 12px; background-color: #fff5f5; border: 1px solid #ffdede; color: #FF3B30; border-radius: 12px; font-weight: 600; font-size: 12px; cursor: pointer; margin-top: 10px;}
-        .btn-ig { width: 100%; padding: 12px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 12px rgba(220, 39, 67, 0.3); display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .btn-ig:active { transform: scale(0.98); }
-        .details-content { display: none; background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 10px; margin-top: 6px; font-size: 11px; color: #666; line-height: 1.6; }
-        .modal { display: none; position: fixed !important; top: 0 !important; left: 0 !important; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 10000; align-items: center; justify-content: center; }
-        .modal-content { background: white; width: 85%; max-width: 320px; border-radius: 20px; padding: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.25); animation: modalPop 0.2s; display: flex; flex-direction: column; max-height: 85vh; overflow-y: auto; position: relative; z-index: 10001; }
-        .modal-body-input { flex-shrink: 0; }
-        .welcome-overlay { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 20000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .welcome-content { background: white; width: 85%; max-width: 340px; border-radius: 24px; padding: 24px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .welcome-title { font-size: 22px; font-weight: 800; color: #333; margin-bottom: 10px; }
-        .welcome-desc { font-size: 14px; color: #666; margin-bottom: 20px; line-height: 1.5; }
-        .welcome-list { text-align: left; max-height: 300px; overflow-y: auto; margin-bottom: 20px; border: 1px solid #eee; border-radius: 12px; padding: 10px; }
-        .welcome-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #f9f9f9; }
-        .welcome-item:last-child { border-bottom: none; }
-        .welcome-item input { width: 20px; height: 20px; margin-right: 12px; margin-bottom: 0; padding: 0;}
-        .welcome-item label { margin: 0; font-size: 15px; font-weight: 600; color: #333; flex: 1; }
-        .welcome-btn { background: #007AFF; color: white; border: none; padding: 14px; width: 100%; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(0,122,255,0.3); }
-        .welcome-btn:active { transform: scale(0.98); }
-        #captureArea { position: fixed; top: -9999px; left: -9999px; z-index: -1; }
-        .share-card-node { width: 320px; height: auto; background: linear-gradient(135deg, #1C1C1E, #2c3e50); color: white; border-radius: 20px; padding: 24px; box-sizing: border-box; font-family: -apple-system, sans-serif; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3); margin-bottom: 20px; }
-        .share-header { font-size: 14px; opacity: 0.8; letter-spacing: 1px; margin-bottom: 4px; text-transform: uppercase; }
-        .share-month { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
-        .share-amount { font-size: 48px; font-weight: 800; margin-bottom: 20px; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        .share-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 15px 0; }
-        .share-footer { font-size: 11px; opacity: 0.8; margin-top: 15px; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 8px; font-weight: 600; }
-        .share-list { text-align: left; margin-top: 10px; }
-        .share-item { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; font-weight: 500; }
-        .share-item span:last-child { font-weight: 700; color: #FFD700; }
-        .social-btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 10px; }
-        .social-btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px; border-radius: 12px; border: none; font-size: 13px; font-weight: 700; color: white; cursor: pointer; transition: transform 0.1s; }
-        .social-btn:active { transform: scale(0.97); }
-        .social-btn.instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
-        .social-btn.threads { background: #000000; border: 1px solid #333; }
-        .social-btn.facebook { background: #1877F2; }
-        .social-btn.line { background: #06C755; }
-        .social-btn.download { background: #555; grid-column: span 2; }
-        .input-group label { display: block; font-size: 12px; font-weight: 600; color: #888; margin-bottom: 6px; margin-top: 10px; }
-        input { width: 100%; padding: 10px; border: 2px solid #f0f0f0; background: #fff; border-radius: 12px; font-size: 18px; box-sizing: border-box; outline: none; font-weight: 600; color: #333; }
-        .btn-group { display: flex; gap: 8px; margin-top: 20px; flex-shrink: 0; }
-        .btn { flex: 1; padding: 10px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center;}
-        .btn-cancel { background: #f5f5f5; color: #333; }
-        .btn-confirm { background: #007AFF; color: white; flex: 2; }
-        .btn-again { background: #E3F2FD; color: #007AFF; border: 1px solid #b3e5fc; }
-        #liveRewardCalc { text-align: center; font-size: 16px; color: #0056b3; font-weight: 700; margin-top: 12px; min-height: 20px; background: #E3F2FD; padding: 8px; border-radius: 8px; display: none; }
-        .modal-history-section { margin-top: 15px; border-top: 2px solid #f0f0f0; padding-top: 10px; height: auto; overflow: visible; }
-        .modal-history-title { font-size: 12px; font-weight: 700; color: #555; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .history-item { padding: 10px 0; border-bottom: 1px solid #f9f9f9; display: flex; justify-content: space-between; align-items: center; font-size: 12px; cursor: pointer; }
-        .history-item:active { background: #f5f5f5; }
-        .history-item:last-child { border-bottom: none; }
-        .h-name { font-weight: 600; color: #555; min-height: 15px; }
-        .h-date { font-size: 10px; color: #aaa; margin-top: 2px;}
-        .h-amount { font-weight: 700; color: #333; font-size: 13px; }
-        .btn-delete-single { background: none; border: none; color: #ccc; font-size: 14px; padding: 0 5px; cursor: pointer; margin-left: 8px;}
-        .btn-delete-single:hover { color: #FF3B30; }
-        #pigRichOptions, #greenCardOptions, #uniOptions, #happyOptions, #hsbcOptions, #uniOpenOptions, #richartOptions, #fubonJOptions, #jiheOptions, #kumamonOptions, #sinopacCurrencyOptions, #sinopacMitsuiOptions, #jiangOptions, #dbsEcoOptions { display: none; background: #f9f9f9; padding: 10px; border-radius: 10px; margin-top: 10px; border: 1px dashed #ddd; }
-        .option-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #555; }
-        .option-row input[type="checkbox"], .option-row input[type="radio"], .option-row input[type="number"] { margin: 0; }
-        .option-row input[type="checkbox"], .option-row input[type="radio"] { width: 20px; height: 20px; }
-        .option-row.read-only { opacity: 0.8; pointer-events: none; }
-        .option-row.read-only input { opacity: 0.6; }
-        .option-row.expired { opacity: 0.5; pointer-events: none; background: #eee; padding: 4px; border-radius: 4px; }
-        .brand-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
-        .brand-btn { border: 1px solid #ddd; background: white; border-radius: 6px; padding: 6px 2px; font-size: 11px; color: #666; text-align: center; cursor: pointer; transition: 0.2s; font-weight: 600; display: flex; align-items: center; justify-content: center; }
-        .brand-btn.active { background: #FF9800; color: white; border-color: #F57C00; box-shadow: 0 2px 4px rgba(255, 152, 0, 0.3); }
-        .manage-item { display: flex; align-items: center; justify-content: space-between; padding: 16px 12px; border-bottom: 1px solid #f0f0f0; background: #fff; cursor: pointer; transition: background 0.2s; }
-        .manage-item:active { background: #f9f9f9; }
-        .manage-info { display: flex; flex-direction: column; gap: 4px; }
-        .manage-name { font-size: 15px; font-weight: 700; color: #333; }
-        .manage-desc { font-size: 12px; color: #999; }
-        .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        input:checked + .slider { background-color: #34C759; }
-        input:checked + .slider:before { transform: translateX(20px); }
-        .btn-card-setting { background: #f0f0f0; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; margin-right: 12px; color: #555; }
-        .btn-card-setting:hover { background: #e0e0e0; }
-        .happy-dashboard { background: transparent; border: none; padding: 0; margin-top: 10px; display: none; }
-        .dash-row { margin-bottom: 8px; }
-        .dash-label { font-size: 12px; font-weight: 700; color: #555; display: flex; justify-content: space-between; margin-bottom: 2px;}
-        .dash-bar-bg { background: #eee; height: 6px; border-radius: 3px; overflow: hidden; }
-        .dash-bar-fill { height: 100%; background: #4cd964; transition: width 0.3s; }
-        .dash-bar-fill.danger { background: #ff3b30; }
-        .manage-tools { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
-        .tools-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .btn-tool-small { background: #f0f0f0; border: 1px solid #e0e0e0; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; color: #555; cursor: pointer; }
-        .btn-tool-small:active { background: #ddd; }
-        .scene-container { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; white-space: nowrap; -webkit-overflow-scrolling: touch; }
-        .btn-scene { padding: 6px 12px; background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; flex-shrink: 0;}
-        .btn-scene:active { transform: scale(0.95); }
-        .btn-scene-del { width: 16px; height: 16px; background: rgba(0,0,0,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; margin-left: 4px; color: #2e7d32; }
-        
-        /* 雙欄網格 + 搜尋 CSS */
-        .manage-search-container { position: sticky; top: 0; background: white; z-index: 10; padding-bottom: 12px; margin-bottom: 8px; border-bottom: 1px solid #f0f0f0; }
-        .manage-search-wrapper { position: relative; width: 100%; }
-        .manage-search-input { width: 100%; padding: 12px 40px 12px 12px; border-radius: 12px; border: 1px solid #e0e0e0; background: #f9f9f9; font-size: 15px; font-weight: 600; color: #333; transition: all 0.2s; box-sizing: border-box; outline: none; }
-        .manage-search-input:focus { background: white; border-color: #007AFF; box-shadow: 0 0 0 3px rgba(0,122,255,0.1); }
-        .btn-search-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; background: #ccc; color: white; border-radius: 50%; border: none; font-size: 14px; display: none; align-items: center; justify-content: center; cursor: pointer; }
-        .manage-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-bottom: 20px; }
-        .manage-card-btn { position: relative; border-radius: 16px; padding: 12px; background: #f5f5f5; border: 2px solid transparent; text-align: left; transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; min-height: 80px; user-select: none; -webkit-tap-highlight-color: transparent; opacity: 0.7; filter: grayscale(100%); }
-        .manage-card-btn.active { opacity: 1; filter: grayscale(0%); background: white; border-color: #007AFF; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-1px); }
-        .manage-card-btn:active { transform: scale(0.96); }
-        .m-card-name { font-size: 14px; font-weight: 800; color: #333; line-height: 1.3; margin-bottom: 4px; padding-right: 20px; }
-        .m-card-nick { font-size: 11px; color: #888; font-weight: 500; }
-        .m-check-mark { position: absolute; top: 10px; right: 10px; width: 18px; height: 18px; background: #007AFF; color: white; border-radius: 50%; font-size: 12px; display: none; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 2; }
-        .manage-card-btn.active .m-check-mark { display: flex; }
-        .m-setting-btn { position: absolute; bottom: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(0,0,0,0.05); color: #666; border: 1px solid rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; font-size: 14px; z-index: 3; transition: all 0.2s; }
-        .manage-card-btn.active .m-setting-btn { background: rgba(0,0,0,0.03); color: #333; }
-        .m-setting-btn:active { background: #e0e0e0; transform: scale(0.9); }
-    </style>
-  </head>
-<body>
-    <div id="welcomeModal" class="welcome-overlay">
-        <div class="welcome-content">
-            <div class="welcome-title">👋 歡迎使用回饋管家</div>
-            <div class="welcome-desc">為了提供最精準的服務<br>請勾選您<b>目前持有</b>的卡片：</div>
-            <div class="welcome-list" id="welcomeList"></div>
-            <button class="welcome-btn" onclick="saveWelcomeSettings()">開始使用 🚀</button>
-        </div>
-    </div>
-
-    <div class="app-container">
-        
-        <div class="header-top-row">
-            <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V124.13(Eco)</div>
-        </div>
-        <div class="header-section">
-            <h1>刷卡回饋管家</h1>
-            <div class="subtitle"><span class="today-date" id="dateDisplay"></span></div>
-        </div>
-        <div class="news-ticker">
-            <div class="ticker-content" id="news-text">🎉 歡迎使用刷卡回饋管家！星展 eco 卡權益更新（新戶 10% / 綠色 10%）。</div>
-        </div>
-        <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
-        <div class="total-reward-card">
-            <div class="total-info">
-                <span class="total-reward-label">當期累積回饋預估</span>
-                <span class="total-reward-amount" id="totalRewardDisplay">$0</span>
-            </div>
-             <button class="btn-share-result" onclick="openShareModal()">📩 曬戰績</button>
-        </div>
-        <div id="card-grid"></div>
-        <div style="flex:1;"></div>
-        <div class="settings-area">
-            <div class="settings-row">
-                <button class="btn-tool btn-manage" onclick="openManageModal()">💳 管理我的卡片</button>
-            </div>
-             <div class="settings-row">
-                <button class="btn-tool" onclick="exportData()">💾 備份檔案</button>
-                <button class="btn-tool" onclick="triggerImport()">📥 讀檔還原</button>
-                <input type="file" id="fileInput" style="display:none" accept=".json, .txt" onchange="importFile(this)">
-            </div>
-        
-            <button class="btn-ig" onclick="window.open('https://www.instagram.com/pocket_lab_tw', '_blank')">
-              📸 歡迎追蹤口袋實驗室
-            </button>
-            <button class="btn-reset-visible" onclick="resetAllData()">🗑️ 重置所有資料</button>
-        </div>
-    
-    <div style="text-align:center; font-size:11px; color:#555; background:#ebebeb; padding:10px; border-radius:8px; margin-top:15px; margin-bottom:10px; line-height:1.4; font-weight:600;">
-            ⚠️ 本工具僅協助用戶監控刷卡進度<br>實際入帳需以各家銀行判定為主
-        </div>
-        <div style="height:20px;"></div>
-    </div>
-    <div id="sharePreviewModal" class="modal" onclick="if(event.target===this) document.getElementById('sharePreviewModal').style.display='none'">
-        <div class="modal-content" style="background:transparent; box-shadow:none; align-items:center; padding:0; width:100%; max-width:340px;">
-            <div id="captureNode" class="share-card-node">
-                <div class="share-header">Monthly Rewards</div>
-                <div class="share-month" id="shareCardMonth">戰績報告</div>
-                <div class="share-amount" id="shareCardAmount">$0</div>
-                <div class="share-divider"></div>
-                <div class="share-list" id="shareCardList"></div> <div class="share-footer">
-                    <div>Generated by 刷卡回饋管家</div>
-                </div>
-            </div>
-
-            <div style="background:white; border-radius:20px; padding:15px; width:100%; box-sizing:border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-top:10px;">
-                <div style="text-align:center; font-size:12px; color:#333; margin-bottom:12px; font-weight:700;">✨ 請選擇分享方式</div>
-                <div class="social-btn-grid">
-                    <button class="social-btn instagram" onclick="shareToIG()">📸 Instagram</button>
-                    <button class="social-btn facebook" onclick="shareToFB()">📘 Facebook</button>
-                    <button class="social-btn threads" onclick="shareToThreads()">🧵 Threads</button>
-                    <button class="social-btn line" onclick="shareToLine()">🟢 LINE</button>
-                    <button class="social-btn download" onclick="downloadShareImage()">📥 僅保存圖片</button>
-                </div>
-                <div style="text-align:center; font-size:10px; color:#999; margin-top:10px; line-height:1.4;">
-                    (FB/IG 為傳圖模式；LINE/Threads 為連結模式)
-                </div>
-            </div>
-            <button style="margin-top:15px; background:none; border:none; color:white; font-size:14px; text-decoration:underline; cursor:pointer;" onclick="document.getElementById('sharePreviewModal').style.display='none'">關閉視窗</button>
-        </div>
-    </div>
-  <div id="transactionModal" class="modal" onclick="if(event.target===this) closeModal()">
-        <div class="modal-content">
-            <div class="modal-body-input">
-                <h2 id="modalTitle" style="margin: 0 0 4px 0; font-size: 18px; font-weight: 800; color:#333;"></h2>
-                <div style="font-size:12px; color:#888; margin-bottom:10px; font-weight: 500;" id="modalSubtitle"></div>
-                <div id="modalParkingInfo" style="background:#FFF9C4; color:#856404; padding:10px; border-radius:10px; font-size:12px; margin-bottom:12px; border-left:4px solid #FFC107; display:none; line-height:1.5;"></div>
-                <input type="hidden" id="cardIdInput"> 
-                
-                <div id="pigRichOptions">
-                    <div class="option-row read-only"><label id="labelBaseRate">🔰 基本回饋 1% (無上限)</label><input type="checkbox" checked disabled></div>
-                    <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0;">
-                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkBonus10">⚡ 新戶加碼 +10% (刷$8,000封頂)</label>
-                            <input type="checkbox" id="checkBonus10" checked onchange="updateRewardPreview()">
-                        </div>
-                        <button onclick="togglePigRichNewUser()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看 10% 定義</button>
-                        <div id="pigRichNewUserDetails" class="details-content">
-                            <b>★ 行動支付：</b><br>LINE Pay、街口支付、icash Pay (含APP內繳費)<br>
-                            <b>★ 海外消費：</b><br>含實體及線上交易 (需非台幣/非台灣)<br>
-                            <b>★ 機票：</b><br>國內外航空公司 (限透過航空公司官網購買)
-                        </div>
-                    </div>
-
-                    <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0; border-top:1px dashed #ddd; padding-top:6px;">
-                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkBonus25">🌟 精選通路 +2.5% (刷$40萬封頂)</label>
-                            <input type="checkbox" id="checkBonus25" checked onchange="toggleSelectedLogic()">
-                        </div>
-                        <button onclick="togglePigRichSelected()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看精選通路</button>
-                        <div id="pigRichSelectedDetails" class="details-content">
-                            <b>(1) 旅遊交通：</b><br>日本PayPay(限街口)、韓國、Klook、KKday、易遊網、Agoda、Airbnb、DJB、酷遊卡、高鐵、Uber、叫車吧、台灣快綫、聯通、USPACE、俥亭停車<br>
-                            <b>(2) 生活購物：</b><br>新光三越、遠東百貨、遠東巨城、LaLaport、三井Outlet、康是美、美廉社、聖德科斯<br>
-                            <b>(3) 外送美食：</b><br>Uber Eats、foodpanda、Foodomo、EZTABLE、85度C、清心福全、三商餐飲<br>
-                            <b>(4) 影城K歌：</b><br>威秀、國賓、新光、喜樂時代、秀泰、錢櫃、好樂迪、享溫馨、凱悅、星聚點、Sing Go、ONCOR
-                        </div>
-                    </div>
-
-                    <div class="option-row" style="margin-bottom:0; border-top:1px dashed #ddd; padding-top:6px;"><label for="checkIsBill">🧾 APP繳費 (底1%→0.15%)</label><input type="checkbox" id="checkIsBill" onchange="toggleBillLogic()"></div>
-                </div>
-
-                <div id="greenCardOptions">
-                    <div class="option-row read-only"><label>🔰 國內 1% / 國外 2%</label><input type="checkbox" checked disabled></div>
-                    
-                    <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0;">
-                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkGreenChannel">🌿 綠色通路 6% (刷$3,000封頂)</label>
-                            <input type="checkbox" id="checkGreenChannel" onchange="toggleGreenLogic()">
-                        </div>
-                        <button onclick="toggleGreenDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看綠色通路</button>
-                        <div id="greenDetails" class="details-content">
-                            <b>(1) 綠色交通：</b><br>特斯拉、Gogoro、WeMo、iRent、GoShare、USPACE、Ubike<br>
-                            <b>(2) 綠色飲食：</b><br>寬心園、陽明春天、小小樹食、養心茶樓、草蔬宴、上善豆家<br>
-                            <b>(3) 綠色購/捐：</b><br>中華電信(電子帳單)、台灣大哥大(電子帳單)、遠傳(電子帳單)、Tesla充電、慈濟、世界展望會
-                        </div>
-                    </div>
-                    
-                    <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0; border-top:1px dashed #ddd; padding-top:6px; margin-top:6px;">
-                         <button onclick="toggleParkingDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0; font-weight:700;">🅿️ 查看免費停車適用名單 (需上月滿額)</button>
-                         <div id="greenParkingDetails" class="details-content">
-                            <b>台灣聯通、詮營、ViVi PARK、嘟嘟房、車麻吉</b><br>
-                            <span style="font-size:10px; color:#555;">(每日1次、每次2小時、每月最高5次)</span>
-                         </div>
-                    </div>
-
-                    <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;"><label for="checkForeign">✈️ 國外消費 2% (無上限)</label><input type="checkbox" id="checkForeign" onchange="toggleForeignLogic()"></div>
-                </div>
-                
-                <div id="uniOptions">
-                    <div class="option-row read-only"><label id="labelUniBase">🔰 任意選 3.5% (刷$4萬封頂)</label><input type="checkbox" checked disabled></div>
-                    <div class="option-row"><label for="checkUniUp">🆙 訂閱 UP 選 4.5% (刷$14萬封頂)</label><input type="checkbox" id="checkUniUp" onchange="toggleUniUpLogic()"></div>
-                    <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;"><label for="checkUniBonus">🔥 統一時代任務 +3% (刷$1.6萬封頂)</label><input type="checkbox" id="checkUniBonus" onchange="updateRewardPreview()"></div>
-                </div>
-                
-                <div id="uniOpenOptions">
-                    <div class="option-row read-only"><label>🔰 基本回饋 1% (無上限)</label><input type="checkbox" checked disabled></div>
-                    <div class="option-row"><label for="checkUniGroup">🏪 統一集團 +2% (刷$2.5萬封頂)</label><input type="checkbox" id="checkUniGroup" onchange="toggleUniGroup()"></div>
-                    <div class="option-row"><label for="checkUniIcash">📱 icash Pay +4% (刷$3,750封頂)</label><input type="checkbox" id="checkUniIcash" onchange="toggleUniIcash()"></div>
-                    
-                    <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px; margin-top:6px; flex-direction:column; align-items:flex-start;">
-                        <label style="margin-bottom:4px;">🏃 踩點任務 (2家起跳，最高+4%)</label>
-                        <div class="brand-grid" id="uniBrandGrid"></div>
-                        <div style="font-size:10px; color:#FF9800; margin-top:6px; font-weight:700;" id="taskBonusDisplay">目前 0 家 (加碼 0%)</div>
-                    </div>
-                    <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px;">
-                        <label for="checkUniOverseas">✈️ 海外實體 11% (刷$6,250封頂)</label>
-                        <input type="checkbox" id="checkUniOverseas" onchange="toggleUniOverseas()">
-                    </div>
-                </div>
-                
-                <div id="jiangOptions">
-                    <div class="option-row read-only" style="background:#eee; padding:8px; border-radius:6px; margin-bottom:8px;"><label>🔰 基本回饋 0.5% (無上限)</label><input type="radio" name="jiangMode" value="base" checked onchange="updateRewardPreview()"></div>
-                    
-                    <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0px; border-top:1px dashed #ddd; padding-top:8px;">
-                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:4px;">
-                            <label for="rbJiangSelected">🛍️ 生活升級 +4.5% (刷$6,666封頂)</label>
-                            <input type="radio" name="jiangMode" id="rbJiangSelected" value="selected" onchange="updateRewardPreview()">
-                        </div>
-                        <button onclick="toggleJiangDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:0 0 6px 0;">🔽 點擊查看指定通路清單</button>
-                        <div id="jiangDetails" class="details-content">
-                            <b>(1) Ai工具及數位工具：</b><br>ChatGPT、Canva、Claude、Cursor、Duolingo、Gamma、Gemini、Notion、Perplexity、Speak、Apple 媒體服務、Google Play<br>
-                            <b>(2) 學習平台：</b><br>Hahow、Udemy、VoiceTube、PressPlay、AmazingTalker、Readmoo、智基科技(學思酷)<br>
-                            <b>(3) 國內外送平台(不含會員費用)：</b><br>Uber Eats、foodpanda<br>
-                            <b>(4) 生活家居：</b><br>IKEA宜家家居、特力屋、HOLA<br>
-                            <b>(5) 指定超商超市：</b><br>7-ELEVEN 實體門市(icash pay、街口支付、橘子支付)、全家便利商店(街口支付)、家樂福<br>
-                            <b>(6) 運動健身：</b><br>World Gym、BEING Fit、Curves、健身工廠<br>
-                            <b>(7) 國內餐廳：</b><br>國內餐廳(MCC 5811/5812/5814/5462)、連鎖速食－麥當勞<br>
-                            <b>(8) 行動支付：</b><br>LINE Pay、街口支付、icash Pay、橘子支付、悠遊付、Hami Pay、Pi錢包、TWQR<br>
-                            <b>(9) 交通：</b><br>一卡通自動加值、高鐵(含高鐵app線上刷卡)
-                        </div>
-                    </div>
-                    
-                    <div class="option-row" id="jiangTravelRow" style="border-top:1px dashed #ddd; padding-top:8px; margin-top:4px; flex-direction:column; align-items:flex-start;">
-                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="rbJiangTravel">✈️ 旅遊加碼 +4.5% (刷$1.1萬封頂)</label>
-                            <input type="radio" name="jiangMode" id="rbJiangTravel" value="travel" onchange="updateRewardPreview()">
-                        </div>
-                        <button onclick="toggleJiangTravelDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看旅遊/航空/旅行社</button>
-                        <div id="jiangTravelDetails" class="details-content">
-                            <b>(1) 海外及航空：</b><br>消費國別非台灣或幣別非台幣、航空 MCC 3000~3350/4511/4723<br>(星宇、華航、長榮、國泰、虎航、阿聯酋、酷航、樂桃、捷星、日航、ANA、亞航、聯合、越捷、大韓、達美、土耳其、卡達、法航)<br>
-                            <b>(2) 旅行社：</b><br>易遊網、雄獅、可樂、東南、五福、燦星、山富、長汎、鳳凰、易飛網、理想、永利、三賀
-                        </div>
-                    </div>
-                    <div id="jiangTravelExpMsg" style="font-size:10px; color:#d32f2f; margin-top:2px; display:none;">⚠️ 活動已於 3/31 結束</div>
-                </div>
-
-                <div id="dbsEcoOptions">
-                     <div class="option-row read-only"><label>🔰 國內外一般 1% (無上限)</label><input type="checkbox" checked disabled></div>
-                     
-                     <div class="option-row" style="background:#fff3e0; padding:8px; border-radius:6px; margin-top:6px; flex-direction:column; align-items:flex-start;">
-                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkDbsLinePay">⚡ 新戶 LINE Pay +9% (刷$11,111封頂)</label>
-                            <input type="checkbox" id="checkDbsLinePay" onchange="toggleDbsLogic('linepay')">
-                        </div>
-                        <div style="font-size:10px; color:#d32f2f; margin-top:4px;">*上限 1000 點</div>
-                     </div>
-                     
-                     <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; flex-direction:column; align-items:flex-start;">
-                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkDbsGreen">🌿 綠色/特斯拉 +9% (刷$3,333封頂)</label>
-                            <input type="checkbox" id="checkDbsGreen" onchange="toggleDbsLogic('green')">
-                        </div>
-                        
-                        <button onclick="toggleDbsDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看加碼詳情</button>
-                        <div id="dbsDetails" class="details-content">
-                            <b>綠色消費 (含特斯拉/Gogoro)：</b><br>加碼 9% (上限 300 點)。<br>通路：Tesla充電/配件、Gogoro電池資費、星巴克(隨行卡儲值不適用)、鮮乳坊、茶籽堂、台灣大車隊、iRent、WeMo、GoShare
-                        </div>
-                     </div>
-                </div>
-
-                <div id="happyOptions">
-                     <div class="option-row read-only"><label>🔰 一般消費 0.5% (無上限)</label><input type="checkbox" checked disabled></div>
-                     
-                     <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0;">
-                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkHappyPet">🐶 寵物通路 +9.5% (刷$5,263封頂)</label>
-                            <input type="checkbox" id="checkHappyPet" onchange="toggleHappyPet()">
-                        </div>
-                        <button onclick="toggleHappyPetDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看寵物通路</button>
-                        <div id="happyPetDetails" class="details-content">
-                            <b>(1) 指定寵物連鎖：</b><br>寵物公園、東森寵物、魚中魚、貓狗隊長、毛孩市集、金吉利、好狗命、好狗運、金王子、愛貓園、福壽寵物旗艦館<br>
-                            <b>(2) 2026 新增品牌：</b><br>汪喵星球、怪獸部落、超凝小姐、Hero Mama<br>
-                            <b>(3) 醫療與美容：</b><br>獸醫診所、動物醫院、寵物旅館、寵物美容 (MCC 0742, 5995)
-                        </div>
-                     </div>
-
-                     <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0; border-top:1px dashed #ddd; padding-top:6px;">
-                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkHappyPeace">🍽️ 大小安心刷 +3.5% (刷$5,714封頂)</label>
-                            <input type="checkbox" id="checkHappyPeace" onchange="toggleHappyPeace()">
-                        </div>
-                        <button onclick="toggleHappyPeaceDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看餐廳/藥局/居家</button>
-                        <div id="happyPeaceDetails" class="details-content">
-                            <b>(1) 國內餐廳：</b><br>國內各大指定餐廳 (MCC 5811, 5812, 5813, 5814)<br>
-                            <b>(2) 婦幼藥局/居家：</b><br>大樹、杏一、維康、躍獅、卡多摩、宜兒樂、營養銀行、麗兒采家、媽咪樂居家服務、潔客幫<br>
-                            <b>(3) 運動健身：</b><br>佐登妮絲、健身工廠、World Gym、BEING spa、BEING sport、Curves可爾姿
-                        </div>
-                     </div>
-
-                     <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0; border-top:1px dashed #ddd; padding-top:6px;">
-                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkHappyLife">🛒 生活禮遇 +3.5% (刷$5,714封頂)</label>
-                            <input type="checkbox" id="checkHappyLife" onchange="toggleHappyLife()">
-                        </div>
-                        <button onclick="toggleHappyLifeDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看百貨/量販/交通</button>
-                        <div id="happyLifeDetails" class="details-content">
-                            <b>(1) 百貨/Outlet：</b><br>遠東百貨、SOGO、巨城、大遠百、南紡、夢時代、skmpark、尚順、大魯閣(湳雅)、桃知道、大江、台茂、新月、遠雄、宏匯、CITYLINK、美麗華、大葉高島屋、統一時代、故宮、秀泰、環球、IKEA、麗寶、LaLaport<br>
-                            <b>(2) 超市量販/生機：</b><br>愛買、家樂福、美廉社、小北、大買家、喜互惠、棉花田、聖德科斯、永豐餘生技、里仁、台灣主婦聯盟、健康食彩、安麗、葡眾、美樂家<br>
-                            <b>(3) 交通電信：</b><br>國內加油(中油/台亞/台塑)、gogoro、Tesla、台灣大車隊、yoxi、Uber(台灣)、GoShare、iRent、WeMo、遠傳/台哥大帳單<br>
-                            <b>(4) 教育/書店：</b><br>台灣蔦屋、誠品、博客來、金石堂、巨匠、聯成、朱宗慶、雲門
-                        </div>
-                     </div>
-
-                     <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;"><label for="checkHappyForeign">✈️ 國外消費 +2% (無上限)</label><input type="checkbox" id="checkHappyForeign" onchange="toggleHappyForeign()"></div>
-                    <div id="happyDashboard" class="happy-dashboard"></div>
-                </div>
-
-                <div id="hsbcOptions">
-                     <div class="option-row" style="border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:10px;">
-                        <span style="font-weight:700; color:#333;">💳 選擇您的卡片等級 (自動記憶)：</span>
-                        <div style="display:flex; gap:15px; margin-top:8px;">
-                            <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;"><input type="radio" name="hsbcTier" value="infinite" onchange="saveHsbcTier()"> 無限卡</label>
-                            <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;"><input type="radio" name="hsbcTier" value="signature" onchange="saveHsbcTier()"> 御璽卡</label>
-                        </div>
-                    </div>
-                    <div class="option-row"><label for="hsbcInitialMiles">🏁 已有哩程 (起始值)</label><input type="number" id="hsbcInitialMiles" onchange="saveHsbcInitial()" style="text-align:right; width: 100px; border:1px solid #ccc; border-radius:4px; padding:4px;" placeholder="0"></div>
-                    <div class="option-row"><label for="hsbcRedeemedMiles" style="color:#d32f2f;">➖ 已兌換哩程</label><input type="number" id="hsbcRedeemedMiles" onchange="saveHsbcSettings()" style="text-align:right; width: 100px; border:1px solid #ffcdd2; color:#d32f2f; border-radius:4px; padding:4px;" placeholder="0"></div>
-                     <div class="option-row" style="margin-top:10px; border-top:1px dashed #ddd; padding-top:6px;"><label for="checkHsbcForeign">✈️ 國外消費</label><input type="checkbox" id="checkHsbcForeign" onchange="updateRewardPreview()"></div>
-                </div>
-                
-                <div id="richartOptions">
-                    <div style="font-size:12px; color:#D32F2F; background:#FFEBEE; padding:8px; border-radius:6px; margin-bottom:10px; font-weight:700; border:1px solid #FFCDD2;">
-                        ⚠️ 需綁定 Richart 帳戶自動扣繳 (未綁僅0.3%)
-                    </div>
-                    <div class="option-row"><label for="rbRichartGeneral">🔰 一般消費 (0.3%)</label><input type="radio" name="richartMode" id="rbRichartGeneral" value="general" checked onchange="toggleRichartLogic()"></div>
-                    <div class="option-row"><label for="rbRichartPay">📱 台新Pay/Pay+ (3.8%)</label><input type="radio" name="richartMode" id="rbRichartPay" value="pay" onchange="toggleRichartLogic()"></div>
-                    <div class="option-row"><label for="rbRichartOnline">🛍️ 指定網購/影音 (3.3%)</label><input type="radio" name="richartMode" id="rbRichartOnline" value="online" onchange="toggleRichartLogic()"></div>
-                    <div class="option-row"><label for="rbRichartLine">🟢 LINE Pay (2.3%)</label><input type="radio" name="richartMode" id="rbRichartLine" value="line" onchange="toggleRichartLogic()"></div>
-                    <div class="option-row" style="border-top:1px dashed #ddd; margin-top:6px; padding-top:6px;"><label for="rbRichartOverseas">✈️ 海外消費 (3.3%)</label><input type="radio" name="richartMode" id="rbRichartOverseas" value="overseas" onchange="toggleRichartLogic()"></div>
-                    <div style="font-size:10px; color:#555; margin-top:8px; opacity:0.8;">
-                        💡 小撇步：若網購使用台新Pay，請勾選「台新Pay (3.8%)」
-                    </div>
-                </div>
-
-                <div id="fubonJOptions">
-                   <div class="option-row read-only"><label id="labelFubonBase">🔰 國內消費 1% (無上限)</label><input type="checkbox" checked disabled></div>
-                   
-                   <div class="option-row"><label for="checkFubonJGeneral">🇯🇵🇰🇷 日韓一般消費 (3%)</label><input type="checkbox" id="checkFubonJGeneral" onchange="toggleFubonJGeneral()"></div>
-
-                   <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px; flex-direction:column; align-items:flex-start;">
-                       <div style="margin-bottom:4px; font-size:11px; color:#d32f2f;">⚠️ 實體/交通卡加碼 (各自獨立計算)</div>
-                       
-                       <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:6px;">
-                           <label for="checkFubonJKorea">🛍️ 日韓當地實體 +3% (刷$3.3萬封頂)</label>
-                           <input type="checkbox" id="checkFubonJKorea" onchange="toggleFubonJPhysical()">
-                       </div>
-                       
-                       <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:6px;">
-                            <label for="checkFubonJThai">🇹🇭 泰國當地實體 +5% (刷$2萬封頂)</label>
-                            <input type="checkbox" id="checkFubonJThai" onchange="toggleFubonJThai()">
-                       </div>
-                       
-                       <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkFubonJSuica">🍎 日本交通卡 +7% (刷$2,857封頂)</label>
-                            <input type="checkbox" id="checkFubonJSuica" onchange="toggleFubonJSuica()">
-                       </div>
-                   </div>
-                </div>
-
-                <div id="jiheOptions">
-                    <div class="option-row read-only"><label id="labelJiheBase">🔰 國內消費 1% (無上限)</label><input type="checkbox" checked disabled></div>
-                   <div class="option-row"><label for="checkJiheJapan">🇯🇵 切換為日本消費 (2.5%)</label><input type="checkbox" id="checkJiheJapan" onchange="toggleJiheLogic()"></div>
-                   <div class="option-row" id="rowJiheApple" style="border-top:1px dashed #ddd; padding-top:6px;"><label for="checkJiheApple">🍎 Apple Pay +1.5% (刷$4萬封頂)</label><input type="checkbox" id="checkJiheApple" onchange="updateRewardPreview()"></div>
-                    
-                    <div class="option-row" id="rowJiheDomesticJapanese" style="border-top:1px dashed #ddd; padding-top:6px; flex-direction:column; align-items:flex-start;">
-                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                             <label for="checkJiheDomesticJapanese">🇹🇼 國內日系名店 +4% (刷$1.25萬封頂)</label>
-                             <input type="checkbox" id="checkJiheDomesticJapanese" onchange="updateRewardPreview()">
-                        </div>
-
-                        <button onclick="toggleJiheDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看指定通路</button>
-                        <div id="jiheDetails" class="details-content">
-                            <b>(1) 服飾：</b><br>UNIQLO、GU、思夢樂、GLOBAL WORK、niko and …、LOWRYS FARM、LAKOLE、studio CLIP、repipi armario、HARE、Heather、PAGEBOY、RAGEBLUE、LEPSIM、JEANASIS<br>
-                            <b>(2) 生活/藥妝：</b><br>DAISO大創、Standard Products、THREEPPY、日藥本舖、松本清、Tomod's、札幌藥妝、TSUTAYA BOOKSTORE、HANDS台隆手創館、宜得利家居
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="kumamonOptions">
-                    <div class="option-row read-only"><label id="labelKumamonBase">🔰 國內消費 0.5% (無上限)</label><input type="checkbox" checked disabled></div>
-                    <div class="option-row" id="rowKumamonJapan"><label for="checkKumamonJapan">🇯🇵 切換為日本消費 (2.5%)</label><input type="checkbox" id="checkKumamonJapan" onchange="toggleKumamonLogic()"></div>
-                    <div id="groupKumamonJapan" style="display:none;">
-                        <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px; flex-direction:column; align-items:flex-start;">
-                            <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                                <label for="checkKumamonDesignated">🐻 指定通路 +6% (刷$8,333封頂)</label>
-                                <input type="checkbox" id="checkKumamonDesignated" onchange="toggleKumamonSub('designated')">
-                            </div>
-                            <button onclick="toggleKumamonDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看指定通路 (熊好系列)</button>
-                            <div id="kumamonDetails" class="details-content">
-                                <b>(1) 熊好遊 (交通/住宿)：</b><br>
-                                交通IC卡：SUICA、PASMO、ICOCA<br>
-                                自駕租車：TOYOTA Rent a Car、Times Car Rental、NIPPON RENT-A-CAR、OTS租車、ORIX租車<br>
-                                鐵路/航空：JR鐵路公司、日本航空<br>
-                                住宿：樂天旅遊、東橫INN、星野集團<br><br>
-                                
-                                <b>(2) 熊好玩 (樂園)：</b><br>
-                                東京迪士尼、華納兄弟哈利波特影城、日本環球影城、豪斯登堡、九州非洲獅樂園、名古屋樂高樂園、吉伊卡哇樂園<br><br>
-                                
-                                <b>(3) 熊好吃 (餐飲)：</b><br>
-                                燒肉：勝烈亭、敘敘苑、牛角、力丸燒肉、六歌仙<br>
-                                漢堡/咖啡：shake shack、DOUTOR Coffee、Fuglen<br>
-                                其他：鳥貴族、一蘭拉麵、松屋、SUKIYA、壽司郎、藏壽司<br><br>
-                                
-                                <b>(4) 熊好買 (購物)：</b><br>
-                                家電/藥妝：BicCamera、Yodobashi、松本清、唐吉軻德、大國藥妝<br>
-                                生活/商城：無印良品、日本MITSUI購物園區<br>
-                                服飾：UNIQLO、GU
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px;"><label for="checkKumamonPayPay">📱 PayPay 5% (季刷$2,857封頂)</label><input type="checkbox" id="checkKumamonPayPay" onchange="toggleKumamonSub('paypay')"></div>
-                </div>
-                
-                <div id="sinopacCurrencyOptions">
-                    <div class="option-row" style="background:#eee; padding:8px; border-radius:6px; margin-bottom:8px; flex-direction:column; align-items:flex-start;">
-                         <label style="margin-bottom:4px; color:#555;">💰 選擇資格等級 (自動記憶)</label>
-                         <div style="display:flex; gap:10px; width:100%;">
-                             <label style="font-weight:normal; font-size:12px; display:flex; align-items:center;"><input type="radio" name="currencyLevel" value="low" onchange="saveCurrencyLevel()" checked> Level 1 (限刷$7,500)</label>
-                             <label style="font-weight:normal; font-size:12px; display:flex; align-items:center;"><input type="radio" name="currencyLevel" value="high" onchange="saveCurrencyLevel()"> Level 2 (限刷$20,000)</label>
-                         </div>
-                         <div style="font-size:10px; color:#999; margin-top:2px;">Level 1: 自動扣繳+電子帳單 | Level 2: 往來資產≥10萬或大戶</div>
-                    </div>
-                    
-                    <div class="option-row read-only"><label id="labelCurrencyBase">🔰 國內一般 1%</label><input type="checkbox" checked disabled></div>
-
-                    <div class="option-row"><label>🇹🇼 國內消費</label><input type="radio" name="currencyType" value="domestic" checked onchange="toggleCurrencyLogic()"></div>
-
-                    <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px; flex-direction:column; align-items:flex-start;">
-                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="rbCurrencySelected">✈️ 海外/精選 +4% (見等級封頂)</label>
-                            <input type="radio" name="currencyType" id="rbCurrencySelected" value="selected" onchange="toggleCurrencyLogic()">
-                        </div>
-
-                        <button onclick="toggleCurrencyDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:0 0 6px 0;">🔽 點擊查看精選通路</button>
-                        <div id="currencyDetails" class="details-content">
-                            <b>(1) 國外實體：</b><br>非台灣地區且非台幣之一般交易<br>
-                            <b>(2) 網購消費：</b><br>Suica/PASMO/ICOCA儲值、Amazon、Rakuten、淘寶、eBay、Gmarket、iHerb、Selfridge、Mercari、大國藥妝、Sugi藥妝、Olive Young<br>
-                            <b>(3) 旅遊通路：</b><br>航空公司、旅行社、Booking.com、Agoda、Hotels.com、Expedia、Trip.com、Airbnb、Klook、KKday、Trivago、AsiaYo、歐特儀松山機場停車
-                        </div>
-                    </div>
-                </div>
-
-                <div id="sinopacMitsuiOptions">
-                    <div class="option-row read-only"><label id="labelMitsuiBase">🔰 一般消費 0.3% (館外/國外)</label><input type="checkbox" checked disabled></div>
-                    
-                    <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px; display:flex; flex-direction:column; align-items:flex-start;">
-                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkSinopacMitsuiSelected">🍽️ 特選通路 7% (刷$1,428封頂)</label>
-                            <input type="checkbox" id="checkSinopacMitsuiSelected" onchange="toggleSinopacMitsui('selected')">
-                        </div>
-
-                        <div style="font-size:10px; color:#aaa; margin-top:2px; line-height:1.3;">
-                            通路：館外餐飲(MCC 58xx) / 全盈+PAY<br>
-                            <span style="color:#d32f2f; font-weight:bold;">⚠️ 上限僅 100 元 (約刷 $1,428)</span>
-                        </div>
-                    </div>
-                    
-                    <div class="option-row" style="background:#fff3e0; padding:8px; border-radius:6px; margin-top:6px;"><label for="checkSinopacMitsuiTarget">🇯🇵 日韓泰實體 (滿3萬送2000/需登錄)</label><input type="checkbox" id="checkSinopacMitsuiTarget" onchange="toggleSinopacMitsui('target')"></div>
-                </div>
-                
-                <div class="input-group" style="margin-top:15px; border-top:1px solid #eee; padding-top:15px;">
-                    <label style="margin-bottom:4px;">📅 消費日期</label>
-                    <input type="date" id="dateInput" style="font-size:16px; padding:8px; text-align:left;">
-                </div>
-
-                <div class="input-group" style="margin-top:10px;">
-                    <input type="number" id="amountInput" placeholder="$ 金額" inputmode="numeric" style="font-size:28px; text-align:center; border:none; border-bottom:2px solid #eee; border-radius:0;" oninput="updateRewardPreview()" onkeyup="updateRewardPreview()" onpaste="updateRewardPreview()">
-                </div>
-                
-                <div id="liveRewardCalc"></div>
-                <div class="input-group"><input type="text" id="noteInput" placeholder="備註 (例如: 午餐)"></div>
-                <div class="btn-group">
-                    <button class="btn btn-cancel" onclick="document.getElementById('transactionModal').style.display='none'">取消</button>
-                    <button class="btn btn-again" onclick="addTransaction(false)">🔄 再記一筆</button>
-                    <button class="btn btn-confirm" id="btn-confirm" onclick="addTransaction(true)">確認</button>
-                </div>
-            </div>
-            <div class="modal-history-section">
-                <div class="modal-history-title" id="modalHistoryTitle"><span>📅 本月消費紀錄</span><span style="font-weight:normal; font-size:10px; color:#aaa;">(點擊文字修改 / ✕ 刪除)</span></div>
-                <div id="modalHistoryList"></div>
-            </div>
-        </div>
-    </div>
-    
-    <div id="manageModal" class="modal" onclick="if(event.target===this) document.getElementById('manageModal').style.display='none'">
-        <div class="modal-content" style="max-height:80vh; overflow-y:auto; padding-top:15px;">
-            <h2 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 800; color:#333;">管理我的卡片</h2>
-            
-            <div class="manage-tools">
-                 <div class="tools-header">
-                     <div style="font-size:12px; color:#888;">情境快照與工具</div>
-                     <div style="display:flex; gap:8px;">
-                         <button class="btn-tool-small" onclick="clearVisibleCards()">🧹 一鍵清空</button>
-                         <button class="btn-tool-small" style="background:#007AFF; color:white; border:none;" onclick="saveCurrentScene()">💾 存成情境</button>
-                     </div>
-                 </div>
-                 <div id="sceneList" class="scene-container"></div>
-            </div>
-            
-            <div class="manage-search-container">
-                <div class="manage-search-wrapper">
-                     <input type="text" id="cardSearchInput" class="manage-search-input" placeholder="搜尋卡片 (如: 吉鶴, 旅人...)" oninput="filterManageCards()">
-                     <button id="btnSearchClear" class="btn-search-clear" onclick="clearCardSearch()">✕</button>
-                </div>
-            </div>
-            
-            <div style="font-size:12px; color:#888; margin-bottom:12px;">點擊卡片即可 啟用 / 隱藏</div>
-            
-            <div id="manageCardList" class="manage-grid"></div>
-            
-            <button class="btn btn-confirm" style="width:100%; margin-top:10px;" onclick="document.getElementById('manageModal').style.display='none'">完成</button>
-        </div>
-    </div>
-  <script>
+<script>
     // 自動注入綠色通路/遠東樂家細節 (防呆)
     function injectDetails() {
         const petDiv = document.getElementById('happyPetDetails');
@@ -846,7 +158,7 @@
                 initWelcomeModal();
             }
         } else {
-             loadAndRenderApp();
+            loadAndRenderApp();
         }
     });
     function initWelcomeModal() {
@@ -995,7 +307,8 @@
             id: 'c10', name: '中信 UniOpen 卡', nickname: '2026 統一集團神卡', 
             note: 'icashPay 11% (刷 $3,750 封頂)', 
             type: 'uniopen_special', gradient: 'linear-gradient(135deg, #FF512F 0%, #F09819 100%)', textColor: 'white', msgDanger: '', 
-            parking: `🏪 <b>統一集團 2026 新權益</b><br>1. <b>基本回饋</b>：1% (無上限)<br>2. <b>集團加碼</b>：+2% (限刷$2.5萬)<br>3. <b>踩點任務</b>：滿 5 家 +4% (限刷$1.25萬)<br>4. <b>icash Pay</b>：加碼 +4% (限刷$3,750)`
+            parking: `🏪 <b>統一集團 2026 新權益</b><br>1.
+            <b>基本回饋</b>：1% (無上限)<br>2. <b>集團加碼</b>：+2% (限刷$2.5萬)<br>3. <b>踩點任務</b>：滿 5 家 +4% (限刷$1.25萬)<br>4. <b>icash Pay</b>：加碼 +4% (限刷$3,750)`
         },
         { 
             id: 'dbs1', name: '星展 eco 永續卡', nickname: '綠能/新戶lp神卡', 
@@ -1052,6 +365,7 @@
             gradient: 'linear-gradient(135deg, #FF7E5F 0%, #FEB47B 100%)', textColor: 'white', msgDanger: '', 
             parking: `🇯🇵🇰🇷 <b>日韓實體 6%</b> (3%+3%)<br>每季上限$1,000，需單筆滿千<br>🍎 <b>日本交通卡 10%</b> (3%+7%)<br>每季上限$200，需單筆滿兩千<br>🇹🇭 <b>泰國實體 6%</b> (1%+5%)<br>每季上限$1,000，需單筆滿千`
         },
+       
         { 
             id: 'j2', name: '聯邦吉鶴卡', nickname: '日本/ApplePay首選', 
             note: '日本 AP 4% (刷 4萬封頂) | 國內日系 5%', 
@@ -1080,7 +394,8 @@
             gradient: 'linear-gradient(135deg, #00C9FF 0%, #92FE9D 100%)', textColor: '#333', msgSuccess: '已達標 (領$2000)',
             parking: `🍽️ <b>特選通路 7% (上限100元)</b><br>通路：館外餐飲(MCC 58xx) / 全盈+PAY<br>⚠️ 加碼上限僅 100 元 (約刷 $1,428)<br><br>🇯🇵 <b>日韓泰滿額禮 (需登錄)</b><br>每季累積滿 30,000 送 2,000 (回饋約6.9%)`
         },
-        { id: 'add1', name: '新增卡片', nickname: '點擊選卡', note: '前往資料庫挑選', type: 'placeholder', gradient: 'linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%)', textColor: '#999', msgDanger: '' }
+        { id: 'add1', name: '新增卡片', nickname: '點擊選卡', note: '前往資料庫挑選', type: 'placeholder', 
+          gradient: 'linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%)', textColor: '#999', msgDanger: '' }
     ];
     let visibleCards = JSON.parse(localStorage.getItem('visibleCards'));
     let savedOrder = JSON.parse(localStorage.getItem('cardOrder'));
@@ -1385,6 +700,7 @@
                 start: new Date(dateObj.getFullYear(), dateObj.getMonth(), 1),
                 end: new Date(dateObj.getFullYear(), dateObj.getMonth() + 1, 0, 23, 59, 59),
                 isCustom: false
+          
             };
         }
 
@@ -1522,7 +838,8 @@
     }
     function calculateStats(cardId, addedAmount = 0, addedIsGreen = false, addedIsForeign = false, addedIsUniBonus = false, addedIsUniUp = false, addedIsHappyPet = false, addedIsHappyLife = false, addedIsHappyForeign = false, addedIsHappyPeace = false, addedIsHsbcForeign = false, addedIsUniGroup = false, addedIsUniIcash = false, addedIsUniOverseas = false, addedIsRichartPay = false, addedIsRichartOnline = false, addedIsRichartLine = false, addedIsRichartOverseas = false, addedIsBonus10 = false, addedIsBonus25 = false, addedIsBill = false, 
         addedIsFubonJGeneral = false, addedIsFubonJKorea = false, addedIsFubonJThai = false, addedIsFubonJSuica = false,
-        addedIsJiheJapan = false, addedIsJiheApple = false, addedIsJiheDomesticJapanese = false,
+        addedIsJiheJapan = false, 
+        addedIsJiheApple = false, addedIsJiheDomesticJapanese = false,
         addedIsKumamonJapan = false, addedIsKumamonDesignated = false, addedIsKumamonPayPay = false,
         addedIsSinopacCurrencySelected = false, 
         addedIsSinopacMitsuiSelected = false, addedIsSinopacMitsuiTarget = false,
@@ -1532,7 +849,8 @@
         const card = cards.find(c => c.id === cardId);
         if (card.type === 'placeholder') return { spend: 0, validSpend: 0, reward: 0, rate: '0.0' };
         
-        const dateInputVal = document.getElementById('dateInput') ? document.getElementById('dateInput').value : null;
+        const dateInputVal = document.getElementById('dateInput') ?
+        document.getElementById('dateInput').value : null;
         const refDate = (addedAmount > 0 && dateInputVal) ? new Date(dateInputVal) : new Date();
         const { start: cycleStart, end: cycleEnd, isCustom } = getBillingCycle(cardId, refDate);
         const { start: quarterStart, end: quarterEnd } = getQuarterRange(refDate);
@@ -1563,12 +881,14 @@
                  baseReward += t.amount * 0.01;
                  
                  // 2. 綠色/特斯拉加碼 9% (修正)
-                 if (t.isDbsGreen) {
+              
+                  if (t.isDbsGreen) {
                      greenBonusSpend += t.amount;
                  }
                  
                  // 3. 新戶 LinePay 加碼 9% (修正)
-                 if (t.isDbsLinePay) {
+               
+                  if (t.isDbsLinePay) {
                      linePayBonusSpend += t.amount;
                  }
              });
@@ -1639,6 +959,7 @@
             qTxList.forEach(t => { 
                 if(t.isFubonJKorea && t.amount >= 1000) jkBonusTotal += t.amount * 0.03; 
                 if(t.isFubonJThai && t.amount >= 1000) thaiBonusTotal += t.amount * 0.05; 
+  
                 if(t.isFubonJSuica && t.amount >= 2000) suicaBonusTotal += t.amount * 0.07; 
             });
             // 應用季上限
@@ -1725,6 +1046,7 @@
                  if (t.isKumamonJapan || t.isKumamonDesignated) rate = 0.025; // 日本基底
                  baseAndDesignatedReward += t.amount * rate;
                  
+         
                  if (t.isKumamonDesignated) designatedSpend += t.amount;
             });
             const designatedBonus = Math.min(designatedSpend, 8333) * 0.06;
@@ -1953,7 +1275,8 @@
             const groupBonus = Math.min(currentGroupSpend, 25000) * 0.02;
             
             const savedState = JSON.parse(localStorage.getItem('uniOpenState') || '{"brands":[]}');
-            const count = savedState.brands ? savedState.brands.length : 0;
+            const count = savedState.brands ?
+            savedState.brands.length : 0;
             let taskRate = 0;
             if (count >= 5) taskRate = 0.04;
             else if (count === 4) taskRate = 0.03;
@@ -2076,7 +1399,8 @@
         let isRichartOverseas = richartMode === 'overseas';
         
         let isBonus10 = document.getElementById('checkBonus10') ? document.getElementById('checkBonus10').checked : false;
-        let isBonus25 = document.getElementById('checkBonus25') ? document.getElementById('checkBonus25').checked : false;
+        let isBonus25 = document.getElementById('checkBonus25') ?
+        document.getElementById('checkBonus25').checked : false;
         let isBill = document.getElementById('checkIsBill') ? document.getElementById('checkIsBill').checked : false;
         // J1
         let isFubonJGeneral = document.getElementById('checkFubonJGeneral') ? document.getElementById('checkFubonJGeneral').checked : false;
@@ -2110,6 +1434,7 @@
             isKumamonJapan, isKumamonDesignated, isKumamonPayPay, 
             isSinopacCurrencySelectedFinal,
             isSinopacMitsuiSelected, isSinopacMitsuiTarget,
+        
             isJiangSelected, isJiangTravel,
             isDbsLinePay, isDbsGreen);
         const thisTransactionReward = newStats.reward - currentStats.reward;
@@ -2139,16 +1464,19 @@
 
             if (card.id === 'c10') {
                 statusText = `本月已賺 ${stats.reward} 點`;
-                const savedState = JSON.parse(localStorage.getItem('uniOpenState') || '{}');
+                 const savedState = JSON.parse(localStorage.getItem('uniOpenState') || '{}');
                 if (savedState.icash) {
                     const icashSpend = transactions.filter(t => t.cardId === 'c10' && t.isUniIcash).reduce((sum, t) => sum + t.amount, 0);
-                    if (icashSpend >= 3750) { msgStyle = 'color:#d32f2f;'; statusText = 'icash回饋已滿'; }
+                    if (icashSpend >= 3750) { msgStyle = 'color:#d32f2f;'; statusText 
+                    = 'icash回饋已滿'; }
                 }
             } else if (card.id === 'c9') {
                 const tier = localStorage.getItem('hsbc_tier') || 'infinite';
                 card.name = (tier === 'infinite') ? '滙豐旅人無限卡' : '滙豐旅人御璽卡';
-                card.note = (tier === 'infinite') ? '國內18/國外10 (哩)' : '國內18/國外15 (哩)';
-                let totalMiles = parseInt(localStorage.getItem('hsbc_initial_miles') || 0);
+                card.note = (tier 
+                === 'infinite') ? '國內18/國外10 (哩)' : '國內18/國外15 (哩)';
+                let totalMiles = parseInt(localStorage.getItem('hsbc_initial_miles') ||
+                0);
                 let redeemedMiles = parseInt(localStorage.getItem('hsbc_redeemed_miles') || 0);
                 const allHistoryTx = transactions.filter(t => t.cardId === 'c9');
                 const rateDomestic = (tier === 'infinite') ? 18 : 18;
@@ -2182,7 +1510,8 @@
             } else if (card.type === 'ceiling' || card.type === 'custom_j' || card.id === 'j2' || card.id === 'j3' || card.id === 'j4' || card.id === 'j5' || card.id === 'dbs1') {
                 if(card.id === 'j1') {
                     if (stats.msgDanger) {
-                        statusText = stats.msgDanger;
+         
+                       statusText = stats.msgDanger;
                         if(stats.msgDanger.includes('已封頂')) msgStyle = stats.msgStyle || 'color: #ffcccc;';
                         percent = 100;
                     } else {
@@ -2190,7 +1519,8 @@
                         percent = 0; 
                     }
                 } else {
-                    const limit = stats.customLimit || card.limit;
+                    const limit = stats.customLimit ||
+                    card.limit;
                     if(limit > 0) percent = (stats.validSpend / limit) * 100;
                     else percent = 0;
                     if (stats.msgDanger) {
@@ -2272,8 +1602,7 @@
         const currentRealCardsCount = visibleCards.filter(id => realCardIds.includes(id)).length;
         
         // 搜尋功能初始化
-        clearCardSearch(); 
-
+        clearCardSearch();
         cards.forEach(card => {
             if (card.id === 'add1') return; // 跳過佔位符
             const isVisible = visibleCards.includes(card.id);
@@ -2281,17 +1610,20 @@
             // 建立卡片按鈕 (Div)
             const btn = document.createElement('div');
             btn.className = `manage-card-btn ${isVisible ? 'active' : ''}`;
-            
+     
+        
             // 點擊事件：切換顯示/隱藏
             btn.onclick = function(e) {
                 if (e.target.classList.contains('m-setting-btn')) return; // 點到設定不觸發
                 
                 // 檢查是否超過8張限制
+            
                 if (!isVisible && currentRealCardsCount >= 8) { 
                     alert('⚠️ 最多只能顯示 8 張卡片，請先隱藏一張！'); 
                     return; 
                 }
                 toggleCardVisibility(card.id); 
+           
             };
             
             // 內部 HTML 結構
@@ -2299,14 +1631,15 @@
                 <div class="m-check-mark">✓</div>
                 <div class="m-card-name">${card.name}</div>
                 <div class="m-card-nick">${card.nickname}</div>
-            `;
+       
+             `;
             
             // 設定按鈕 (齒輪)
             const settingBtn = document.createElement('div');
             settingBtn.className = 'm-setting-btn';
             settingBtn.innerHTML = '⚙️';
             settingBtn.onclick = (e) => { 
-                e.stopPropagation(); 
+                e.stopPropagation();
                 editCardSettings(card.id); 
             };
             
@@ -2325,7 +1658,8 @@
         const btnClear = document.getElementById('btnSearchClear');
         
         // 控制清除按鈕顯示
-        btnClear.style.display = filter.length > 0 ? 'flex' : 'none';
+        btnClear.style.display = filter.length > 0 ?
+        'flex' : 'none';
         
         const cards = document.querySelectorAll('.manage-card-btn');
         cards.forEach(card => {
@@ -2334,7 +1668,8 @@
             if (name.includes(filter) || nick.includes(filter)) {
                 card.style.display = 'flex';
             } else {
-                card.style.display = 'none';
+             
+               card.style.display = 'none';
             }
         });
     }
@@ -2404,7 +1739,7 @@
         if (cardId === 'c2') document.getElementById('greenCardOptions').style.display = 'block';
         if (cardId === 'c7') {
              document.getElementById('uniOptions').style.display = 'block';
-             toggleUniUpLogic(); 
+            toggleUniUpLogic(); 
         }
         if (cardId === 'c8') document.getElementById('happyOptions').style.display = 'block';
         if (cardId === 'c9') document.getElementById('hsbcOptions').style.display = 'block';
@@ -2419,7 +1754,8 @@
                 const btns = document.querySelectorAll('.brand-btn');
                 btns.forEach(btn => { if(savedState.brands.includes(btn.innerText)) btn.classList.add('active'); });
             }
-            const count = savedState.brands ? savedState.brands.length : 0;
+            const count = savedState.brands ?
+            savedState.brands.length : 0;
             updateTaskBonusDisplay(count);
         }
         
@@ -2527,7 +1863,7 @@
             
             // 優化點：如果沒有 note，就給空字串 (CSS h-name 已設定 min-height 防止塌陷)
             let displayText = t.note || ''; 
-            
+           
             let tags = [];
             const isCard = (id) => t.cardId === id;
 
@@ -2535,6 +1871,7 @@
             if(isCard('c2') && t.isForeign) tags.push('✈️');
             
             if(isCard('c7') && t.isUniUp) tags.push('🆙');
+        
             if(isCard('c7') && t.isUniBonus) tags.push('🔥');
             
             if(isCard('c8') && t.isHappyPet) tags.push('🐶');
@@ -2542,7 +1879,8 @@
             if(isCard('c8') && t.isHappyLife) tags.push('🛒');
             if(isCard('c8') && t.isHappyForeign) tags.push('✈️');
             
-            if(isCard('c9') && t.isHsbcForeign) tags.push('✈️');
+         
+           if(isCard('c9') && t.isHsbcForeign) tags.push('✈️');
             
             if(isCard('c10') && t.isUniGroup) tags.push('🏪');
             if(isCard('c10') && t.isUniIcash) tags.push('📱');
@@ -2592,6 +1930,7 @@
                     <div class="h-date">${t.date}</div>
                 </div>
                 <div style="display:flex; align-items:center;">
+    
                     <div class="h-amount" onclick="loadTransaction(${t.id})">$${t.amount.toLocaleString()}</div>
                     <button class="btn-delete-single" onclick="deleteTransaction(${t.id}, event)">✕</button>
                 </div>
@@ -2695,6 +2034,7 @@
             visibleCards: visibleCards,
             cardOrder: savedOrder,
             uniOpenState: JSON.parse(localStorage.getItem('uniOpenState') || '{}'),
+            
             currencyLevel: localStorage.getItem('currency_level'),
             hsbcTier: localStorage.getItem('hsbc_tier'),
             hsbcInitial: localStorage.getItem('hsbc_initial_miles'),
@@ -2745,14 +2085,14 @@
             if (card.type === 'placeholder') return;
             const stats = calculateStats(card.id); let target = card.type === 'floor' ? card.target : (card.type === 'mixed' ? card.minSpend : 0);
             if (target > 0 && stats.spend < target) {
-                const end = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0), diff = Math.ceil((end - new Date()) / 86400000);
+                const end = new Date(new Date().getFullYear(), new Date().getMonth() 
+                + 1, 0), diff = Math.ceil((end - new Date()) / 86400000);
                 if (diff <= 3 && diff >= 0) { hasUrgent = true; alertList.innerHTML += `<div class="urgent-item">${card.name} 缺 $${(target - stats.spend).toLocaleString()} (剩 ${diff} 天)</div>`; }
             }
         });
         alertArea.style.display = hasUrgent ? 'block' : 'none';
     }
     updateDate(); 
-</script>
+  </script>
 </body>
 </html>
-

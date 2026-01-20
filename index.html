@@ -316,7 +316,7 @@
                           
             var isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
 
-            // 1. App 內瀏覽器偵測 -> 顯示頂部黃條 (智慧文案)
+            // 1. App 內瀏覽器偵測 -> 顯示頂部黃條 (通用文案)
             if (isInApp) {
                 var tipBar = document.getElementById('line-tip-bar');
                 var tipText = document.getElementById('line-tip-text');
@@ -324,10 +324,10 @@
                 if(tipBar && tipText) {
                     if (isIOS) {
                         // iPhone: 建議 Safari，使用「角落選單」涵蓋右上/右下
-                        tipText.innerHTML = '⚠️ 內建瀏覽器無法存檔，請點擊<strong>角落選單</strong>，選擇<strong>「在 Safari 開啟」</strong>';
+                        tipText.innerHTML = '⚠️ 內建瀏覽器無法存檔，請點擊<strong>角落選單 (...或分享)</strong>，選擇<strong>「在 Safari 開啟」</strong>';
                     } else {
                         // Android: 建議 Chrome
-                        tipText.innerHTML = '⚠️ 內建瀏覽器無法存檔，請點擊<strong>角落選單</strong>，選擇<strong>「在 Chrome 開啟」</strong>';
+                        tipText.innerHTML = '⚠️ 內建瀏覽器無法存檔，請點擊<strong>角落選單 (...)</strong>，選擇<strong>「在 Chrome 開啟」</strong>';
                     }
                     
                     tipBar.style.display = 'flex';
@@ -379,7 +379,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V124.19(Final)</div>
+            <div class="version-tag">V124.20</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -959,12 +959,13 @@
             btns.forEach(b => b.style.opacity = '1'); 
             
             canvas.toBlob(async (blob) => {
-                const file = new File([blob], `reward_${Date.now()}.png`, { type: "image/png" });
+                // 檔名設定：全英文
+                const file = new File([blob], `Reward_Report_${Date.now()}.png`, { type: "image/png" });
         
                 if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
                     try {
-                        await navigator.share({ files: [file], title: '我的刷卡戰績', text: getShareText() });
-                    } catch (err) { console.log('分享已取消'); }
+                        await navigator.share({ files: [file], title: 'My Credit Card Rewards', text: getShareText() });
+                    } catch (err) { console.log('Share cancelled'); }
                 } else {
                     alert("您的裝置不支援直接分享，系統將自動為您下載圖片。");
                     downloadShareImage(); 
@@ -981,7 +982,8 @@
         html2canvas(node, { backgroundColor: null, scale: 2 }).then(canvas => {
             node.style.transform = originalTransform; 
             const link = document.createElement('a');
-            link.download = `我的回饋戰績_${new Date().getTime()}.png`;
+            // 檔名設定：全英文
+            link.download = `Reward_Report_${new Date().getTime()}.png`;
             link.href = canvas.toDataURL();
             link.click();
             if(callback) callback();
@@ -1231,7 +1233,7 @@
         { 
             id: 'j2', name: '聯邦吉鶴卡', nickname: '日本/ApplePay首選', 
             note: '日本 AP 4% (刷 4萬封頂) | 國內日系 5%', 
-            type: 'ceiling', limit: 40000, tier1Rate: 0.04, tier2Rate: 0.025, 
+            type: 'ceiling', limit: 40000, tier1Rate: 0.04, tier2Rate: 0.02, 
             gradient: 'linear-gradient(135deg, #DC143C 0%, #FFFFFF 150%)', textColor: 'white', msgDanger: '加碼已封頂 (變2.5%)', 
             parking: `🍎 <b>日本 QUICPay (Apple Pay)</b><br>日本 2.5% + 加碼 1.5% = 4%<br>⚠️ 加碼上限 $600/月 (約刷$4萬)<br>🇹🇼 <b>國內日系名店 5%</b><br>國內 1% + 加碼 4% (刷$1.25萬封頂)`
         },
@@ -2907,7 +2909,8 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `backup_${new Date().toISOString().slice(0,10)}.json`;
+        // 檔名設定：全英文
+        a.download = `Backup_Data_${new Date().toISOString().slice(0,10)}.json`;
         a.click();
     }
 

@@ -203,7 +203,7 @@
   </head>
   <body>
     <div id="line-tip-bar">
-        <span>⚠️ LINE 瀏覽器無法存檔，建議點角落 <strong>...</strong> 切換 Safari 開啟</span>
+        <span>⚠️ LINE 瀏覽器無法存檔，建議點角落 <strong>...</strong> 切換瀏覽器開啟</span>
         <button onclick="this.parentElement.style.display='none'">✕</button>
     </div>
 
@@ -215,97 +215,98 @@
         <button class="bubble-close" onclick="closeBubble()">✕</button>
     </div>
 
+    <div id="android-install-bar">
+        <div class="install-info">
+            <div class="install-icon">💳</div>
+            <div class="install-text">
+                <div style="font-weight:800; font-size:14px;">安裝「刷卡回饋管家」</div>
+                <div style="font-size:11px; opacity:0.8;">全螢幕執行，資料不遺失</div>
+            </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <button class="btn-install-trigger" onclick="triggerAndroidInstall()">📲 安裝</button>
+            <button class="btn-close-install" onclick="closeAndroidBar()">✕</button>
+        </div>
+    </div>
+
     <style>
+        /* 共用：隱藏預設 */
+        #line-tip-bar, #safari-install-bubble, #android-install-bar { display: none; }
+
         /* LINE 提示條 */
         #line-tip-bar {
-            display: none; /* 預設隱藏 */
             background: #FFF9C4; color: #856404;
             padding: 10px 15px; font-size: 12px; font-weight: 600;
             position: fixed; top: 0; left: 0; width: 100%;
             z-index: 99999; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            justify-content: space-between; align-items: center;
-            box-sizing: border-box;
+            justify-content: space-between; align-items: center; box-sizing: border-box;
         }
-        #line-tip-bar button {
-            background: none; border: none; font-size: 16px; color: #856404; cursor: pointer; padding: 0 5px;
-        }
+        #line-tip-bar button { background: none; border: none; font-size: 16px; color: #856404; cursor: pointer; padding: 0 5px; }
 
         /* Safari 安裝氣泡 */
         #safari-install-bubble {
-            display: none; /* 預設隱藏 */
-            position: fixed;
-            bottom: 30px; /* 懸浮在底部工具列上方 */
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10000;
-            animation: bounce 2s infinite;
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            z-index: 10000; animation: bounce 2s infinite;
         }
-        
         .bubble-content {
-            background: #007AFF; /* iOS 藍 */
-            color: white;
-            padding: 10px 16px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,122,255,0.4);
-            position: relative;
-            text-align: center;
-            min-width: 160px;
+            background: #007AFF; color: white; padding: 10px 16px; border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,122,255,0.4); position: relative; text-align: center; min-width: 160px;
         }
-
         .bubble-text { font-size: 13px; line-height: 1.4; display: block; }
-        
-        /* 向下的箭頭 */
         .bubble-arrow {
-            position: absolute;
-            bottom: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0; 
-            height: 0; 
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-top: 8px solid #007AFF;
+            position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid #007AFF;
+        }
+        .bubble-close {
+            position: absolute; top: -8px; right: -8px; background: #ccc; color: white; border: 2px solid white;
+            border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
 
-        .bubble-close {
-            position: absolute;
-            top: -8px; right: -8px;
-            background: #ccc; color: white;
-            border: 2px solid white;
-            border-radius: 50%;
-            width: 20px; height: 20px;
-            font-size: 12px;
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
+        /* Android 安裝條 */
+        #android-install-bar {
+            position: fixed; bottom: 20px; left: 5%; width: 90%;
+            background: #222; color: white; border-radius: 16px;
+            padding: 12px 16px; box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            z-index: 10000; display: none; justify-content: space-between; align-items: center;
+            box-sizing: border-box; animation: slideUp 0.5s ease-out;
         }
+        .install-info { display: flex; align-items: center; gap: 12px; }
+        .install-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #00C9FF, #92FE9D); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .btn-install-trigger {
+            background: #007AFF; color: white; border: none; padding: 8px 16px; border-radius: 20px;
+            font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap;
+        }
+        .btn-close-install { background: rgba(255,255,255,0.2); border: none; width: 24px; height: 24px; border-radius: 50%; color: #aaa; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
         @keyframes bounce {
             0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);}
             40% {transform: translateX(-50%) translateY(-10px);}
             60% {transform: translateX(-50%) translateY(-5px);}
         }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 
     <script>
+        // 宣告全域變數存放安裝事件
+        let deferredPrompt;
+
         (function() {
             var ua = navigator.userAgent.toLowerCase();
             var isIOS = /iphone|ipad|ipod/.test(ua);
             var isInApp = ua.indexOf('line') > -1 || ua.indexOf('fban') > -1 || ua.indexOf('instagram') > -1;
             var isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
 
-            // 情境 1: 如果是 LINE/FB -> 顯示頂部黃條
+            // 1. LINE/FB 偵測 -> 顯示頂部黃條
             if (isInApp) {
                 var tipBar = document.getElementById('line-tip-bar');
                 if(tipBar) {
                     tipBar.style.display = 'flex';
-                    // 為了不擋住標題，把 app往下推一點
                     var appContainer = document.querySelector('.app-container');
                     if(appContainer) appContainer.style.marginTop = '40px';
                 }
             }
-            // 情境 2: 如果是 iOS Safari 且還沒安裝 -> 顯示底部氣泡指引
+            // 2. iOS Safari 偵測 -> 顯示底部氣泡
             else if (isIOS && !isStandalone && !isInApp) {
-                // 延遲 2 秒出現，讓用戶先看清楚介面
                 setTimeout(function() {
                     var bubble = document.getElementById('safari-install-bubble');
                     if(bubble) bubble.style.display = 'block';
@@ -313,9 +314,33 @@
             }
         })();
 
-        function closeBubble() {
-            document.getElementById('safari-install-bubble').style.display = 'none';
+        // 3. Android Chrome 安裝事件監聽 (這是關鍵!)
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // 防止 Chrome 67+ 自動顯示橫幅 (我們要自己控制)
+            e.preventDefault();
+            // 把事件存起來，等用戶點按鈕時用
+            deferredPrompt = e;
+            // 顯示我們自製的漂亮安裝條
+            document.getElementById('android-install-bar').style.display = 'flex';
+        });
+
+        // 按下「安裝」按鈕時觸發
+        async function triggerAndroidInstall() {
+            if (deferredPrompt) {
+                // 觸發系統原本的安裝詢問
+                deferredPrompt.prompt();
+                // 等待用戶決定
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to the install prompt: ${outcome}`);
+                // 用完就清掉
+                deferredPrompt = null;
+                // 關閉安裝條
+                document.getElementById('android-install-bar').style.display = 'none';
+            }
         }
+
+        function closeBubble() { document.getElementById('safari-install-bubble').style.display = 'none'; }
+        function closeAndroidBar() { document.getElementById('android-install-bar').style.display = 'none'; }
     </script>
     <div id="welcomeModal" class="welcome-overlay">
         <div class="welcome-content">
@@ -950,10 +975,9 @@
     window.addEventListener('load', () => {
         injectDetails(); 
         
-        // [防崩潰修補] 確保 LINE 提示條不會擋住標題
-        // 如果第二段的腳本執行太快抓不到 app-container，這裡會再執行一次
+        // [防崩潰修補] 再次檢查頂部提示條，避免被 CSS 蓋掉或因載入順序沒推開
         const tipBar = document.getElementById('line-tip-bar');
-        if (tipBar && tipBar.style.display === 'flex') {
+        if (tipBar && window.getComputedStyle(tipBar).display !== 'none') {
              const container = document.querySelector('.app-container');
              if(container) container.style.marginTop = '40px';
         }

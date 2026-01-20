@@ -312,22 +312,22 @@
             var isInApp = ua.indexOf('line') > -1 || 
                           ua.indexOf('fban') > -1 || 
                           ua.indexOf('instagram') > -1 || 
-                          ua.indexOf('threads') > -1;
+                          ua.indexOf('threads') > -1; // 關鍵修正
                           
             var isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
 
-            // 1. App 內瀏覽器偵測 -> 顯示頂部黃條 (通用文案)
+            // 1. App 內瀏覽器偵測 -> 顯示頂部黃條
             if (isInApp) {
                 var tipBar = document.getElementById('line-tip-bar');
                 var tipText = document.getElementById('line-tip-text');
                 
                 if(tipBar && tipText) {
                     if (isIOS) {
-                        // iPhone: 建議 Safari，使用「角落選單」涵蓋右上/右下
-                        tipText.innerHTML = '⚠️ 內建瀏覽器無法存檔，請點擊<strong>角落選單 (...或分享)</strong>，選擇<strong>「在 Safari 開啟」</strong>';
+                        // iPhone: 建議 Safari，使用「角落點點點」
+                        tipText.innerHTML = '⚠️ 內建瀏覽器無法存檔，請點擊<strong>角落點點點</strong>，選擇<strong>「在 Safari 開啟」</strong>';
                     } else {
                         // Android: 建議 Chrome
-                        tipText.innerHTML = '⚠️ 內建瀏覽器無法存檔，請點擊<strong>角落選單 (...)</strong>，選擇<strong>「在 Chrome 開啟」</strong>';
+                        tipText.innerHTML = '⚠️ 內建瀏覽器無法存檔，請點擊<strong>角落點點點</strong>，選擇<strong>「在 Chrome 開啟」</strong>';
                     }
                     
                     tipBar.style.display = 'flex';
@@ -336,7 +336,8 @@
                 }
             }
             // 2. iOS Safari 偵測 -> 顯示底部氣泡
-            else if (isIOS && !isStandalone && !isInApp) {
+            // 只有在 iOS 且 不是 App 內 且 不是已安裝模式 才顯示
+            else if (isIOS && !isStandalone) {
                 setTimeout(function() {
                     var bubble = document.getElementById('safari-install-bubble');
                     if(bubble) bubble.style.display = 'block';
@@ -379,7 +380,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V124.20</div>
+            <div class="version-tag">V124.21(Fix)</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -1002,11 +1003,12 @@
     window.addEventListener('load', () => {
         injectDetails(); 
         
-        // [防崩潰修補] 再次檢查頂部提示條，避免被 CSS 蓋掉或因載入順序沒推開
+        // [防崩潰修補] 再次檢查頂部提示條
         const tipBar = document.getElementById('line-tip-bar');
+        // 這裡會檢查 CSS 是否真的顯示了 tipBar
         if (tipBar && window.getComputedStyle(tipBar).display !== 'none') {
              const container = document.querySelector('.app-container');
-             if(container) container.style.marginTop = '45px';
+             if(container) container.style.marginTop = '45px'; // 往下推
         }
 
         setTimeout(() => { const ticker = document.querySelector('.ticker-content'); if(ticker) { ticker.style.animation = 'none'; void ticker.offsetWidth; ticker.style.animation = 'scroll-left 15s linear infinite'; } }, 100);
@@ -1016,15 +1018,18 @@
 
         if (!isSetupDone) {
             if (hasLegacyData) {
+                // 舊用戶：默默補上標記，直接進入 App
                 localStorage.setItem('user_setup_done', 'true');
                 loadAndRenderApp();
             } else {
+                // 真·新用戶：顯示歡迎視窗
                 initWelcomeModal();
             }
         } else {
             loadAndRenderApp();
         }
     });
+    
     function initWelcomeModal() {
         const modal = document.getElementById('welcomeModal');
         const list = document.getElementById('welcomeList');

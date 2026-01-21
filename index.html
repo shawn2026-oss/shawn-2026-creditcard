@@ -392,7 +392,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V124.29</div>
+            <div class="version-tag">V124.29(JCB)</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -2924,7 +2924,7 @@
             // C12 JCB
             if(isCard('c12') && t.isSinopacJcbForeign) tags.push('✈️');
             if(isCard('c12') && t.isSinopacJcbJapan) tags.push('🇯🇵');
-            if(isCard('c12') && t.isSinopacJcbSelected) tags.push('🛍️');
+            if(isCard('c12') && t.isSinopacJcbBonus) tags.push('🛍️'); // 共用
             if(isCard('c12') && t.isSinopacJcbQuarterly) tags.push('🔥');
 
             const tagStr = tags.length > 0 ? tags.join('') + ' ' : '';
@@ -2941,82 +2941,6 @@
             `;
             list.appendChild(item);
         });
-    }
-
-    let editingId = null;
-    function loadTransaction(id) {
-        const tx = transactions.find(t => t.id === id);
-        if (!tx) return;
-        editingId = id;
-        document.getElementById('amountInput').value = tx.amount;
-        document.getElementById('dateInput').value = tx.date;
-        document.getElementById('noteInput').value = tx.note;
-        document.getElementById('btn-confirm').innerText = "修改";
-        // 載入屬性 (Checkbox 狀態)
-        if(document.getElementById('checkGreenChannel')) document.getElementById('checkGreenChannel').checked = !!tx.isGreen;
-        if(document.getElementById('checkForeign')) document.getElementById('checkForeign').checked = !!tx.isForeign;
-        if(document.getElementById('checkUniUp')) document.getElementById('checkUniUp').checked = !!tx.isUniUp;
-        if(document.getElementById('checkUniBonus')) document.getElementById('checkUniBonus').checked = !!tx.isUniBonus;
-        if(document.getElementById('checkHappyPet')) document.getElementById('checkHappyPet').checked = !!tx.isHappyPet;
-        if(document.getElementById('checkHappyPeace')) document.getElementById('checkHappyPeace').checked = !!tx.isHappyPeace;
-        if(document.getElementById('checkHappyLife')) document.getElementById('checkHappyLife').checked = !!tx.isHappyLife;
-        if(document.getElementById('checkHappyForeign')) document.getElementById('checkHappyForeign').checked = !!tx.isHappyForeign;
-        if(document.getElementById('checkHsbcForeign')) document.getElementById('checkHsbcForeign').checked = !!tx.isHsbcForeign;
-        if(document.getElementById('checkUniGroup')) document.getElementById('checkUniGroup').checked = !!tx.isUniGroup;
-        if(document.getElementById('checkUniIcash')) document.getElementById('checkUniIcash').checked = !!tx.isUniIcash;
-        if(document.getElementById('checkUniOverseas')) document.getElementById('checkUniOverseas').checked = !!tx.isUniOverseas;
-        // Richart Radio
-        if(tx.isRichartPay) document.getElementById('rbRichartPay').checked = true;
-        else if(tx.isRichartOnline) document.getElementById('rbRichartOnline').checked = true;
-        else if(tx.isRichartLine) document.getElementById('rbRichartLine').checked = true;
-        else if(tx.isRichartOverseas) document.getElementById('rbRichartOverseas').checked = true;
-        else if(document.getElementById('rbRichartGeneral')) document.getElementById('rbRichartGeneral').checked = true;
-
-        if(document.getElementById('checkBonus10')) document.getElementById('checkBonus10').checked = !!tx.isBonus10;
-        if(document.getElementById('checkBonus25')) document.getElementById('checkBonus25').checked = !!tx.isBonus25;
-        if(document.getElementById('checkIsBill')) document.getElementById('checkIsBill').checked = !!tx.isBill;
-        
-        // J卡
-        if(document.getElementById('checkFubonJGeneral')) document.getElementById('checkFubonJGeneral').checked = !!tx.isFubonJGeneral;
-        if(document.getElementById('checkFubonJKorea')) document.getElementById('checkFubonJKorea').checked = !!tx.isFubonJKorea;
-        if(document.getElementById('checkFubonJThai')) document.getElementById('checkFubonJThai').checked = !!tx.isFubonJThai;
-        if(document.getElementById('checkFubonJSuica')) document.getElementById('checkFubonJSuica').checked = !!tx.isFubonJSuica;
-        // 吉鶴
-        if(document.getElementById('checkJiheJapan')) document.getElementById('checkJiheJapan').checked = !!tx.isJiheJapan;
-        if(document.getElementById('checkJiheApple')) document.getElementById('checkJiheApple').checked = !!tx.isJiheApple;
-        if(document.getElementById('checkJiheDomesticJapanese')) document.getElementById('checkJiheDomesticJapanese').checked = !!tx.isJiheDomesticJapanese;
-        
-        // 熊本熊
-        if(document.getElementById('checkKumamonJapan')) document.getElementById('checkKumamonJapan').checked = !!tx.isKumamonJapan;
-        if(document.getElementById('checkKumamonDesignated')) document.getElementById('checkKumamonDesignated').checked = !!tx.isKumamonDesignated;
-        if(document.getElementById('checkKumamonPayPay')) document.getElementById('checkKumamonPayPay').checked = !!tx.isKumamonPayPay;
-        
-        // 幣倍
-        if(tx.isSinopacCurrencySelected) document.getElementById('rbCurrencySelected').checked = true;
-        // 三井
-        if(document.getElementById('checkSinopacMitsuiSelected')) document.getElementById('checkSinopacMitsuiSelected').checked = !!tx.isSinopacMitsuiSelected;
-        if(document.getElementById('checkSinopacMitsuiTarget')) document.getElementById('checkSinopacMitsuiTarget').checked = !!tx.isSinopacMitsuiTarget;
-        // 將將
-        if(tx.isJiangSelected) document.getElementById('rbJiangSelected').checked = true;
-        else if(tx.isJiangTravel) document.getElementById('rbJiangTravel').checked = true;
-        // DBS
-        if(document.getElementById('checkDbsLinePay')) document.getElementById('checkDbsLinePay').checked = !!tx.isDbsLinePay;
-        if(document.getElementById('checkDbsGreen')) document.getElementById('checkDbsGreen').checked = !!tx.isDbsGreen;
-        // C12 JCB
-        if(document.getElementById('checkSinopacJcbForeign')) document.getElementById('checkSinopacJcbForeign').checked = !!tx.isSinopacJcbForeign;
-        if(document.getElementById('checkSinopacJcbJapan')) document.getElementById('checkSinopacJcbJapan').checked = !!tx.isSinopacJcbJapan;
-        if(document.getElementById('checkSinopacJcbBonus')) document.getElementById('checkSinopacJcbBonus').checked = !!tx.isSinopacJcbBonus;
-        if(document.getElementById('checkSinopacJcbQuarterly')) document.getElementById('checkSinopacJcbQuarterly').checked = !!tx.isSinopacJcbQuarterly;
-
-        // 觸發 UI 更新
-        if (tx.cardId === 'j3') toggleKumamonSub('none');
-        if (tx.cardId === 'j2') toggleJiheLogic();
-        if (cardId === 'c6') toggleBillLogic();
-        if (cardId === 'c7') toggleUniUpLogic();
-        if (cardId === 'dbs1') toggleDbsLogic('none');
-        // Update preview for DBS
-        
-        updateRewardPreview();
     }
 
     function deleteTransaction(id, event) {

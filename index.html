@@ -1902,16 +1902,23 @@
         const refDate = (addedAmount > 0 && dateInputVal) ? new Date(dateInputVal) : new Date();
         const { start: cycleStart, end: cycleEnd, isCustom } = getBillingCycle(cardId, refDate);
         const { start: quarterStart, end: quarterEnd } = getQuarterRange(refDate);
+        
+        // --- [關鍵修正]：若正在編輯某筆交易 (editingId 存在)，先從歷史紀錄中排除該筆，避免重複計算導致誤判封頂 ---
+        const txToExclude = (typeof editingId !== 'undefined') ? editingId : null;
+
         // 月週期交易 (大部分卡片用)
         const relevantTx = transactions.filter(t => {
+            if (txToExclude && t.id === txToExclude) return false; // 排除正在編輯的舊交易
             const tDate = new Date(t.date);
             return t.cardId === cardId && tDate >= cycleStart && tDate <= cycleEnd;
         });
         // 季週期交易 (富邦J/熊本熊/三井用)
         const quarterTx = transactions.filter(t => {
+            if (txToExclude && t.id === txToExclude) return false; // 排除正在編輯的舊交易
             const tDate = new Date(t.date);
             return t.cardId === cardId && tDate >= quarterStart && tDate <= quarterEnd;
         });
+
         let totalSpend = relevantTx.reduce((sum, t) => sum + parseFloat(t.amount), 0);
         totalSpend += addedAmount;
         let reward = 0;

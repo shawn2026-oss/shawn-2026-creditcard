@@ -21,7 +21,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="刷卡回饋管家">
     <meta name="theme-color" content="#F0F2F5">
-    
+     
     <meta property="og:title" content="刷卡回饋管家 - 您的信用卡最佳幫手">
     <meta property="og:description" content="自動計算回饋、即時顯示上限、支援戰績圖分享。快來看看你本月賺了多少回饋！">
     <meta property="og:image" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/icon-192.png">
@@ -29,7 +29,7 @@
     <meta property="og:type" content="website">
 
     <title>刷卡回饋管家</title>
-      
+       
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
     <link rel="icon" type="image/png" sizes="48x48" href="icon-48.png">
@@ -200,7 +200,7 @@
         .manage-card-btn.active .m-setting-btn { background: rgba(0,0,0,0.03); color: #333; }
         .m-setting-btn:active { background: #e0e0e0; transform: scale(0.9); }
     </style>
-  </head>
+</head>
   <body>
     <div id="line-tip-bar">
         <span id="line-tip-text">⚠️ 偵測中...</span>
@@ -400,7 +400,7 @@
         </div>
         
         <div class="news-ticker">
-            <div class="ticker-content" id="news-text">🎉 歡迎使用刷卡回饋管家！新增星展 Eco 卡國外實體 4% 加碼選項。</div>
+            <div class="ticker-content" id="news-text">🎉 歡迎使用刷卡回饋管家！新增星展 Eco 卡國外實體 5% 加碼選項。</div>
         </div>
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
         <div class="total-reward-card">
@@ -589,7 +589,7 @@
                 </div>
 
                 <div id="dbsEcoOptions">
-                      <div class="option-row read-only"><label>🔰 國內外一般 1.5% (無上限)</label><input type="checkbox" checked disabled></div>
+                      <div class="option-row read-only"><label>🔰 國內外一般 1% (無上限)</label><input type="checkbox" checked disabled></div>
                       
                       <div class="option-row" style="background:#fff3e0; padding:8px; border-radius:6px; margin-top:6px; flex-direction:column; align-items:flex-start;">
                          <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
@@ -611,7 +611,7 @@
                       </div>
 
                       <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px;">
-                         <label for="checkDbsForeign">✈️ 國外實體 4% (刷$1.5萬封頂)</label>
+                         <label for="checkDbsForeign">✈️ 國外實體 +4% (刷$1.5萬封頂)</label>
                          <input type="checkbox" id="checkDbsForeign" onchange="toggleDbsLogic('foreign')">
                       </div>
                 </div>
@@ -690,40 +690,40 @@
                 </div>
 
                 <div id="fubonJOptions">
-                   <div class="option-row read-only"><label id="labelFubonBase">🔰 國內消費 1% (無上限)</label><input type="checkbox" checked disabled></div>
-                   
-                   <div class="option-row"><label for="checkFubonJGeneral">🇯🇵🇰🇷 日韓一般消費 (3%)</label><input type="checkbox" id="checkFubonJGeneral" onchange="toggleFubonJGeneral()"></div>
+                    <div class="option-row read-only"><label id="labelFubonBase">🔰 國內消費 1% (無上限)</label><input type="checkbox" checked disabled></div>
+                    
+                    <div class="option-row"><label for="checkFubonJGeneral">🇯🇵🇰🇷 日韓一般消費 (3%)</label><input type="checkbox" id="checkFubonJGeneral" onchange="toggleFubonJGeneral()"></div>
 
-                   <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px; flex-direction:column; align-items:flex-start;">
-                       <div style="margin-bottom:4px; font-size:11px; color:#d32f2f;">⚠️ 實體/交通卡加碼 (各自獨立計算)</div>
-                       
-                       <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:6px;">
-                           <label for="checkFubonJKorea">🛍️ 日韓當地實體 +3% (刷$3.3萬封頂)</label>
-                           <input type="checkbox" id="checkFubonJKorea" onchange="toggleFubonJPhysical()">
-                       </div>
-                       
-                       <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:6px;">
-                            <label for="checkFubonJThai">🇹🇭 泰國當地實體 +5% (刷$2萬封頂)</label>
-                            <input type="checkbox" id="checkFubonJThai" onchange="toggleFubonJThai()">
-                       </div>
-                       
-                       <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkFubonJSuica">🍎 日本交通卡 +7% (刷$2,857封頂)</label>
-                            <input type="checkbox" id="checkFubonJSuica" onchange="toggleFubonJSuica()">
-                       </div>
-                   </div>
+                    <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px; flex-direction:column; align-items:flex-start;">
+                        <div style="margin-bottom:4px; font-size:11px; color:#d32f2f;">⚠️ 實體/交通卡加碼 (各自獨立計算)</div>
+                        
+                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:6px;">
+                            <label for="checkFubonJKorea">🛍️ 日韓當地實體 +3% (刷$3.3萬封頂)</label>
+                            <input type="checkbox" id="checkFubonJKorea" onchange="toggleFubonJPhysical()">
+                        </div>
+                        
+                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:6px;">
+                             <label for="checkFubonJThai">🇹🇭 泰國當地實體 +5% (刷$2萬封頂)</label>
+                             <input type="checkbox" id="checkFubonJThai" onchange="toggleFubonJThai()">
+                        </div>
+                        
+                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                             <label for="checkFubonJSuica">🍎 日本交通卡 +7% (刷$2,857封頂)</label>
+                             <input type="checkbox" id="checkFubonJSuica" onchange="toggleFubonJSuica()">
+                        </div>
+                    </div>
                 </div>
 
                 <div id="jiheOptions">
                     <div class="option-row read-only"><label id="labelJiheBase">🔰 國內消費 1% (無上限)</label><input type="checkbox" checked disabled></div>
-                   <div class="option-row"><label for="checkJiheJapan">🇯🇵 切換為日本消費 (2.5%)</label><input type="checkbox" id="checkJiheJapan" onchange="toggleJiheLogic()"></div>
+                    <div class="option-row"><label for="checkJiheJapan">🇯🇵 切換為日本消費 (2.5%)</label><input type="checkbox" id="checkJiheJapan" onchange="toggleJiheLogic()"></div>
                     <div class="option-row" id="rowJiheApple" style="border-top:1px dashed #ddd; padding-top:6px;"><label for="checkJiheApple">🍎 Apple Pay +1.5% (刷$4萬封頂)</label><input type="checkbox" id="checkJiheApple" onchange="updateRewardPreview()"></div>
                     
                     <div class="option-row" id="rowJiheDomesticJapanese" style="border-top:1px dashed #ddd; padding-top:6px; flex-direction:column; align-items:flex-start;">
                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
                              <label for="checkJiheDomesticJapanese">🇹🇼 國內日系名店 +4% (刷$1.25萬封頂)</label>
                              <input type="checkbox" id="checkJiheDomesticJapanese" onchange="updateRewardPreview()">
-                        </div>
+                         </div>
 
                         <button onclick="toggleJiheDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看指定通路</button>
                         <div id="jiheDetails" class="details-content">
@@ -1226,12 +1226,12 @@
         },
         { 
             id: 'dbs1', name: '星展 eco 永續卡', nickname: '綠能/新戶lp神卡', 
-            note: '國外實體 4% (刷1.5萬封頂)', 
+            note: '國外實體 +4% (刷$1.5萬封頂)', 
             type: 'ceiling', limit: 15000, 
-            tier1Rate: 0.04, tier2Rate: 0.015, 
+            tier1Rate: 0.05, tier2Rate: 0.01, 
             gradient: 'linear-gradient(135deg, #FF0000 0%, #000000 100%)', textColor: 'white', 
-            msgDanger: '加碼已封頂 (變1.5%)', 
-            parking: `⚡ <b>新戶 Line Pay 10%</b><br>基本 1.5% + 加碼 8.5%<br>⚠️ 加碼上限 1000 點 (約刷 $11,111)<br>✈️ <b>國外實體 4%</b><br>基本 1.5% + 加碼 2.5%<br>⚠️ 加碼適用月刷 $15,000 封頂`
+            msgDanger: '加碼已封頂 (變1%)', 
+            parking: `⚡ <b>新戶 Line Pay 10%</b><br>基本 1% + 加碼 9%<br>⚠️ 加碼上限 1000 點 (約刷 $11,111)<br>✈️ <b>國外實體 +4%</b><br>基本 1% + 加碼 4% (共5%)<br>⚠️ 加碼適用月刷 $15,000 封頂`
         },
         { 
             id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', 
@@ -1617,7 +1617,7 @@
                 start: new Date(dateObj.getFullYear(), dateObj.getMonth(), 1),
                 end: new Date(dateObj.getFullYear(), dateObj.getMonth() + 1, 0, 23, 59, 59),
                 isCustom: false
-           
+            
             };
         }
 
@@ -1883,8 +1883,7 @@
             document.getElementById('amountInput').focus();
         }
     }
-    
-    function calculateStats(cardId, addedAmount = 0, addedIsGreen = false, addedIsForeign = false, addedIsUniBonus = false, addedIsUniUp = false, addedIsHappyPet = false, addedIsHappyLife = false, addedIsHappyForeign = false, addedIsHappyPeace = false, addedIsHsbcForeign = false, addedIsUniGroup = false, addedIsUniIcash = false, addedIsUniOverseas = false, addedIsRichartPay = false, addedIsRichartOnline = false, addedIsRichartLine = false, addedIsRichartOverseas = false, addedIsBonus10 = false, addedIsBonus25 = false, addedIsBill = false, 
+      function calculateStats(cardId, addedAmount = 0, addedIsGreen = false, addedIsForeign = false, addedIsUniBonus = false, addedIsUniUp = false, addedIsHappyPet = false, addedIsHappyLife = false, addedIsHappyForeign = false, addedIsHappyPeace = false, addedIsHsbcForeign = false, addedIsUniGroup = false, addedIsUniIcash = false, addedIsUniOverseas = false, addedIsRichartPay = false, addedIsRichartOnline = false, addedIsRichartLine = false, addedIsRichartOverseas = false, addedIsBonus10 = false, addedIsBonus25 = false, addedIsBill = false, 
         addedIsFubonJGeneral = false, addedIsFubonJKorea = false, addedIsFubonJThai = false, addedIsFubonJSuica = false,
         addedIsJiheJapan = false, 
         addedIsJiheApple = false, addedIsJiheDomesticJapanese = false,
@@ -1985,7 +1984,7 @@
             return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: displayRate, isCustom, cycleStart, cycleEnd, msgDanger: statusText, customLimit: limit, msgStyle };
         }
 
-        // --- 星展 eco 永續卡 (DBS) - 修正版 ---
+        // --- 星展 eco 永續卡 (DBS) - 2026/01 修正版 ---
         if (cardId === 'dbs1') {
              const txList = [...relevantTx];
              if (addedAmount > 0) txList.push({ amount: addedAmount, isDbsLinePay: addedIsDbsLinePay, isDbsGreen: addedIsDbsGreen, isDbsForeign: addedIsDbsForeign });
@@ -1996,30 +1995,29 @@
              let foreignBonusSpend = 0;
              
              txList.forEach(t => {
-                 // 1. 全通路基本 1.5% (國內外)
-                 baseReward += t.amount * 0.015;
+                 // 1. 全通路基本 1% (國內外) - 修正為 0.01
+                 baseReward += t.amount * 0.01;
                  
-                 // 2. 綠色/特斯拉加碼 (9% -> 8.5%?) 
-                 // 修正：DBS官網通常是 基底1.5% + 加碼8.5% = 10% (但上限不同)
+                 // 2. 綠色/特斯拉加碼 (10% - 1% = 9%)
                  if (t.isDbsGreen) greenBonusSpend += t.amount;
                  
-                 // 3. 新戶 LinePay 加碼 (9% -> 8.5%?)
+                 // 3. 新戶 LinePay 加碼 (10% - 1% = 9%)
                  if (t.isDbsLinePay) linePayBonusSpend += t.amount;
 
-                 // 4. 國外實體加碼 (4% -> 基底1.5% + 加碼2.5%)
+                 // 4. 國外實體加碼 (5% - 1% = 4%) - 新增
                  if (t.isDbsForeign) foreignBonusSpend += t.amount;
              });
 
-             // 計算 LinePay 加碼 (1.5+8.5=10%, 上限1000點)
-             const linePayBonus = Math.min(linePayBonusSpend * 0.085, 1000);
-             // 計算 綠色 加碼 (1.5+8.5=10%, 上限300點)
-             const greenBonus = Math.min(greenBonusSpend * 0.085, 300);
-             // 計算 國外實體 加碼 (1.5+2.5=4%, 上限刷1.5萬 -> 15000*0.025=375)
-             const foreignBonus = Math.min(foreignBonusSpend, 15000) * 0.025;
+             // 計算 LinePay 加碼 (9%, 上限1000點)
+             const linePayBonus = Math.min(linePayBonusSpend * 0.09, 1000);
+             // 計算 綠色 加碼 (9%, 上限300點)
+             const greenBonus = Math.min(greenBonusSpend * 0.09, 300);
+             // 計算 國外實體 加碼 (4%, 上限刷1.5萬) -> 15000*0.04=600
+             const foreignBonus = Math.min(foreignBonusSpend, 15000) * 0.04;
 
              reward = baseReward + linePayBonus + greenBonus + foreignBonus;
              
-             let displayRate = "1.5";
+             let displayRate = "1.0";
              let statusText = '';
              let msgStyle = '';
              let validSpend = 0;
@@ -2028,7 +2026,7 @@
              if (addedIsDbsLinePay) {
                  displayRate = "10.0";
                  validSpend = linePayBonusSpend;
-                 limit = 11764; // 1000 / 0.085
+                 limit = 11111; // 1000 / 0.09
                  if (validSpend >= limit) {
                      statusText = 'LinePay加碼已封頂';
                      msgStyle = 'color: #ffcccc;';
@@ -2038,7 +2036,7 @@
              } else if (addedIsDbsGreen) {
                  displayRate = "10.0";
                  validSpend = greenBonusSpend;
-                 limit = 3529; // 300 / 0.085
+                 limit = 3333; // 300 / 0.09
                  if (validSpend >= limit) {
                      statusText = '綠色加碼已封頂';
                      msgStyle = 'color: #ffcccc;';
@@ -2046,14 +2044,14 @@
                      statusText = `綠色 剩 $${Math.floor(limit - validSpend).toLocaleString()} (10%)`;
                  }
              } else if (addedIsDbsForeign) {
-                 displayRate = "4.0";
+                 displayRate = "5.0";
                  validSpend = foreignBonusSpend;
                  limit = 15000;
                  if (validSpend >= limit) {
-                     statusText = '國外加碼已封頂 (變1.5%)';
+                     statusText = '國外加碼已封頂 (變1%)';
                      msgStyle = 'color: #ffcccc;';
                  } else {
-                     statusText = `國外實體剩 $${Math.floor(limit - validSpend).toLocaleString()} (4%)`;
+                     statusText = `國外實體剩 $${Math.floor(limit - validSpend).toLocaleString()} (+4%)`;
                  }
              } else {
                  statusText = `本月累積 $${totalSpend.toLocaleString()}`;
@@ -2732,8 +2730,8 @@
             // 建立卡片按鈕 (Div)
             const btn = document.createElement('div');
             btn.className = `manage-card-btn ${isVisible ? 'active' : ''}`;
-       
         
+            
             // 點擊事件：切換顯示/隱藏
             btn.onclick = function(e) {
                 if (e.target.classList.contains('m-setting-btn')) return; // 點到設定不觸發
@@ -2990,7 +2988,7 @@
             
             // 優化點：如果沒有 note，就給空字串 (CSS h-name 已設定 min-height 防止塌陷)
             let displayText = t.note || ''; 
-           
+            
             let tags = [];
             const isCard = (id) => t.cardId === id;
 

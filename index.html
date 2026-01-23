@@ -1,3 +1,4 @@
+0123 21:15
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -21,7 +22,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="刷卡回饋管家">
     <meta name="theme-color" content="#F0F2F5">
-     
+      
     <meta property="og:title" content="刷卡回饋管家 - 您的信用卡最佳幫手">
     <meta property="og:description" content="自動計算回饋、即時顯示上限、支援戰績圖分享。快來看看你本月賺了多少回饋！">
     <meta property="og:image" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/icon-192.png">
@@ -29,7 +30,7 @@
     <meta property="og:type" content="website">
 
     <title>刷卡回饋管家</title>
-       
+        
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
     <link rel="icon" type="image/png" sizes="48x48" href="icon-48.png">
@@ -249,7 +250,7 @@
         .h-amount { font-weight: 700; color: #333; font-size: 13px; }
         .btn-delete-single { background: none; border: none; color: #ccc; font-size: 14px; padding: 0 5px; cursor: pointer; margin-left: 8px;}
         .btn-delete-single:hover { color: #FF3B30; }
-        #pigRichOptions, #greenCardOptions, #uniOptions, #happyOptions, #hsbcOptions, #uniOpenOptions, #richartOptions, #fubonJOptions, #jiheOptions, #kumamonOptions, #sinopacCurrencyOptions, #sinopacMitsuiOptions, #jiangOptions, #dbsEcoOptions, #sinopacJcbOptions { display: none; background: #f9f9f9; padding: 10px; border-radius: 10px; margin-top: 10px; border: 1px dashed #ddd; }
+        #pigRichOptions, #greenCardOptions, #uniOptions, #happyOptions, #hsbcOptions, #uniOpenOptions, #richartOptions, #fubonJOptions, #jiheOptions, #kumamonOptions, #sinopacCurrencyOptions, #sinopacMitsuiOptions, #jiangOptions, #dbsEcoOptions, #sinopacJcbOptions, #laiDianOptions { display: none; background: #f9f9f9; padding: 10px; border-radius: 10px; margin-top: 10px; border: 1px dashed #ddd; }
         .option-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #555; }
         .option-row input[type="checkbox"], .option-row input[type="radio"], .option-row input[type="number"] { margin: 0; }
         .option-row input[type="checkbox"], .option-row input[type="radio"] { width: 20px; height: 20px; }
@@ -536,8 +537,7 @@
             <button style="margin-top:15px; background:none; border:none; color:white; font-size:14px; text-decoration:underline; cursor:pointer;" onclick="document.getElementById('sharePreviewModal').style.display='none'">關閉視窗</button>
         </div>
     </div>
-
-    <div id="transactionModal" class="modal" onclick="if(event.target===this) closeModal()">
+  <div id="transactionModal" class="modal" onclick="if(event.target===this) closeModal()">
         <div class="modal-content">
             <div class="modal-body-input">
                 <h2 id="modalTitle" style="margin: 0 0 4px 0; font-size: 18px; font-weight: 800; color:#333;"></h2>
@@ -583,6 +583,39 @@
                     <div class="option-row" style="margin-bottom:0; border-top:1px dashed #ddd; padding-top:6px;"><label for="checkIsBill">🧾 APP繳費 (底1%→0.15%)</label><input type="checkbox" id="checkIsBill" onchange="toggleBillLogic()"></div>
                 </div>
 
+                <div id="laiDianOptions" style="display:none; background:#f9f9f9; padding:10px; border-radius:10px; margin-top:10px; border:1px dashed #ddd;">
+                    <div class="option-row" style="margin-bottom:8px;">
+                        <label for="checkLaiDianNew" style="font-weight:700; color:#007AFF;">👶 我是新戶 (核卡6個月內)</label>
+                        <input type="checkbox" id="checkLaiDianNew" onchange="updateRewardPreview()">
+                    </div>
+                    
+                    <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:4px; border-top:1px dashed #ddd; padding-top:8px;">
+                        <div style="font-size:12px; font-weight:700; color:#555; margin-bottom:4px;">請選擇消費模式：</div>
+                        
+                        <label style="display:flex; align-items:center; width:100%; justify-content:space-between; margin-bottom:6px;">
+                            <span>1️⃣ 一般消費 / 國外 (無LP)</span>
+                            <input type="radio" name="laiDianMode" value="general" checked onchange="updateRewardPreview()">
+                        </label>
+                        
+                        <label style="display:flex; align-items:center; width:100%; justify-content:space-between; margin-bottom:6px;">
+                            <span>2️⃣ LINE Pay 一般 (含新戶)</span>
+                            <input type="radio" name="laiDianMode" value="lp" onchange="updateRewardPreview()">
+                        </label>
+                        
+                        <label style="display:flex; align-items:center; width:100%; justify-content:space-between;">
+                            <span>3️⃣ 偶數日 + 指定通路</span>
+                            <input type="radio" name="laiDianMode" value="even" onchange="updateRewardPreview()">
+                        </label>
+                        
+                        <button onclick="toggleLaiDianDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:6px 0 0 0; width:100%; text-align:left;">🔽 查看指定通路 (偶數日+5%)</button>
+                        <div id="laiDianDetails" class="details-content">
+                            <b>指定通路 (需綁定 LINE Pay)：</b><br>
+                            UNIQLO、DAISO大創、日藥本舖、王品集團、瓦城、屋馬燒肉、春水堂、YAYOI彌生軒、壽司郎、Klook、KKday、可樂旅遊、摩曼頓、尚智運動世界<br>
+                            <span style="font-size:10px; color:#d32f2f;">(詳情請以官方公告為準)</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="greenCardOptions">
                     <div class="option-row read-only"><label>🔰 國內 1% / 國外 2%</label><input type="checkbox" checked disabled></div>
                     
@@ -604,7 +637,7 @@
                           <div id="greenParkingDetails" class="details-content">
                             <b>台灣聯通、詮營、ViVi PARK、嘟嘟房、車麻吉</b><br>
                             <span style="font-size:10px; color:#555;">(每日1次、每次2小時、每月最高5次)</span><br>
-                         </div>
+                          </div>
                     </div>
 
                     <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;"><label for="checkForeign">✈️ 國外消費 2% (無上限)</label><input type="checkbox" id="checkForeign" onchange="toggleForeignLogic()"></div>
@@ -672,7 +705,7 @@
                       <div class="option-row read-only"><label>🔰 國內外一般 1% (無上限)</label><input type="checkbox" checked disabled></div>
                       
                       <div class="option-row" style="background:#fff3e0; padding:8px; border-radius:6px; margin-top:6px; flex-direction:column; align-items:flex-start;">
-                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                          <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
                             <label for="checkDbsLinePay">⚡ 新戶 LINE Pay +9% (刷$11,111封頂)</label>
                             <input type="checkbox" id="checkDbsLinePay" onchange="toggleDbsLogic('linepay')">
                         </div>
@@ -680,7 +713,7 @@
                       </div>
                       
                       <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; flex-direction:column; align-items:flex-start;">
-                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                          <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
                             <label for="checkDbsGreen">🌿 綠色/特斯拉 +9% (刷$3,333封頂)</label>
                             <input type="checkbox" id="checkDbsGreen" onchange="toggleDbsLogic('green')">
                         </div>
@@ -691,54 +724,59 @@
                       </div>
 
                       <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px;">
-                         <label for="checkDbsForeign">✈️ 國外實體 +4% (刷$1.5萬封頂)</label>
-                         <input type="checkbox" id="checkDbsForeign" onchange="toggleDbsLogic('foreign')">
+                          <label for="checkDbsForeign">✈️ 國外實體 +4% (刷$1.5萬封頂)</label>
+                          <input type="checkbox" id="checkDbsForeign" onchange="toggleDbsLogic('foreign')">
                       </div>
                 </div>
-              <div id="happyOptions">
-                      <div class="option-row read-only"><label>🔰 一般消費 0.5% (無上限)</label><input type="checkbox" checked disabled></div>
-                      
-                      <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0;">
-                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkHappyPet">🐶 寵物通路 +9.5% (刷$5,263封頂)</label>
-                            <input type="checkbox" id="checkHappyPet" onchange="toggleHappyPet()">
-                        </div>
-                        <button onclick="toggleHappyPetDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看寵物通路</button>
-                        <div id="happyPetDetails" class="details-content">
+                
+                <div id="happyOptions">
+                      <div class="option-row" style="flex-direction:column; align-items:flex-start; margin-bottom:10px;">
+                          <label style="margin-bottom:8px; font-weight:700; color:#555;">請選擇消費類別：</label>
+                          
+                          <label style="display:flex; align-items:center; width:100%; justify-content:space-between; margin-bottom:8px;">
+                              <span>🔰 一般消費 (0.5%)</span>
+                              <input type="radio" name="happyMode" value="general" checked onchange="toggleHappyLogic()">
+                          </label>
+                          
+                          <label style="display:flex; align-items:center; width:100%; justify-content:space-between; margin-bottom:4px;">
+                              <span>🐶 寵物 (10%)</span>
+                              <input type="radio" name="happyMode" value="pet" onchange="toggleHappyLogic()">
+                          </label>
+                          <button onclick="toggleHappyPetDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:0 0 8px 24px; text-align:left;">🔽 查看寵物通路</button>
+                          <div id="happyPetDetails" class="details-content" style="margin-left:8px; margin-bottom:8px;">
                             <b>(1) 指定寵物連鎖：</b><br>寵物公園、東森寵物、魚中魚、貓狗隊長、毛孩市集、金吉利、好狗命、好狗運、金王子、愛貓園、福壽寵物旗艦館<br>
                             <b>(2) 2026 新增品牌：</b><br>汪喵星球、怪獸部落、超凝小姐、Hero Mama<br>
                             <b>(3) 醫療與美容：</b><br>獸醫診所、動物醫院、寵物旅館、寵物美容 (MCC 0742, 5995)<br>
-                        </div>
-                      </div>
-
-                      <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0; border-top:1px dashed #ddd; padding-top:6px;">
-                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkHappyPeace">🍽️ 大小安心刷 +3.5% (刷$5,714封頂)</label>
-                            <input type="checkbox" id="checkHappyPeace" onchange="toggleHappyPeace()">
-                        </div>
-                        <button onclick="toggleHappyPeaceDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看餐廳/藥局/居家</button>
-                        <div id="happyPeaceDetails" class="details-content">
-                            <b>(1) 國內餐廳：</b><br>國內各大指定餐廳 (MCC 5811, 5812, 5813, 5814)<br>
-                            <b>(2) 婦幼藥局/居家：</b><br>大樹、杏一、維康、躍獅、卡多摩、宜兒樂、營養銀行、麗兒采家、媽咪樂居家服務、潔客幫<br>
-                            <b>(3) 運動健身：</b><br>佐登妮絲、健身工廠、World Gym、BEING spa、BEING sport、Curves可爾姿<br>
-                        </div>
-                      </div>
-
-                      <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0; border-top:1px dashed #ddd; padding-top:6px;">
-                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkHappyLife">🛒 生活禮遇 +3.5% (刷$5,714封頂)</label>
-                            <input type="checkbox" id="checkHappyLife" onchange="toggleHappyLife()">
-                        </div>
-                        <button onclick="toggleHappyLifeDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看百貨/量販/交通</button>
-                        <div id="happyLifeDetails" class="details-content">
+                          </div>
+                          
+                          <label style="display:flex; align-items:center; width:100%; justify-content:space-between; margin-bottom:4px;">
+                              <span>🍽️ 生活 (4%)</span>
+                              <input type="radio" name="happyMode" value="life" onchange="toggleHappyLogic()">
+                          </label>
+                          <button onclick="toggleHappyLifeDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:0 0 8px 24px; text-align:left;">🔽 查看百貨/量販/交通</button>
+                          <div id="happyLifeDetails" class="details-content" style="margin-left:8px; margin-bottom:8px;">
                             <b>(1) 百貨/Outlet：</b><br>遠東百貨、SOGO、巨城、大遠百、南紡、夢時代、skmpark、尚順、大魯閣(湳雅)、桃知道、大江、台茂、新月、遠雄、宏匯、CITYLINK、美麗華、大葉高島屋、統一時代、故宮、秀泰、環球、IKEA、麗寶、LaLaport<br>
                             <b>(2) 超市量販/生機：</b><br>愛買、家樂福、美廉社、小北、大買家、喜互惠、棉花田、聖德科斯、永豐餘生技、里仁、台灣主婦聯盟、健康食彩、安麗、葡眾、美樂家<br>
                             <b>(3) 交通電信：</b><br>國內加油(中油/台亞/台塑)、gogoro、Tesla、台灣大車隊、yoxi、Uber(台灣)、GoShare、iRent、WeMo、遠傳/台哥大帳單<br>
                             <b>(4) 教育/書店：</b><br>台灣蔦屋、誠品、博客來、金石堂、巨匠、聯成、朱宗慶、雲門<br>
-                        </div>
-                      </div>
+                          </div>
+                          
+                          <label style="display:flex; align-items:center; width:100%; justify-content:space-between; margin-bottom:4px;">
+                              <span>📡 安心 (4%)</span>
+                              <input type="radio" name="happyMode" value="peace" onchange="toggleHappyLogic()">
+                          </label>
+                           <button onclick="toggleHappyPeaceDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:0 0 8px 24px; text-align:left;">🔽 查看餐廳/藥局/居家</button>
+                           <div id="happyPeaceDetails" class="details-content" style="margin-left:8px; margin-bottom:8px;">
+                            <b>(1) 國內餐廳：</b><br>國內各大指定餐廳 (MCC 5811, 5812, 5813, 5814)<br>
+                            <b>(2) 婦幼藥局/居家：</b><br>大樹、杏一、維康、躍獅、卡多摩、宜兒樂、營養銀行、麗兒采家、媽咪樂居家服務、潔客幫<br>
+                            <b>(3) 運動健身：</b><br>佐登妮絲、健身工廠、World Gym、BEING spa、BEING sport、Curves可爾姿<br>
+                           </div>
 
-                      <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;"><label for="checkHappyForeign">✈️ 國外消費 +2% (無上限)</label><input type="checkbox" id="checkHappyForeign" onchange="toggleHappyForeign()"></div>
+                          <label style="display:flex; align-items:center; width:100%; justify-content:space-between;">
+                              <span>✈️ 國外消費 (2.5%)</span>
+                              <input type="radio" name="happyMode" value="foreign" onchange="toggleHappyLogic()">
+                          </label>
+                      </div>
                     <div id="happyDashboard" class="happy-dashboard"></div>
                 </div>
 
@@ -803,7 +841,7 @@
                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
                              <label for="checkJiheDomesticJapanese">🇹🇼 國內日系名店 +4% (刷$1.25萬封頂)</label>
                              <input type="checkbox" id="checkJiheDomesticJapanese" onchange="updateRewardPreview()">
-                         </div>
+                          </div>
 
                         <button onclick="toggleJiheDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看指定通路</button>
                         <div id="jiheDetails" class="details-content">
@@ -917,9 +955,9 @@
                 <div class="input-group" style="margin-top:10px;">
                     <input type="number" id="amountInput" placeholder="$ 金額" inputmode="numeric" style="font-size:28px; text-align:center; border:none; border-bottom:2px solid #eee; border-radius:0;" oninput="updateRewardPreview()" onkeyup="updateRewardPreview()" onpaste="updateRewardPreview()">
                     <div id="thresholdWarning" class="threshold-warning">⚠️ 未滿 $100，僅享 1% 回饋</div>
+                    <div id="liveRewardCalc"></div>
                 </div>
                 
-                <div id="liveRewardCalc"></div>
                 <div class="input-group"><input type="text" id="noteInput" placeholder="備註 (例如: 午餐)"></div>
                 <div class="btn-group">
                     <button class="btn btn-cancel" onclick="document.getElementById('transactionModal').style.display='none'">取消</button>
@@ -963,7 +1001,7 @@
             <button class="btn btn-confirm" style="width:100%; margin-top:10px;" onclick="document.getElementById('manageModal').style.display='none'">完成</button>
         </div>
     </div>
-    <script>
+  <script>
     // 自動注入詳細資訊 (防呆)
     function injectDetails() {
         const petDiv = document.getElementById('happyPetDetails');
@@ -991,6 +1029,8 @@
     function toggleHappyPeaceDetails() { const el = document.getElementById('happyPeaceDetails'); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
     function toggleHappyLifeDetails() { const el = document.getElementById('happyLifeDetails'); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
     function toggleSinopacJcbDetails() { const el = document.getElementById('sinopacJcbDetails'); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
+    // [新增] 賴點卡通路折疊
+    function toggleLaiDianDetails() { const el = document.getElementById('laiDianDetails'); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
 
 
     // --- 曬戰績功能核心邏輯 ---
@@ -1253,18 +1293,17 @@
         { 
             id: 'c5', name: '聯邦賴點卡', 
             nickname: 'Line Pay優等生', 
-            // [修正] 卡面標註低消 $100
-            note: 'Line Pay 6% (需單筆滿$100)', 
-            rule: '⚠️ 單筆需滿$100', 
+            note: '偶數日+5% / LP+1% / 新戶+4%', 
+            rule: '⚠️ 複雜堆疊規則', 
             type: 'ceiling', 
             limit: 3000, 
             tier1Rate: 0.06, 
             tier2Rate: 0.01, 
-            threshold: 100, // 恢復低消邏輯參數
+            threshold: 0, 
             gradient: 'linear-gradient(135deg, #00B900 0%, #33CC33 100%)', 
             textColor: 'white', 
-            msgDanger: '已封頂 (變1%)', 
-            parking: `✅ <b>Line Pay 回饋 6%</b> (上限3000)<br>⚠️ <b>注意：單筆需滿 $100</b>`
+            msgDanger: '加碼已封頂', 
+            parking: `✅ <b>基本回饋 1%</b> (無上限)<br>📱 <b>LP 加碼 1%</b> (限刷2萬)<br>📅 <b>偶數日 5%</b> (限刷3千)<br>👶 <b>新戶加碼 4%</b> (限刷7500，需LP+新戶)`
         },
         { id: 'c3', name: '永豐 Sport 卡', nickname: 'Apple Pay優等生', note: 'Apple Pay 5% (刷 5千封頂)', rule: '', type: 'ceiling', limit: 5000, tier1Rate: 0.05, tier2Rate: 0.02, gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)' },
         { 
@@ -1322,7 +1361,6 @@
         },
         { 
             id: 'j4', name: '永豐幣倍卡 (大大/大戶)', nickname: '海外雙幣神卡', 
-            // [修正] 名稱顯示 大大/大戶
             note: '海外精選 6% (刷 2萬封頂)', 
             type: 'ceiling', limit: 80000, tier1Rate: 0.06, tier2Rate: 0.02, 
             gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: 'white', msgDanger: '加碼已封頂',
@@ -1609,6 +1647,11 @@
         updateRewardPreview();
     }
     
+    // [修正] C8 樂家卡邏輯 (Radio)
+    function toggleHappyLogic() {
+        updateRewardPreview();
+    }
+
     function saveCurrencyLevel() {
         const level = document.querySelector('input[name="currencyLevel"]:checked').value;
         localStorage.setItem('currency_level', level);
@@ -1649,219 +1692,9 @@
         return { start, end, isCustom: true };
     }
 
-    function loadTransaction(id) {
-        const t = transactions.find(tx => tx.id === id);
-        if (!t) return;
-
-        editingId = id;
-        openQuickAdd(t.cardId); 
-
-        document.getElementById('amountInput').value = t.amount;
-        document.getElementById('dateInput').value = t.date;
-        document.getElementById('noteInput').value = t.note || '';
-        document.getElementById('btn-confirm').innerText = "更新";
-
-        const setCheck = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
-        
-        setCheck('checkBonus10', t.isBonus10);
-        setCheck('checkBonus25', t.isBonus25);
-        setCheck('checkIsBill', t.isBill);
-        if(t.isBill) toggleBillLogic();
-        if(t.isBonus25) toggleSelectedLogic();
-
-        setCheck('checkGreenChannel', t.isGreen);
-        setCheck('checkForeign', t.isForeign);
-        if(t.isGreen) toggleGreenLogic();
-        if(t.isForeign) toggleForeignLogic();
-
-        setCheck('checkUniUp', t.isUniUp);
-        setCheck('checkUniBonus', t.isUniBonus);
-        if(t.isUniUp) toggleUniUpLogic();
-
-        setCheck('checkHappyPet', t.isHappyPet);
-        setCheck('checkHappyPeace', t.isHappyPeace);
-        setCheck('checkHappyLife', t.isHappyLife);
-        setCheck('checkHappyForeign', t.isHappyForeign);
-        if(t.isHappyPet) toggleHappyPet();
-        if(t.isHappyPeace) toggleHappyPeace();
-        if(t.isHappyLife) toggleHappyLife();
-        if(t.isHappyForeign) toggleHappyForeign();
-
-        setCheck('checkHsbcForeign', t.isHsbcForeign);
-
-        setCheck('checkUniGroup', t.isUniGroup);
-        setCheck('checkUniIcash', t.isUniIcash);
-        setCheck('checkUniOverseas', t.isUniOverseas);
-        
-        if(t.cardId === 'c11') {
-            if(t.isRichartPay) document.getElementById('rbRichartPay').checked = true;
-            else if(t.isRichartOnline) document.getElementById('rbRichartOnline').checked = true;
-            else if(t.isRichartLine) document.getElementById('rbRichartLine').checked = true;
-            else if(t.isRichartOverseas) document.getElementById('rbRichartOverseas').checked = true;
-            else document.getElementById('rbRichartGeneral').checked = true;
-        }
-
-        setCheck('checkFubonJGeneral', t.isFubonJGeneral);
-        setCheck('checkFubonJKorea', t.isFubonJKorea);
-        setCheck('checkFubonJThai', t.isFubonJThai);
-        setCheck('checkFubonJSuica', t.isFubonJSuica);
-        if(t.isFubonJKorea) toggleFubonJPhysical();
-        if(t.isFubonJThai) toggleFubonJThai();
-        if(t.isFubonJSuica) toggleFubonJSuica();
-
-        setCheck('checkJiheJapan', t.isJiheJapan);
-        setCheck('checkJiheApple', t.isJiheApple);
-        setCheck('checkJiheDomesticJapanese', t.isJiheDomesticJapanese);
-        if(t.isJiheJapan) toggleJiheLogic();
-
-        setCheck('checkKumamonJapan', t.isKumamonJapan);
-        setCheck('checkKumamonDesignated', t.isKumamonDesignated);
-        setCheck('checkKumamonPayPay', t.isKumamonPayPay);
-        if(t.isKumamonJapan) toggleKumamonLogic();
-        if(t.isKumamonDesignated) toggleKumamonSub('designated');
-        if(t.isKumamonPayPay) toggleKumamonSub('paypay');
-
-        if(t.cardId === 'j4') {
-            if(t.isSinopacCurrencySelected) {
-                document.getElementById('rbCurrencySelected').checked = true;
-                toggleCurrencyLogic();
-            }
-        }
-
-        setCheck('checkSinopacMitsuiSelected', t.isSinopacMitsuiSelected);
-        setCheck('checkSinopacMitsuiTarget', t.isSinopacMitsuiTarget);
-        if(t.isSinopacMitsuiSelected) toggleSinopacMitsui('selected');
-        if(t.isSinopacMitsuiTarget) toggleSinopacMitsui('target');
-
-        if(t.cardId === 'c4') {
-            if(t.isJiangSelected) document.getElementById('rbJiangSelected').checked = true;
-            else if(t.isJiangTravel) document.getElementById('rbJiangTravel').checked = true;
-        }
-
-        setCheck('checkDbsLinePay', t.isDbsLinePay);
-        setCheck('checkDbsGreen', t.isDbsGreen);
-        setCheck('checkDbsForeign', t.isDbsForeign);
-        if(t.isDbsLinePay) toggleDbsLogic('linepay');
-        if(t.isDbsGreen) toggleDbsLogic('green');
-        if(t.isDbsForeign) toggleDbsLogic('foreign');
-
-        setCheck('checkSinopacJcbForeign', t.isSinopacJcbForeign);
-        setCheck('checkSinopacJcbBonus', t.isSinopacJcbBonus);
-        setCheck('checkSinopacJcbQuarterly', t.isSinopacJcbQuarterly);
-
-        updateRewardPreview();
-    }
-
-    function addTransaction(isConfirm) {
-        const amount = parseFloat(document.getElementById('amountInput').value);
-        const date = document.getElementById('dateInput').value;
-        const note = document.getElementById('noteInput').value;
-        const cardId = document.getElementById('cardIdInput').value;
-        
-        if (!amount || amount <= 0) { alert('請輸入有效金額'); return; }
-        if (!date) { alert('請選擇日期'); return; }
-
-        const isCard = (id) => cardId === id;
-        
-        let isBonus10 = isCard('c6') && document.getElementById('checkBonus10').checked;
-        let isBonus25 = isCard('c6') && document.getElementById('checkBonus25').checked;
-        let isBill = isCard('c6') && document.getElementById('checkIsBill').checked;
-        let isGreen = isCard('c2') && document.getElementById('checkGreenChannel').checked;
-        let isForeign = (isCard('c2') && document.getElementById('checkForeign').checked) || (isCard('hsbc') && document.getElementById('checkHsbcForeign').checked);
-        let isUniUp = isCard('c7') && document.getElementById('checkUniUp').checked;
-        let isUniBonus = isCard('c7') && document.getElementById('checkUniBonus').checked;
-        let isHappyPet = isCard('c8') && document.getElementById('checkHappyPet').checked;
-        let isHappyPeace = isCard('c8') && document.getElementById('checkHappyPeace').checked;
-        let isHappyLife = isCard('c8') && document.getElementById('checkHappyLife').checked;
-        let isHappyForeign = isCard('c8') && document.getElementById('checkHappyForeign').checked;
-        let isHsbcForeign = isCard('c9') && document.getElementById('checkHsbcForeign').checked;
-        let isUniGroup = isCard('c10') && document.getElementById('checkUniGroup').checked;
-        let isUniIcash = isCard('c10') && document.getElementById('checkUniIcash').checked;
-        let isUniOverseas = isCard('c10') && document.getElementById('checkUniOverseas').checked;
-        let richartMode = 'general';
-        if (isCard('c11')) {
-             richartMode = document.querySelector('input[name="richartMode"]:checked') ? 
-             document.querySelector('input[name="richartMode"]:checked').value : 'general';
-        }
-        let isRichartPay = (richartMode === 'pay');
-        let isRichartOnline = (richartMode === 'online');
-        let isRichartLine = (richartMode === 'line');
-        let isRichartOverseas = (richartMode === 'overseas');
-        let isFubonJGeneral = isCard('j1') && document.getElementById('checkFubonJGeneral').checked;
-        let isFubonJKorea = isCard('j1') && document.getElementById('checkFubonJKorea').checked;
-        let isFubonJThai = isCard('j1') && document.getElementById('checkFubonJThai').checked;
-        let isFubonJSuica = isCard('j1') && document.getElementById('checkFubonJSuica').checked;
-        let isJiheJapan = isCard('j2') && document.getElementById('checkJiheJapan').checked;
-        let isJiheApple = isCard('j2') && document.getElementById('checkJiheApple').checked;
-        let isJiheDomesticJapanese = isCard('j2') && document.getElementById('checkJiheDomesticJapanese').checked;
-        let isKumamonJapan = isCard('j3') && document.getElementById('checkKumamonJapan').checked;
-        let isKumamonDesignated = isCard('j3') && document.getElementById('checkKumamonDesignated').checked;
-        let isKumamonPayPay = isCard('j3') && document.getElementById('checkKumamonPayPay').checked;
-        let isSinopacCurrencySelectedFinal = false;
-        if (isCard('j4')) {
-            let cType = document.querySelector('input[name="currencyType"]:checked') ? 
-            document.querySelector('input[name="currencyType"]:checked').value : 'domestic';
-            isSinopacCurrencySelectedFinal = (cType === 'selected');
-        }
-        let isSinopacMitsuiSelected = isCard('j5') && document.getElementById('checkSinopacMitsuiSelected').checked;
-        let isSinopacMitsuiTarget = isCard('j5') && document.getElementById('checkSinopacMitsuiTarget').checked;
-        let isJiangSelected = false;
-        let isJiangTravel = false;
-        if (isCard('c4')) {
-            let jMode = document.querySelector('input[name="jiangMode"]:checked') ? 
-            document.querySelector('input[name="jiangMode"]:checked').value : 'base';
-            isJiangSelected = (jMode === 'selected');
-            isJiangTravel = (jMode === 'travel');
-        }
-        let isDbsLinePay = isCard('dbs1') && document.getElementById('checkDbsLinePay').checked;
-        let isDbsGreen = isCard('dbs1') && document.getElementById('checkDbsGreen').checked;
-        let isDbsForeign = isCard('dbs1') && document.getElementById('checkDbsForeign').checked;
-        let isSinopacJcbForeign = isCard('c12') && document.getElementById('checkSinopacJcbForeign').checked;
-        let isSinopacJcbJapan = isCard('c12') && document.getElementById('checkSinopacJcbBonus').checked;
-        let isSinopacJcbBonus = isCard('c12') && document.getElementById('checkSinopacJcbBonus').checked;
-        let isSinopacJcbQuarterly = isCard('c12') && document.getElementById('checkSinopacJcbQuarterly').checked;
-
-        const newTx = {
-            id: editingId || Date.now(),
-            cardId, amount, date, note,
-            isGreen, isForeign, isUniUp, isUniBonus, isHappyPet, isHappyPeace, isHappyLife, isHappyForeign, isHsbcForeign,
-            isUniGroup, isUniIcash, isUniOverseas,
-            isRichartPay, isRichartOnline, isRichartLine, isRichartOverseas,
-            isBonus10, isBonus25, isBill,
-            isFubonJGeneral, isFubonJKorea, isFubonJThai, isFubonJSuica,
-            isJiheJapan, isJiheApple, isJiheDomesticJapanese,
-            isKumamonJapan, isKumamonDesignated, isKumamonPayPay,
-            isSinopacCurrencySelected: isSinopacCurrencySelectedFinal,
-            isSinopacMitsuiSelected, isSinopacMitsuiTarget,
-            isJiangSelected, isJiangTravel,
-            isDbsLinePay, isDbsGreen, isDbsForeign,
-            isSinopacJcbForeign, isSinopacJcbJapan, isSinopacJcbBonus, isSinopacJcbQuarterly
-        };
-        if (editingId) {
-            const index = transactions.findIndex(t => t.id === editingId);
-            if (index !== -1) transactions[index] = newTx;
-            editingId = null;
-        } else {
-            transactions.push(newTx);
-        }
-
-        localStorage.setItem('transactions', JSON.stringify(transactions));
-        
-        document.getElementById('amountInput').value = '';
-        document.getElementById('noteInput').value = '';
-        document.getElementById('btn-confirm').innerText = "確認";
-        
-        renderGrid();
-        renderModalHistory(cardId);
-        updateRewardPreview();
-
-        if (isConfirm) {
-            document.getElementById('transactionModal').style.display = 'none';
-        } else {
-            document.getElementById('amountInput').focus();
-        }
-    }
-
+    // ==========================================
+    // 核心運算邏輯: calculateStats
+    // ==========================================
     function calculateStats(cardId, addedAmount = 0, addedIsGreen = false, addedIsForeign = false, addedIsUniBonus = false, addedIsUniUp = false, addedIsHappyPet = false, addedIsHappyLife = false, addedIsHappyForeign = false, addedIsHappyPeace = false, addedIsHsbcForeign = false, addedIsUniGroup = false, addedIsUniIcash = false, addedIsUniOverseas = false, addedIsRichartPay = false, addedIsRichartOnline = false, addedIsRichartLine = false, addedIsRichartOverseas = false, addedIsBonus10 = false, addedIsBonus25 = false, addedIsBill = false, 
         addedIsFubonJGeneral = false, addedIsFubonJKorea = false, addedIsFubonJThai = false, addedIsFubonJSuica = false,
         addedIsJiheJapan = false, 
@@ -1871,7 +1704,10 @@
         addedIsSinopacMitsuiSelected = false, addedIsSinopacMitsuiTarget = false,
         addedIsJiangSelected = false, addedIsJiangTravel = false,
         addedIsDbsLinePay = false, addedIsDbsGreen = false, addedIsDbsForeign = false,
-        addedIsSinopacJcbForeign = false, addedIsSinopacJcbJapan = false, addedIsSinopacJcbBonus = false, addedIsSinopacJcbQuarterly = false) {
+        addedIsSinopacJcbForeign = false, addedIsSinopacJcbJapan = false, addedIsSinopacJcbBonus = false, addedIsSinopacJcbQuarterly = false,
+        // [新增參數]
+        addedLaiDianMode = 'general', addedIsLaiDianNew = false,
+        addedHappyMode = 'general') {
         
         const card = cards.find(c => c.id === cardId);
         if (card.type === 'placeholder') return { spend: 0, validSpend: 0, reward: 0, rate: '0.0' };
@@ -1900,41 +1736,93 @@
         let reward = 0;
         let breakdown = {};
 
-        // [重要修正] C5 賴點卡 (單筆需滿 $100)
+        // ------------------------------------------
+        // [C5] 聯邦賴點卡 (Lai Dian) - 邏輯重寫
+        // ------------------------------------------
         if (cardId === 'c5') {
             const txList = [...relevantTx];
-            if(addedAmount > 0) txList.push({ amount: addedAmount });
+            if(addedAmount > 0) txList.push({ amount: addedAmount, laiDianMode: addedLaiDianMode, isLaiDianNew: addedIsLaiDianNew });
             
-            let baseReward = 0;
-            let bonusSpend = 0;
+            let baseReward = 0; // 1%
+            let lpSpend = 0;    // Mode 'lp' or 'even'
+            let evenSpend = 0;  // Mode 'even'
+            let newUserSpend = 0; // (Mode 'lp' or 'even') AND isNewUser
+            
             txList.forEach(t => {
-                baseReward += t.amount * 0.01; // Base 1%
-                if (t.amount >= 100) bonusSpend += t.amount; // 只有滿 100 才算進 LinePay 加碼
+                const mode = t.laiDianMode || 'general'; // 舊資料預設 general
+                const isNew = !!t.isLaiDianNew;
+                
+                baseReward += t.amount * 0.01;
+                
+                if (mode === 'lp' || mode === 'even') {
+                    lpSpend += t.amount;
+                    if (isNew) newUserSpend += t.amount;
+                }
+                if (mode === 'even') {
+                    evenSpend += t.amount;
+                }
             });
-            const bonus = Math.min(bonusSpend * 0.05, 3000);
-            reward = baseReward + bonus;
             
+            // 堆疊計算
+            const lpBonus = Math.min(lpSpend * 0.01, 200);      // LP加碼 1% (上限200點 -> 刷2萬)
+            const evenBonus = Math.min(evenSpend * 0.05, 150);  // 偶數日 5% (上限150點 -> 刷3千)
+            const newBonus = Math.min(newUserSpend * 0.04, 300); // 新戶 4% (上限300點 -> 刷7500)
+            
+            reward = baseReward + lpBonus + evenBonus + newBonus;
+            
+            // 狀態顯示 (優先顯示快滿的項目)
             let statusText = '';
-            if (bonusSpend * 0.05 >= 3000) { statusText = '加碼已封頂 (變1%)'; }
-            else { statusText = `剩 $${Math.floor((3000 - (bonusSpend*0.05)) / 0.05).toLocaleString()} (6%)`; }
+            let msgStyle = '';
             
-            return { spend: totalSpend, validSpend: bonusSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, msgDanger: statusText };
+            if (evenSpend > 0) {
+                const remain = Math.max(0, 3000 - evenSpend);
+                statusText = (remain === 0) ? '偶數日加碼已滿' : `偶數日剩 $${remain.toLocaleString()}`;
+                if (remain === 0) msgStyle = 'color: #ffcccc;';
+            } else if (newUserSpend > 0) {
+                const remain = Math.max(0, 7500 - newUserSpend);
+                statusText = (remain === 0) ? '新戶加碼已滿' : `新戶額度剩 $${remain.toLocaleString()}`;
+            } else if (lpSpend > 0) {
+                const remain = Math.max(0, 20000 - lpSpend);
+                statusText = (remain === 0) ? 'LP加碼已滿' : `LP額度剩 $${remain.toLocaleString()}`;
+            } else {
+                statusText = `本月累積 $${totalSpend.toLocaleString()}`;
+            }
+            
+            return { spend: totalSpend, validSpend: lpSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, msgDanger: statusText, msgStyle };
         }
 
-        // C8 遠東樂家+卡
+        // ------------------------------------------
+        // [C8] 遠東樂家+卡 (Happy Card) - 顯示優化
+        // ------------------------------------------
         if (cardId === 'c8') {
             const petLimit = 5263;
             const lifeLimit = 5714;
+            // 處理 Radio Mode
+            const txList = [...relevantTx];
+            if(addedAmount > 0) txList.push({ amount: addedAmount, happyMode: addedHappyMode });
             
-            const petSpend = relevantTx.filter(t => t.isHappyPet).reduce((sum, t) => sum + t.amount, 0) + (addedIsHappyPet ? addedAmount : 0);
-            const lifeSpend = relevantTx.filter(t => t.isHappyLife || t.isHappyPeace).reduce((sum, t) => sum + t.amount, 0) + ((addedIsHappyLife || addedIsHappyPeace) ? addedAmount : 0);
-            const foreignSpend = relevantTx.filter(t => t.isHappyForeign).reduce((sum, t) => sum + t.amount, 0) + (addedIsHappyForeign ? addedAmount : 0);
+            let petSpend = 0, lifeSpend = 0, peaceSpend = 0, foreignSpend = 0;
+            
+            txList.forEach(t => {
+                // 舊資料相容: 檢查舊布林值，若無則用 happyMode
+                if (t.happyMode) {
+                    if (t.happyMode === 'pet') petSpend += t.amount;
+                    if (t.happyMode === 'life') lifeSpend += t.amount;
+                    if (t.happyMode === 'peace') peaceSpend += t.amount;
+                    if (t.happyMode === 'foreign') foreignSpend += t.amount;
+                } else {
+                    if (t.isHappyPet) petSpend += t.amount;
+                    else if (t.isHappyLife) lifeSpend += t.amount;
+                    else if (t.isHappyPeace) peaceSpend += t.amount;
+                    else if (t.isHappyForeign) foreignSpend += t.amount;
+                }
+            });
             
             breakdown = {
                 items: [
-                    { label: '寵物 (10%)', current: petSpend, max: petLimit, color: 'orange' },
-                    { label: '生活/安心 (4%)', current: lifeSpend, max: lifeLimit, color: 'green' },
-                    { label: '國外 (2.5%)', current: foreignSpend, max: 0, color: 'purple' }
+                    { label: '🐶 寵物 (10%)', current: petSpend, max: petLimit, color: 'orange' },
+                    { label: '🍽️ 生活 (4%)', current: lifeSpend, max: lifeLimit, color: 'green' },
+                    { label: '📡 安心 (4%)', current: peaceSpend, max: lifeLimit, color: 'purple' }
                 ]
             };
 
@@ -1944,9 +1832,10 @@
                 let baseReward = totalSpend * 0.005;
                 const bonusPet = Math.min(petSpend, petLimit) * 0.095;
                 const bonusLife = Math.min(lifeSpend, lifeLimit) * 0.035; 
+                const bonusPeace = Math.min(peaceSpend, lifeLimit) * 0.035;
                 const bonusForeign = foreignSpend * 0.02;
-                reward = baseReward + bonusPet + bonusLife + bonusForeign;
-                if(totalSpend >= 26000) reward += 400;
+                reward = baseReward + bonusPet + bonusLife + bonusPeace + bonusForeign;
+                if(totalSpend >= 26000) reward += 400; // 滿額禮
             }
             return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, breakdown };
         }
@@ -2037,7 +1926,75 @@
              return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, suggestion, breakdown };
         }
 
-        // --- 以下為舊有卡片邏輯 (必須保留) ---
+        // ------------------------------------------
+        // [C10] UniOpen - 顯示優化
+        // ------------------------------------------
+        if (cardId === 'c10') {
+            const currentOverseasSpend = relevantTx.filter(t => t.isUniOverseas).reduce((sum, t) => sum + t.amount, 0) + (addedIsUniOverseas ? addedAmount : 0);
+            const overseasReward = (currentOverseasSpend * 0.03) + Math.min(currentOverseasSpend, 6250) * 0.08;
+            
+            const icashSpend = relevantTx.filter(t => t.isUniIcash && !t.isUniOverseas).reduce((sum, t) => sum + t.amount, 0) + (addedIsUniIcash && !addedIsUniOverseas ? addedAmount : 0);
+            const icashReward = Math.min(icashSpend, 3750) * 0.04;
+            
+            const groupTx = relevantTx.filter(t => t.isUniGroup && !t.isUniOverseas);
+            let currentGroupSpend = groupTx.reduce((sum, t) => sum + t.amount, 0);
+            if (addedIsUniGroup && !addedIsUniOverseas) currentGroupSpend += addedAmount;
+            const groupBonus = Math.min(currentGroupSpend, 25000) * 0.02;
+            
+            const savedState = JSON.parse(localStorage.getItem('uniOpenState') || '{"brands":[]}');
+            const count = savedState.brands ? savedState.brands.length : 0;
+            let taskRate = 0;
+            if (count >= 5) taskRate = 0.04;
+            else if (count === 4) taskRate = 0.03;
+            else if (count === 3) taskRate = 0.02;
+            else if (count === 2) taskRate = 0.01;
+            const taskBonus = Math.min(currentGroupSpend, 12500) * taskRate;
+            
+            const domesticSpend = totalSpend - currentOverseasSpend;
+            const baseDomesticReward = domesticSpend * 0.01;
+            
+            reward = overseasReward + baseDomesticReward + groupBonus + taskBonus + icashReward;
+            
+            // [優化] 三軌顯示
+            breakdown = {
+                items: [
+                    { label: 'icash Pay (4%)', current: icashSpend, max: 3750, color: 'orange' },
+                    { label: '海外實體 (10%)', current: currentOverseasSpend, max: 6250, color: 'purple' },
+                    { label: '踩點任務 (家數)', current: count, max: 5, color: 'green' }
+                ]
+            };
+            
+            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, breakdown };
+        }
+
+        // C11
+        if (cardId === 'c11') {
+            const richartPaySpend = relevantTx.filter(t => t.isRichartPay).reduce((sum, t) => sum + t.amount, 0) + (addedIsRichartPay ? addedAmount : 0);
+            const richartOnlineSpend = relevantTx.filter(t => t.isRichartOnline).reduce((sum, t) => sum + t.amount, 0) + (addedIsRichartOnline ? addedAmount : 0);
+            const richartLineSpend = relevantTx.filter(t => t.isRichartLine).reduce((sum, t) => sum + t.amount, 0) + (addedIsRichartLine ? addedAmount : 0);
+            const richartOverseasSpend = relevantTx.filter(t => t.isRichartOverseas).reduce((sum, t) => sum + t.amount, 0) + (addedIsRichartOverseas ? addedAmount : 0);
+            const normalSpend = Math.max(0, totalSpend - richartPaySpend - richartOnlineSpend - richartLineSpend - richartOverseasSpend);
+            reward = (richartPaySpend * 0.038) + (richartOnlineSpend * 0.033) + (richartLineSpend * 0.023) + (richartOverseasSpend * 0.033) + (normalSpend * 0.003);
+            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd };
+        }
+
+        // C9
+        if (cardId === 'c9') {
+            const tier = localStorage.getItem('hsbc_tier') || 'infinite';
+            let rateDomestic = 18; let rateForeign = 10; if (tier === 'signature') { rateDomestic = 18; rateForeign = 15; }
+            let totalMiles = parseInt(localStorage.getItem('hsbc_initial_miles') || 0);
+            let redeemedMiles = parseInt(localStorage.getItem('hsbc_redeemed_miles') || 0);
+            const allHistoryTx = transactions.filter(t => t.cardId === 'c9');
+            allHistoryTx.forEach(tx => { const rate = tx.isHsbcForeign ? rateForeign : rateDomestic; totalMiles += Math.floor(tx.amount / rate); });
+            if (addedAmount > 0) { const currentRate = addedIsHsbcForeign ? rateForeign : rateDomestic; totalMiles += Math.floor(addedAmount / currentRate); }
+            reward = totalMiles - redeemedMiles;
+            let cycleReward = 0;
+            const { start, end } = getBillingCycle(cardId);
+            const cycleTx = transactions.filter(t => { const tDate = new Date(t.date); return t.cardId === 'c9' && tDate >= start && tDate <= end; });
+            cycleTx.forEach(tx => { const rate = tx.isHsbcForeign ? rateForeign : rateDomestic; cycleReward += Math.floor(tx.amount / rate); });
+            if(addedAmount > 0) { const currentRate = addedIsHsbcForeign ? rateForeign : rateDomestic; cycleReward += Math.floor(addedAmount / currentRate); }
+            return { spend: totalSpend, validSpend: totalSpend, reward: cycleReward, rate: (totalSpend>0?(totalSpend/totalMiles).toFixed(1):0), isCustom, cycleStart, cycleEnd };
+        }
         
         // C12
         if (cardId === 'c12') {
@@ -2243,59 +2200,6 @@
             reward = baseReward + selectedReward + bonus10Reward;
             return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd };
         }
-
-        // C10
-        if (cardId === 'c10') {
-            const currentOverseasSpend = relevantTx.filter(t => t.isUniOverseas).reduce((sum, t) => sum + t.amount, 0) + (addedIsUniOverseas ? addedAmount : 0);
-            const overseasReward = (currentOverseasSpend * 0.03) + Math.min(currentOverseasSpend, 6250) * 0.08;
-            const icashSpend = relevantTx.filter(t => t.isUniIcash && !t.isUniOverseas).reduce((sum, t) => sum + t.amount, 0) + (addedIsUniIcash && !addedIsUniOverseas ? addedAmount : 0);
-            const icashReward = Math.min(icashSpend, 3750) * 0.04;
-            const groupTx = relevantTx.filter(t => t.isUniGroup && !t.isUniOverseas);
-            let currentGroupSpend = groupTx.reduce((sum, t) => sum + t.amount, 0);
-            if (addedIsUniGroup && !addedIsUniOverseas) currentGroupSpend += addedAmount;
-            const groupBonus = Math.min(currentGroupSpend, 25000) * 0.02;
-            const savedState = JSON.parse(localStorage.getItem('uniOpenState') || '{"brands":[]}');
-            const count = savedState.brands ? savedState.brands.length : 0;
-            let taskRate = 0;
-            if (count >= 5) taskRate = 0.04;
-            else if (count === 4) taskRate = 0.03;
-            else if (count === 3) taskRate = 0.02;
-            else if (count === 2) taskRate = 0.01;
-            const taskBonus = Math.min(currentGroupSpend, 12500) * taskRate;
-            const domesticSpend = totalSpend - currentOverseasSpend;
-            const baseDomesticReward = domesticSpend * 0.01;
-            reward = overseasReward + baseDomesticReward + groupBonus + taskBonus + icashReward;
-            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd };
-        }
-
-        // C11
-        if (cardId === 'c11') {
-            const richartPaySpend = relevantTx.filter(t => t.isRichartPay).reduce((sum, t) => sum + t.amount, 0) + (addedIsRichartPay ? addedAmount : 0);
-            const richartOnlineSpend = relevantTx.filter(t => t.isRichartOnline).reduce((sum, t) => sum + t.amount, 0) + (addedIsRichartOnline ? addedAmount : 0);
-            const richartLineSpend = relevantTx.filter(t => t.isRichartLine).reduce((sum, t) => sum + t.amount, 0) + (addedIsRichartLine ? addedAmount : 0);
-            const richartOverseasSpend = relevantTx.filter(t => t.isRichartOverseas).reduce((sum, t) => sum + t.amount, 0) + (addedIsRichartOverseas ? addedAmount : 0);
-            const normalSpend = Math.max(0, totalSpend - richartPaySpend - richartOnlineSpend - richartLineSpend - richartOverseasSpend);
-            reward = (richartPaySpend * 0.038) + (richartOnlineSpend * 0.033) + (richartLineSpend * 0.023) + (richartOverseasSpend * 0.033) + (normalSpend * 0.003);
-            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd };
-        }
-
-        // C9
-        if (cardId === 'c9') {
-            const tier = localStorage.getItem('hsbc_tier') || 'infinite';
-            let rateDomestic = 18; let rateForeign = 10; if (tier === 'signature') { rateDomestic = 18; rateForeign = 15; }
-            let totalMiles = parseInt(localStorage.getItem('hsbc_initial_miles') || 0);
-            let redeemedMiles = parseInt(localStorage.getItem('hsbc_redeemed_miles') || 0);
-            const allHistoryTx = transactions.filter(t => t.cardId === 'c9');
-            allHistoryTx.forEach(tx => { const rate = tx.isHsbcForeign ? rateForeign : rateDomestic; totalMiles += Math.floor(tx.amount / rate); });
-            if (addedAmount > 0) { const currentRate = addedIsHsbcForeign ? rateForeign : rateDomestic; totalMiles += Math.floor(addedAmount / currentRate); }
-            reward = totalMiles - redeemedMiles;
-            let cycleReward = 0;
-            const { start, end } = getBillingCycle(cardId);
-            const cycleTx = transactions.filter(t => { const tDate = new Date(t.date); return t.cardId === 'c9' && tDate >= start && tDate <= end; });
-            cycleTx.forEach(tx => { const rate = tx.isHsbcForeign ? rateForeign : rateDomestic; cycleReward += Math.floor(tx.amount / rate); });
-            if(addedAmount > 0) { const currentRate = addedIsHsbcForeign ? rateForeign : rateDomestic; cycleReward += Math.floor(addedAmount / currentRate); }
-            return { spend: totalSpend, validSpend: totalSpend, reward: cycleReward, rate: (totalSpend>0?(totalSpend/totalMiles).toFixed(1):0), isCustom, cycleStart, cycleEnd };
-        }
         
         let validSpend = totalSpend;
         if (card.type === 'mixed') { if (validSpend < card.minSpend) reward = validSpend * card.tier2Rate;
@@ -2311,7 +2215,6 @@
         if(totalSpend>0) currentRate = (reward/totalSpend)*100;
         return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd };
     }
-
     function renderDetailProgress(stats) {
         const container = document.getElementById('detailProgressArea');
         if (!stats.breakdown || !stats.breakdown.items || stats.breakdown.items.length === 0) {
@@ -2361,10 +2264,9 @@
         let isForeign = document.getElementById('checkForeign') ? document.getElementById('checkForeign').checked : false;
         let isUniUp = document.getElementById('checkUniUp') ? document.getElementById('checkUniUp').checked : false;
         let isUniBonus = document.getElementById('checkUniBonus') ? document.getElementById('checkUniBonus').checked : false;
-        let isHappyPet = document.getElementById('checkHappyPet') ? document.getElementById('checkHappyPet').checked : false;
-        let isHappyPeace = document.getElementById('checkHappyPeace') ? document.getElementById('checkHappyPeace').checked : false;
-        let isHappyLife = document.getElementById('checkHappyLife') ? document.getElementById('checkHappyLife').checked : false;
-        let isHappyForeign = document.getElementById('checkHappyForeign') ? document.getElementById('checkHappyForeign').checked : false;
+        // C8 舊相容 (雖然已改Radio但保留變數宣告防錯)
+        let isHappyPet = false, isHappyPeace = false, isHappyLife = false, isHappyForeign = false;
+        
         let isHsbcForeign = document.getElementById('checkHsbcForeign') ? document.getElementById('checkHsbcForeign').checked : false;
         let isUniGroup = document.getElementById('checkUniGroup') ? document.getElementById('checkUniGroup').checked : false;
         let isUniIcash = document.getElementById('checkUniIcash') ? document.getElementById('checkUniIcash').checked : false;
@@ -2403,6 +2305,13 @@
         let isSinopacJcbBonus = document.getElementById('checkSinopacJcbBonus') ? document.getElementById('checkSinopacJcbBonus').checked : false;
         let isSinopacJcbQuarterly = document.getElementById('checkSinopacJcbQuarterly') ? document.getElementById('checkSinopacJcbQuarterly').checked : false;
 
+        // [新增] C5 賴點卡參數
+        let laiDianMode = document.querySelector('input[name="laiDianMode"]:checked') ? document.querySelector('input[name="laiDianMode"]:checked').value : 'general';
+        let isLaiDianNew = document.getElementById('checkLaiDianNew') ? document.getElementById('checkLaiDianNew').checked : false;
+
+        // [新增] C8 樂家卡參數
+        let happyMode = document.querySelector('input[name="happyMode"]:checked') ? document.querySelector('input[name="happyMode"]:checked').value : 'general';
+
         const currentStats = calculateStats(cardId, 0);
         const newStats = calculateStats(cardId, amount, isGreen, isForeign, isUniBonus, isUniUp, isHappyPet, isHappyLife, isHappyForeign, isHappyPeace, isHsbcForeign, isUniGroup, isUniIcash, isUniOverseas, isRichartPay, isRichartOnline, isRichartLine, isRichartOverseas, isBonus10, isBonus25, isBill, 
             isFubonJGeneral, isFubonJKorea, isFubonJThai, isFubonJSuica,
@@ -2412,7 +2321,9 @@
             isSinopacMitsuiSelected, isSinopacMitsuiTarget,
             isJiangSelected, isJiangTravel,
             isDbsLinePay, isDbsGreen, isDbsForeign,
-            isSinopacJcbForeign, isSinopacJcbJapan, isSinopacJcbBonus, isSinopacJcbQuarterly);
+            isSinopacJcbForeign, isSinopacJcbJapan, isSinopacJcbBonus, isSinopacJcbQuarterly,
+            // 傳遞新參數
+            laiDianMode, isLaiDianNew, happyMode);
         
         renderDetailProgress(currentStats); 
 
@@ -2449,7 +2360,7 @@
             let displayRate = `${stats.rate}%`; 
 
             if (card.id === 'c6') displayRate = '13.5%';
-            if (card.id === 'c5') displayRate = '6.0%'; 
+            if (card.id === 'c5') displayRate = '11.0%'; 
             if (card.id === 'c4') displayRate = '5.0%'; 
             if (card.id === 'c8') displayRate = '10.0%';
             if (card.id === 'j4') displayRate = '6.0%'; 
@@ -2657,10 +2568,11 @@
         editingId = null;
         document.getElementById('btn-confirm').innerText = "確認";
         document.getElementById('transactionModal').style.display = 'flex';
-        const allOptionIds = ['pigRichOptions', 'greenCardOptions', 'uniOptions', 'happyOptions', 'hsbcOptions', 'uniOpenOptions', 'richartOptions', 'fubonJOptions', 'jiheOptions', 'kumamonOptions', 'sinopacCurrencyOptions', 'sinopacMitsuiOptions', 'jiangOptions', 'dbsEcoOptions', 'sinopacJcbOptions'];
+        const allOptionIds = ['pigRichOptions', 'greenCardOptions', 'uniOptions', 'happyOptions', 'hsbcOptions', 'uniOpenOptions', 'richartOptions', 'fubonJOptions', 'jiheOptions', 'kumamonOptions', 'sinopacCurrencyOptions', 'sinopacMitsuiOptions', 'jiangOptions', 'dbsEcoOptions', 'sinopacJcbOptions', 'laiDianOptions'];
         allOptionIds.forEach(id => { document.getElementById(id).style.display = 'none'; });
 
         if (cardId === 'c6') document.getElementById('pigRichOptions').style.display = 'block';
+        if (cardId === 'c5') document.getElementById('laiDianOptions').style.display = 'block';
         if (cardId === 'c2') document.getElementById('greenCardOptions').style.display = 'block';
         if (cardId === 'c7') { document.getElementById('uniOptions').style.display = 'block'; toggleUniUpLogic(); }
         if (cardId === 'c8') document.getElementById('happyOptions').style.display = 'block';
@@ -2710,6 +2622,15 @@
             document.getElementById('checkDbsForeign').checked = false;
         }
         if (cardId === 'c12') { document.getElementById('sinopacJcbOptions').style.display = 'block'; }
+
+        // 預設重置 Radio
+        if (cardId === 'c5') {
+            document.querySelector('input[name="laiDianMode"][value="general"]').checked = true;
+            document.getElementById('checkLaiDianNew').checked = false;
+        }
+        if (cardId === 'c8') {
+            document.querySelector('input[name="happyMode"][value="general"]').checked = true;
+        }
 
         if (card.parking) { document.getElementById('modalParkingInfo').innerHTML = card.parking; document.getElementById('modalParkingInfo').style.display = 'block'; } 
         else { document.getElementById('modalParkingInfo').style.display = 'none'; }
@@ -2763,10 +2684,15 @@
             if(isCard('c2') && t.isForeign) tags.push('✈️');
             if(isCard('c7') && t.isUniUp) tags.push('🆙');
             if(isCard('c7') && t.isUniBonus) tags.push('🔥');
-            if(isCard('c8') && t.isHappyPet) tags.push('🐶');
-            if(isCard('c8') && t.isHappyPeace) tags.push('🍽️');
-            if(isCard('c8') && t.isHappyLife) tags.push('🛒');
-            if(isCard('c8') && t.isHappyForeign) tags.push('✈️');
+            
+            // C8 Tag (舊+新)
+            if(isCard('c8')) {
+                if(t.happyMode === 'pet' || t.isHappyPet) tags.push('🐶');
+                if(t.happyMode === 'life' || t.isHappyLife) tags.push('🛒');
+                if(t.happyMode === 'peace' || t.isHappyPeace) tags.push('🍽️');
+                if(t.happyMode === 'foreign' || t.isHappyForeign) tags.push('✈️');
+            }
+
             if(isCard('c9') && t.isHsbcForeign) tags.push('✈️');
             if(isCard('c10') && t.isUniGroup) tags.push('🏪');
             if(isCard('c10') && t.isUniIcash) tags.push('📱');
@@ -2775,6 +2701,14 @@
             if(isCard('c11') && t.isRichartOnline) tags.push('🛍️');
             if(isCard('c11') && t.isRichartLine) tags.push('🟢');
             if(isCard('c11') && t.isRichartOverseas) tags.push('✈️');
+            
+            // C5 賴點卡 Tags
+            if(isCard('c5')) {
+                if(t.isLaiDianNew) tags.push('👶');
+                if(t.laiDianMode === 'lp') tags.push('📱');
+                if(t.laiDianMode === 'even') tags.push('📅');
+            }
+
             if(isCard('c6') && t.isBonus10) tags.push('⚡');
             if(isCard('c6') && t.isBonus25) tags.push('🌟');
             if(isCard('c6') && t.isBill) tags.push('🧾');
@@ -2805,6 +2739,245 @@
             item.innerHTML = `<div style="flex:1" onclick="loadTransaction(${t.id})"><div class="h-name">${tagStr}${displayText}</div><div class="h-date">${t.date}</div></div><div style="display:flex; align-items:center;"><div class="h-amount" onclick="loadTransaction(${t.id})">$${t.amount.toLocaleString()}</div><button class="btn-delete-single" onclick="deleteTransaction(${t.id}, event)">✕</button></div>`;
             list.appendChild(item);
         });
+    }
+
+    function loadTransaction(id) {
+        const t = transactions.find(tx => tx.id === id);
+        if (!t) return;
+
+        editingId = id;
+        openQuickAdd(t.cardId); 
+
+        document.getElementById('amountInput').value = t.amount;
+        document.getElementById('dateInput').value = t.date;
+        document.getElementById('noteInput').value = t.note || '';
+        document.getElementById('btn-confirm').innerText = "更新";
+
+        const setCheck = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
+        
+        setCheck('checkBonus10', t.isBonus10);
+        setCheck('checkBonus25', t.isBonus25);
+        setCheck('checkIsBill', t.isBill);
+        if(t.isBill) toggleBillLogic();
+        if(t.isBonus25) toggleSelectedLogic();
+
+        setCheck('checkGreenChannel', t.isGreen);
+        setCheck('checkForeign', t.isForeign);
+        if(t.isGreen) toggleGreenLogic();
+        if(t.isForeign) toggleForeignLogic();
+
+        setCheck('checkUniUp', t.isUniUp);
+        setCheck('checkUniBonus', t.isUniBonus);
+        if(t.isUniUp) toggleUniUpLogic();
+
+        // C5 Load
+        if(t.cardId === 'c5') {
+            if(t.laiDianMode) {
+                document.querySelector(`input[name="laiDianMode"][value="${t.laiDianMode}"]`).checked = true;
+            }
+            setCheck('checkLaiDianNew', t.isLaiDianNew);
+        }
+
+        // C8 Load (兼容舊資料)
+        if(t.cardId === 'c8') {
+            if(t.happyMode) {
+                document.querySelector(`input[name="happyMode"][value="${t.happyMode}"]`).checked = true;
+            } else {
+                if(t.isHappyPet) document.querySelector('input[name="happyMode"][value="pet"]').checked = true;
+                else if(t.isHappyLife) document.querySelector('input[name="happyMode"][value="life"]').checked = true;
+                else if(t.isHappyPeace) document.querySelector('input[name="happyMode"][value="peace"]').checked = true;
+                else if(t.isHappyForeign) document.querySelector('input[name="happyMode"][value="foreign"]').checked = true;
+                else document.querySelector('input[name="happyMode"][value="general"]').checked = true;
+            }
+        }
+
+        setCheck('checkHsbcForeign', t.isHsbcForeign);
+
+        setCheck('checkUniGroup', t.isUniGroup);
+        setCheck('checkUniIcash', t.isUniIcash);
+        setCheck('checkUniOverseas', t.isUniOverseas);
+        
+        if(t.cardId === 'c11') {
+            if(t.isRichartPay) document.getElementById('rbRichartPay').checked = true;
+            else if(t.isRichartOnline) document.getElementById('rbRichartOnline').checked = true;
+            else if(t.isRichartLine) document.getElementById('rbRichartLine').checked = true;
+            else if(t.isRichartOverseas) document.getElementById('rbRichartOverseas').checked = true;
+            else document.getElementById('rbRichartGeneral').checked = true;
+        }
+
+        setCheck('checkFubonJGeneral', t.isFubonJGeneral);
+        setCheck('checkFubonJKorea', t.isFubonJKorea);
+        setCheck('checkFubonJThai', t.isFubonJThai);
+        setCheck('checkFubonJSuica', t.isFubonJSuica);
+        if(t.isFubonJKorea) toggleFubonJPhysical();
+        if(t.isFubonJThai) toggleFubonJThai();
+        if(t.isFubonJSuica) toggleFubonJSuica();
+
+        setCheck('checkJiheJapan', t.isJiheJapan);
+        setCheck('checkJiheApple', t.isJiheApple);
+        setCheck('checkJiheDomesticJapanese', t.isJiheDomesticJapanese);
+        if(t.isJiheJapan) toggleJiheLogic();
+
+        setCheck('checkKumamonJapan', t.isKumamonJapan);
+        setCheck('checkKumamonDesignated', t.isKumamonDesignated);
+        setCheck('checkKumamonPayPay', t.isKumamonPayPay);
+        if(t.isKumamonJapan) toggleKumamonLogic();
+        if(t.isKumamonDesignated) toggleKumamonSub('designated');
+        if(t.isKumamonPayPay) toggleKumamonSub('paypay');
+
+        if(t.cardId === 'j4') {
+            if(t.isSinopacCurrencySelected) {
+                document.getElementById('rbCurrencySelected').checked = true;
+                toggleCurrencyLogic();
+            }
+        }
+
+        setCheck('checkSinopacMitsuiSelected', t.isSinopacMitsuiSelected);
+        setCheck('checkSinopacMitsuiTarget', t.isSinopacMitsuiTarget);
+        if(t.isSinopacMitsuiSelected) toggleSinopacMitsui('selected');
+        if(t.isSinopacMitsuiTarget) toggleSinopacMitsui('target');
+
+        if(t.cardId === 'c4') {
+            if(t.isJiangSelected) document.getElementById('rbJiangSelected').checked = true;
+            else if(t.isJiangTravel) document.getElementById('rbJiangTravel').checked = true;
+        }
+
+        setCheck('checkDbsLinePay', t.isDbsLinePay);
+        setCheck('checkDbsGreen', t.isDbsGreen);
+        setCheck('checkDbsForeign', t.isDbsForeign);
+        if(t.isDbsLinePay) toggleDbsLogic('linepay');
+        if(t.isDbsGreen) toggleDbsLogic('green');
+        if(t.isDbsForeign) toggleDbsLogic('foreign');
+
+        setCheck('checkSinopacJcbForeign', t.isSinopacJcbForeign);
+        setCheck('checkSinopacJcbBonus', t.isSinopacJcbBonus);
+        setCheck('checkSinopacJcbQuarterly', t.isSinopacJcbQuarterly);
+
+        updateRewardPreview();
+    }
+
+    function addTransaction(isConfirm) {
+        const amount = parseFloat(document.getElementById('amountInput').value);
+        const date = document.getElementById('dateInput').value;
+        const note = document.getElementById('noteInput').value;
+        const cardId = document.getElementById('cardIdInput').value;
+        
+        if (!amount || amount <= 0) { alert('請輸入有效金額'); return; }
+        if (!date) { alert('請選擇日期'); return; }
+
+        const isCard = (id) => cardId === id;
+        
+        let isBonus10 = isCard('c6') && document.getElementById('checkBonus10').checked;
+        let isBonus25 = isCard('c6') && document.getElementById('checkBonus25').checked;
+        let isBill = isCard('c6') && document.getElementById('checkIsBill').checked;
+        let isGreen = isCard('c2') && document.getElementById('checkGreenChannel').checked;
+        let isForeign = (isCard('c2') && document.getElementById('checkForeign').checked) || (isCard('hsbc') && document.getElementById('checkHsbcForeign').checked);
+        let isUniUp = isCard('c7') && document.getElementById('checkUniUp').checked;
+        let isUniBonus = isCard('c7') && document.getElementById('checkUniBonus').checked;
+        
+        // C8 Save
+        let happyMode = 'general';
+        if (isCard('c8')) {
+            happyMode = document.querySelector('input[name="happyMode"]:checked').value;
+        }
+        
+        // C5 Save
+        let laiDianMode = 'general';
+        let isLaiDianNew = false;
+        if (isCard('c5')) {
+            laiDianMode = document.querySelector('input[name="laiDianMode"]:checked').value;
+            isLaiDianNew = document.getElementById('checkLaiDianNew').checked;
+        }
+
+        let isHsbcForeign = isCard('c9') && document.getElementById('checkHsbcForeign').checked;
+        let isUniGroup = isCard('c10') && document.getElementById('checkUniGroup').checked;
+        let isUniIcash = isCard('c10') && document.getElementById('checkUniIcash').checked;
+        let isUniOverseas = isCard('c10') && document.getElementById('checkUniOverseas').checked;
+        let richartMode = 'general';
+        if (isCard('c11')) {
+             richartMode = document.querySelector('input[name="richartMode"]:checked') ? 
+             document.querySelector('input[name="richartMode"]:checked').value : 'general';
+        }
+        let isRichartPay = (richartMode === 'pay');
+        let isRichartOnline = (richartMode === 'online');
+        let isRichartLine = (richartMode === 'line');
+        let isRichartOverseas = (richartMode === 'overseas');
+        let isFubonJGeneral = isCard('j1') && document.getElementById('checkFubonJGeneral').checked;
+        let isFubonJKorea = isCard('j1') && document.getElementById('checkFubonJKorea').checked;
+        let isFubonJThai = isCard('j1') && document.getElementById('checkFubonJThai').checked;
+        let isFubonJSuica = isCard('j1') && document.getElementById('checkFubonJSuica').checked;
+        let isJiheJapan = isCard('j2') && document.getElementById('checkJiheJapan').checked;
+        let isJiheApple = isCard('j2') && document.getElementById('checkJiheApple').checked;
+        let isJiheDomesticJapanese = isCard('j2') && document.getElementById('checkJiheDomesticJapanese').checked;
+        let isKumamonJapan = isCard('j3') && document.getElementById('checkKumamonJapan').checked;
+        let isKumamonDesignated = isCard('j3') && document.getElementById('checkKumamonDesignated').checked;
+        let isKumamonPayPay = isCard('j3') && document.getElementById('checkKumamonPayPay').checked;
+        let isSinopacCurrencySelectedFinal = false;
+        if (isCard('j4')) {
+            let cType = document.querySelector('input[name="currencyType"]:checked') ? 
+            document.querySelector('input[name="currencyType"]:checked').value : 'domestic';
+            isSinopacCurrencySelectedFinal = (cType === 'selected');
+        }
+        let isSinopacMitsuiSelected = isCard('j5') && document.getElementById('checkSinopacMitsuiSelected').checked;
+        let isSinopacMitsuiTarget = isCard('j5') && document.getElementById('checkSinopacMitsuiTarget').checked;
+        let isJiangSelected = false;
+        let isJiangTravel = false;
+        if (isCard('c4')) {
+            let jMode = document.querySelector('input[name="jiangMode"]:checked') ? 
+            document.querySelector('input[name="jiangMode"]:checked').value : 'base';
+            isJiangSelected = (jMode === 'selected');
+            isJiangTravel = (jMode === 'travel');
+        }
+        let isDbsLinePay = isCard('dbs1') && document.getElementById('checkDbsLinePay').checked;
+        let isDbsGreen = isCard('dbs1') && document.getElementById('checkDbsGreen').checked;
+        let isDbsForeign = isCard('dbs1') && document.getElementById('checkDbsForeign').checked;
+        let isSinopacJcbForeign = isCard('c12') && document.getElementById('checkSinopacJcbForeign').checked;
+        let isSinopacJcbJapan = isCard('c12') && document.getElementById('checkSinopacJcbBonus').checked;
+        let isSinopacJcbBonus = isCard('c12') && document.getElementById('checkSinopacJcbBonus').checked;
+        let isSinopacJcbQuarterly = isCard('c12') && document.getElementById('checkSinopacJcbQuarterly').checked;
+
+        const newTx = {
+            id: editingId || Date.now(),
+            cardId, amount, date, note,
+            isGreen, isForeign, isUniUp, isUniBonus, 
+            happyMode, // 新 C8
+            isHsbcForeign,
+            isUniGroup, isUniIcash, isUniOverseas,
+            isRichartPay, isRichartOnline, isRichartLine, isRichartOverseas,
+            isBonus10, isBonus25, isBill,
+            isFubonJGeneral, isFubonJKorea, isFubonJThai, isFubonJSuica,
+            isJiheJapan, isJiheApple, isJiheDomesticJapanese,
+            isKumamonJapan, isKumamonDesignated, isKumamonPayPay,
+            isSinopacCurrencySelected: isSinopacCurrencySelectedFinal,
+            isSinopacMitsuiSelected, isSinopacMitsuiTarget,
+            isJiangSelected, isJiangTravel,
+            isDbsLinePay, isDbsGreen, isDbsForeign,
+            isSinopacJcbForeign, isSinopacJcbJapan, isSinopacJcbBonus, isSinopacJcbQuarterly,
+            laiDianMode, isLaiDianNew // 新 C5
+        };
+        if (editingId) {
+            const index = transactions.findIndex(t => t.id === editingId);
+            if (index !== -1) transactions[index] = newTx;
+            editingId = null;
+        } else {
+            transactions.push(newTx);
+        }
+
+        localStorage.setItem('transactions', JSON.stringify(transactions));
+        
+        document.getElementById('amountInput').value = '';
+        document.getElementById('noteInput').value = '';
+        document.getElementById('btn-confirm').innerText = "確認";
+        
+        renderGrid();
+        renderModalHistory(cardId);
+        updateRewardPreview();
+
+        if (isConfirm) {
+            document.getElementById('transactionModal').style.display = 'none';
+        } else {
+            document.getElementById('amountInput').focus();
+        }
     }
 
     function deleteTransaction(id, event) {
@@ -2887,5 +3060,4 @@
   </script>
 </body>
 </html>
-   
-    
+  

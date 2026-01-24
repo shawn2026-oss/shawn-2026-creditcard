@@ -463,7 +463,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V124.33(FullFix)</div>
+            <div class="version-tag">V124.34(Fix)</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -471,7 +471,7 @@
         </div>
         
         <div class="news-ticker">
-            <div class="ticker-content" id="news-text">🎉 V124.33 更新：全面修復卡片點擊問題與行數遺失。新增賴點卡低消提示、樂家/幣倍詳細額度顯示。</div>
+            <div class="ticker-content" id="news-text">🎉 V124.34 更新：修復富邦J/熊本熊/綠卡顯示邏輯。修正修改紀錄時變新增的問題。全線優化額度顯示。</div>
         </div>
         
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
@@ -1262,7 +1262,7 @@
 
     window.addEventListener('popstate', function(event) { closeModal(); });
     
-    // --- 核心資料庫 (V124.33 - Detailed Progress & Fixes) ---
+    // --- 核心資料庫 (V124.34 - Fixes) ---
     const defaultCards = [
         { 
             id: 'c10', name: '中信 UniOpen 卡', nickname: '2026 統一集團神卡', 
@@ -1313,7 +1313,7 @@
         },
         { 
             id: 'c2', name: '聯邦綠卡', nickname: '綠色/市區停車神卡', 
-            note: '綠色 6% (刷 3千封頂) | 停車 (刷 1.2萬達標)', 
+            note: '綠色 +5% (刷 3千封頂) | 停車 (刷 1.2萬達標)', 
             rule: '', type: 'floor', target: 12000, tier1Rate: 0.02, tier2Rate: 0.02, 
             gradient: 'linear-gradient(135deg, #20B2AA 0%, #008B8B 100%)', textColor: 'white', msgSuccess: '已達標 (下月免停)', 
             parking: `🅿️ <b>免費停車：</b>需上月刷滿1.2萬<br>🌿 <b>綠色通路 6%</b><br>基本 1% + 加碼 5%<br>⚠️ 加碼適用月刷 $3,000 封頂 (回饋 $150)`
@@ -1754,7 +1754,6 @@
             const newBonus = Math.min(newUserSpend * 0.04, 300); 
             reward = baseReward + lpBonus + evenBonus + newBonus;
             
-            // 返回各項消費以便 renderGrid 顯示剩餘額度
             return { spend: totalSpend, validSpend: lpSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, evenSpend, newUserSpend, lpSpend };
         }
 
@@ -1947,7 +1946,7 @@
             return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd };
         }
 
-        // J3
+        // [J3] 熊本熊卡
         if (cardId === 'j3') {
             const txList = [...relevantTx];
             const qTxList = [...quarterTx];
@@ -1968,8 +1967,7 @@
             const paypayBonus = Math.min(quarterlyPayPaySpend * 0.035, 100);
             reward = baseAndDesignatedReward + designatedBonus + feeWaiverReward + paypayBonus;
             let validSpend = designatedSpend; let limit = 8333; let msg = '';
-            // 邏輯: 如果有累積消費，就應該顯示，即便沒開按鈕 (顯示本月累積)。但這裡要針對指定通路顯示餘額
-            // 優先權：PayPay -> 指定通路 -> 一般
+            // 邏輯: 顯示指定通路餘額
             if (addedIsKumamonPayPay || (quarterlyPayPaySpend > 0 && !addedIsKumamonDesignated && !addedIsKumamonJapan)) {
                 validSpend = quarterlyPayPaySpend; limit = 2857;
             } 
@@ -2023,15 +2021,15 @@
             return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd };
         }
 
-        // C2
+        // [C2] 聯邦綠卡 (修正：綠色+5%, 與國外分開計算)
         if (cardId === 'c2') {
             let baseReward = totalSpend * 0.01;
             const greenSpend = relevantTx.filter(t => t.isGreen).reduce((sum, t) => sum + t.amount, 0) + (addedIsGreen ? addedAmount : 0);
-            const bonusGreen = Math.min(greenSpend, 3000) * 0.05;
+            const bonusGreen = Math.min(greenSpend, 3000) * 0.05; // 綠色 1%+5% = 6% (但這邊只算bonus 5%)
             const foreignSpend = relevantTx.filter(t => t.isForeign).reduce((sum, t) => sum + t.amount, 0) + (addedIsForeign ? addedAmount : 0);
-            const bonusForeign = foreignSpend * 0.01;
+            const bonusForeign = foreignSpend * 0.01; // 國外 1%+1% = 2% (Bonus 1%)
             reward = baseReward + bonusGreen + bonusForeign;
-            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd };
+            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, greenSpend, foreignSpend };
         }
         
         // C6
@@ -2291,6 +2289,15 @@
                     statusText = "特選已封頂"; percent = 100; msgStyle = 'color: #ffcccc;';
                 }
             }
+            // [C2] 聯邦綠卡 (強制顯示綠色額度)
+            else if (card.id === 'c2') {
+                const g = stats.greenSpend || 0;
+                if (g < 3000) {
+                    statusText = `綠色剩 $${Math.floor(3000-g).toLocaleString()}`; percent = (g/3000)*100; msgStyle = 'color: #FF9800;';
+                } else {
+                    statusText = "綠色已封頂 (變1%)"; percent = 100; msgStyle = 'color: #ffcccc;';
+                }
+            }
             else if (card.id === 'c9') {
                 const tier = localStorage.getItem('hsbc_tier') || 'infinite';
                 card.name = (tier === 'infinite') ? '滙豐旅人無限卡' : '滙豐旅人御璽卡';
@@ -2364,7 +2371,7 @@
             tile.setAttribute('data-card-id', card.id);
             tile.style.background = card.gradient;
             tile.style.color = card.textColor; 
-            tile.onclick = () => card.type === 'placeholder' ? openManageModal() : openQuickAdd(card.id);
+            tile.onclick = () => { editingId = null; card.type === 'placeholder' ? openManageModal() : openQuickAdd(card.id); };
             let earnedText = `+$${stats.reward.toLocaleString()}`;
             if (card.id === 'c9') { earnedText = `+${stats.reward.toLocaleString()} 哩`; }
             let cycleHint = '';
@@ -2466,7 +2473,7 @@
         const today = `${year}-${month}-${day}`;
         document.getElementById('dateInput').value = today;
         
-        editingId = null;
+        // Remove editingId = null here to fix the update bug
         document.getElementById('btn-confirm').innerText = "確認";
         document.getElementById('transactionModal').style.display = 'flex';
         const allOptionIds = ['pigRichOptions', 'greenCardOptions', 'uniOptions', 'happyOptions', 'hsbcOptions', 'uniOpenOptions', 'richartOptions', 'fubonJOptions', 'jiheOptions', 'kumamonOptions', 'sinopacCurrencyOptions', 'sinopacMitsuiOptions', 'jiangOptions', 'dbsEcoOptions', 'sinopacJcbOptions', 'laiDianOptions'];

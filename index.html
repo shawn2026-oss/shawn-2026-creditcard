@@ -463,7 +463,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V124.34(Fix2)</div>
+            <div class="version-tag">V124.34(Fix3)</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -471,7 +471,7 @@
         </div>
         
         <div class="news-ticker">
-            <div class="ticker-content" id="news-text">🎉 V124.34 更新：修復富邦J/熊本熊/綠卡顯示邏輯。修正修改紀錄時變新增的問題。全線優化額度顯示。</div>
+            <div class="ticker-content" id="news-text">🎉 V124.34 更新：修復 Uni Card 進度條顯示問題、修正右上角 0% 顯示、綠卡顯示優化。</div>
         </div>
         
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
@@ -553,9 +553,9 @@
                 <div id="pigRichOptions">
                     <div class="option-row read-only"><label id="labelBaseRate">🔰 基本回饋 1% (無上限)</label><input type="checkbox" checked disabled></div>
                     <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0;">
-                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkBonus10">⚡ 新戶加碼 +10% (刷$8,000封頂)</label>
-                            <input type="checkbox" id="checkBonus10" checked onchange="updateRewardPreview()">
+                          <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                             <label for="checkBonus10">⚡ 新戶加碼 +10% (刷$8,000封頂)</label>
+                             <input type="checkbox" id="checkBonus10" checked onchange="updateRewardPreview()">
                         </div>
                         <button onclick="togglePigRichNewUser()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看 10% 定義</button>
                         <div id="pigRichNewUserDetails" class="details-content">
@@ -620,7 +620,7 @@
                     
                     <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0;">
                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkGreenChannel">🌿 綠色通路 6% (刷$3,000封頂)</label>
+                            <label for="checkGreenChannel">🌿 綠色通路 +5% (刷$3,000封頂)</label>
                             <input type="checkbox" id="checkGreenChannel" onchange="toggleGreenLogic()">
                         </div>
                         <button onclick="toggleGreenDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看綠色通路</button>
@@ -641,8 +641,7 @@
 
                     <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;"><label for="checkForeign">✈️ 國外消費 2% (無上限)</label><input type="checkbox" id="checkForeign" onchange="toggleForeignLogic()"></div>
                 </div>
-                
-                <div id="uniOptions">
+              <div id="uniOptions">
                     <div class="option-row read-only"><label id="labelUniBase">🔰 任意選 3.5% (刷$4萬封頂)</label><input type="checkbox" checked disabled></div>
                     <div class="option-row"><label for="checkUniUp">🆙 訂閱 UP 選 4.5% (刷$14萬封頂)</label><input type="checkbox" id="checkUniUp" onchange="toggleUniUpLogic()"></div>
                     <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;"><label for="checkUniBonus">🔥 統一時代任務 +3% (刷$1.6萬封頂)</label><input type="checkbox" id="checkUniBonus" onchange="updateRewardPreview()"></div>
@@ -941,8 +940,8 @@
                          <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
                              <label for="checkSinopacJcbQuarterly">🔥 日韓泰滿額 +5% (季)</label>
                              <input type="checkbox" id="checkSinopacJcbQuarterly" onchange="updateRewardPreview()">
-                         </div>
-                         <div style="font-size:10px; color:#d32f2f; margin-top:2px;">需登錄，滿2萬送1000 (上限1000)</div>
+                          </div>
+                          <div style="font-size:10px; color:#d32f2f; margin-top:2px;">需登錄，滿2萬送1000 (上限1000)</div>
                     </div>
                 </div>
                 
@@ -1405,7 +1404,7 @@
     let savedOrder = JSON.parse(localStorage.getItem('cardOrder'));
     let cards = [...defaultCards];
     let sortableInstance = null;
-    
+      
     function getSortedCards() {
         if (!visibleCards) return [];
         let displayCards = cards.filter(c => visibleCards.includes(c.id));
@@ -1467,24 +1466,24 @@
         btn.classList.toggle('active');
         saveUniOpenState();
     }
-    
+      
     function toggleUniGroup() {
         if(document.getElementById('checkUniGroup').checked) { document.getElementById('checkUniOverseas').checked = false; }
         saveUniOpenState();
     }
-    
+      
     function toggleUniIcash() {
         if(document.getElementById('checkUniIcash').checked) { document.getElementById('checkUniOverseas').checked = false; }
         saveUniOpenState();
     }
-    
+      
     function getCheckedBrands() {
         const activeBtns = document.querySelectorAll('.brand-btn.active');
         const brands = [];
         activeBtns.forEach(btn => brands.push(btn.innerText));
         return brands;
     }
-    
+      
     function updateTaskBonusDisplay(count) {
         const display = document.getElementById('taskBonusDisplay');
         let rate = 0;
@@ -1494,7 +1493,7 @@
         else if(count === 2) rate = 1;
         display.innerText = `目前踩點 ${count} 家 (加碼 +${rate}%)`;
     }
-    
+      
     function toggleUniOverseas() {
         const isOverseas = document.getElementById('checkUniOverseas').checked;
         if (isOverseas) {
@@ -1608,7 +1607,7 @@
         }
         updateRewardPreview();
     }
-    
+      
     function toggleKumamonSub(mode) {
         const isPayPay = document.getElementById('checkKumamonPayPay').checked;
         const isDesignated = document.getElementById('checkKumamonDesignated').checked;
@@ -1644,7 +1643,7 @@
         }
         updateRewardPreview(); 
     }
-    
+      
     function toggleSinopacMitsui(mode) {
         if (mode === 'selected' && document.getElementById('checkSinopacMitsuiSelected').checked) {
             document.getElementById('checkSinopacMitsuiTarget').checked = false;
@@ -1654,7 +1653,7 @@
         }
         updateRewardPreview();
     }
-    
+      
     function toggleDbsLogic(mode) {
         const isLine = document.getElementById('checkDbsLinePay').checked;
         const isGreen = document.getElementById('checkDbsGreen').checked;
@@ -1674,12 +1673,12 @@
         }
         updateRewardPreview();
     }
-    
+      
     // [C8 樂家卡邏輯 (Radio)]
     function toggleHappyLogic() {
         updateRewardPreview();
     }
-    
+      
     // [C11 Richart 邏輯]
     function toggleRichartLogic() {
         updateRewardPreview();
@@ -1691,7 +1690,7 @@
         renderGrid();
         updateRewardPreview();
     }
-    
+      
     function getQuarterRange(dateObj) {
         const year = dateObj.getFullYear();
         const month = dateObj.getMonth();
@@ -1723,8 +1722,7 @@
         }
         return { start, end, isCustom: true };
     }
-
-    // ==========================================
+      // ==========================================
     // 核心運算邏輯: calculateStats
     // ==========================================
     function calculateStats(cardId, addedAmount = 0, addedIsGreen = false, addedIsForeign = false, addedIsUniBonus = false, addedIsUniUp = false, addedIsHappyPet = false, addedIsHappyLife = false, addedIsHappyForeign = false, addedIsHappyPeace = false, addedIsHsbcForeign = false, addedIsUniGroup = false, addedIsUniIcash = false, addedIsUniOverseas = false, addedIsRichartPay = false, addedIsRichartOnline = false, addedIsRichartLine = false, addedIsRichartOverseas = false, addedIsBonus10 = false, addedIsBonus25 = false, addedIsBill = false, 
@@ -1784,8 +1782,8 @@
                 if (mode === 'even') evenSpend += t.amount;
             });
             
-            const lpBonus = Math.min(lpSpend * 0.01, 200);       
-            const evenBonus = Math.min(evenSpend * 0.05, 150);  
+            const lpBonus = Math.min(lpSpend * 0.01, 200);        
+            const evenBonus = Math.min(evenSpend * 0.05, 150);   
             const newBonus = Math.min(newUserSpend * 0.04, 300); 
             reward = baseReward + lpBonus + evenBonus + newBonus;
             
@@ -1853,10 +1851,11 @@
             return { spend: totalSpend, validSpend: selectedSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, msgDanger: statusText, customLimit: spendingCap, breakdown };
         }
 
-        // [C7] Uni Card
+        // [C7] Uni Card (修正：UP選上限為 140,000)
         if (cardId === 'c7') {
              const isUpMode = addedIsUniUp || relevantTx.some(t => t.isUniUp);
-             const currentCap = isUpMode ? 142857 : 40000;
+             // [修正] UP選上限改為 140,000 (原為 142857)
+             const currentCap = isUpMode ? 140000 : 40000;
              const bonusSpend = relevantTx.filter(t => t.isUniBonus).reduce((sum, t) => sum + t.amount, 0) + (addedIsUniBonus ? addedAmount : 0);
              breakdown = { items: [ { label: isUpMode ? 'UP選額度 (4.5%)' : '任意選額度 (3.5%)', current: totalSpend, max: currentCap, color: 'purple' }, { label: '時代百貨 (+3%)', current: bonusSpend, max: 16666, color: 'red' } ] };
              let currentRate = isUpMode ? 0.045 : 0.035; 
@@ -2236,13 +2235,26 @@
         displayCards.forEach(card => {
             const stats = calculateStats(card.id); 
             let percent = 0, statusText = '', msgStyle = '';
+            
+            // [FIX] 修復卡面顯示 0% 的問題，強制顯示最高權益 %
             let displayRate = `${stats.rate}%`; 
-
             if (card.id === 'c6') displayRate = '13.5%';
             if (card.id === 'c5') displayRate = '11.0%'; 
             if (card.id === 'c4') displayRate = '5.0%'; 
             if (card.id === 'c8') displayRate = '10.0%';
             if (card.id === 'j4') displayRate = '6.0%'; 
+            if (card.id === 'c10') displayRate = '11.0%';
+            if (card.id === 'dbs1') displayRate = '10.0%';
+            if (card.id === 'c1') displayRate = '11.0%';
+            if (card.id === 'c2') displayRate = '6.0%';
+            if (card.id === 'c3') displayRate = '7.0%';
+            if (card.id === 'c7') displayRate = '4.5%';
+            if (card.id === 'c11') displayRate = '3.8%';
+            if (card.id === 'j1') displayRate = '6.0%';
+            if (card.id === 'j2') displayRate = '5.0%';
+            if (card.id === 'j3') displayRate = '8.5%';
+            if (card.id === 'j5') displayRate = '7.3%';
+            if (card.id === 'c12') displayRate = '5.0%';
             if (card.type === 'placeholder') displayRate = '--%';
 
             // C7 Uni Card 建議
@@ -2357,9 +2369,9 @@
                     percent = (stats.spend / 3000) * 100;
                     statusText = `差 $${(3000 - stats.spend).toLocaleString()} 升級回饋`;
                     msgStyle = 'color: #FFD700;';
-                } else if (stats.spend < 26000) { percent = (stats.spend / 26000) * 100;
+                } else if (stats.spend < 26000) { percent = (stats.spend / 26000) * 100; 
                 statusText = `差 $${(26000 - stats.spend).toLocaleString()} 領滿額禮`; } 
-                else { percent = 100;
+                else { percent = 100; 
                 statusText = '🎉 滿額達標 (記得登錄!)'; msgStyle = 'color: #38ef7d;'; }
             } else if (card.type === 'mixed') { 
                 if (stats.validSpend < card.minSpend) { 
@@ -2372,7 +2384,7 @@
                     const remain = card.limit - stats.validSpend; 
                     statusText = `剩 $${remain.toLocaleString()} (5%)`;
                 }
-                else { percent = 100;
+                else { percent = 100; 
                 statusText = '已封頂 (變0.5%)'; msgStyle = 'color: #ffcccc;'; }
             } else if (card.type === 'ceiling' || card.type === 'custom_j' || card.id === 'j2' || card.id === 'j3' || card.id === 'j4' || card.id === 'j5' || card.id === 'dbs1' || card.id === 'c12') {
                 const limit = stats.customLimit || card.limit;
@@ -2500,6 +2512,12 @@
     }
 
     function openQuickAdd(cardId) {
+        // [FIX] 關鍵修正：每次打開前先隱藏並清空進度條區域，防止殘留
+        document.getElementById('detailProgressArea').style.display = 'none';
+        document.getElementById('detailProgressArea').innerHTML = '';
+        const uniSug = document.getElementById('uniUpSuggestion');
+        if(uniSug) uniSug.style.display = 'none';
+
         const card = cards.find(c => c.id === cardId);
         document.getElementById('modalTitle').innerText = card.name; 
         document.getElementById('modalSubtitle').innerText = card.note;

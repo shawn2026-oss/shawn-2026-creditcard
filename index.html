@@ -1702,15 +1702,13 @@
         addedIsJiangSelected = false, addedIsJiangTravel = false,
         addedIsDbsLinePay = false, addedIsDbsGreen = false, addedIsDbsForeign = false,
         addedIsSinopacJcbForeign = false, addedIsSinopacJcbJapan = false, addedIsSinopacJcbBonus = false, addedIsSinopacJcbQuarterly = false,
-        // [新增參數]
         addedLaiDianMode = 'general', addedIsLaiDianNew = false,
         addedHappyMode = 'general') {
         
         const card = cards.find(c => c.id === cardId);
         if (card.type === 'placeholder') return { spend: 0, validSpend: 0, reward: 0, rate: '0.0' };
         
-        const dateInputVal = document.getElementById('dateInput') ? 
-        document.getElementById('dateInput').value : null;
+        const dateInputVal = document.getElementById('dateInput') ? document.getElementById('dateInput').value : null;
         const refDate = (addedAmount > 0 && dateInputVal) ? new Date(dateInputVal) : new Date();
         const { start: cycleStart, end: cycleEnd, isCustom } = getBillingCycle(cardId, refDate);
         const { start: quarterStart, end: quarterEnd } = getQuarterRange(refDate);
@@ -1733,70 +1731,40 @@
         let reward = 0;
         let breakdown = {};
 
-        // ------------------------------------------
-        // [C5] 聯邦賴點卡 (Lai Dian)
-        // ------------------------------------------
+        // [C5] 聯邦賴點卡
         if (cardId === 'c5') {
             const txList = [...relevantTx];
             if(addedAmount > 0) txList.push({ amount: addedAmount, laiDianMode: addedLaiDianMode, isLaiDianNew: addedIsLaiDianNew });
             
-            let baseReward = 0; // 1%
-            let lpSpend = 0;    // Mode 'lp' or 'even'
-            let evenSpend = 0;  // Mode 'even'
-            let newUserSpend = 0; // (Mode 'lp' or 'even') AND isNewUser
+            let baseReward = 0; let lpSpend = 0; let evenSpend = 0; let newUserSpend = 0;
             
             txList.forEach(t => {
-                const mode = t.laiDianMode || 'general'; // 舊資料預設 general
+                const mode = t.laiDianMode || 'general';
                 const isNew = !!t.isLaiDianNew;
-                
                 baseReward += t.amount * 0.01;
-                
                 if (mode === 'lp' || mode === 'even') {
                     lpSpend += t.amount;
                     if (isNew) newUserSpend += t.amount;
                 }
-                if (mode === 'even') {
-                    evenSpend += t.amount;
-                }
+                if (mode === 'even') evenSpend += t.amount;
             });
             
             const lpBonus = Math.min(lpSpend * 0.01, 200);      
             const evenBonus = Math.min(evenSpend * 0.05, 150);  
             const newBonus = Math.min(newUserSpend * 0.04, 300); 
-            
             reward = baseReward + lpBonus + evenBonus + newBonus;
             
-            let statusText = '';
-            let msgStyle = '';
-            
-            if (evenSpend > 0) {
-                const remain = Math.max(0, 3000 - evenSpend);
-                statusText = (remain === 0) ? '偶數日加碼已滿' : `偶數日剩 $${remain.toLocaleString()}`;
-                if (remain === 0) msgStyle = 'color: #ffcccc;';
-            } else if (newUserSpend > 0) {
-                const remain = Math.max(0, 7500 - newUserSpend);
-                statusText = (remain === 0) ? '新戶加碼已滿' : `新戶額度剩 $${remain.toLocaleString()}`;
-            } else if (lpSpend > 0) {
-                const remain = Math.max(0, 20000 - lpSpend);
-                statusText = (remain === 0) ? 'LP加碼已滿' : `LP額度剩 $${remain.toLocaleString()}`;
-            } else {
-                statusText = `本月累積 $${totalSpend.toLocaleString()}`;
-            }
-            
-            return { spend: totalSpend, validSpend: lpSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, msgDanger: statusText, msgStyle };
+            // 返回各項消費以便 renderGrid 顯示剩餘額度
+            return { spend: totalSpend, validSpend: lpSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, evenSpend, newUserSpend, lpSpend };
         }
 
-        // ------------------------------------------
-        // [C8] 遠東樂家+卡 (Happy Card)
-        // ------------------------------------------
+        // [C8] 遠東樂家+卡
         if (cardId === 'c8') {
-            const petLimit = 5263;
-            const lifeLimit = 5714;
+            const petLimit = 5263; const lifeLimit = 5714;
             const txList = [...relevantTx];
             if(addedAmount > 0) txList.push({ amount: addedAmount, happyMode: addedHappyMode });
             
             let petSpend = 0, lifeSpend = 0, peaceSpend = 0, foreignSpend = 0;
-            
             txList.forEach(t => {
                 if (t.happyMode) {
                     if (t.happyMode === 'pet') petSpend += t.amount;
@@ -1804,144 +1772,73 @@
                     if (t.happyMode === 'peace') peaceSpend += t.amount;
                     if (t.happyMode === 'foreign') foreignSpend += t.amount;
                 } else {
-                    if (t.isHappyPet) petSpend += t.amount;
-                    else if (t.isHappyLife) lifeSpend += t.amount;
-                    else if (t.isHappyPeace) peaceSpend += t.amount;
-                    else if (t.isHappyForeign) foreignSpend += t.amount;
+                    if (t.isHappyPet) petSpend += t.amount; else if (t.isHappyLife) lifeSpend += t.amount; else if (t.isHappyPeace) peaceSpend += t.amount; else if (t.isHappyForeign) foreignSpend += t.amount;
                 }
             });
-            
-            breakdown = {
-                items: [
-                    { label: '🐶 寵物 (10%)', current: petSpend, max: petLimit, color: 'orange' },
-                    { label: '🍽️ 生活 (4%)', current: lifeSpend, max: lifeLimit, color: 'green' },
-                    { label: '📡 安心 (4%)', current: peaceSpend, max: lifeLimit, color: 'purple' }
-                ]
-            };
-
-            if (totalSpend < 3000) {
-                reward = totalSpend * 0.005;
-            } else {
-                let baseReward = totalSpend * 0.005;
+            breakdown = { items: [ { label: '🐶 寵物 (10%)', current: petSpend, max: petLimit, color: 'orange' }, { label: '🍽️ 生活 (4%)', current: lifeSpend, max: lifeLimit, color: 'green' }, { label: '📡 安心 (4%)', current: peaceSpend, max: lifeLimit, color: 'purple' } ] };
+            let baseReward = totalSpend * 0.005;
+            if (totalSpend >= 3000) {
                 const bonusPet = Math.min(petSpend, petLimit) * 0.095;
                 const bonusLife = Math.min(lifeSpend, lifeLimit) * 0.035; 
                 const bonusPeace = Math.min(peaceSpend, lifeLimit) * 0.035;
                 const bonusForeign = foreignSpend * 0.02;
                 reward = baseReward + bonusPet + bonusLife + bonusPeace + bonusForeign;
-                if(totalSpend >= 26000) reward += 400; // 滿額禮
-            }
+                if(totalSpend >= 26000) reward += 400;
+            } else { reward = baseReward; }
             return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, breakdown };
         }
 
-        // DBS Eco
+        // [DBS1] 星展 Eco
         if (cardId === 'dbs1') {
-             const lineLimit = 11111;
-             const greenLimit = 3333;
-             const foreignLimit = 15000;
              const lineSpend = relevantTx.filter(t => t.isDbsLinePay).reduce((sum, t) => sum + t.amount, 0) + (addedIsDbsLinePay ? addedAmount : 0);
              const greenSpend = relevantTx.filter(t => t.isDbsGreen).reduce((sum, t) => sum + t.amount, 0) + (addedIsDbsGreen ? addedAmount : 0);
              const foreignSpend = relevantTx.filter(t => t.isDbsForeign).reduce((sum, t) => sum + t.amount, 0) + (addedIsDbsForeign ? addedAmount : 0);
-
-             breakdown = {
-                items: [
-                    { label: 'Line Pay (10%)', current: lineSpend, max: lineLimit, color: 'green' },
-                    { label: '綠色通路 (10%)', current: greenSpend, max: greenLimit, color: 'orange' },
-                    { label: '國外實體 (5%)', current: foreignSpend, max: foreignLimit, color: 'purple' }
-                ]
-             };
-             
+             breakdown = { items: [ { label: 'Line Pay (10%)', current: lineSpend, max: 11111, color: 'green' }, { label: '綠色通路 (10%)', current: greenSpend, max: 3333, color: 'orange' }, { label: '國外實體 (5%)', current: foreignSpend, max: 15000, color: 'purple' } ] };
              const baseReward = totalSpend * 0.01;
              const lineBonus = Math.min(lineSpend * 0.09, 1000);
              const greenBonus = Math.min(greenSpend * 0.09, 300);
-             const foreignBonus = Math.min(foreignSpend, foreignLimit) * 0.04;
+             const foreignBonus = Math.min(foreignSpend, 15000) * 0.04;
              reward = baseReward + lineBonus + greenBonus + foreignBonus;
-             
-             let statusText = `本月累積 $${totalSpend.toLocaleString()}`;
-             let msgStyle = '';
-             if (addedIsDbsLinePay) {
-                 if (lineSpend > lineLimit) { statusText = 'LinePay封頂'; msgStyle = 'color:#ffcccc'; }
-                 else statusText = `LinePay剩 $${Math.floor(lineLimit - lineSpend).toLocaleString()}`;
-             }
-             return { spend: totalSpend, validSpend: 0, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, msgDanger: statusText, msgStyle, breakdown };
+             return { spend: totalSpend, validSpend: 0, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, breakdown, lineSpend, greenSpend, foreignSpend };
         }
 
-        // J4 幣倍
+        // [J4] 幣倍卡
         if (cardId === 'j4') {
             const level = localStorage.getItem('currency_level') || 'low';
             const bonusCap = (level === 'high') ? 800 : 300; 
             const spendingCap = (level === 'high') ? 20000 : 7500;
-            
             const txList = [...relevantTx];
             if (addedAmount > 0) txList.push({ amount: addedAmount, isSinopacCurrencySelected: addedIsSinopacCurrencySelected });
-            
             const selectedSpend = txList.filter(t => t.isSinopacCurrencySelected).reduce((sum, t) => sum + t.amount, 0);
-            
-            breakdown = {
-                items: [
-                    { label: '精選/海外額度', current: selectedSpend, max: spendingCap, color: 'orange' }
-                ]
-            };
-            
+            breakdown = { items: [ { label: '精選/海外額度', current: selectedSpend, max: spendingCap, color: 'orange' } ] };
             let baseReward = 0;
-            txList.forEach(t => {
-                if(t.isSinopacCurrencySelected) baseReward += t.amount * 0.02; 
-                else baseReward += t.amount * 0.01;
-            });
+            txList.forEach(t => { if(t.isSinopacCurrencySelected) baseReward += t.amount * 0.02; else baseReward += t.amount * 0.01; });
             const actualBonus = Math.min(selectedSpend * 0.04, bonusCap); 
             reward = baseReward + actualBonus;
-            
-            let statusText = '';
-            if (selectedSpend >= spendingCap) statusText = '加碼已封頂';
-            else statusText = `加碼剩 $${Math.floor(spendingCap - selectedSpend).toLocaleString()}`;
-            
+            let statusText = (selectedSpend >= spendingCap) ? '加碼已封頂' : `加碼剩 $${Math.floor(spendingCap - selectedSpend).toLocaleString()}`;
             return { spend: totalSpend, validSpend: selectedSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, msgDanger: statusText, customLimit: spendingCap, breakdown };
         }
 
-        // ------------------------------------------
-        // [C7] Uni Card - 邏輯確認
-        // ------------------------------------------
+        // [C7] Uni Card
         if (cardId === 'c7') {
-             // 邏輯說明: 任意選 (3.5%) 與 UP選 (4.5%) 互斥，但兩者皆可與 任務 (+3%) 疊加
-             // 程式邏輯: isUpMode 決定基礎費率是 3.5% 還是 4.5%。 bonusSpend 額外算 3%。
-             
              const isUpMode = addedIsUniUp || relevantTx.some(t => t.isUniUp);
              const currentCap = isUpMode ? 142857 : 40000;
              const bonusSpend = relevantTx.filter(t => t.isUniBonus).reduce((sum, t) => sum + t.amount, 0) + (addedIsUniBonus ? addedAmount : 0);
-             
-             breakdown = {
-                 items: [
-                     { label: isUpMode ? 'UP選額度 (4.5%)' : '任意選額度 (3.5%)', current: totalSpend, max: currentCap, color: 'purple' },
-                     { label: '時代百貨 (+3%)', current: bonusSpend, max: 16666, color: 'red' }
-                 ]
-             };
-             
-             // 互斥邏輯實作：若 UP 為真則用 4.5%，否則用 3.5%。不會疊加。
+             breakdown = { items: [ { label: isUpMode ? 'UP選額度 (4.5%)' : '任意選額度 (3.5%)', current: totalSpend, max: currentCap, color: 'purple' }, { label: '時代百貨 (+3%)', current: bonusSpend, max: 16666, color: 'red' } ] };
              let currentRate = isUpMode ? 0.045 : 0.035; 
-             let baseReward = 0;
-             if (totalSpend <= currentCap) { 
-                 baseReward = totalSpend * currentRate; 
-             } else { 
-                 baseReward = (currentCap * currentRate) + ((totalSpend - currentCap) * 0.01); 
-             }
-             
-             // 任務疊加
+             let baseReward = (totalSpend <= currentCap) ? totalSpend * currentRate : (currentCap * currentRate) + ((totalSpend - currentCap) * 0.01); 
              const bonusReward = Math.min(bonusSpend, 16666) * 0.03;
-             
              reward = baseReward + bonusReward;
              let suggestion = (!isUpMode && totalSpend >= 14900) ? "💡 額度破 1.5 萬，建議訂閱 UP" : "";
              return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, suggestion, breakdown };
         }
 
-        // ------------------------------------------
-        // [C10] UniOpen - 顯示優化
-        // ------------------------------------------
+        // [C10] UniOpen
         if (cardId === 'c10') {
             const currentOverseasSpend = relevantTx.filter(t => t.isUniOverseas).reduce((sum, t) => sum + t.amount, 0) + (addedIsUniOverseas ? addedAmount : 0);
             const overseasReward = (currentOverseasSpend * 0.03) + Math.min(currentOverseasSpend, 6250) * 0.08;
-            
             const icashSpend = relevantTx.filter(t => t.isUniIcash && !t.isUniOverseas).reduce((sum, t) => sum + t.amount, 0) + (addedIsUniIcash && !addedIsUniOverseas ? addedAmount : 0);
             const icashReward = Math.min(icashSpend, 3750) * 0.04;
-            
             const groupTx = relevantTx.filter(t => t.isUniGroup && !t.isUniOverseas);
             let currentGroupSpend = groupTx.reduce((sum, t) => sum + t.amount, 0);
             if (addedIsUniGroup && !addedIsUniOverseas) currentGroupSpend += addedAmount;
@@ -1950,27 +1847,15 @@
             const savedState = JSON.parse(localStorage.getItem('uniOpenState') || '{"brands":[]}');
             const count = savedState.brands ? savedState.brands.length : 0;
             let taskRate = 0;
-            if (count >= 5) taskRate = 0.04;
-            else if (count === 4) taskRate = 0.03;
-            else if (count === 3) taskRate = 0.02;
-            else if (count === 2) taskRate = 0.01;
+            if (count >= 5) taskRate = 0.04; else if (count === 4) taskRate = 0.03; else if (count === 3) taskRate = 0.02; else if (count === 2) taskRate = 0.01;
             const taskBonus = Math.min(currentGroupSpend, 12500) * taskRate;
             
             const domesticSpend = totalSpend - currentOverseasSpend;
             const baseDomesticReward = domesticSpend * 0.01;
-            
             reward = overseasReward + baseDomesticReward + groupBonus + taskBonus + icashReward;
             
-            breakdown = {
-                items: [
-                    { label: 'icash Pay (4%)', current: icashSpend, max: 3750, color: 'orange' },
-                    { label: '海外實體 (11%)', current: currentOverseasSpend, max: 6250, color: 'purple' },
-                    { label: '統一集團 (3%)', current: currentGroupSpend, max: 25000, color: 'green' }
-                ]
-            };
-            
-            // 讓外部 renderGrid 可以取得這兩個關鍵進度
-            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, breakdown, currentGroupSpend, currentOverseasSpend };
+            breakdown = { items: [ { label: 'icash Pay (4%)', current: icashSpend, max: 3750, color: 'orange' }, { label: '海外實體 (11%)', current: currentOverseasSpend, max: 6250, color: 'purple' }, { label: '統一集團 (3%)', current: currentGroupSpend, max: 25000, color: 'green' } ] };
+            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, breakdown, currentGroupSpend, currentOverseasSpend, icashSpend };
         }
 
         // C11
@@ -2010,8 +1895,7 @@
                 txList.push({ amount: addedAmount, isSinopacJcbForeign: addedIsSinopacJcbForeign, isSinopacJcbJapan: addedIsSinopacJcbJapan, isSinopacJcbBonus: addedIsSinopacJcbBonus });
                 qTxList.push({ amount: addedAmount, isSinopacJcbQuarterly: addedIsSinopacJcbQuarterly });
             }
-            let baseReward = 0;
-            let monthlyBonusSpend = 0;
+            let baseReward = 0; let monthlyBonusSpend = 0;
             txList.forEach(t => {
                 let rate = t.isSinopacJcbForeign ? 0.02 : 0.01;
                 baseReward += t.amount * rate;
@@ -2022,19 +1906,10 @@
             let quarterlyBonus = 0;
             if (quarterlySpend >= 20000) quarterlyBonus = 1000;
             reward = baseReward + monthlyBonus + quarterlyBonus;
-            let statusText = "", msgStyle = "", limit = 10000;
-            if (addedIsSinopacJcbQuarterly) {
-                 if (quarterlySpend >= 20000) { statusText = "🎉 季滿額達標 (+$1000)"; msgStyle = "color: #38ef7d;"; } 
-                 else { statusText = `季累積 $${quarterlySpend.toLocaleString()} (差 $${(20000-quarterlySpend).toLocaleString()})`; }
-            } else if (addedIsSinopacJcbBonus) { 
-                const remain = Math.max(0, limit - monthlyBonusSpend);
-                if (monthlyBonusSpend > limit) { statusText = "特選/日本加碼已封頂"; msgStyle = "color: #ffcccc;"; } 
-                else { statusText = `加碼剩 $${remain.toLocaleString()} (3%)`; }
-            } else { statusText = `本月累積 $${totalSpend.toLocaleString()}`; }
-            return { spend: totalSpend, validSpend: monthlyBonusSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, msgDanger: statusText, customLimit: limit, msgStyle };
+            return { spend: totalSpend, validSpend: monthlyBonusSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, quarterlySpend, monthlyBonusSpend };
         }
 
-        // J1
+        // [J1] 富邦 J 卡
         if (cardId === 'j1') {
             const txList = [...relevantTx];
             const qTxList = [...quarterTx];
@@ -2043,39 +1918,19 @@
                 qTxList.push({ amount: addedAmount, isFubonJKorea: addedIsFubonJKorea, isFubonJThai: addedIsFubonJThai, isFubonJSuica: addedIsFubonJSuica });
             }
             let baseReward = 0;
-            txList.forEach(t => {
-                if(t.isFubonJGeneral) baseReward += t.amount * 0.03;
-                else baseReward += t.amount * 0.01;
-            });
+            txList.forEach(t => { if(t.isFubonJGeneral) baseReward += t.amount * 0.03; else baseReward += t.amount * 0.01; });
             let jkBonusTotal = 0, thaiBonusTotal = 0, suicaBonusTotal = 0;
+            let jkSpend = 0, thaiSpend = 0, suicaSpend = 0;
             qTxList.forEach(t => { 
-                if(t.isFubonJKorea && t.amount >= 1000) jkBonusTotal += t.amount * 0.03; 
-                if(t.isFubonJThai && t.amount >= 1000) thaiBonusTotal += t.amount * 0.05; 
-                if(t.isFubonJSuica && t.amount >= 2000) suicaBonusTotal += t.amount * 0.07; 
+                if(t.isFubonJKorea) { if(t.amount >= 1000) jkBonusTotal += t.amount * 0.03; jkSpend += t.amount; }
+                if(t.isFubonJThai) { if(t.amount >= 1000) thaiBonusTotal += t.amount * 0.05; thaiSpend += t.amount; }
+                if(t.isFubonJSuica) { if(t.amount >= 2000) suicaBonusTotal += t.amount * 0.07; suicaSpend += t.amount; }
             });
             jkBonusTotal = Math.min(jkBonusTotal, 1000);
             thaiBonusTotal = Math.min(thaiBonusTotal, 1000);
             suicaBonusTotal = Math.min(suicaBonusTotal, 200);
             reward = baseReward + jkBonusTotal + thaiBonusTotal + suicaBonusTotal;
-            let statusText = `本月累積 $${totalSpend.toLocaleString()}`;
-            let msgStyle = '';
-            if(addedIsFubonJKorea) {
-                const used = Math.min(qTxList.filter(t=>t.isFubonJKorea).reduce((a,b)=>a+b.amount,0) * 0.03, 1000);
-                const remain = Math.floor((1000 - used) / 0.03);
-                statusText = (used >= 1000) ? "季加碼已封頂 (變3%)" : `日韓實體剩 $${remain.toLocaleString()} (季)`;
-                if(used >= 1000) msgStyle = 'color: #ffcccc;';
-            } else if(addedIsFubonJThai) {
-                const used = Math.min(qTxList.filter(t=>t.isFubonJThai).reduce((a,b)=>a+b.amount,0) * 0.05, 1000);
-                const remain = Math.floor((1000 - used) / 0.05);
-                statusText = (used >= 1000) ? "泰國加碼已封頂 (變1%)" : `泰國實體剩 $${remain.toLocaleString()} (季)`;
-                if(used >= 1000) msgStyle = 'color: #ffcccc;';
-            } else if(addedIsFubonJSuica) {
-                const used = Math.min(qTxList.filter(t=>t.isFubonJSuica).reduce((a,b)=>a+b.amount,0) * 0.07, 200);
-                const remain = Math.floor((200 - used) / 0.07);
-                statusText = (used >= 200) ? "交通卡加碼已封頂 (變3%)" : `交通卡剩 $${remain.toLocaleString()} (季)`;
-                if(used >= 200) msgStyle = 'color: #ffcccc;';
-            }
-            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, msgDanger: statusText, customLimit: 0, msgStyle: msgStyle };
+            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, jkSpend, thaiSpend, suicaSpend };
         }
 
         // J2
@@ -2083,10 +1938,7 @@
             const txList = [...relevantTx];
             if (addedAmount > 0) txList.push({ amount: addedAmount, isJiheJapan: addedIsJiheJapan, isJiheApple: addedIsJiheApple, isJiheDomesticJapanese: addedIsJiheDomesticJapanese });
             let baseReward = 0;
-            txList.forEach(t => {
-                if (t.isJiheJapan) baseReward += t.amount * 0.025;
-                else baseReward += t.amount * 0.01;
-            });
+            txList.forEach(t => { if (t.isJiheJapan) baseReward += t.amount * 0.025; else baseReward += t.amount * 0.01; });
             const appleSpend = relevantTx.filter(t => t.isJiheApple).reduce((sum, t) => sum + t.amount, 0) + (addedIsJiheApple ? addedAmount : 0);
             const bonusApple = Math.min(appleSpend, 40000) * 0.015;
             const domesticJpSpend = relevantTx.filter(t => t.isJiheDomesticJapanese).reduce((sum, t) => sum + t.amount, 0) + (addedIsJiheDomesticJapanese ? addedAmount : 0);
@@ -2103,34 +1955,25 @@
                 txList.push({ amount: addedAmount, isKumamonJapan: addedIsKumamonJapan, isKumamonDesignated: addedIsKumamonDesignated });
                 qTxList.push({ amount: addedAmount, isKumamonPayPay: addedIsKumamonPayPay });
             }
-            let baseAndDesignatedReward = 0;
-            let designatedSpend = 0;
+            let baseAndDesignatedReward = 0; let designatedSpend = 0;
             txList.forEach(t => {
-                 let rate = 0.005; 
-                 if (t.isKumamonJapan || t.isKumamonDesignated) rate = 0.025; 
+                 let rate = 0.005; if (t.isKumamonJapan || t.isKumamonDesignated) rate = 0.025; 
                  baseAndDesignatedReward += t.amount * rate;
                  if (t.isKumamonDesignated) designatedSpend += t.amount;
             });
             const designatedBonus = Math.min(designatedSpend, 8333) * 0.06;
-            const paypayBonusRate = 0.035;
-            const paypayFeeWaiver = 0.015;
             const monthlyPayPaySpend = txList.filter(t => t.isKumamonPayPay).reduce((sum,t) => sum + t.amount, 0) + (addedIsKumamonPayPay ? addedAmount : 0);
-            const feeWaiverReward = monthlyPayPaySpend * paypayFeeWaiver;
+            const feeWaiverReward = monthlyPayPaySpend * 0.015;
             const quarterlyPayPaySpend = qTxList.filter(t => t.isKumamonPayPay).reduce((sum,t) => sum + t.amount, 0);
-            const paypayBonus = Math.min(quarterlyPayPaySpend * paypayBonusRate, 100);
+            const paypayBonus = Math.min(quarterlyPayPaySpend * 0.035, 100);
             reward = baseAndDesignatedReward + designatedBonus + feeWaiverReward + paypayBonus;
-            let validSpend = designatedSpend;
-            let limit = 8333;
-            let msg = '';
+            let validSpend = designatedSpend; let limit = 8333; let msg = '';
+            // 邏輯: 如果有累積消費，就應該顯示，即便沒開按鈕 (顯示本月累積)。但這裡要針對指定通路顯示餘額
+            // 優先權：PayPay -> 指定通路 -> 一般
             if (addedIsKumamonPayPay || (quarterlyPayPaySpend > 0 && !addedIsKumamonDesignated && !addedIsKumamonJapan)) {
                 validSpend = quarterlyPayPaySpend; limit = 2857;
-                if (validSpend >= limit) msg = 'PayPay加碼已封頂';
-                else msg = `PayPay 剩 $${Math.floor(limit - validSpend).toLocaleString()} (季)`;
-            } else if (addedIsKumamonDesignated || designatedSpend > 0) {
-                if (validSpend >= limit) msg = '指定加碼已封頂';
-                else msg = `指定通路剩 $${Math.floor(limit - validSpend).toLocaleString()}`;
-            } else { msg = '本月累積消費'; limit = 0; }
-            return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, msgDanger: msg, customLimit: limit };
+            } 
+            return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, designatedSpend, quarterlyPayPaySpend };
         }
 
         // J5
@@ -2147,16 +1990,12 @@
             let targetBonus = 0;
             if (currentQuarterSpend >= 30000 && quarterHistory < 30000) targetBonus = 2000;
             reward = baseReward + selectedBonus + targetBonus;
-            let statusText = '';
-            let validSpend = selectedSpend; 
-            let limit = spendingCap;
+            let statusText = ''; let validSpend = selectedSpend;  let limit = spendingCap;
             if (addedIsSinopacMitsuiTarget || (quarterHistory > 0 && !addedIsSinopacMitsuiSelected)) {
                 validSpend = currentQuarterSpend; limit = 30000;
-                if (currentQuarterSpend >= 30000) statusText = '🎉 本季已達標 (領$2000)';
-                else statusText = `差 $${(30000 - currentQuarterSpend).toLocaleString()} 領$2000 (季)`;
+                if (currentQuarterSpend >= 30000) statusText = '🎉 本季已達標 (領$2000)'; else statusText = `差 $${(30000 - currentQuarterSpend).toLocaleString()} 領$2000 (季)`;
             } else {
-                if (selectedSpend >= spendingCap) statusText = '特選已封頂';
-                else statusText = `剩 $${Math.floor(spendingCap - selectedSpend).toLocaleString()} (特選)`;
+                if (selectedSpend >= spendingCap) statusText = '特選已封頂'; else statusText = `剩 $${Math.floor(spendingCap - selectedSpend).toLocaleString()} (特選)`;
             }
             return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, msgDanger: statusText, customLimit: limit };
         }
@@ -2221,6 +2060,7 @@
         if(totalSpend>0) currentRate = (reward/totalSpend)*100;
         return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd };
     }
+    
     function renderDetailProgress(stats) {
         const container = document.getElementById('detailProgressArea');
         if (!stats.breakdown || !stats.breakdown.items || stats.breakdown.items.length === 0) {
@@ -2378,28 +2218,80 @@
                 msgStyle = 'color: #007AFF; font-weight: bold;';
                 percent = 100;
             }
-            // [C10] UniOpen 顯示邏輯修正：改為顯示剩餘額度
+            // [C10] UniOpen 顯示邏輯：優先顯示小額度剩餘
             else if (card.id === 'c10') {
-                // 優先顯示海外額度，若無則顯示集團額度
-                const uniOverseasLimit = 6250;
-                const uniGroupLimit = 25000;
-                
-                // 從 stats 取得 current spend (需要在 calculateStats 返回)
-                const currentGroup = stats.currentGroupSpend || 0;
-                const currentOverseas = stats.currentOverseasSpend || 0;
-
-                if (currentOverseas > 0) {
-                     const remain = Math.max(0, uniOverseasLimit - currentOverseas);
-                     statusText = (remain === 0) ? '海外實體已封頂' : `海外實體剩 $${remain.toLocaleString()}`;
-                     percent = (currentOverseas / uniOverseasLimit) * 100;
-                     if(remain === 0) msgStyle = 'color: #ffcccc;';
+                const i = stats.icashSpend || 0;
+                const o = stats.currentOverseasSpend || 0;
+                const g = stats.currentGroupSpend || 0;
+                // icash 3750, Overseas 6250, Group 25000
+                if (i < 3750) {
+                     statusText = `icash剩 $${Math.floor(3750 - i).toLocaleString()}`;
+                     percent = (i / 3750) * 100;
+                     msgStyle = 'color: #FF9800;'; // Orange
+                } else if (o < 6250) {
+                     statusText = `海外剩 $${Math.floor(6250 - o).toLocaleString()}`;
+                     percent = (o / 6250) * 100;
+                     msgStyle = 'color: #AF52DE;'; // Purple
+                } else if (g < 25000) {
+                     statusText = `集團剩 $${Math.floor(25000 - g).toLocaleString()}`;
+                     percent = (g / 25000) * 100;
+                     msgStyle = 'color: #34C759;'; // Green
                 } else {
-                     const remain = Math.max(0, uniGroupLimit - currentGroup);
-                     statusText = (remain === 0) ? '集團加碼已封頂' : `集團額度剩 $${remain.toLocaleString()}`;
-                     percent = (currentGroup / uniGroupLimit) * 100;
-                     if(remain === 0) msgStyle = 'color: #ffcccc;';
+                     statusText = "已封頂"; msgStyle = 'color: #ffcccc;'; percent = 100;
                 }
-            } else if (card.id === 'c9') {
+            } 
+            // [C5] 賴點卡
+            else if (card.id === 'c5') {
+                const even = stats.evenSpend || 0;
+                const user = stats.newUserSpend || 0;
+                const lp = stats.lpSpend || 0;
+                // Even 3000, New 7500, LP 20000
+                if (even < 3000) { statusText = `偶數日剩 $${Math.floor(3000-even).toLocaleString()}`; percent = (even/3000)*100; msgStyle='color: #FF9800;'; }
+                else if (user < 7500) { statusText = `新戶剩 $${Math.floor(7500-user).toLocaleString()}`; percent = (user/7500)*100; msgStyle='color: #AF52DE;'; }
+                else if (lp < 20000) { statusText = `LP剩 $${Math.floor(20000-lp).toLocaleString()}`; percent = (lp/20000)*100; msgStyle='color: #34C759;'; }
+                else { statusText = "已封頂"; percent = 100; msgStyle = 'color: #ffcccc;'; }
+            }
+            // [J1] 富邦 J 卡
+            else if (card.id === 'j1') {
+                const suica = stats.suicaSpend || 0;
+                const thai = stats.thaiSpend || 0;
+                const jk = stats.jkSpend || 0;
+                // Suica 2857, Thai 20000, JK 33333
+                if (suica < 2857) { statusText = `交通卡剩 $${Math.floor(2857-suica).toLocaleString()} (季)`; percent = (suica/2857)*100; msgStyle='color: #FF9800;'; }
+                else if (thai < 20000) { statusText = `泰國剩 $${Math.floor(20000-thai).toLocaleString()} (季)`; percent = (thai/20000)*100; msgStyle='color: #AF52DE;'; }
+                else if (jk < 33333) { statusText = `日韓實體剩 $${Math.floor(33333-jk).toLocaleString()} (季)`; percent = (jk/33333)*100; msgStyle='color: #34C759;'; }
+                else { statusText = "已封頂"; percent = 100; msgStyle = 'color: #ffcccc;'; }
+            }
+            // [DBS1] 星展 Eco
+            else if (card.id === 'dbs1') {
+                const g = stats.greenSpend || 0;
+                const l = stats.lineSpend || 0;
+                const f = stats.foreignSpend || 0;
+                // Green 3333, Line 11111, Foreign 15000
+                if (g < 3333) { statusText = `綠色剩 $${Math.floor(3333-g).toLocaleString()}`; percent = (g/3333)*100; msgStyle='color: #FF9800;'; }
+                else if (l < 11111) { statusText = `LinePay剩 $${Math.floor(11111-l).toLocaleString()}`; percent = (l/11111)*100; msgStyle='color: #34C759;'; }
+                else if (f < 15000) { statusText = `國外剩 $${Math.floor(15000-f).toLocaleString()}`; percent = (f/15000)*100; msgStyle='color: #AF52DE;'; }
+                else { statusText = "已封頂"; percent = 100; msgStyle = 'color: #ffcccc;'; }
+            }
+            // [J3] 熊本熊
+            else if (card.id === 'j3') {
+                const d = stats.designatedSpend || 0;
+                if (d < 8333) {
+                    statusText = `指定剩 $${Math.floor(8333-d).toLocaleString()}`; percent = (d/8333)*100;
+                } else {
+                    statusText = "指定已封頂"; percent = 100; msgStyle = 'color: #ffcccc;';
+                }
+            }
+            // [C12] JCB
+            else if (card.id === 'c12') {
+                const mb = stats.monthlyBonusSpend || 0;
+                if (mb < 10000) {
+                    statusText = `特選剩 $${Math.floor(10000-mb).toLocaleString()}`; percent = (mb/10000)*100;
+                } else {
+                    statusText = "特選已封頂"; percent = 100; msgStyle = 'color: #ffcccc;';
+                }
+            }
+            else if (card.id === 'c9') {
                 const tier = localStorage.getItem('hsbc_tier') || 'infinite';
                 card.name = (tier === 'infinite') ? '滙豐旅人無限卡' : '滙豐旅人御璽卡';
                 card.note = (tier === 'infinite') ? '國內18/國外10 (哩)' : '國內18/國外15 (哩)';
@@ -2435,31 +2327,20 @@
                 else { percent = 100;
                 statusText = '已封頂 (變0.5%)'; msgStyle = 'color: #ffcccc;'; }
             } else if (card.type === 'ceiling' || card.type === 'custom_j' || card.id === 'j2' || card.id === 'j3' || card.id === 'j4' || card.id === 'j5' || card.id === 'dbs1' || card.id === 'c12') {
-                if(card.id === 'j1') {
-                    if (stats.msgDanger) {
-                       statusText = stats.msgDanger;
-                        if(stats.msgDanger.includes('已封頂')) msgStyle = stats.msgStyle || 'color: #ffcccc;';
-                        percent = 100;
-                    } else {
-                        statusText = `本月累積 $${stats.spend.toLocaleString()}`;
-                        percent = 0; 
-                    }
-                } else {
-                    const limit = stats.customLimit || card.limit;
-                    if(limit > 0) percent = (stats.validSpend / limit) * 100;
-                    else percent = 0;
-                    if (stats.msgDanger) {
-                        statusText = stats.msgDanger;
-                        if(stats.msgDanger.includes('已封頂')) msgStyle = stats.msgStyle || 'color: #ffcccc;';
-                    } else if (stats.validSpend <= limit) { 
-                        const remain = limit - stats.validSpend;
-                        statusText = `剩 $${remain.toLocaleString()}`;
-                        if(remain < 1000) {statusText = `⚠️ 剩 $${remain.toLocaleString()}`;
-                        msgStyle='color:#FFD700;';} 
-                    } else { 
-                        percent = 100;
-                        statusText = card.msgDanger || '已封頂'; msgStyle = 'color: #ffcccc;'; 
-                    }
+                const limit = stats.customLimit || card.limit;
+                if(limit > 0) percent = (stats.validSpend / limit) * 100;
+                else percent = 0;
+                if (stats.msgDanger) {
+                    statusText = stats.msgDanger;
+                    if(stats.msgDanger.includes('已封頂')) msgStyle = stats.msgStyle || 'color: #ffcccc;';
+                } else if (stats.validSpend <= limit) { 
+                    const remain = limit - stats.validSpend;
+                    statusText = `剩 $${remain.toLocaleString()}`;
+                    if(remain < 1000) {statusText = `⚠️ 剩 $${remain.toLocaleString()}`;
+                    msgStyle='color:#FFD700;';} 
+                } else { 
+                    percent = 100;
+                    statusText = card.msgDanger || '已封頂'; msgStyle = 'color: #ffcccc;'; 
                 }
             } else if (card.id === 'c2') {
                 percent = (stats.validSpend / 12000) * 100;

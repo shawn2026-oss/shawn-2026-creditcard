@@ -21,7 +21,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="刷卡回饋管家">
     <meta name="theme-color" content="#F0F2F5">
-       
+        
     <meta property="og:title" content="刷卡回饋管家 - 您的信用卡最佳幫手">
     <meta property="og:description" content="自動計算回饋、即時顯示上限、支援戰績圖分享。快來看看你本月賺了多少回饋！">
     <meta property="og:image" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/icon-192.png">
@@ -704,7 +704,7 @@
                     </div>
                     
                     <div class="option-row" id="jiangTravelRow" style="border-top:1px dashed #ddd; padding-top:8px; margin-top:4px; flex-direction:column; align-items:flex-start;">
-                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                          <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
                             <label for="rbJiangTravel">✈️ 旅遊加碼 +4.5% (刷$1.1萬封頂)</label>
                             <input type="radio" name="jiangMode" id="rbJiangTravel" value="travel" onchange="updateRewardPreview()">
                         </div>
@@ -952,8 +952,8 @@
                           <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
                              <label for="checkSinopacJcbQuarterly">🔥 日韓泰滿額 +5% (季)</label>
                              <input type="checkbox" id="checkSinopacJcbQuarterly" onchange="updateRewardPreview()">
-                           </div>
-                           <div style="font-size:10px; color:#d32f2f; margin-top:2px;">需登錄，滿2萬送1000 (上限1000)</div>
+                            </div>
+                            <div style="font-size:10px; color:#d32f2f; margin-top:2px;">需登錄，滿2萬送1000 (上限1000)</div>
                     </div>
                 </div>
                 
@@ -1306,7 +1306,8 @@
             tier1Rate: 0.05, tier2Rate: 0.01, 
             gradient: 'linear-gradient(135deg, #FF0000 0%, #000000 100%)', textColor: 'white', 
             msgDanger: '加碼已封頂 (變1%)', 
-            parking: `⚡ <b>新戶 Line Pay 10%</b><br>基本 1% + 加碼 9%<br>⚠️ 加碼上限 1000 點 (約刷 $11,111)<br>✈️ <b>國外實體 +4%</b><br>基本 1% + 加碼 4% (共5%)<br>⚠️ 加碼適用月刷 $15,000 封頂`
+            // [修正] 補上綠色通路/特斯拉資訊，並保留原本新戶 Line Pay 與國外實體說明
+            parking: `🌿 <b>綠色/特斯拉 +9%</b><br>基本 1% + 加碼 9% (上限300點)<br>⚠️ 約刷 $3,333 封頂<br>⚡ <b>新戶 Line Pay 10%</b><br>基本 1% + 加碼 9%<br>⚠️ 加碼上限 1000 點 (約刷 $11,111)<br>✈️ <b>國外實體 +4%</b><br>基本 1% + 加碼 4% (共5%)<br>⚠️ 加碼適用月刷 $15,000 封頂`
         },
         { 
             id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', 
@@ -2338,8 +2339,7 @@
             previewDiv.innerHTML = `✨ 預計回饋：$${thisTransactionReward} (${effectiveRate.toFixed(1)}%)`;
         }
     }
-
-    function renderGrid() {
+      function renderGrid() {
         const container = document.getElementById('card-grid');
         let monthTotalReward = 0; container.innerHTML = '';
         cards.forEach(card => { if (card.type === 'placeholder') return; const stats = calculateStats(card.id); if (card.id !== 'c9') monthTotalReward += (Number(stats.reward) || 0); });
@@ -2399,12 +2399,36 @@
                 else if (jk < 33333) { statusText = `日韓實體剩 $${Math.floor(33333-jk).toLocaleString()} (季)`; percent = (jk/33333)*100; msgStyle='color: #34C759;'; }
                 else { statusText = "已封頂"; percent = 100; msgStyle = 'color: #ffcccc;'; }
             }
+            // [Fix] DBS1 瀑布流顯示邏輯修正
             else if (card.id === 'dbs1') {
-                const g = stats.greenSpend || 0; const l = stats.lineSpend || 0; const f = stats.foreignSpend || 0;
-                if (g < 3333) { statusText = `綠色剩 $${Math.floor(3333-g).toLocaleString()}`; percent = (g/3333)*100; msgStyle='color: #FF9800;'; }
-                else if (l < 11111) { statusText = `LinePay剩 $${Math.floor(11111-l).toLocaleString()}`; percent = (l/11111)*100; msgStyle='color: #34C759;'; }
-                else if (f < 15000) { statusText = `國外剩 $${Math.floor(15000-f).toLocaleString()}`; percent = (f/15000)*100; msgStyle='color: #AF52DE;'; }
-                else { statusText = "已封頂"; percent = 100; msgStyle = 'color: #ffcccc;'; }
+                const g = stats.greenSpend || 0;   // Limit: 3333
+                const l = stats.lineSpend || 0;    // Limit: 11111
+                const f = stats.foreignSpend || 0; // Limit: 15000
+                
+                // Priority 1: 綠色通路 (上限 3333)
+                if (g < 3333) { 
+                    statusText = `綠色剩 $${Math.floor(3333-g).toLocaleString()}`; 
+                    percent = (g/3333)*100; 
+                    msgStyle='color: #FF9800;'; // Orange
+                }
+                // Priority 2: Line Pay (上限 11111)
+                else if (l < 11111) { 
+                    statusText = `LinePay剩 $${Math.floor(11111-l).toLocaleString()}`; 
+                    percent = (l/11111)*100; 
+                    msgStyle='color: #34C759;'; // Green
+                }
+                // Priority 3: 國外實體 (上限 15000)
+                else if (f < 15000) { 
+                    statusText = `國外剩 $${Math.floor(15000-f).toLocaleString()}`; 
+                    percent = (f/15000)*100; 
+                    msgStyle='color: #AF52DE;'; // Purple
+                }
+                // Full
+                else { 
+                    statusText = "加碼已封頂"; 
+                    percent = 100; 
+                    msgStyle = 'color: #ffcccc;'; 
+                }
             }
             else if (card.id === 'j3') {
                 const d = stats.designatedSpend || 0;

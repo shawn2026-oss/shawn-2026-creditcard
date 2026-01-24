@@ -21,7 +21,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="刷卡回饋管家">
     <meta name="theme-color" content="#F0F2F5">
-      
+       
     <meta property="og:title" content="刷卡回饋管家 - 您的信用卡最佳幫手">
     <meta property="og:description" content="自動計算回饋、即時顯示上限、支援戰績圖分享。快來看看你本月賺了多少回饋！">
     <meta property="og:image" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/icon-192.png">
@@ -249,7 +249,7 @@
         .h-amount { font-weight: 700; color: #333; font-size: 13px; }
         .btn-delete-single { background: none; border: none; color: #ccc; font-size: 14px; padding: 0 5px; cursor: pointer; margin-left: 8px;}
         .btn-delete-single:hover { color: #FF3B30; }
-        #pigRichOptions, #greenCardOptions, #uniOptions, #happyOptions, #hsbcOptions, #uniOpenOptions, #richartOptions, #fubonJOptions, #jiheOptions, #kumamonOptions, #sinopacCurrencyOptions, #sinopacMitsuiOptions, #jiangOptions, #dbsEcoOptions, #sinopacJcbOptions, #laiDianOptions { display: none; background: #f9f9f9; padding: 10px; border-radius: 10px; margin-top: 10px; border: 1px dashed #ddd; }
+        #pigRichOptions, #greenCardOptions, #uniOptions, #happyOptions, #hsbcOptions, #uniOpenOptions, #richartOptions, #fubonJOptions, #jiheOptions, #kumamonOptions, #sinopacCurrencyOptions, #sinopacMitsuiOptions, #jiangOptions, #dbsEcoOptions, #sinopacJcbOptions, #laiDianOptions, #legendOptions { display: none; background: #f9f9f9; padding: 10px; border-radius: 10px; margin-top: 10px; border: 1px dashed #ddd; }
         .option-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #555; }
         .option-row input[type="checkbox"], .option-row input[type="radio"], .option-row input[type="number"] { margin: 0; }
         .option-row input[type="checkbox"], .option-row input[type="radio"] { width: 20px; height: 20px; }
@@ -450,7 +450,6 @@
         function closeBubble() { document.getElementById('safari-install-bubble').style.display = 'none'; }
         function closeAndroidBar() { document.getElementById('android-install-bar').style.display = 'none'; }
     </script>
-    
     <div id="welcomeModal" class="welcome-overlay">
         <div class="welcome-content">
             <div class="welcome-title">👋 歡迎使用回饋管家</div>
@@ -463,7 +462,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V124.34(Fix3)</div>
+            <div class="version-tag">V124.35(FixFinal)</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -471,7 +470,7 @@
         </div>
         
         <div class="news-ticker">
-            <div class="ticker-content" id="news-text">🎉 V124.34 更新：修復 Uni Card 進度條顯示問題、修正右上角 0% 顯示、綠卡顯示優化。</div>
+            <div class="ticker-content" id="news-text">🎉 V124.35 更新：傳說對決卡/樂家卡/三井卡權益邏輯優化。</div>
         </div>
         
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
@@ -550,6 +549,25 @@
                 
                 <input type="hidden" id="cardIdInput"> 
                 
+                <div id="legendOptions">
+                    <div class="option-row read-only"><label>🔰 一般消費 1.2% (無上限)</label><input type="checkbox" checked disabled></div>
+                    <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0;">
+                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                             <label for="checkLegendBonus">🔥 精選通路 +8.8% (刷$11,363封頂)</label>
+                             <input type="checkbox" id="checkLegendBonus" onchange="updateRewardPreview()">
+                        </div>
+                        <button onclick="toggleLegendDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 查看指定通路 (娛樂/影音/生活)</button>
+                        <div id="legendDetails" class="details-content">
+                            <b>(1) 指定娛樂平台：</b><br>
+                            App Store, Google Play, Garena, GASH, MyCard, Nintendo, PlayStation, Steam, Acer, ASUS, Logitech, NOVA...<br>
+                            <b>(2) 影音串流平台：</b><br>
+                            YouTube Premium, Netflix, Disney+, Spotify, Twitch, 愛奇藝, Catchplay, KKBOX, KKTV, LiTV...<br>
+                            <b>(3) 生活補給通路：</b><br>
+                            LINE Pay, UberEats, foodpanda, 麥當勞, 肯德基, 摩斯漢堡, 21世紀, 美墨炸雞, 拿坡里, Pizzahut, 蝦皮...
+                        </div>
+                    </div>
+                </div>
+
                 <div id="pigRichOptions">
                     <div class="option-row read-only"><label id="labelBaseRate">🔰 基本回饋 1% (無上限)</label><input type="checkbox" checked disabled></div>
                     <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0;">
@@ -728,18 +746,12 @@
                 </div>
                 
                 <div id="happyOptions">
-                      <div class="option-row" style="flex-direction:column; align-items:flex-start; margin-bottom:10px;">
-                          <label style="margin-bottom:8px; font-weight:700; color:#555;">請選擇消費類別：</label>
-                          
-                          <label style="display:flex; align-items:center; width:100%; justify-content:space-between; margin-bottom:8px;">
-                              <span>🔰 一般消費 (0.5%)</span>
-                              <input type="radio" name="happyMode" value="general" checked onchange="toggleHappyLogic()">
-                          </label>
-                          
-                          <label style="display:flex; align-items:center; width:100%; justify-content:space-between; margin-bottom:4px;">
-                              <span>🐶 寵物 (10%)</span>
-                              <input type="radio" name="happyMode" value="pet" onchange="toggleHappyLogic()">
-                          </label>
+                      <div class="option-row read-only"><label>🔰 基本回饋 0.5% (無上限)</label><input type="checkbox" checked disabled></div>
+                      <div class="option-row" style="flex-direction:column; align-items:flex-start; margin-bottom:10px; margin-top:6px;">
+                          <div class="option-row" style="width:100%; justify-content:space-between;">
+                              <label>🐶 指定寵物 +9.5%  <span id="happyPetRemain" style="font-size:10px;color:#aaa"></span></label>
+                              <input type="checkbox" id="checkHappyPet" onchange="updateRewardPreview()">
+                          </div>
                           <button onclick="toggleHappyPetDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:0 0 8px 24px; text-align:left;">🔽 查看寵物通路</button>
                           <div id="happyPetDetails" class="details-content" style="margin-left:8px; margin-bottom:8px;">
                             <b>(1) 指定寵物連鎖：</b><br>寵物公園、東森寵物、魚中魚、貓狗隊長、毛孩市集、金吉利、好狗命、好狗運、金王子、愛貓園、福壽寵物旗艦館<br>
@@ -747,10 +759,10 @@
                             <b>(3) 醫療與美容：</b><br>獸醫診所、動物醫院、寵物旅館、寵物美容 (MCC 0742, 5995)<br>
                           </div>
                           
-                          <label style="display:flex; align-items:center; width:100%; justify-content:space-between; margin-bottom:4px;">
-                              <span>🍽️ 生活 (4%)</span>
-                              <input type="radio" name="happyMode" value="life" onchange="toggleHappyLogic()">
-                          </label>
+                          <div class="option-row" style="width:100%; justify-content:space-between;">
+                              <label>🍽️ 指定生活 +3.5%  <span id="happyLifeRemain" style="font-size:10px;color:#aaa"></span></label>
+                              <input type="checkbox" id="checkHappyLife" onchange="updateRewardPreview()">
+                          </div>
                           <button onclick="toggleHappyLifeDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:0 0 8px 24px; text-align:left;">🔽 查看百貨/量販/交通</button>
                           <div id="happyLifeDetails" class="details-content" style="margin-left:8px; margin-bottom:8px;">
                             <b>(1) 百貨/Outlet：</b><br>遠東百貨、SOGO、巨城、大遠百、南紡、夢時代、skmpark、尚順、大魯閣(湳雅)、桃知道、大江、台茂、新月、遠雄、宏匯、CITYLINK、美麗華、大葉高島屋、統一時代、故宮、秀泰、環球、IKEA、麗寶、LaLaport<br>
@@ -759,10 +771,10 @@
                             <b>(4) 教育/書店：</b><br>台灣蔦屋、誠品、博客來、金石堂、巨匠、聯成、朱宗慶、雲門<br>
                           </div>
                           
-                          <label style="display:flex; align-items:center; width:100%; justify-content:space-between; margin-bottom:4px;">
-                              <span>📡 安心 (4%)</span>
-                              <input type="radio" name="happyMode" value="peace" onchange="toggleHappyLogic()">
-                          </label>
+                          <div class="option-row" style="width:100%; justify-content:space-between;">
+                              <label>📡 指定安心 +3.5%  <span id="happyPeaceRemain" style="font-size:10px;color:#aaa"></span></label>
+                              <input type="checkbox" id="checkHappyPeace" onchange="updateRewardPreview()">
+                          </div>
                            <button onclick="toggleHappyPeaceDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:0 0 8px 24px; text-align:left;">🔽 查看餐廳/藥局/居家</button>
                            <div id="happyPeaceDetails" class="details-content" style="margin-left:8px; margin-bottom:8px;">
                             <b>(1) 國內餐廳：</b><br>國內各大指定餐廳 (MCC 5811, 5812, 5813, 5814)<br>
@@ -770,10 +782,10 @@
                             <b>(3) 運動健身：</b><br>佐登妮絲、健身工廠、World Gym、BEING spa、BEING sport、Curves可爾姿<br>
                            </div>
 
-                          <label style="display:flex; align-items:center; width:100%; justify-content:space-between;">
-                              <span>✈️ 國外消費 (2.5%)</span>
-                              <input type="radio" name="happyMode" value="foreign" onchange="toggleHappyLogic()">
-                          </label>
+                          <div class="option-row" style="width:100%; justify-content:space-between;">
+                              <label>✈️ 國外消費 +2.0% </label>
+                              <input type="checkbox" id="checkHappyForeign" onchange="updateRewardPreview()">
+                          </div>
                       </div>
                     <div id="happyDashboard" class="happy-dashboard"></div>
                 </div>
@@ -873,12 +885,12 @@
                 
                 <div id="sinopacCurrencyOptions">
                     <div class="option-row" style="background:#eee; padding:8px; border-radius:6px; margin-bottom:8px; flex-direction:column; align-items:flex-start;">
-                         <label style="margin-bottom:4px; color:#555;">💰 選擇資格等級 (自動記憶)</label>
-                         <div style="display:flex; gap:10px; width:100%;">
-                             <label style="font-weight:normal; font-size:12px; display:flex; align-items:center;"><input type="radio" name="currencyLevel" value="low" onchange="saveCurrencyLevel()" checked> 大大等級 (Level 1)</label>
-                             <label style="font-weight:normal; font-size:12px; display:flex; align-items:center;"><input type="radio" name="currencyLevel" value="high" onchange="saveCurrencyLevel()"> 大戶等級 (Level 2)</label>
-                         </div>
-                         <div style="font-size:10px; color:#999; margin-top:2px;">大大: 自動扣繳+電子帳單 | 大戶: 往來資產≥10萬</div>
+                          <label style="margin-bottom:4px; color:#555;">💰 選擇資格等級 (自動記憶)</label>
+                          <div style="display:flex; gap:10px; width:100%;">
+                              <label style="font-weight:normal; font-size:12px; display:flex; align-items:center;"><input type="radio" name="currencyLevel" value="low" onchange="saveCurrencyLevel()" checked> 大大等級 (Level 1)</label>
+                              <label style="font-weight:normal; font-size:12px; display:flex; align-items:center;"><input type="radio" name="currencyLevel" value="high" onchange="saveCurrencyLevel()"> 大戶等級 (Level 2)</label>
+                          </div>
+                          <div style="font-size:10px; color:#999; margin-top:2px;">大大: 自動扣繳+電子帳單 | 大戶: 往來資產≥10萬</div>
                     </div>
                     
                     <div class="option-row read-only"><label id="labelCurrencyBase">🔰 國內一般 1%</label><input type="checkbox" checked disabled></div>
@@ -905,7 +917,7 @@
                     
                     <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px; display:flex; flex-direction:column; align-items:flex-start;">
                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkSinopacMitsuiSelected">🍽️ 特選通路 7% (刷$1,428封頂)</label>
+                            <label for="checkSinopacMitsuiSelected">🍽️ 特選餐飲 +7% (共7.3%)</label>
                             <input type="checkbox" id="checkSinopacMitsuiSelected" onchange="toggleSinopacMitsui('selected')">
                         </div>
 
@@ -937,11 +949,11 @@
                     </div>
                     
                     <div class="option-row" style="background:#fff3e0; padding:8px; border-radius:6px; margin-top:6px; flex-direction:column; align-items:flex-start;">
-                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                          <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
                              <label for="checkSinopacJcbQuarterly">🔥 日韓泰滿額 +5% (季)</label>
                              <input type="checkbox" id="checkSinopacJcbQuarterly" onchange="updateRewardPreview()">
-                          </div>
-                          <div style="font-size:10px; color:#d32f2f; margin-top:2px;">需登錄，滿2萬送1000 (上限1000)</div>
+                           </div>
+                           <div style="font-size:10px; color:#d32f2f; margin-top:2px;">需登錄，滿2萬送1000 (上限1000)</div>
                     </div>
                 </div>
                 
@@ -1027,6 +1039,8 @@
     function toggleHappyLifeDetails() { const el = document.getElementById('happyLifeDetails'); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
     function toggleSinopacJcbDetails() { const el = document.getElementById('sinopacJcbDetails'); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
     function toggleLaiDianDetails() { const el = document.getElementById('laiDianDetails'); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
+    // [New] 傳說對決卡通路折疊
+    function toggleLegendDetails() { const el = document.getElementById('legendDetails'); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
 
     // [FIX] 修復 C6 豬富卡互斥邏輯
     function toggleSelectedLogic() {
@@ -1277,7 +1291,7 @@
 
     window.addEventListener('popstate', function(event) { closeModal(); });
     
-    // --- 核心資料庫 (V124.34 - Fixes) ---
+    // --- 核心資料庫 (V124.35 - FixFinal) ---
     const defaultCards = [
         { 
             id: 'c10', name: '中信 UniOpen 卡', nickname: '2026 統一集團神卡', 
@@ -1302,7 +1316,12 @@
             textColor: 'white', msgDanger: '新戶10%已封頂',
             parking: `🐷 <b>新戶限定神卡</b><br>新戶 +10% (限刷$8,000)<br>🌟 <b>精選通路 +2.5%</b><br>上限 $40 萬`
         },
-        { id: 'c1', name: '星展傳說對決卡', nickname: 'Line Pay神卡', note: 'LinePay / 蝦皮 / 外送 (刷 $11,363 封頂)', rule: '', type: 'ceiling', limit: 11363, tier1Rate: 0.10, tier2Rate: 0.012, gradient: 'linear-gradient(135deg, #43cea2 0%, #185a9d 100%)', textColor: 'white', msgDanger: '已封頂 (變1.2%)' },
+        { 
+            id: 'c1', name: '星展傳說對決卡', nickname: 'Line Pay神卡', 
+            note: 'LinePay/外送/蝦皮(刷$11,363 封頂)', 
+            rule: '', type: 'custom_legend', limit: 11363, 
+            gradient: 'linear-gradient(135deg, #43cea2 0%, #185a9d 100%)', textColor: 'white', msgDanger: '加碼已封頂 (變1.2%)' 
+        },
         { 
             id: 'c5', name: '聯邦賴點卡', 
             nickname: 'Line Pay優等生', 
@@ -1341,8 +1360,8 @@
         },
         { 
             id: 'c8', name: '遠東樂家+卡', nickname: '生活/寵物神卡', 
-            note: '寵物10% / 生活4% / 國外2.5% (需一般消費滿3千)', 
-            type: 'ceiling', limit: 5263, tier1Rate: 0.1, tier2Rate: 0.005, 
+            note: '寵物10% / 生活安心4% ', 
+            type: 'custom_happy', limit: 5263, tier1Rate: 0.1, tier2Rate: 0.005, 
             gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)', 
             textColor: 'white', msgDanger: '已封頂 (變0.5%)', 
             parking: `🐶 <b>寵物 10%</b> (限刷$5,263)<br>🍽️ <b>安心/生活 4%</b> (限刷$5,714)<br>✈️ <b>國外 2.5%</b> (無上限)`
@@ -1381,10 +1400,10 @@
         },
         { 
             id: 'j5', name: '永豐三井聯名卡', nickname: '餐飲優等生/日韓泰附加', 
-            note: '餐飲 7.3% | 日韓泰滿額禮', 
-            type: 'floor', target: 30000, tier1Rate: 0.073, tier2Rate: 0.003, 
+            note: '餐飲 7.3% (底0.3%+7%)', 
+            type: 'custom_mitsui', target: 30000, tier1Rate: 0.073, tier2Rate: 0.003, 
             gradient: 'linear-gradient(135deg, #00C9FF 0%, #92FE9D 100%)', textColor: '#333', msgSuccess: '已達標 (領$2000)',
-            parking: `🍽️ <b>特選通路 7% (上限100元)</b><br>通路：館外餐飲(MCC 58xx) / 全盈+PAY<br>⚠️ 加碼上限僅 100 元 (約刷 $1,428)<br><br>🇯🇵 <b>日韓泰滿額禮 (需登錄)</b><br>每季累積滿 30,000 送 2,000 (回饋約6.9%)`
+            parking: `🍽️ <b>特選餐飲 7.3%</b> (0.3+7)<br>通路：館外餐飲(MCC 58xx) / 全盈+PAY<br>⚠️ 加碼上限僅 100 元 (約刷 $1,428)<br><br>🇯🇵 <b>日韓泰滿額禮 (需登錄)</b><br>每季累積滿 30,000 送 2,000 (回饋約6.9%)`
         },
         { 
             id: 'c12', name: '永豐現金回饋 JCB', nickname: '旅日神卡', 
@@ -1740,7 +1759,7 @@
         addedIsDbsLinePay = false, addedIsDbsGreen = false, addedIsDbsForeign = false,
         addedIsSinopacJcbForeign = false, addedIsSinopacJcbJapan = false, addedIsSinopacJcbBonus = false, addedIsSinopacJcbQuarterly = false,
         addedLaiDianMode = 'general', addedIsLaiDianNew = false,
-        addedHappyMode = 'general') {
+        addedHappyMode = 'general', addedIsLegendBonus = false) {
         
         const card = cards.find(c => c.id === cardId);
         if (card.type === 'placeholder') return { spend: 0, validSpend: 0, reward: 0, rate: '0.0' };
@@ -1768,6 +1787,30 @@
         let reward = 0;
         let breakdown = {};
 
+        // [New] C1 傳說對決卡
+        if (cardId === 'c1') {
+            const txList = [...relevantTx];
+            if(addedAmount > 0) txList.push({ amount: addedAmount, isLegendBonus: addedIsLegendBonus });
+            
+            // 1. 底層 1.2% (無上限)
+            const baseReward = totalSpend * 0.012;
+            
+            // 2. 加碼 8.8% (上限11363)
+            const bonusSpendTotal = txList.filter(t => t.isLegendBonus).reduce((sum, t) => sum + t.amount, 0);
+            const cappedBonusSpend = Math.min(bonusSpendTotal, 11363);
+            const bonusReward = cappedBonusSpend * 0.088;
+            
+            reward = baseReward + bonusReward;
+            
+            // 進度條
+            breakdown = { items: [ { label: '🔥 精選加碼 (8.8%)', current: bonusSpendTotal, max: 11363, color: 'orange' } ] };
+            let statusText = ''; let msgStyle = '';
+            if (bonusSpendTotal >= 11363) { statusText = '加碼已封頂 (變1.2%)'; msgStyle = 'color: #ffcccc;'; }
+            else { statusText = `剩 $${Math.floor(11363 - bonusSpendTotal).toLocaleString()}`; }
+            
+            return { spend: totalSpend, validSpend: bonusSpendTotal, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, breakdown, msgDanger: statusText, msgStyle, customLimit: 11363 };
+        }
+
         // [C5] 聯邦賴點卡
         if (cardId === 'c5') {
             const txList = [...relevantTx];
@@ -1787,41 +1830,69 @@
             });
             
             const lpBonus = Math.min(lpSpend * 0.01, 200);        
-            const evenBonus = Math.min(evenSpend * 0.05, 150);   
+            const evenBonus = Math.min(evenSpend * 0.05, 150);    
             const newBonus = Math.min(newUserSpend * 0.04, 300); 
             reward = baseReward + lpBonus + evenBonus + newBonus;
             
             return { spend: totalSpend, validSpend: lpSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, evenSpend, newUserSpend, lpSpend };
         }
 
-        // [C8] 遠東樂家+卡
+        // [C8] 遠東樂家+卡 (Stack Logic - Update)
         if (cardId === 'c8') {
-            const petLimit = 5263; const lifeLimit = 5714;
             const txList = [...relevantTx];
-            if(addedAmount > 0) txList.push({ amount: addedAmount, happyMode: addedHappyMode });
-            
-            let petSpend = 0, lifeSpend = 0, peaceSpend = 0, foreignSpend = 0;
-            txList.forEach(t => {
-                if (t.happyMode) {
-                    if (t.happyMode === 'pet') petSpend += t.amount;
-                    if (t.happyMode === 'life') lifeSpend += t.amount;
-                    if (t.happyMode === 'peace') peaceSpend += t.amount;
-                    if (t.happyMode === 'foreign') foreignSpend += t.amount;
-                } else {
-                    if (t.isHappyPet) petSpend += t.amount; else if (t.isHappyLife) lifeSpend += t.amount; else if (t.isHappyPeace) peaceSpend += t.amount; else if (t.isHappyForeign) foreignSpend += t.amount;
-                }
+            // [Fix] 移除 Radio mode 依賴，改用 boolean flag
+            if(addedAmount > 0) txList.push({ 
+                amount: addedAmount, 
+                isHappyPet: addedIsHappyPet,
+                isHappyLife: addedIsHappyLife,
+                isHappyPeace: addedIsHappyPeace,
+                isHappyForeign: addedIsHappyForeign
             });
-            breakdown = { items: [ { label: '🐶 寵物 (10%)', current: petSpend, max: petLimit, color: 'orange' }, { label: '🍽️ 生活 (4%)', current: lifeSpend, max: lifeLimit, color: 'green' }, { label: '📡 安心 (4%)', current: peaceSpend, max: lifeLimit, color: 'purple' } ] };
-            let baseReward = totalSpend * 0.005;
+            
+            // 1. 基底回饋 0.5% (無上限)
+            const baseReward = totalSpend * 0.005;
+            
+            // 2. 加碼計算
+            let petSpend = 0, lifeSpend = 0, peaceSpend = 0, foreignSpend = 0;
+            
+            txList.forEach(t => {
+                // 相容舊資料 (Radio)
+                if (t.happyMode === 'pet') petSpend += t.amount;
+                else if (t.happyMode === 'life') lifeSpend += t.amount;
+                else if (t.happyMode === 'peace') peaceSpend += t.amount;
+                else if (t.happyMode === 'foreign') foreignSpend += t.amount;
+                
+                // 新資料 (Checkbox)
+                if (t.isHappyPet) petSpend += t.amount;
+                if (t.isHappyLife) lifeSpend += t.amount;
+                if (t.isHappyPeace) peaceSpend += t.amount;
+                if (t.isHappyForeign) foreignSpend += t.amount;
+            });
+
+            let bonusReward = 0;
+            // 需一般消費滿 3000 才啟動加碼 (包含加碼類別也算入總消)
             if (totalSpend >= 3000) {
-                const bonusPet = Math.min(petSpend, petLimit) * 0.095;
-                const bonusLife = Math.min(lifeSpend, lifeLimit) * 0.035; 
-                const bonusPeace = Math.min(peaceSpend, lifeLimit) * 0.035;
-                const bonusForeign = foreignSpend * 0.02;
-                reward = baseReward + bonusPet + bonusLife + bonusPeace + bonusForeign;
-                if(totalSpend >= 26000) reward += 400;
-            } else { reward = baseReward; }
-            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, breakdown };
+                // 寵物 +9.5% (上限 500 => 刷 5263)
+                bonusReward += Math.min(petSpend, 5263) * 0.095;
+                // 生活 +3.5% (與安心共用上限? 依據目前code邏輯似乎分開，若依圖片邏輯應分開或共用需查證，此處維持分開計算邏輯但修正倍率)
+                bonusReward += Math.min(lifeSpend, 5714) * 0.035;
+                bonusReward += Math.min(peaceSpend, 5714) * 0.035;
+                // 國外 +2% (無上限)
+                bonusReward += foreignSpend * 0.02;
+                
+                // 滿額禮
+                if(totalSpend >= 26000) bonusReward += 400; 
+            }
+
+            reward = baseReward + bonusReward;
+            
+            breakdown = { items: [ 
+                { label: '🐶 寵物 (+9.5%)', current: petSpend, max: 5263, color: 'orange' }, 
+                { label: '🍽️ 生活 (+3.5%)', current: lifeSpend, max: 5714, color: 'green' }, 
+                { label: '📡 安心 (+3.5%)', current: peaceSpend, max: 5714, color: 'purple' } 
+            ] };
+
+            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, breakdown, petSpend, lifeSpend, peaceSpend };
         }
 
         // [DBS1] 星展 Eco
@@ -1855,22 +1926,17 @@
             return { spend: totalSpend, validSpend: selectedSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, msgDanger: statusText, customLimit: spendingCap, breakdown };
         }
 
-        // [C7] Uni Card (修正：嚴格互斥邏輯)
+        // [C7] Uni Card
         if (cardId === 'c7') {
-             // 1. 判定模式：只要有勾選 UP (新增時) 或歷史紀錄有 UP，就進入 UP 模式
              const isUpMode = addedIsUniUp || relevantTx.some(t => t.isUniUp);
-             
-             // 2. 設定參數 (互斥)
              const currentCap = isUpMode ? 140000 : 40000;
              const currentRate = isUpMode ? 0.045 : 0.035;
              const modeLabel = isUpMode ? '🆙 UP選額度 (4.5%)' : '🔰 任意選額度 (3.5%)';
 
              const bonusSpend = relevantTx.filter(t => t.isUniBonus).reduce((sum, t) => sum + t.amount, 0) + (addedIsUniBonus ? addedAmount : 0);
              
-             // 3. 顯示層：動態切換進度條
              breakdown = { items: [ { label: modeLabel, current: totalSpend, max: currentCap, color: 'purple' }, { label: '時代百貨 (+3%)', current: bonusSpend, max: 16666, color: 'red' } ] };
              
-             // 4. 計算層：直接套用當前模式的費率
              let baseReward = 0;
              if (totalSpend <= currentCap) {
                  baseReward = totalSpend * currentRate;
@@ -1881,7 +1947,6 @@
              const bonusReward = Math.min(bonusSpend, 16666) * 0.03;
              reward = baseReward + bonusReward;
              
-             // 5. 建議：僅在非UP模式且消費高時提示
              let suggestion = (!isUpMode && totalSpend >= 14900) ? "💡 額度破 1.5 萬，建議訂閱 UP" : "";
              
              return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, suggestion, breakdown, customLimit: currentCap };
@@ -2022,33 +2087,41 @@
             const paypayBonus = Math.min(quarterlyPayPaySpend * 0.035, 100);
             reward = baseAndDesignatedReward + designatedBonus + feeWaiverReward + paypayBonus;
             let validSpend = designatedSpend; let limit = 8333; let msg = '';
-            // 邏輯: 顯示指定通路餘額
+            
             if (addedIsKumamonPayPay || (quarterlyPayPaySpend > 0 && !addedIsKumamonDesignated && !addedIsKumamonJapan)) {
                 validSpend = quarterlyPayPaySpend; limit = 2857;
             } 
             return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, designatedSpend, quarterlyPayPaySpend };
         }
 
-        // J5
+        // [J5] 永豐三井聯名卡 (修正: 7.3% = 0.3% + 7%)
         if (cardId === 'j5') {
+            // 1. 基底 0.3% (無上限)
             const baseReward = totalSpend * 0.003;
+            
+            // 2. 特選餐飲 +7% (上限100元 -> 刷 1428)
             const txList = [...relevantTx]; 
             if (addedAmount > 0) txList.push({ amount: addedAmount, isSinopacMitsuiSelected: addedIsSinopacMitsuiSelected });
+            
             const selectedSpend = txList.filter(t => t.isSinopacMitsuiSelected).reduce((sum, t) => sum + t.amount, 0);
-            const selectedBonus = Math.min(selectedSpend * 0.07, 100);
-            const spendingCap = 1428;
+            // 上限100元，回饋率 0.07 => 100 / 0.07 = 1428.57
+            const selectedBonus = Math.min(selectedSpend, 1428) * 0.07;
+            
+            // 3. 滿額禮
             const quarterHistory = quarterTx.filter(t => t.isSinopacMitsuiTarget).reduce((sum, t) => sum + t.amount, 0);
             let currentQuarterSpend = quarterHistory;
             if (addedIsSinopacMitsuiTarget) currentQuarterSpend += addedAmount;
             let targetBonus = 0;
             if (currentQuarterSpend >= 30000 && quarterHistory < 30000) targetBonus = 2000;
+            
             reward = baseReward + selectedBonus + targetBonus;
-            let statusText = ''; let validSpend = selectedSpend;  let limit = spendingCap;
+            
+            let statusText = ''; let validSpend = selectedSpend;  let limit = 1428;
             if (addedIsSinopacMitsuiTarget || (quarterHistory > 0 && !addedIsSinopacMitsuiSelected)) {
                 validSpend = currentQuarterSpend; limit = 30000;
                 if (currentQuarterSpend >= 30000) statusText = '🎉 本季已達標 (領$2000)'; else statusText = `差 $${(30000 - currentQuarterSpend).toLocaleString()} 領$2000 (季)`;
             } else {
-                if (selectedSpend >= spendingCap) statusText = '特選已封頂'; else statusText = `剩 $${Math.floor(spendingCap - selectedSpend).toLocaleString()} (特選)`;
+                if (selectedSpend >= 1428) statusText = '特選已封頂'; else statusText = `剩 $${Math.floor(1428 - selectedSpend).toLocaleString()} (特選)`;
             }
             return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, msgDanger: statusText, customLimit: limit };
         }
@@ -2113,8 +2186,7 @@
         if(totalSpend>0) currentRate = (reward/totalSpend)*100;
         return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd };
     }
-    
-    function renderDetailProgress(stats) {
+      function renderDetailProgress(stats) {
         const container = document.getElementById('detailProgressArea');
         if (!stats.breakdown || !stats.breakdown.items || stats.breakdown.items.length === 0) {
             container.style.display = 'none';
@@ -2163,7 +2235,12 @@
         let isForeign = document.getElementById('checkForeign') ? document.getElementById('checkForeign').checked : false;
         let isUniUp = document.getElementById('checkUniUp') ? document.getElementById('checkUniUp').checked : false;
         let isUniBonus = document.getElementById('checkUniBonus') ? document.getElementById('checkUniBonus').checked : false;
-        let isHappyPet = false, isHappyPeace = false, isHappyLife = false, isHappyForeign = false;
+        
+        // [Modify] 樂家卡改為 Checkbox 多選
+        let isHappyPet = document.getElementById('checkHappyPet') ? document.getElementById('checkHappyPet').checked : false;
+        let isHappyLife = document.getElementById('checkHappyLife') ? document.getElementById('checkHappyLife').checked : false;
+        let isHappyPeace = document.getElementById('checkHappyPeace') ? document.getElementById('checkHappyPeace').checked : false;
+        let isHappyForeign = document.getElementById('checkHappyForeign') ? document.getElementById('checkHappyForeign').checked : false;
         
         let isHsbcForeign = document.getElementById('checkHsbcForeign') ? document.getElementById('checkHsbcForeign').checked : false;
         let isUniGroup = document.getElementById('checkUniGroup') ? document.getElementById('checkUniGroup').checked : false;
@@ -2205,7 +2282,9 @@
 
         let laiDianMode = document.querySelector('input[name="laiDianMode"]:checked') ? document.querySelector('input[name="laiDianMode"]:checked').value : 'general';
         let isLaiDianNew = document.getElementById('checkLaiDianNew') ? document.getElementById('checkLaiDianNew').checked : false;
-        let happyMode = document.querySelector('input[name="happyMode"]:checked') ? document.querySelector('input[name="happyMode"]:checked').value : 'general';
+        
+        // [New] Legend
+        let isLegendBonus = document.getElementById('checkLegendBonus') ? document.getElementById('checkLegendBonus').checked : false;
 
         const currentStats = calculateStats(cardId, 0);
         const newStats = calculateStats(cardId, amount, isGreen, isForeign, isUniBonus, isUniUp, isHappyPet, isHappyLife, isHappyForeign, isHappyPeace, isHsbcForeign, isUniGroup, isUniIcash, isUniOverseas, isRichartPay, isRichartOnline, isRichartLine, isRichartOverseas, isBonus10, isBonus25, isBill, 
@@ -2217,9 +2296,28 @@
             isJiangSelected, isJiangTravel,
             isDbsLinePay, isDbsGreen, isDbsForeign,
             isSinopacJcbForeign, isSinopacJcbJapan, isSinopacJcbBonus, isSinopacJcbQuarterly,
-            laiDianMode, isLaiDianNew, happyMode);
+            laiDianMode, isLaiDianNew, 'general', isLegendBonus); // happyMode deprecated, pass 'general'
         
         renderDetailProgress(currentStats); 
+
+        // [New] 更新樂家卡剩餘額度文字
+        if(cardId === 'c8') {
+            // 計算目前累積消費 (加上這筆預算前，或包含這筆? 通常顯示"目前剩餘"，所以用 newStats 的消費額來扣會變動，這裡用 currentStats 比較直觀)
+            // 但如果使用者想看 "刷了這筆後剩多少"，則用 newStats。
+            // 為了讓使用者知道「現在還能刷多少」，我們基於 currentStats (已確認的交易) 來計算。
+            // 不過 calculateStats 回傳的是加上 addedAmount 後的結果。
+            // 這裡我們直接計算剩餘： Limit - Used
+            const pRemain = Math.max(0, 5263 - (newStats.petSpend || 0) + (isHappyPet ? amount : 0)); // 修正邏輯：顯示"現在"剩多少，所以要把預覽的扣回去，或者直接讀取 currentStats 的
+            
+            // 更精準的做法：讀取 currentStats 的各項 Spend
+            const curP = currentStats.petSpend || 0;
+            const curL = currentStats.lifeSpend || 0;
+            const curPeace = currentStats.peaceSpend || 0;
+            
+            if(document.getElementById('happyPetRemain')) document.getElementById('happyPetRemain').innerText = `(剩 $${Math.max(0, 5263 - curP).toLocaleString()})`;
+            if(document.getElementById('happyLifeRemain')) document.getElementById('happyLifeRemain').innerText = `(剩 $${Math.max(0, 5714 - curL).toLocaleString()})`;
+            if(document.getElementById('happyPeaceRemain')) document.getElementById('happyPeaceRemain').innerText = `(剩 $${Math.max(0, 5714 - curPeace).toLocaleString()})`;
+        }
 
         const thisTransactionReward = newStats.reward - currentStats.reward;
         
@@ -2261,7 +2359,7 @@
             if (card.id === 'j4') displayRate = '6.0%'; 
             if (card.id === 'c10') displayRate = '11.0%';
             if (card.id === 'dbs1') displayRate = '10.0%';
-            if (card.id === 'c1') displayRate = '11.0%';
+            if (card.id === 'c1') displayRate = '10.0%'; // Legend: 1.2+8.8
             if (card.id === 'c2') displayRate = '6.0%';
             if (card.id === 'c3') displayRate = '7.0%';
             if (card.id === 'c7') displayRate = '4.5%';
@@ -2344,7 +2442,7 @@
                 if (stats.validSpend < card.minSpend) { percent = (stats.validSpend / card.minSpend) * 100; statusText = `⚠️ 差 $${(card.minSpend - stats.validSpend).toLocaleString()} 啟動加碼`; msgStyle = 'color: #FFD700; font-weight: bold;'; }
                 else if (stats.validSpend <= card.limit) { percent = (stats.validSpend / card.limit) * 100; const remain = card.limit - stats.validSpend; statusText = `剩 $${remain.toLocaleString()} (5%)`; }
                 else { percent = 100; statusText = '已封頂 (變0.5%)'; msgStyle = 'color: #ffcccc;'; }
-            } else if (card.type === 'ceiling' || card.type === 'custom_j' || card.id === 'j2' || card.id === 'j3' || card.id === 'j4' || card.id === 'j5' || card.id === 'dbs1' || card.id === 'c12' || card.id === 'c7') { // [FIX] C7 也納入此邏輯
+            } else if (card.type === 'ceiling' || card.type === 'custom_j' || card.type === 'custom_legend' || card.type === 'custom_mitsui' || card.id === 'j2' || card.id === 'j3' || card.id === 'j4' || card.id === 'dbs1' || card.id === 'c12' || card.id === 'c7') { 
                 const limit = stats.customLimit || card.limit;
                 if(limit > 0) percent = (stats.validSpend / limit) * 100; else percent = 0;
                 if (stats.msgDanger) {
@@ -2484,7 +2582,7 @@
         
         document.getElementById('btn-confirm').innerText = "確認";
         document.getElementById('transactionModal').style.display = 'flex';
-        const allOptionIds = ['pigRichOptions', 'greenCardOptions', 'uniOptions', 'happyOptions', 'hsbcOptions', 'uniOpenOptions', 'richartOptions', 'fubonJOptions', 'jiheOptions', 'kumamonOptions', 'sinopacCurrencyOptions', 'sinopacMitsuiOptions', 'jiangOptions', 'dbsEcoOptions', 'sinopacJcbOptions', 'laiDianOptions'];
+        const allOptionIds = ['pigRichOptions', 'greenCardOptions', 'uniOptions', 'happyOptions', 'hsbcOptions', 'uniOpenOptions', 'richartOptions', 'fubonJOptions', 'jiheOptions', 'kumamonOptions', 'sinopacCurrencyOptions', 'sinopacMitsuiOptions', 'jiangOptions', 'dbsEcoOptions', 'sinopacJcbOptions', 'laiDianOptions', 'legendOptions'];
         allOptionIds.forEach(id => { document.getElementById(id).style.display = 'none'; });
 
         if (cardId === 'c6') document.getElementById('pigRichOptions').style.display = 'block';
@@ -2493,6 +2591,7 @@
         if (cardId === 'c7') { document.getElementById('uniOptions').style.display = 'block'; toggleUniUpLogic(); }
         if (cardId === 'c8') document.getElementById('happyOptions').style.display = 'block';
         if (cardId === 'c9') document.getElementById('hsbcOptions').style.display = 'block';
+        if (cardId === 'c1') document.getElementById('legendOptions').style.display = 'block'; // [New]
         if (cardId === 'c10') {
             document.getElementById('uniOpenOptions').style.display = 'block';
             const savedState = JSON.parse(localStorage.getItem('uniOpenState') || '{}');
@@ -2539,13 +2638,24 @@
         }
         if (cardId === 'c12') { document.getElementById('sinopacJcbOptions').style.display = 'block'; }
 
-        // 預設重置 Radio
+        // 預設重置
         if (cardId === 'c5') {
             document.querySelector('input[name="laiDianMode"][value="general"]').checked = true;
             document.getElementById('checkLaiDianNew').checked = false;
         }
         if (cardId === 'c8') {
-            document.querySelector('input[name="happyMode"][value="general"]').checked = true;
+            // [Modify] 樂家卡 Checkbox 重置
+            document.getElementById('checkHappyPet').checked = false;
+            document.getElementById('checkHappyLife').checked = false;
+            document.getElementById('checkHappyPeace').checked = false;
+            document.getElementById('checkHappyForeign').checked = false;
+        }
+        if (cardId === 'c1') {
+            document.getElementById('checkLegendBonus').checked = false;
+        }
+        if (cardId === 'j5') {
+            document.getElementById('checkSinopacMitsuiSelected').checked = false;
+            document.getElementById('checkSinopacMitsuiTarget').checked = false;
         }
 
         if (card.parking) { document.getElementById('modalParkingInfo').innerHTML = card.parking; document.getElementById('modalParkingInfo').style.display = 'block'; } 
@@ -2573,6 +2683,9 @@
         renderModalHistory(cardId);
         if(cardId === 'c8') injectDetails();
         setTimeout(() => document.getElementById('amountInput').focus(), 100);
+        
+        // 觸發一次預覽以顯示樂家卡的剩餘額度
+        if(cardId === 'c8') updateRewardPreview();
     }
     
     function renderModalHistory(cardId) {
@@ -2593,15 +2706,22 @@
             let tags = [];
             const isCard = (id) => t.cardId === id;
 
+            if(isCard('c1') && t.isLegendBonus) tags.push('🔥');
             if(isCard('c2') && t.isGreen) tags.push('🌿');
             if(isCard('c2') && t.isForeign) tags.push('✈️');
             if(isCard('c7') && t.isUniUp) tags.push('🆙');
             if(isCard('c7') && t.isUniBonus) tags.push('🔥');
             if(isCard('c8')) {
-                if(t.happyMode === 'pet' || t.isHappyPet) tags.push('🐶');
-                if(t.happyMode === 'life' || t.isHappyLife) tags.push('🛒');
-                if(t.happyMode === 'peace' || t.isHappyPeace) tags.push('🍽️');
-                if(t.happyMode === 'foreign' || t.isHappyForeign) tags.push('✈️');
+                // [Modify] Happy Card Tags Checkbox
+                if(t.isHappyPet) tags.push('🐶');
+                if(t.isHappyLife) tags.push('🛒');
+                if(t.isHappyPeace) tags.push('🍽️');
+                if(t.isHappyForeign) tags.push('✈️');
+                // Fallback for old data
+                if(t.happyMode === 'pet') tags.push('🐶');
+                if(t.happyMode === 'life') tags.push('🛒');
+                if(t.happyMode === 'peace') tags.push('🍽️');
+                if(t.happyMode === 'foreign') tags.push('✈️');
             }
             if(isCard('c9') && t.isHsbcForeign) tags.push('✈️');
             if(isCard('c10') && t.isUniGroup) tags.push('🏪');
@@ -2661,6 +2781,8 @@
 
         const setCheck = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
         
+        setCheck('checkLegendBonus', t.isLegendBonus); // [New]
+
         setCheck('checkBonus10', t.isBonus10);
         setCheck('checkBonus25', t.isBonus25);
         setCheck('checkIsBill', t.isBill);
@@ -2685,15 +2807,18 @@
         }
 
         if(t.cardId === 'c8') {
+            // [Modify] Load Checkbox states
+            setCheck('checkHappyPet', t.isHappyPet);
+            setCheck('checkHappyLife', t.isHappyLife);
+            setCheck('checkHappyPeace', t.isHappyPeace);
+            setCheck('checkHappyForeign', t.isHappyForeign);
+            
+            // Legacy Support
             if(t.happyMode) {
-                const el = document.querySelector(`input[name="happyMode"][value="${t.happyMode}"]`);
-                if(el) el.checked = true;
-            } else {
-                if(t.isHappyPet) document.querySelector('input[name="happyMode"][value="pet"]').checked = true;
-                else if(t.isHappyLife) document.querySelector('input[name="happyMode"][value="life"]').checked = true;
-                else if(t.isHappyPeace) document.querySelector('input[name="happyMode"][value="peace"]').checked = true;
-                else if(t.isHappyForeign) document.querySelector('input[name="happyMode"][value="foreign"]').checked = true;
-                else document.querySelector('input[name="happyMode"][value="general"]').checked = true;
+                if(t.happyMode === 'pet') setCheck('checkHappyPet', true);
+                if(t.happyMode === 'life') setCheck('checkHappyLife', true);
+                if(t.happyMode === 'peace') setCheck('checkHappyPeace', true);
+                if(t.happyMode === 'foreign') setCheck('checkHappyForeign', true);
             }
         }
 
@@ -2775,6 +2900,9 @@
 
         const isCard = (id) => cardId === id;
         
+        // [New]
+        let isLegendBonus = isCard('c1') && document.getElementById('checkLegendBonus').checked;
+
         let isBonus10 = isCard('c6') && document.getElementById('checkBonus10').checked;
         let isBonus25 = isCard('c6') && document.getElementById('checkBonus25').checked;
         let isBill = isCard('c6') && document.getElementById('checkIsBill').checked;
@@ -2783,10 +2911,11 @@
         let isUniUp = isCard('c7') && document.getElementById('checkUniUp').checked;
         let isUniBonus = isCard('c7') && document.getElementById('checkUniBonus').checked;
         
-        let happyMode = 'general';
-        if (isCard('c8')) {
-            happyMode = document.querySelector('input[name="happyMode"]:checked').value;
-        }
+        // [Modify] Happy Card Checkbox Logic
+        let isHappyPet = isCard('c8') && document.getElementById('checkHappyPet').checked;
+        let isHappyLife = isCard('c8') && document.getElementById('checkHappyLife').checked;
+        let isHappyPeace = isCard('c8') && document.getElementById('checkHappyPeace').checked;
+        let isHappyForeign = isCard('c8') && document.getElementById('checkHappyForeign').checked;
         
         let laiDianMode = 'general';
         let isLaiDianNew = false;
@@ -2846,7 +2975,7 @@
             id: editingId || Date.now(),
             cardId, amount, date, note,
             isGreen, isForeign, isUniUp, isUniBonus, 
-            happyMode, 
+            isHappyPet, isHappyLife, isHappyPeace, isHappyForeign, // [New]
             isHsbcForeign,
             isUniGroup, isUniIcash, isUniOverseas,
             isRichartPay, isRichartOnline, isRichartLine, isRichartOverseas,
@@ -2859,7 +2988,8 @@
             isJiangSelected, isJiangTravel,
             isDbsLinePay, isDbsGreen, isDbsForeign,
             isSinopacJcbForeign, isSinopacJcbJapan, isSinopacJcbBonus, isSinopacJcbQuarterly,
-            laiDianMode, isLaiDianNew
+            laiDianMode, isLaiDianNew,
+            isLegendBonus // [New]
         };
         if (editingId) {
             const index = transactions.findIndex(t => t.id === editingId);

@@ -1026,7 +1026,6 @@
     function toggleHappyPeaceDetails() { const el = document.getElementById('happyPeaceDetails'); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
     function toggleHappyLifeDetails() { const el = document.getElementById('happyLifeDetails'); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
     function toggleSinopacJcbDetails() { const el = document.getElementById('sinopacJcbDetails'); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
-    // [新增] 賴點卡通路折疊
     function toggleLaiDianDetails() { const el = document.getElementById('laiDianDetails'); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
 
     // [FIX] 修復 C6 豬富卡互斥邏輯
@@ -1338,7 +1337,7 @@
             id: 'c7', name: '玉山 UNI 卡', nickname: '行支/百貨優等生', 
             note: 'UP 4.5% (刷 14萬封頂)', type: 'ceiling', limit: 40000, tier1Rate: 0.035, tier2Rate: 0.01, 
             gradient: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)', 
-            parking: `🔥 <b>任意選 3.5%</b> (限刷$4萬)<br>🆙 <b>UP 選 4.5%</b> (限刷$14萬)<br>⚠️ <b>注意：</b>任意選與 UP 選為互斥權益 (二選一)<br>ℹ️ <b>訂閱建議</b>：<br>消費滿 $14,900 以上建議訂閱 UP 選`
+            parking: `🔥 <b>任意選 3.5%</b> (限刷$4萬)<br>🆙 <b>UP 選 4.5%</b> (限刷$14萬)<br>ℹ️ <b>訂閱建議</b>：<br>消費滿 $14,900 以上建議訂閱 UP 選`
         },
         { 
             id: 'c8', name: '遠東樂家+卡', nickname: '生活/寵物神卡', 
@@ -1510,10 +1509,15 @@
         const label = document.getElementById('labelUniBase');
         if (isUp) {
             label.innerHTML = "🆙 <b>UP 選 4.5%</b> (刷$14萬封頂)";
-            label.parentNode.style.background = "#fff3e0"; 
+            label.parentNode.style.background = "#E3F2FD"; 
+            label.parentNode.style.color = "#0D47A1";
+            label.parentNode.style.borderRadius = "6px";
+            label.parentNode.style.padding = "4px 8px";
         } else {
             label.innerHTML = "🔰 <b>任意選 3.5%</b> (刷$4萬封頂)";
             label.parentNode.style.background = "transparent";
+            label.parentNode.style.color = "#555";
+            label.parentNode.style.padding = "0";
         }
         updateRewardPreview();
     }
@@ -1851,19 +1855,36 @@
             return { spend: totalSpend, validSpend: selectedSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, msgDanger: statusText, customLimit: spendingCap, breakdown };
         }
 
-        // [C7] Uni Card (修正：UP選上限為 140,000)
+        // [C7] Uni Card (修正：嚴格互斥邏輯)
         if (cardId === 'c7') {
+             // 1. 判定模式：只要有勾選 UP (新增時) 或歷史紀錄有 UP，就進入 UP 模式
              const isUpMode = addedIsUniUp || relevantTx.some(t => t.isUniUp);
-             // [修正] UP選上限改為 140,000 (原為 142857)
+             
+             // 2. 設定參數 (互斥)
              const currentCap = isUpMode ? 140000 : 40000;
+             const currentRate = isUpMode ? 0.045 : 0.035;
+             const modeLabel = isUpMode ? '🆙 UP選額度 (4.5%)' : '🔰 任意選額度 (3.5%)';
+
              const bonusSpend = relevantTx.filter(t => t.isUniBonus).reduce((sum, t) => sum + t.amount, 0) + (addedIsUniBonus ? addedAmount : 0);
-             breakdown = { items: [ { label: isUpMode ? 'UP選額度 (4.5%)' : '任意選額度 (3.5%)', current: totalSpend, max: currentCap, color: 'purple' }, { label: '時代百貨 (+3%)', current: bonusSpend, max: 16666, color: 'red' } ] };
-             let currentRate = isUpMode ? 0.045 : 0.035; 
-             let baseReward = (totalSpend <= currentCap) ? totalSpend * currentRate : (currentCap * currentRate) + ((totalSpend - currentCap) * 0.01); 
+             
+             // 3. 顯示層：動態切換進度條
+             breakdown = { items: [ { label: modeLabel, current: totalSpend, max: currentCap, color: 'purple' }, { label: '時代百貨 (+3%)', current: bonusSpend, max: 16666, color: 'red' } ] };
+             
+             // 4. 計算層：直接套用當前模式的費率
+             let baseReward = 0;
+             if (totalSpend <= currentCap) {
+                 baseReward = totalSpend * currentRate;
+             } else {
+                 baseReward = (currentCap * currentRate) + ((totalSpend - currentCap) * 0.01);
+             }
+             
              const bonusReward = Math.min(bonusSpend, 16666) * 0.03;
              reward = baseReward + bonusReward;
+             
+             // 5. 建議：僅在非UP模式且消費高時提示
              let suggestion = (!isUpMode && totalSpend >= 14900) ? "💡 額度破 1.5 萬，建議訂閱 UP" : "";
-             return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, suggestion, breakdown };
+             
+             return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, suggestion, breakdown, customLimit: currentCap };
         }
 
         // [C10] UniOpen
@@ -2055,13 +2076,13 @@
             return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd };
         }
 
-        // [C2] 聯邦綠卡 (修正：綠色+5%, 與國外分開計算)
+        // [C2] 聯邦綠卡
         if (cardId === 'c2') {
             let baseReward = totalSpend * 0.01;
             const greenSpend = relevantTx.filter(t => t.isGreen).reduce((sum, t) => sum + t.amount, 0) + (addedIsGreen ? addedAmount : 0);
-            const bonusGreen = Math.min(greenSpend, 3000) * 0.05; // 綠色 1%+5% = 6% (但這邊只算bonus 5%)
+            const bonusGreen = Math.min(greenSpend, 3000) * 0.05; 
             const foreignSpend = relevantTx.filter(t => t.isForeign).reduce((sum, t) => sum + t.amount, 0) + (addedIsForeign ? addedAmount : 0);
-            const bonusForeign = foreignSpend * 0.01; // 國外 1%+1% = 2% (Bonus 1%)
+            const bonusForeign = foreignSpend * 0.01;
             reward = baseReward + bonusGreen + bonusForeign;
             return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, greenSpend, foreignSpend };
         }
@@ -2142,7 +2163,6 @@
         let isForeign = document.getElementById('checkForeign') ? document.getElementById('checkForeign').checked : false;
         let isUniUp = document.getElementById('checkUniUp') ? document.getElementById('checkUniUp').checked : false;
         let isUniBonus = document.getElementById('checkUniBonus') ? document.getElementById('checkUniBonus').checked : false;
-        // C8 舊相容 (雖然已改Radio但保留變數宣告防錯)
         let isHappyPet = false, isHappyPeace = false, isHappyLife = false, isHappyForeign = false;
         
         let isHsbcForeign = document.getElementById('checkHsbcForeign') ? document.getElementById('checkHsbcForeign').checked : false;
@@ -2183,11 +2203,8 @@
         let isSinopacJcbBonus = document.getElementById('checkSinopacJcbBonus') ? document.getElementById('checkSinopacJcbBonus').checked : false;
         let isSinopacJcbQuarterly = document.getElementById('checkSinopacJcbQuarterly') ? document.getElementById('checkSinopacJcbQuarterly').checked : false;
 
-        // [新增] C5 賴點卡參數
         let laiDianMode = document.querySelector('input[name="laiDianMode"]:checked') ? document.querySelector('input[name="laiDianMode"]:checked').value : 'general';
         let isLaiDianNew = document.getElementById('checkLaiDianNew') ? document.getElementById('checkLaiDianNew').checked : false;
-
-        // [新增] C8 樂家卡參數
         let happyMode = document.querySelector('input[name="happyMode"]:checked') ? document.querySelector('input[name="happyMode"]:checked').value : 'general';
 
         const currentStats = calculateStats(cardId, 0);
@@ -2200,7 +2217,6 @@
             isJiangSelected, isJiangTravel,
             isDbsLinePay, isDbsGreen, isDbsForeign,
             isSinopacJcbForeign, isSinopacJcbJapan, isSinopacJcbBonus, isSinopacJcbQuarterly,
-            // 傳遞新參數
             laiDianMode, isLaiDianNew, happyMode);
         
         renderDetailProgress(currentStats); 
@@ -2236,7 +2252,7 @@
             const stats = calculateStats(card.id); 
             let percent = 0, statusText = '', msgStyle = '';
             
-            // [FIX] 修復卡面顯示 0% 的問題，強制顯示最高權益 %
+            // [FIX] 修復右上角顯示 0% 的問題，強制顯示最高權益 %
             let displayRate = `${stats.rate}%`; 
             if (card.id === 'c6') displayRate = '13.5%';
             if (card.id === 'c5') displayRate = '11.0%'; 
@@ -2257,99 +2273,55 @@
             if (card.id === 'c12') displayRate = '5.0%';
             if (card.type === 'placeholder') displayRate = '--%';
 
-            // C7 Uni Card 建議
             if (card.id === 'c7' && stats.suggestion) {
                 statusText = stats.suggestion;
                 msgStyle = 'color: #007AFF; font-weight: bold;';
                 percent = 100;
             }
-            // [C10] UniOpen 顯示邏輯：優先顯示小額度剩餘
             else if (card.id === 'c10') {
                 const i = stats.icashSpend || 0;
                 const o = stats.currentOverseasSpend || 0;
                 const g = stats.currentGroupSpend || 0;
-                // icash 3750, Overseas 6250, Group 25000
-                if (i < 3750) {
-                      statusText = `icash剩 $${Math.floor(3750 - i).toLocaleString()}`;
-                      percent = (i / 3750) * 100;
-                      msgStyle = 'color: #FF9800;'; // Orange
-                } else if (o < 6250) {
-                      statusText = `海外剩 $${Math.floor(6250 - o).toLocaleString()}`;
-                      percent = (o / 6250) * 100;
-                      msgStyle = 'color: #AF52DE;'; // Purple
-                } else if (g < 25000) {
-                      statusText = `集團剩 $${Math.floor(25000 - g).toLocaleString()}`;
-                      percent = (g / 25000) * 100;
-                      msgStyle = 'color: #34C759;'; // Green
-                } else {
-                      statusText = "已封頂"; msgStyle = 'color: #ffcccc;'; percent = 100;
-                }
+                if (i < 3750) { statusText = `icash剩 $${Math.floor(3750 - i).toLocaleString()}`; percent = (i / 3750) * 100; msgStyle = 'color: #FF9800;'; } 
+                else if (o < 6250) { statusText = `海外剩 $${Math.floor(6250 - o).toLocaleString()}`; percent = (o / 6250) * 100; msgStyle = 'color: #AF52DE;'; } 
+                else if (g < 25000) { statusText = `集團剩 $${Math.floor(25000 - g).toLocaleString()}`; percent = (g / 25000) * 100; msgStyle = 'color: #34C759;'; } 
+                else { statusText = "已封頂"; msgStyle = 'color: #ffcccc;'; percent = 100; }
             } 
-            // [C5] 賴點卡
             else if (card.id === 'c5') {
-                const even = stats.evenSpend || 0;
-                const user = stats.newUserSpend || 0;
-                const lp = stats.lpSpend || 0;
-                // Even 3000, New 7500, LP 20000
+                const even = stats.evenSpend || 0; const user = stats.newUserSpend || 0; const lp = stats.lpSpend || 0;
                 if (even < 3000) { statusText = `偶數日剩 $${Math.floor(3000-even).toLocaleString()}`; percent = (even/3000)*100; msgStyle='color: #FF9800;'; }
                 else if (user < 7500) { statusText = `新戶剩 $${Math.floor(7500-user).toLocaleString()}`; percent = (user/7500)*100; msgStyle='color: #AF52DE;'; }
                 else if (lp < 20000) { statusText = `LP剩 $${Math.floor(20000-lp).toLocaleString()}`; percent = (lp/20000)*100; msgStyle='color: #34C759;'; }
                 else { statusText = "已封頂"; percent = 100; msgStyle = 'color: #ffcccc;'; }
             }
-            // [J1] 富邦 J 卡 (修正顯示優先級)
             else if (card.id === 'j1') {
-                const suica = stats.suicaSpend || 0;
-                const thai = stats.thaiSpend || 0;
-                const jk = stats.jkSpend || 0;
-                // 優先級修正：只有當 Suica 真的有刷時才優先顯示，否則預設顯示日韓 JK
-                if (suica > 0 && suica < 2857) { 
-                    statusText = `交通卡剩 $${Math.floor(2857-suica).toLocaleString()} (季)`; percent = (suica/2857)*100; msgStyle='color: #FF9800;'; 
-                }
-                else if (thai > 0 && thai < 20000) { 
-                    statusText = `泰國剩 $${Math.floor(20000-thai).toLocaleString()} (季)`; percent = (thai/20000)*100; msgStyle='color: #AF52DE;'; 
-                }
-                else if (jk < 33333) { 
-                    statusText = `日韓實體剩 $${Math.floor(33333-jk).toLocaleString()} (季)`; percent = (jk/33333)*100; msgStyle='color: #34C759;'; 
-                }
+                const suica = stats.suicaSpend || 0; const thai = stats.thaiSpend || 0; const jk = stats.jkSpend || 0;
+                if (suica > 0 && suica < 2857) { statusText = `交通卡剩 $${Math.floor(2857-suica).toLocaleString()} (季)`; percent = (suica/2857)*100; msgStyle='color: #FF9800;'; }
+                else if (thai > 0 && thai < 20000) { statusText = `泰國剩 $${Math.floor(20000-thai).toLocaleString()} (季)`; percent = (thai/20000)*100; msgStyle='color: #AF52DE;'; }
+                else if (jk < 33333) { statusText = `日韓實體剩 $${Math.floor(33333-jk).toLocaleString()} (季)`; percent = (jk/33333)*100; msgStyle='color: #34C759;'; }
                 else { statusText = "已封頂"; percent = 100; msgStyle = 'color: #ffcccc;'; }
             }
-            // [DBS1] 星展 Eco
             else if (card.id === 'dbs1') {
-                const g = stats.greenSpend || 0;
-                const l = stats.lineSpend || 0;
-                const f = stats.foreignSpend || 0;
-                // Green 3333, Line 11111, Foreign 15000
+                const g = stats.greenSpend || 0; const l = stats.lineSpend || 0; const f = stats.foreignSpend || 0;
                 if (g < 3333) { statusText = `綠色剩 $${Math.floor(3333-g).toLocaleString()}`; percent = (g/3333)*100; msgStyle='color: #FF9800;'; }
                 else if (l < 11111) { statusText = `LinePay剩 $${Math.floor(11111-l).toLocaleString()}`; percent = (l/11111)*100; msgStyle='color: #34C759;'; }
                 else if (f < 15000) { statusText = `國外剩 $${Math.floor(15000-f).toLocaleString()}`; percent = (f/15000)*100; msgStyle='color: #AF52DE;'; }
                 else { statusText = "已封頂"; percent = 100; msgStyle = 'color: #ffcccc;'; }
             }
-            // [J3] 熊本熊
             else if (card.id === 'j3') {
                 const d = stats.designatedSpend || 0;
-                if (d < 8333) {
-                    statusText = `指定剩 $${Math.floor(8333-d).toLocaleString()}`; percent = (d/8333)*100;
-                } else {
-                    statusText = "指定已封頂"; percent = 100; msgStyle = 'color: #ffcccc;';
-                }
+                if (d < 8333) { statusText = `指定剩 $${Math.floor(8333-d).toLocaleString()}`; percent = (d/8333)*100; } 
+                else { statusText = "指定已封頂"; percent = 100; msgStyle = 'color: #ffcccc;'; }
             }
-            // [C12] JCB
             else if (card.id === 'c12') {
                 const mb = stats.monthlyBonusSpend || 0;
-                if (mb < 10000) {
-                    statusText = `特選剩 $${Math.floor(10000-mb).toLocaleString()}`; percent = (mb/10000)*100;
-                } else {
-                    statusText = "特選已封頂"; percent = 100; msgStyle = 'color: #ffcccc;';
-                }
+                if (mb < 10000) { statusText = `特選剩 $${Math.floor(10000-mb).toLocaleString()}`; percent = (mb/10000)*100; } 
+                else { statusText = "特選已封頂"; percent = 100; msgStyle = 'color: #ffcccc;'; }
             }
-            // [C2] 聯邦綠卡 (強制顯示綠色額度)
             else if (card.id === 'c2') {
                 const g = stats.greenSpend || 0;
-                if (g < 3000) {
-                    statusText = `綠色剩 $${Math.floor(3000-g).toLocaleString()}`; percent = (g/3000)*100; msgStyle = 'color: #FF9800;';
-                } else {
-                    statusText = "綠色已封頂 (變1%)"; percent = 100; msgStyle = 'color: #ffcccc;';
-                }
+                if (g < 3000) { statusText = `綠色剩 $${Math.floor(3000-g).toLocaleString()}`; percent = (g/3000)*100; msgStyle = 'color: #FF9800;'; } 
+                else { statusText = "綠色已封頂 (變1%)"; percent = 100; msgStyle = 'color: #ffcccc;'; }
             }
             else if (card.id === 'c9') {
                 const tier = localStorage.getItem('hsbc_tier') || 'infinite';
@@ -2365,53 +2337,31 @@
                 statusText = `總哩程 ${finalTotal.toLocaleString()} 哩`;
                 msgStyle = 'color: #007AFF; font-weight:bold;';
             } else if (card.id === 'c8') { 
-                if (stats.spend < 3000) { 
-                    percent = (stats.spend / 3000) * 100;
-                    statusText = `差 $${(3000 - stats.spend).toLocaleString()} 升級回饋`;
-                    msgStyle = 'color: #FFD700;';
-                } else if (stats.spend < 26000) { percent = (stats.spend / 26000) * 100; 
-                statusText = `差 $${(26000 - stats.spend).toLocaleString()} 領滿額禮`; } 
-                else { percent = 100; 
-                statusText = '🎉 滿額達標 (記得登錄!)'; msgStyle = 'color: #38ef7d;'; }
+                if (stats.spend < 3000) { percent = (stats.spend / 3000) * 100; statusText = `差 $${(3000 - stats.spend).toLocaleString()} 升級回饋`; msgStyle = 'color: #FFD700;'; } 
+                else if (stats.spend < 26000) { percent = (stats.spend / 26000) * 100; statusText = `差 $${(26000 - stats.spend).toLocaleString()} 領滿額禮`; } 
+                else { percent = 100; statusText = '🎉 滿額達標 (記得登錄!)'; msgStyle = 'color: #38ef7d;'; }
             } else if (card.type === 'mixed') { 
-                if (stats.validSpend < card.minSpend) { 
-                    percent = (stats.validSpend / card.minSpend) * 100;
-                    statusText = `⚠️ 差 $${(card.minSpend - stats.validSpend).toLocaleString()} 啟動加碼`;
-                    msgStyle = 'color: #FFD700; font-weight: bold;';
-                }
-                else if (stats.validSpend <= card.limit) { 
-                    percent = (stats.validSpend / card.limit) * 100;
-                    const remain = card.limit - stats.validSpend; 
-                    statusText = `剩 $${remain.toLocaleString()} (5%)`;
-                }
-                else { percent = 100; 
-                statusText = '已封頂 (變0.5%)'; msgStyle = 'color: #ffcccc;'; }
-            } else if (card.type === 'ceiling' || card.type === 'custom_j' || card.id === 'j2' || card.id === 'j3' || card.id === 'j4' || card.id === 'j5' || card.id === 'dbs1' || card.id === 'c12') {
+                if (stats.validSpend < card.minSpend) { percent = (stats.validSpend / card.minSpend) * 100; statusText = `⚠️ 差 $${(card.minSpend - stats.validSpend).toLocaleString()} 啟動加碼`; msgStyle = 'color: #FFD700; font-weight: bold;'; }
+                else if (stats.validSpend <= card.limit) { percent = (stats.validSpend / card.limit) * 100; const remain = card.limit - stats.validSpend; statusText = `剩 $${remain.toLocaleString()} (5%)`; }
+                else { percent = 100; statusText = '已封頂 (變0.5%)'; msgStyle = 'color: #ffcccc;'; }
+            } else if (card.type === 'ceiling' || card.type === 'custom_j' || card.id === 'j2' || card.id === 'j3' || card.id === 'j4' || card.id === 'j5' || card.id === 'dbs1' || card.id === 'c12' || card.id === 'c7') { // [FIX] C7 也納入此邏輯
                 const limit = stats.customLimit || card.limit;
-                if(limit > 0) percent = (stats.validSpend / limit) * 100;
-                else percent = 0;
+                if(limit > 0) percent = (stats.validSpend / limit) * 100; else percent = 0;
                 if (stats.msgDanger) {
                     statusText = stats.msgDanger;
                     if(stats.msgDanger.includes('已封頂')) msgStyle = stats.msgStyle || 'color: #ffcccc;';
                 } else if (stats.validSpend <= limit) { 
                     const remain = limit - stats.validSpend;
                     statusText = `剩 $${remain.toLocaleString()}`;
-                    if(remain < 1000) {statusText = `⚠️ 剩 $${remain.toLocaleString()}`;
-                    msgStyle='color:#FFD700;';} 
+                    if(remain < 1000) {statusText = `⚠️ 剩 $${remain.toLocaleString()}`; msgStyle='color:#FFD700;';} 
                 } else { 
                     percent = 100;
                     statusText = card.msgDanger || '已封頂'; msgStyle = 'color: #ffcccc;'; 
                 }
             } else if (card.id === 'c2') {
                 percent = (stats.validSpend / 12000) * 100;
-                if (stats.validSpend >= 12000) {
-                    statusText = '已達標 (下月免停)';
-                    msgStyle = 'color: #38ef7d; font-weight:bold;';
-                    percent = 100;
-                } else {
-                    statusText = `差 $${(12000 - stats.validSpend).toLocaleString()} 享免費停車`;
-                    msgStyle = 'color: #FFD700;';
-                }
+                if (stats.validSpend >= 12000) { statusText = '已達標 (下月免停)'; msgStyle = 'color: #38ef7d; font-weight:bold;'; percent = 100; } 
+                else { statusText = `差 $${(12000 - stats.validSpend).toLocaleString()} 享免費停車`; msgStyle = 'color: #FFD700;'; }
             } else { 
                 percent = (stats.validSpend / card.target) * 100;
                 statusText = stats.validSpend >= card.target ? '任務達成' : `差 $${(card.target - stats.validSpend).toLocaleString()}`;
@@ -2512,7 +2462,7 @@
     }
 
     function openQuickAdd(cardId) {
-        // [FIX] 關鍵修正：每次打開前先隱藏並清空進度條區域，防止殘留
+        // [FIX] 強制重置進度條與建議區塊，防止 UI 污染
         document.getElementById('detailProgressArea').style.display = 'none';
         document.getElementById('detailProgressArea').innerHTML = '';
         const uniSug = document.getElementById('uniUpSuggestion');
@@ -2531,9 +2481,6 @@
         const year = now.getFullYear();
         const today = `${year}-${month}-${day}`;
         document.getElementById('dateInput').value = today;
-        
-        // [FIX] 關鍵修正：這裡不重置 editingId，避免編輯模式被覆蓋
-        // editingId = null; (移除此行)
         
         document.getElementById('btn-confirm').innerText = "確認";
         document.getElementById('transactionModal').style.display = 'flex';
@@ -2604,9 +2551,6 @@
         if (card.parking) { document.getElementById('modalParkingInfo').innerHTML = card.parking; document.getElementById('modalParkingInfo').style.display = 'block'; } 
         else { document.getElementById('modalParkingInfo').style.display = 'none'; }
         
-        const suggestionDiv = document.getElementById('uniUpSuggestion');
-        if(suggestionDiv) suggestionDiv.style.display = 'none';
-        
         if (cardId === 'c8') document.getElementById('happyDashboard').style.display = 'block';
         else document.getElementById('happyDashboard').style.display = 'none';
 
@@ -2653,15 +2597,12 @@
             if(isCard('c2') && t.isForeign) tags.push('✈️');
             if(isCard('c7') && t.isUniUp) tags.push('🆙');
             if(isCard('c7') && t.isUniBonus) tags.push('🔥');
-            
-            // C8 Tag (舊+新)
             if(isCard('c8')) {
                 if(t.happyMode === 'pet' || t.isHappyPet) tags.push('🐶');
                 if(t.happyMode === 'life' || t.isHappyLife) tags.push('🛒');
                 if(t.happyMode === 'peace' || t.isHappyPeace) tags.push('🍽️');
                 if(t.happyMode === 'foreign' || t.isHappyForeign) tags.push('✈️');
             }
-
             if(isCard('c9') && t.isHsbcForeign) tags.push('✈️');
             if(isCard('c10') && t.isUniGroup) tags.push('🏪');
             if(isCard('c10') && t.isUniIcash) tags.push('📱');
@@ -2670,14 +2611,11 @@
             if(isCard('c11') && t.isRichartOnline) tags.push('🛍️');
             if(isCard('c11') && t.isRichartLine) tags.push('🟢');
             if(isCard('c11') && t.isRichartOverseas) tags.push('✈️');
-            
-            // C5 賴點卡 Tags
             if(isCard('c5')) {
                 if(t.isLaiDianNew) tags.push('👶');
                 if(t.laiDianMode === 'lp') tags.push('📱');
                 if(t.laiDianMode === 'even') tags.push('📅');
             }
-
             if(isCard('c6') && t.isBonus10) tags.push('⚡');
             if(isCard('c6') && t.isBonus25) tags.push('🌟');
             if(isCard('c6') && t.isBill) tags.push('🧾');
@@ -2715,9 +2653,6 @@
         if (!t) return;
 
         openQuickAdd(t.cardId); 
-        
-        // [FIX] 關鍵修正：將 ID 賦值移到開啟視窗之後，確保編輯模式生效
-        editingId = id;
 
         document.getElementById('amountInput').value = t.amount;
         document.getElementById('dateInput').value = t.date;
@@ -2741,18 +2676,18 @@
         setCheck('checkUniBonus', t.isUniBonus);
         if(t.isUniUp) toggleUniUpLogic();
 
-        // C5 Load
         if(t.cardId === 'c5') {
             if(t.laiDianMode) {
-                document.querySelector(`input[name="laiDianMode"][value="${t.laiDianMode}"]`).checked = true;
+                const el = document.querySelector(`input[name="laiDianMode"][value="${t.laiDianMode}"]`);
+                if(el) el.checked = true;
             }
             setCheck('checkLaiDianNew', t.isLaiDianNew);
         }
 
-        // C8 Load (兼容舊資料)
         if(t.cardId === 'c8') {
             if(t.happyMode) {
-                document.querySelector(`input[name="happyMode"][value="${t.happyMode}"]`).checked = true;
+                const el = document.querySelector(`input[name="happyMode"][value="${t.happyMode}"]`);
+                if(el) el.checked = true;
             } else {
                 if(t.isHappyPet) document.querySelector('input[name="happyMode"][value="pet"]').checked = true;
                 else if(t.isHappyLife) document.querySelector('input[name="happyMode"][value="life"]').checked = true;
@@ -2763,7 +2698,6 @@
         }
 
         setCheck('checkHsbcForeign', t.isHsbcForeign);
-
         setCheck('checkUniGroup', t.isUniGroup);
         setCheck('checkUniIcash', t.isUniIcash);
         setCheck('checkUniOverseas', t.isUniOverseas);
@@ -2825,6 +2759,9 @@
         setCheck('checkSinopacJcbQuarterly', t.isSinopacJcbQuarterly);
 
         updateRewardPreview();
+        
+        // [FIX] 確保在所有 DOM 操作完成後才設定編輯 ID，避免被 openQuickAdd 覆蓋
+        editingId = id;
     }
 
     function addTransaction(isConfirm) {
@@ -2846,13 +2783,11 @@
         let isUniUp = isCard('c7') && document.getElementById('checkUniUp').checked;
         let isUniBonus = isCard('c7') && document.getElementById('checkUniBonus').checked;
         
-        // C8 Save
         let happyMode = 'general';
         if (isCard('c8')) {
             happyMode = document.querySelector('input[name="happyMode"]:checked').value;
         }
         
-        // C5 Save
         let laiDianMode = 'general';
         let isLaiDianNew = false;
         if (isCard('c5')) {
@@ -2911,7 +2846,7 @@
             id: editingId || Date.now(),
             cardId, amount, date, note,
             isGreen, isForeign, isUniUp, isUniBonus, 
-            happyMode, // 新 C8
+            happyMode, 
             isHsbcForeign,
             isUniGroup, isUniIcash, isUniOverseas,
             isRichartPay, isRichartOnline, isRichartLine, isRichartOverseas,
@@ -2924,7 +2859,7 @@
             isJiangSelected, isJiangTravel,
             isDbsLinePay, isDbsGreen, isDbsForeign,
             isSinopacJcbForeign, isSinopacJcbJapan, isSinopacJcbBonus, isSinopacJcbQuarterly,
-            laiDianMode, isLaiDianNew // 新 C5
+            laiDianMode, isLaiDianNew
         };
         if (editingId) {
             const index = transactions.findIndex(t => t.id === editingId);

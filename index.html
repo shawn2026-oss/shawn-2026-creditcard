@@ -3139,9 +3139,12 @@
             document.getElementById('twdConversionDisplay').style.display = 'none';
         }
 
-        // [Fix] 低消/門檻警語邏輯：只要輸入金額>0且<100，就顯示
-        if (amount < 100 && amount > 0) document.getElementById('thresholdWarning').style.display = 'block';
-        else document.getElementById('thresholdWarning').style.display = 'none';
+        // [Fix] 低消/門檻警語邏輯：僅 c5 (賴點) 與 j2 (吉鶴) 且金額>0且<100時顯示
+        if ((cardId === 'c5' || cardId === 'j2') && amount < 100 && amount > 0) {
+            document.getElementById('thresholdWarning').style.display = 'block';
+        } else {
+            document.getElementById('thresholdWarning').style.display = 'none';
+        }
 
         // 收集所有 checkbox 狀態
         const isLegendBonus = document.getElementById('checkLegendBonus') ? document.getElementById('checkLegendBonus').checked : false;

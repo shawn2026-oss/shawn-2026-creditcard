@@ -223,7 +223,7 @@
         .modal-body-input { flex-shrink: 0; }
         
         /* 所在地選擇彈窗樣式 */
-        .location-modal-content {
+      .location-modal-content {
             background: white;
             width: 85%;
             max-width: 300px;
@@ -1843,7 +1843,7 @@
                 if (mode === 'even') evenSpend += t.amount;
             });
             const lpBonus = Math.min(lpSpend * 0.01, 200);        
-            const evenBonus = Math.min(evenSpend * 0.05, 150);     
+            const evenBonus = Math.min(evenSpend * 0.05, 150);      
             const newBonus = Math.min(newUserSpend * 0.04, 300); 
             reward = baseReward + lpBonus + evenBonus + newBonus;
             return { spend: totalSpend, validSpend: lpSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, evenSpend, newUserSpend, lpSpend };
@@ -2159,7 +2159,6 @@
         if(totalSpend>0) currentRate = (reward/totalSpend)*100;
         return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd };
     }
-
     function renderDetailProgress(stats) {
         const container = document.getElementById('detailProgressArea');
         if (!stats.breakdown || !stats.breakdown.items || stats.breakdown.items.length === 0) {
@@ -3096,6 +3095,128 @@
             } catch(err) { alert("檔案格式錯誤或損毀"); }
         };
         reader.readAsText(file);
+    }
+
+    // 補回缺失的即時試算函式
+    function updateRewardPreview() {
+        const cardId = document.getElementById('cardIdInput').value;
+        if (!cardId) return;
+        const amountInput = parseFloat(document.getElementById('amountInput').value) || 0;
+        
+        let amount = amountInput;
+        // 如果是外幣，轉換為台幣進行試算
+        if (currentLocation !== 'TW') {
+            const rateInput = document.getElementById('exchangeRateInput');
+            const rate = parseFloat(rateInput.value) || 1;
+            amount = Math.round(amountInput * rate);
+            updateTWDPreview(); // 同步更新 TWD 顯示
+        } else {
+            document.getElementById('twdConversionDisplay').style.display = 'none';
+        }
+
+        if (amount < 100 && amount > 0) document.getElementById('thresholdWarning').style.display = 'block';
+        else document.getElementById('thresholdWarning').style.display = 'none';
+
+        // 收集所有 checkbox 狀態
+        const isLegendBonus = document.getElementById('checkLegendBonus') ? document.getElementById('checkLegendBonus').checked : false;
+        const isBonus10 = document.getElementById('checkBonus10') ? document.getElementById('checkBonus10').checked : false;
+        const isBonus25 = document.getElementById('checkBonus25') ? document.getElementById('checkBonus25').checked : false;
+        const isBill = document.getElementById('checkIsBill') ? document.getElementById('checkIsBill').checked : false;
+        const isGreen = document.getElementById('checkGreenChannel') ? document.getElementById('checkGreenChannel').checked : false;
+        const isForeign = document.getElementById('checkForeign') ? document.getElementById('checkForeign').checked : false;
+        const isUniUp = document.getElementById('checkUniUp') ? document.getElementById('checkUniUp').checked : false;
+        const isUniBonus = document.getElementById('checkUniBonus') ? document.getElementById('checkUniBonus').checked : false;
+        const isHappyPet = document.getElementById('checkHappyPet') ? document.getElementById('checkHappyPet').checked : false;
+        const isHappyLife = document.getElementById('checkHappyLife') ? document.getElementById('checkHappyLife').checked : false;
+        const isHappyPeace = document.getElementById('checkHappyPeace') ? document.getElementById('checkHappyPeace').checked : false;
+        const isHappyForeign = document.getElementById('checkHappyForeign') ? document.getElementById('checkHappyForeign').checked : false;
+        const isHsbcForeign = document.getElementById('checkHsbcForeign') ? document.getElementById('checkHsbcForeign').checked : false;
+        
+        const isUniGroup = document.getElementById('checkUniGroup') ? document.getElementById('checkUniGroup').checked : false;
+        const isUniIcash = document.getElementById('checkUniIcash') ? document.getElementById('checkUniIcash').checked : false;
+        const isUniOverseas = document.getElementById('checkUniOverseas') ? document.getElementById('checkUniOverseas').checked : false;
+
+        let richartMode = 'general';
+        const richartRadio = document.querySelector('input[name="richartMode"]:checked');
+        if (richartRadio) richartMode = richartRadio.value;
+        const isRichartPay = (richartMode === 'pay');
+        const isRichartOnline = (richartMode === 'online');
+        const isRichartLine = (richartMode === 'line');
+        const isRichartOverseas = (richartMode === 'overseas');
+
+        const isFubonJGeneral = document.getElementById('checkFubonJGeneral') ? document.getElementById('checkFubonJGeneral').checked : false;
+        const isFubonJKorea = document.getElementById('checkFubonJKorea') ? document.getElementById('checkFubonJKorea').checked : false;
+        const isFubonJThai = document.getElementById('checkFubonJThai') ? document.getElementById('checkFubonJThai').checked : false;
+        const isFubonJSuica = document.getElementById('checkFubonJSuica') ? document.getElementById('checkFubonJSuica').checked : false;
+
+        const isJiheJapan = document.getElementById('checkJiheJapan') ? document.getElementById('checkJiheJapan').checked : false;
+        const isJiheApple = document.getElementById('checkJiheApple') ? document.getElementById('checkJiheApple').checked : false;
+        const isJiheDomesticJapanese = document.getElementById('checkJiheDomesticJapanese') ? document.getElementById('checkJiheDomesticJapanese').checked : false;
+
+        const isKumamonJapan = document.getElementById('checkKumamonJapan') ? document.getElementById('checkKumamonJapan').checked : false;
+        const isKumamonDesignated = document.getElementById('checkKumamonDesignated') ? document.getElementById('checkKumamonDesignated').checked : false;
+        const isKumamonPayPay = document.getElementById('checkKumamonPayPay') ? document.getElementById('checkKumamonPayPay').checked : false;
+
+        let isSinopacCurrencySelected = false;
+        const currencyRadio = document.querySelector('input[name="currencyType"]:checked');
+        if (currencyRadio && currencyRadio.value === 'selected') isSinopacCurrencySelected = true;
+
+        const isSinopacMitsuiSelected = document.getElementById('checkSinopacMitsuiSelected') ? document.getElementById('checkSinopacMitsuiSelected').checked : false;
+        const isSinopacMitsuiTarget = document.getElementById('checkSinopacMitsuiTarget') ? document.getElementById('checkSinopacMitsuiTarget').checked : false;
+
+        let isJiangSelected = false;
+        let isJiangTravel = false;
+        const jiangRadio = document.querySelector('input[name="jiangMode"]:checked');
+        if (jiangRadio) {
+            if (jiangRadio.value === 'selected') isJiangSelected = true;
+            if (jiangRadio.value === 'travel') isJiangTravel = true;
+        }
+
+        const isDbsLinePay = document.getElementById('checkDbsLinePay') ? document.getElementById('checkDbsLinePay').checked : false;
+        const isDbsGreen = document.getElementById('checkDbsGreen') ? document.getElementById('checkDbsGreen').checked : false;
+        const isDbsForeign = document.getElementById('checkDbsForeign') ? document.getElementById('checkDbsForeign').checked : false;
+
+        const isSinopacJcbForeign = document.getElementById('checkSinopacJcbForeign') ? document.getElementById('checkSinopacJcbForeign').checked : false;
+        const isSinopacJcbJapan = document.getElementById('checkSinopacJcbBonus') ? document.getElementById('checkSinopacJcbBonus').checked : false; 
+        const isSinopacJcbBonus = document.getElementById('checkSinopacJcbBonus') ? document.getElementById('checkSinopacJcbBonus').checked : false;
+        const isSinopacJcbQuarterly = document.getElementById('checkSinopacJcbQuarterly') ? document.getElementById('checkSinopacJcbQuarterly').checked : false;
+
+        let laiDianMode = 'general';
+        const laiDianRadio = document.querySelector('input[name="laiDianMode"]:checked');
+        if (laiDianRadio) laiDianMode = laiDianRadio.value;
+        const isLaiDianNew = document.getElementById('checkLaiDianNew') ? document.getElementById('checkLaiDianNew').checked : false;
+
+        const stats = calculateStats(cardId, amount, isGreen, isForeign, isUniBonus, isUniUp, isHappyPet, isHappyLife, isHappyForeign, isHappyPeace, isHsbcForeign, isUniGroup, isUniIcash, isUniOverseas, isRichartPay, isRichartOnline, isRichartLine, isRichartOverseas, isBonus10, isBonus25, isBill, isFubonJGeneral, isFubonJKorea, isFubonJThai, isFubonJSuica, isJiheJapan, isJiheApple, isJiheDomesticJapanese, isKumamonJapan, isKumamonDesignated, isKumamonPayPay, isSinopacCurrencySelected, isSinopacMitsuiSelected, isSinopacMitsuiTarget, isJiangSelected, isJiangTravel, isDbsLinePay, isDbsGreen, isDbsForeign, isSinopacJcbForeign, isSinopacJcbJapan, isSinopacJcbBonus, isSinopacJcbQuarterly, laiDianMode, isLaiDianNew, 'general', isLegendBonus);
+
+        const liveDiv = document.getElementById('liveRewardCalc');
+        if (amount > 0) {
+            let unit = (cardId === 'c9') ? '哩' : '元';
+            let extraText = '';
+            if (stats.reward > 0) {
+                const rate = ((stats.reward / amount) * 100).toFixed(1);
+                extraText = ` (${rate}%)`;
+            }
+            liveDiv.innerText = `預估回饋: ${Math.round(stats.reward).toLocaleString()} ${unit}${extraText}`;
+            liveDiv.style.display = 'block';
+        } else {
+            liveDiv.style.display = 'none';
+        }
+        
+        renderDetailProgress(stats);
+        
+        if(cardId === 'c7') {
+            const sugDiv = document.getElementById('uniUpSuggestion');
+            if(stats.suggestion) { sugDiv.innerText = stats.suggestion; sugDiv.style.display = 'block'; }
+            else sugDiv.style.display = 'none';
+        }
+        if(cardId === 'c8') {
+            const petR = 5263 - (stats.petSpend || 0);
+            const lifeR = 5714 - (stats.lifeSpend || 0);
+            const peaceR = 5714 - (stats.peaceSpend || 0);
+            document.getElementById('happyPetRemain').innerText = petR > 0 ? `(剩$${petR.toLocaleString()})` : '(已封頂)';
+            document.getElementById('happyLifeRemain').innerText = lifeR > 0 ? `(剩$${lifeR.toLocaleString()})` : '(已封頂)';
+            document.getElementById('happyPeaceRemain').innerText = peaceR > 0 ? `(剩$${peaceR.toLocaleString()})` : '(已封頂)';
+        }
     }
 
     function checkUrgentTasks() {

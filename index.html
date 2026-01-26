@@ -2035,7 +2035,7 @@
             return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, jkSpend, thaiSpend, suicaSpend };
         }
 
-        // J2
+        // J2 (Fix: 將 Apple Pay 額度設為 validSpend 以讓首頁進度條正確顯示倒數)
         if (cardId === 'j2') {
             const txList = [...relevantTx];
             if (addedAmount > 0) txList.push({ amount: addedAmount, isJiheJapan: addedIsJiheJapan, isJiheApple: addedIsJiheApple, isJiheDomesticJapanese: addedIsJiheDomesticJapanese });
@@ -2046,7 +2046,8 @@
             const domesticJpSpend = relevantTx.filter(t => t.isJiheDomesticJapanese).reduce((sum, t) => sum + t.amount, 0) + (addedIsJiheDomesticJapanese ? addedAmount : 0);
             const bonusDom = Math.min(domesticJpSpend, 12500) * 0.04;
             reward = baseReward + bonusApple + bonusDom;
-            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd };
+            // 這裡將 appleSpend 傳回為 validSpend，這樣首頁的 ceiling 邏輯 (40000) 就會正確計算 AP 剩餘額度
+            return { spend: totalSpend, validSpend: appleSpend, reward: Math.round(reward), rate: "0.0", isCustom, cycleStart, cycleEnd, appleSpend, domesticJpSpend };
         }
 
         // [J3] 熊本熊卡
@@ -2246,8 +2247,20 @@
                 if (jk < 33333) { statusText = `日韓加碼剩 $${Math.floor(33333-jk).toLocaleString()}`; percent = (jk/33333)*100; msgStyle='color: #34C759;'; }
                 else { statusText = "日韓加碼已封頂"; percent = 100; msgStyle = 'color: #ffcccc;'; }
             }
+            // [修正] 吉鶴卡在日本模式下，改為顯示 QUICPay 加碼倒數
             else if (card.id === 'j2' && currentLocation === 'JP') {
-                 statusText = "日本 2.5% 無上限"; msgStyle='color: #34C759;'; percent = 0;
+                 // validSpend 在 J2 Part 4 logic 中已被設為 appleSpend
+                 const limit = 40000;
+                 if (stats.validSpend <= limit) {
+                     const remain = limit - stats.validSpend;
+                     statusText = `AP加碼剩 $${remain.toLocaleString()}`;
+                     percent = (stats.validSpend / limit) * 100;
+                     if(remain < 5000) msgStyle='color:#FFD700;';
+                 } else {
+                     statusText = "AP加碼已封頂 (變2.5%)";
+                     percent = 100;
+                     msgStyle = 'color: #ffcccc;';
+                 }
             }
             else if (card.id === 'c7' && stats.suggestion) {
                 statusText = stats.suggestion; msgStyle = 'color: #007AFF; font-weight: bold;'; percent = 100;
@@ -3114,6 +3127,7 @@
             document.getElementById('twdConversionDisplay').style.display = 'none';
         }
 
+        // [Fix] 低消/門檻警語邏輯：只要輸入金額>0且<100，就顯示
         if (amount < 100 && amount > 0) document.getElementById('thresholdWarning').style.display = 'block';
         else document.getElementById('thresholdWarning').style.display = 'none';
 

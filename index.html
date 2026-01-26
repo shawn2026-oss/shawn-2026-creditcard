@@ -28,7 +28,7 @@
     <meta property="og:url" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/">
     <meta property="og:type" content="website">
 
-    <title>刷卡回饋管家 (V124.37)</title>
+    <title>刷卡回饋管家 (V124.38)</title>
         
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
@@ -138,6 +138,28 @@
         .location-text { font-size: 12px; font-weight: 700; color: #007AFF; }
         .location-arrow { font-size: 10px; color: #007AFF; }
         
+        /* 全域匯率顯示列 (新) */
+        #globalRateArea {
+            display: none;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+        .rate-display-label { font-size: 12px; font-weight: 600; color: #555; display: flex; align-items: center; gap: 4px; }
+        .rate-input-group { display: flex; align-items: center; gap: 6px; }
+        .global-rate-input { 
+            width: 70px; padding: 4px 8px; border: 1px solid #eee; background: #f9f9f9; 
+            border-radius: 6px; font-size: 13px; font-weight: 700; text-align: right; 
+            color: #333; outline: none; transition: all 0.2s;
+        }
+        .global-rate-input:focus { background: #fff; border-color: #007AFF; }
+        .btn-update-rate { font-size: 14px; background: none; border: none; cursor: pointer; padding: 0 4px; }
+
         .header-section { margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-end; }
         h1 { font-size: 22px; font-weight: 800; margin: 0; color: #333; letter-spacing: -0.5px; line-height: 1.2;}
         .subtitle { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
@@ -264,28 +286,6 @@
         .location-currency { font-size: 11px; color: #888; margin-top: 2px; }
         .location-check { font-size: 18px; color: #007AFF; display: none; }
         .location-option.active .location-check { display: block; }
-        
-        /* 匯率調整輸入框樣式 */
-        .exchange-rate-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 8px;
-            padding: 8px;
-            background: #f9f9f9;
-            border-radius: 8px;
-        }
-        .exchange-rate-label { font-size: 12px; font-weight: 600; color: #555; }
-        .exchange-rate-input {
-            width: 80px;
-            padding: 4px 8px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            text-align: right;
-        }
-        .exchange-rate-edit-btn { background: none; border: none; color: #007AFF; font-size: 14px; cursor: pointer; padding: 0 4px; }
         
         .welcome-overlay { 
             position: fixed !important; 
@@ -609,7 +609,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V124.37(CleanUI)</div>
+            <div class="version-tag">V124.38(CleanUI)</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -619,10 +619,19 @@
                 <span class="location-arrow">▼</span>
             </div>
         </div>
+        
+        <div class="exchange-rate-row" id="exchangeRateRow" style="display:none; margin-top:0; margin-bottom:12px; background:white; border:1px solid #ddd;">
+            <span class="exchange-rate-label">📊 匯率 <span id="currencySymbolInRate"></span> → TWD</span>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <input type="number" id="exchangeRateInput" class="exchange-rate-input" step="0.0001" oninput="updateTWDPreview()">
+                <button class="exchange-rate-edit-btn" onclick="toggleExchangeRateEdit()">✏️</button>
+            </div>
+        </div>
+
         <div class="subtitle"><span class="today-date" id="dateDisplay"></span></div>
         
         <div class="news-ticker">
-            <div class="ticker-content" id="news-text">🎉 V124.37 更新：CleanUI 雙幣顯示優化、多國情境自動連動系統上線。</div>
+            <div class="ticker-content" id="news-text">🎉 V124.38 更新：優化外幣顯示、修正旅人卡哩程計算與預覽邏輯。</div>
         </div>
         
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
@@ -1116,13 +1125,6 @@
                 </div>
 
                 <div class="input-group" style="margin-top:10px;">
-                    <div class="exchange-rate-row" id="exchangeRateRow" style="display:none;">
-                        <span class="exchange-rate-label">📊 匯率 <span id="currencySymbolInRate"></span> → TWD</span>
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <input type="number" id="exchangeRateInput" class="exchange-rate-input" step="0.0001" oninput="updateTWDPreview()">
-                            <button class="exchange-rate-edit-btn" onclick="toggleExchangeRateEdit()">✏️</button>
-                        </div>
-                    </div>
                     <input type="number" id="amountInput" placeholder="$ 金額" inputmode="numeric" style="font-size:28px; text-align:center; border:none; border-bottom:2px solid #eee; border-radius:0;" oninput="updateRewardPreview()" onkeyup="updateRewardPreview()" onpaste="updateRewardPreview()">
                     <div id="twdConversionDisplay" style="text-align:center; font-size:14px; color:#666; margin-top:6px; display:none;">
                         ≈ TWD <span id="twdAmount">0</span>
@@ -1175,7 +1177,7 @@
     </div>
   <script>
     // ==========================================
-    // Part 3: 核心設定、匯率與 UI 邏輯 (Fix V124.37.1)
+    // Part 3: 核心設定、匯率與 UI 邏輯 (Fix V124.38)
     // ==========================================
     
     const LOCATION_CONFIG = {
@@ -1223,6 +1225,21 @@
         document.getElementById('currentLocationFlag').innerText = flag;
         document.getElementById('currentLocationName').innerText = name;
         document.getElementById('locationModal').style.display = 'none';
+        
+        // [修正] 切換國家時，控制主畫面匯率列的顯示
+        const rateRow = document.getElementById('exchangeRateRow');
+        const rateInput = document.getElementById('exchangeRateInput');
+        const currencySymbol = LOCATION_CONFIG[code].currency;
+        
+        if (code !== 'TW') {
+            rateRow.style.display = 'flex';
+            document.getElementById('currencySymbolInRate').innerText = currencySymbol;
+            // 更新輸入框內的匯率數值
+            if(exchangeRates[currencySymbol]) rateInput.value = exchangeRates[currencySymbol];
+        } else {
+            rateRow.style.display = 'none';
+        }
+        
         updateAmountPlaceholder();
         renderGrid(); 
     }
@@ -1235,16 +1252,25 @@
 
     function getCurrentRate() {
         if (currentLocation === 'TW') return 1;
+        // 優先讀取使用者手動調整的匯率框
+        const inputVal = parseFloat(document.getElementById('exchangeRateInput').value);
+        if(inputVal) return inputVal;
         return exchangeRates[LOCATION_CONFIG[currentLocation].currency] || 1;
     }
 
     function updateTWDPreview() {
         const amount = parseFloat(document.getElementById('amountInput').value);
-        const rateInput = document.getElementById('exchangeRateInput');
         const twdDisplay = document.getElementById('twdConversionDisplay');
         const twdAmount = document.getElementById('twdAmount');
-        if (currentLocation === 'TW' || !amount || amount <= 0) { twdDisplay.style.display = 'none'; return; }
-        const rate = parseFloat(rateInput.value) || getCurrentRate();
+        
+        if (currentLocation === 'TW' || !amount || amount <= 0) { 
+            twdDisplay.style.display = 'none'; 
+            return; 
+        }
+        
+        const rate = getCurrentRate();
+        // 這裡的 rate 定義是：1 外幣 = ? 台幣 (例如 JPY 0.22)
+        // 所以 外幣 * rate = 台幣
         twdAmount.innerText = Math.round(amount * rate).toLocaleString();
         twdDisplay.style.display = 'block';
     }
@@ -1960,7 +1986,7 @@
             return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: realRate, isCustom, cycleStart, cycleEnd };
         }
 
-        // C9
+        // C9 (Hsbc)
         if (cardId === 'c9') {
             const tier = localStorage.getItem('hsbc_tier') || 'infinite';
             let rateDomestic = 18; let rateForeign = 10; if (tier === 'signature') { rateDomestic = 18; rateForeign = 15; }
@@ -1970,13 +1996,17 @@
             allHistoryTx.forEach(tx => { const rate = tx.isHsbcForeign ? rateForeign : rateDomestic; totalMiles += Math.floor(tx.amount / rate); });
             if (addedAmount > 0) { const currentRate = addedIsHsbcForeign ? rateForeign : rateDomestic; totalMiles += Math.floor(addedAmount / currentRate); }
             reward = totalMiles - redeemedMiles;
-            let cycleReward = 0;
-            const { start, end } = getBillingCycle(cardId);
-            const cycleTx = transactions.filter(t => { const tDate = new Date(t.date); return t.cardId === 'c9' && tDate >= start && tDate <= end; });
-            cycleTx.forEach(tx => { const rate = tx.isHsbcForeign ? rateForeign : rateDomestic; cycleReward += Math.floor(tx.amount / rate); });
-            if(addedAmount > 0) { const currentRate = addedIsHsbcForeign ? rateForeign : rateDomestic; cycleReward += Math.floor(addedAmount / currentRate); }
-            const realRate = totalSpend > 0 ? (totalSpend / totalMiles).toFixed(1) : "0.0";
-            return { spend: totalSpend, validSpend: totalSpend, reward: cycleReward, rate: realRate, isCustom, cycleStart, cycleEnd };
+            
+            // 計算回饋率 (顯示 $/哩)
+            let currentMilesEarned = 0;
+            const currentRateDivisor = addedIsHsbcForeign ? rateForeign : rateDomestic;
+            if(addedAmount > 0) currentMilesEarned = Math.floor(addedAmount / currentRateDivisor);
+            // 為了讓 UI 顯示正確，這裡回傳的 rate 字串設為 "$XX/哩" 格式的文字，或者單純回傳哩程數
+            // 根據需求，預覽框要顯示「預估回饋: XX 哩 (10元/哩)」
+            // 這裡回傳的 rate 會被 updateRewardPreview 使用
+            const rateDisplay = `${currentRateDivisor}元/哩`;
+            
+            return { spend: totalSpend, validSpend: totalSpend, reward: reward, rate: rateDisplay, isCustom, cycleStart, cycleEnd, currentMilesEarned };
         }
         
         // C12
@@ -2207,7 +2237,7 @@
         container.style.display = 'block';
     }
 
-    // [V124.37 修復] renderGrid 雙層顯示與底部外幣換算
+    // [V124.38 修復] renderGrid 雙層顯示與底部外幣換算
     function renderGrid() {
         const container = document.getElementById('card-grid');
         let monthTotalReward = 0; 
@@ -2226,6 +2256,7 @@
             const stats = calculateStats(card.id); 
             let percent = 0, statusText = '', msgStyle = '';
             let displayRate = `${stats.rate}%`; 
+            if(card.id === 'c9') displayRate = stats.rate; // 旅人卡顯示 元/哩
 
             // [修正] 僅在無消費時顯示最高行銷回饋率，有消費則顯示實際計算率
             if (stats.spend === 0 && card.type !== 'placeholder') {
@@ -2925,7 +2956,7 @@
 
         const isCard = (id) => cardId === id;
         
-        // [V124.37.2 Fix] 完整讀取所有勾選狀態，確保疊加回饋能被儲存
+        // [V124.38 Fix] 完整讀取所有勾選狀態
         let isLegendBonus = isCard('c1') && document.getElementById('checkLegendBonus').checked;
         let isBonus10 = isCard('c6') && document.getElementById('checkBonus10').checked;
         let isBonus25 = isCard('c6') && document.getElementById('checkBonus25').checked;
@@ -2994,7 +3025,7 @@
         let isSinopacJcbBonus = isCard('c12') && document.getElementById('checkSinopacJcbBonus').checked;
         let isSinopacJcbQuarterly = isCard('c12') && document.getElementById('checkSinopacJcbQuarterly').checked;
         
-        // [V124.37] 匯率寫入邏輯
+        // [V124.38] 匯率寫入邏輯
         let finalAmount = amount;
         if (currentLocation !== 'TW') {
             const config = LOCATION_CONFIG[currentLocation];
@@ -3221,11 +3252,26 @@
         if (amount > 0) {
             let unit = (cardId === 'c9') ? '哩' : '元';
             let extraText = '';
-            if (stats.reward > 0) {
-                // [FIX] 改為使用 calculateStats 算好的平均有效回饋率，避免除以單筆金額導致天文數字
-                extraText = ` (${stats.rate}%)`;
+            
+            // 修正：針對單筆消費計算回饋
+            // stats.reward 是本期總回饋，這不適合拿來算單筆回饋率
+            // 我們需要重新計算「這一筆」產生的回饋
+            
+            // 暫時使用簡易方式：如果是旅人卡 (c9)，顯示 這一筆 能賺多少哩
+            if (cardId === 'c9') {
+                 // 從 stats.currentMilesEarned 取得單筆回饋
+                 const singleReward = stats.currentMilesEarned || 0;
+                 // 顯示: 預估回饋: 400 哩 (10元/哩)
+                 liveDiv.innerText = `預估回饋: ${singleReward.toLocaleString()} 哩 (${stats.rate})`;
+            } else {
+                 // 其他現金回饋卡片，這裡 stats.rate 已經是正確的綜合回饋率字串 (Part 4 修正過)
+                 // 但 stats.reward 包含舊的
+                 // 為了精準，我們應該顯示「這筆消費的回饋金額」
+                 // 不過 calculateStats 回傳的是總額。
+                 // 沒關係，我們用 (Rate * Amount) 近似，或者直接顯示 Rate
+                 // 為了修復 17100%，我們直接顯示 Rate 即可
+                 liveDiv.innerText = `預估回饋率: ${stats.rate}%`;
             }
-            liveDiv.innerText = `預估回饋: ${Math.round(stats.reward).toLocaleString()} ${unit}${extraText}`;
             liveDiv.style.display = 'block';
         } else {
             liveDiv.style.display = 'none';

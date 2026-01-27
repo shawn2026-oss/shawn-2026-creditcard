@@ -28,7 +28,7 @@
     <meta property="og:url" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/">
     <meta property="og:type" content="website">
 
-    <title>刷卡回饋管家 (V124.41)</title>
+    <title>刷卡回饋管家 (V125.00 Global)</title>
         
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
@@ -415,7 +415,7 @@
         .m-setting-btn:active { background: #e0e0e0; transform: scale(0.9); }
     </style>
   </head>
-<body>
+  <body>
     <div id="locationModal" class="modal" onclick="if(event.target===this) document.getElementById('locationModal').style.display='none'">
         <div class="location-modal-content">
             <div class="location-modal-title">選擇所在地</div>
@@ -618,7 +618,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V124.41(LocalFix)</div>
+            <div class="version-tag">V125.00(Global)</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -640,7 +640,7 @@
         <div class="subtitle"><span class="today-date" id="dateDisplay"></span></div>
         
         <div class="news-ticker">
-            <div class="ticker-content" id="news-text">🎉 V124.41 更新：優化國外消費顯示邏輯、自動扣除背景額度，旅遊記帳更直覺！</div>
+            <div class="ticker-content" id="news-text">🎉 V125.00 更新：優化國外消費顯示邏輯、自動扣除背景額度，旅遊記帳更直覺！</div>
         </div>
         
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
@@ -677,7 +677,6 @@
         </div>
         <div style="height:20px;"></div>
     </div>
-
     <div id="sharePreviewModal" class="modal" onclick="if(event.target===this) document.getElementById('sharePreviewModal').style.display='none'">
         <div class="modal-content" style="background:transparent; box-shadow:none; align-items:center; padding:0; width:100%; max-width:340px;">
             <div id="captureNode" class="share-card-node">
@@ -1314,7 +1313,6 @@
     function toggleSinopacJcbDetails() { const el = document.getElementById('sinopacJcbDetails'); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
     function toggleLaiDianDetails() { const el = document.getElementById('laiDianDetails'); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
     function toggleLegendDetails() { const el = document.getElementById('legendDetails'); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
-
     function toggleSelectedLogic() {
         if(document.getElementById('checkBonus25').checked) {
             document.getElementById('checkIsBill').checked = false;
@@ -1464,7 +1462,7 @@
     function closeModal() { document.getElementById('transactionModal').style.display = 'none'; document.getElementById('manageModal').style.display = 'none'; document.getElementById('sharePreviewModal').style.display = 'none'; }
     window.addEventListener('popstate', closeModal);
     
-    // Cards DB (Same as before)
+    // Cards DB
     const defaultCards = [
         { id: 'c10', name: '中信 UniOpen 卡', nickname: '2026 統一集團神卡', note: 'icashPay/海外 11% ($3,750/$6,250 封頂)', type: 'uniopen_special', gradient: 'linear-gradient(135deg, #FF512F 0%, #F09819 100%)', textColor: 'white', msgDanger: '', parking: `🏪 <b>統一集團 2026 新權益</b><br>1. <b>基本回饋</b>：1% (無上限)<br>2. <b>集團加碼</b>：+2% (限刷$2.5萬)<br>3. <b>踩點任務</b>：滿 5 家 +4% (限刷$1.25萬)<br>4. <b>icash Pay</b>：加碼 +4% (限刷$3,750)`},
         { id: 'dbs1', name: '星展 eco 永續卡', nickname: '綠能/新戶lp神卡', note: '國外實體 +4% (刷$1.5萬封頂)', type: 'ceiling', limit: 15000, tier1Rate: 0.05, tier2Rate: 0.01, gradient: 'linear-gradient(135deg, #FF0000 0%, #000000 100%)', textColor: 'white', msgDanger: '加碼已封頂 (變1%)', parking: `🌿 <b>綠色/特斯拉 +9%</b><br>基本 1% + 加碼 9% (上限300點)<br>⚠️ 約刷 $3,333 封頂<br>⚡ <b>新戶 Line Pay 10%</b><br>基本 1% + 加碼 9%<br>⚠️ 加碼上限 1000 點 (約刷 $11,111)<br>✈️ <b>國外實體 +4%</b><br>基本 1% + 加碼 4% (共5%)<br>⚠️ 加碼適用月刷 $15,000 封頂`},
@@ -1498,10 +1496,8 @@
         if (sortableInstance) sortableInstance.destroy();
         sortableInstance = new Sortable(document.getElementById('card-grid'), { animation: 150, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', delay: 200, delayOnTouchOnly: true, forceFallback: true, onEnd: function (evt) { const allIds = cards.map(c => c.id), vis = Array.from(evt.to.children).map(el => el.getAttribute('data-card-id')), hidden = allIds.filter(id => !vis.includes(id)); localStorage.setItem('cardOrder', JSON.stringify([...vis, ...hidden])); savedOrder = [...vis, ...hidden]; } });
     }
-</script>
-  <script>
     // ==========================================
-    // Part 4: 交易資料、Toggle 邏輯與運算核心
+    // Part 5: 交易資料、Toggle 邏輯與運算核心 (Final Fix V3)
     // ==========================================
 
     let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
@@ -1923,6 +1919,7 @@
             let bonusReward = 0;
             // 滿額門檻：需看總消費 (含背景)
             const globalTotalSpend = totalSpend + backgroundSpend;
+            let statusText = ''; let msgStyle = '';
             
             if (globalTotalSpend >= 3000) {
                 bonusReward += Math.min(petSpend, limitPet) * 0.095;
@@ -1930,11 +1927,14 @@
                 bonusReward += Math.min(peaceSpend, limitLife) * 0.035;
                 bonusReward += foreignSpend * 0.02;
                 if(globalTotalSpend >= 26000) bonusReward += 400; 
+            } else {
+                statusText = `累積欠 $${(3000 - globalTotalSpend).toLocaleString()}`;
+                msgStyle = 'color: #FF3B30;';
             }
             reward = baseReward + bonusReward;
             breakdown = { items: [ { label: '🐶 寵物 (+9.5%)', current: petSpend, max: limitPet, color: 'orange' }, { label: '🍽️ 生活 (+3.5%)', current: lifeSpend, max: limitLife, color: 'green' }, { label: '📡 安心 (+3.5%)', current: peaceSpend, max: limitLife, color: 'purple' } ] };
             const realRate = totalSpend > 0 ? ((reward / totalSpend) * 100).toFixed(1) : "0.0";
-            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: realRate, isCustom, cycleStart, cycleEnd, breakdown, petSpend, lifeSpend, peaceSpend };
+            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: realRate, isCustom, cycleStart, cycleEnd, breakdown, petSpend, lifeSpend, peaceSpend, msgDanger: statusText, msgStyle };
         }
 
         // [DBS1] 星展 Eco (國外獨立額度)
@@ -2092,14 +2092,17 @@
             return { spend: totalSpend, validSpend: monthlyBonusSpend, reward: Math.round(reward), rate: realRate, isCustom, cycleStart, cycleEnd, quarterlySpend, monthlyBonusSpend };
         }
 
-        // [J1] 富邦 J 卡 (日韓獨立額度)
+        // [J1] 富邦 J 卡 (Fix: 單筆門檻 $2000, 季上限 $33333)
         if (cardId === 'j1') {
             const txList = [...relevantTx];
             const qTxList = [...quarterTx];
+            
+            // 暫存新增的那一筆，用於計算
             if (addedAmount > 0) {
                 txList.push({ amount: addedAmount, isFubonJGeneral: addedIsFubonJGeneral });
                 qTxList.push({ amount: addedAmount, isFubonJKorea: addedIsFubonJKorea, isFubonJThai: addedIsFubonJThai, isFubonJSuica: addedIsFubonJSuica });
             }
+            
             let baseReward = 0;
             txList.forEach(t => { 
                 if(t.isFubonJGeneral) baseReward += t.amount * 0.03; 
@@ -2107,30 +2110,39 @@
             });
             
             let jkBonusTotal = 0, thaiBonusTotal = 0, suicaBonusTotal = 0;
-            let jkSpend = 0, thaiSpend = 0, suicaSpend = 0;
+            let jkQuotaUsed = 0; // 追蹤有吃到加碼的消費額 (進度條用)
             
             qTxList.forEach(t => { 
                 if(t.isFubonJKorea) { 
-                    if(t.amount >= 1000) jkBonusTotal += t.amount * 0.03; 
-                    jkSpend += t.amount; 
+                    // 單筆滿 $2000 才給 +3%
+                    if(t.amount >= 2000) {
+                        jkBonusTotal += t.amount * 0.03; 
+                        jkQuotaUsed += t.amount; 
+                    }
                 }
                 if(t.isFubonJThai) { 
+                    // 泰國規則維持單筆滿千？(原檔寫滿千) 暫不更動，若需連動可改
                     if(t.amount >= 1000) thaiBonusTotal += t.amount * 0.05; 
-                    thaiSpend += t.amount; 
                 }
                 if(t.isFubonJSuica) { 
+                    // 單筆滿 $2000 才給 +7%
                     if(t.amount >= 2000) suicaBonusTotal += t.amount * 0.07; 
-                    suicaSpend += t.amount; 
                 }
             });
             
-            jkBonusTotal = Math.min(jkBonusTotal, 1000);
-            thaiBonusTotal = Math.min(thaiBonusTotal, 1000);
-            suicaBonusTotal = Math.min(suicaBonusTotal, 200);
+            // 上限計算 (季)
+            jkBonusTotal = Math.min(jkBonusTotal, 1000);    // 約刷 $33,333
+            thaiBonusTotal = Math.min(thaiBonusTotal, 1000); 
+            suicaBonusTotal = Math.min(suicaBonusTotal, 200); // 約刷 $2,857
             
             reward = baseReward + jkBonusTotal + thaiBonusTotal + suicaBonusTotal;
+            
+            // 強制設定日韓加碼上限為 33,333
+            const quarterLimit = 33333;
+            
+            // 進度條顯示「已使用多少符合資格的加碼額度」
             const realRate = totalSpend > 0 ? ((reward / totalSpend) * 100).toFixed(1) : "0.0";
-            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: realRate, isCustom, cycleStart, cycleEnd, jkSpend, thaiSpend, suicaSpend };
+            return { spend: totalSpend, validSpend: jkQuotaUsed, reward: Math.round(reward), rate: realRate, isCustom, cycleStart, cycleEnd, customLimit: quarterLimit };
         }
 
         // J2 吉鶴卡
@@ -2204,8 +2216,10 @@
         if (cardId === 'c4') {
             const baseReward = totalSpend * 0.005;
             let bonusReward = 0;
-            // 低消：看全球消費總額
+            // 低消：看全球消費總額 (含背景)
             const globalTotal = totalSpend + backgroundSpend;
+            let statusText = ''; let msgStyle = '';
+            
             if (globalTotal >= 3000) {
                 const txList = [...relevantTx];
                 if(addedAmount > 0) txList.push({ amount: addedAmount, isJiangSelected: addedIsJiangSelected, isJiangTravel: addedIsJiangTravel });
@@ -2220,10 +2234,13 @@
                 });
                 const travelBonus = Math.min(qualifiedTravelSpend, 11111) * 0.045;
                 bonusReward = selectedBonus + travelBonus;
+            } else {
+                statusText = `累積欠 $${(3000 - globalTotal).toLocaleString()}`;
+                msgStyle = 'color: #FF3B30;';
             }
             reward = baseReward + bonusReward;
             const realRate = totalSpend > 0 ? ((reward / totalSpend) * 100).toFixed(1) : "0.0";
-            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: realRate, isCustom, cycleStart, cycleEnd };
+            return { spend: totalSpend, validSpend: totalSpend, reward: Math.round(reward), rate: realRate, isCustom, cycleStart, cycleEnd, msgDanger: statusText, msgStyle };
         }
 
         // [C2] 聯邦綠卡
@@ -2271,7 +2288,7 @@
         // 最終動態回饋率修正
         let currentRate = (card.tier1Rate || 0)*100;
         if(totalSpend>0) currentRate = (reward/totalSpend)*100;
-        return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: currentRate.toFixed(1), isCustom, cycleStart, cycleEnd };
+        return { spend: totalSpend, validSpend: validSpend, reward: Math.round(reward), rate: currentRate.toFixed(1), isCustom, cycleStart, cycleEnd, msgDanger: (typeof statusText !== 'undefined') ? statusText : undefined, msgStyle: (typeof msgStyle !== 'undefined') ? msgStyle : undefined };
     }
     function renderDetailProgress(stats) {
         const container = document.getElementById('detailProgressArea');
@@ -2343,6 +2360,7 @@
             if (stats.msgDanger) {
                 statusText = stats.msgDanger;
                 if(stats.msgDanger.includes('已封頂')) msgStyle = stats.msgStyle || 'color: #ffcccc;';
+                else if(stats.msgDanger.includes('累積欠')) msgStyle = stats.msgStyle || 'color: #FF3B30;';
             } else if (stats.validSpend < currentLimit) { 
                 const remain = currentLimit - stats.validSpend;
                 statusText = `剩 $${remain.toLocaleString()}`;
@@ -2366,7 +2384,7 @@
             }
 
             // 外幣模式下的文字轉換
-            if (currentLocation !== 'TW' && statusText.includes('$')) {
+            if (currentLocation !== 'TW' && statusText.includes('$') && !statusText.includes('累積欠')) {
                 const rate = getCurrentRate();
                 const config = LOCATION_CONFIG[currentLocation];
                 statusText = statusText.replace(/\$([\d,]+)/g, (match, p1) => {
@@ -2655,8 +2673,16 @@
     function updateRewardPreview() {
         const cardId = document.getElementById('cardIdInput').value; if (!cardId) return;
         const amountIn = parseFloat(document.getElementById('amountInput').value) || 0;
+        
         let amount = amountIn;
-        if (currentLocation !== 'TW') { amount = Math.round(amountIn * getCurrentRate()); updateTWDPreview(); }
+        
+        // 匯率顯示邏輯修正
+        if (currentLocation === 'TW') {
+            document.getElementById('twdConversionDisplay').style.display = 'none';
+        } else {
+            amount = Math.round(amountIn * getCurrentRate()); 
+            updateTWDPreview();
+        }
         
         const stats = calculateStats(cardId, amount, 
             document.getElementById('checkGreenChannel')?.checked, document.getElementById('checkForeign')?.checked,
@@ -2691,6 +2717,20 @@
             document.getElementById('happyPetRemain').innerText = (5263 - (stats.petSpend||0)) > 0 ? `(剩$${Math.floor(5263-stats.petSpend).toLocaleString()})` : '(已封頂)';
             document.getElementById('happyLifeRemain').innerText = (5714 - (stats.lifeSpend||0)) > 0 ? `(剩$${Math.floor(5714-stats.lifeSpend).toLocaleString()})` : '(已封頂)';
         }
+        
+        // 低消警語邏輯 (J 卡單筆 < 2000)
+        const warningEl = document.getElementById('thresholdWarning');
+        let showWarning = false;
+        
+        if (cardId === 'j1' && amount > 0 && amount < 2000) {
+             // 只有在勾選日韓實體或交通卡時才檢查
+             if (document.getElementById('checkFubonJKorea').checked || document.getElementById('checkFubonJSuica').checked) {
+                 showWarning = true;
+                 warningEl.innerText = "⚠️ 單筆未滿 $2,000，僅享 3% 回饋";
+             }
+        }
+        
+        warningEl.style.display = showWarning ? 'block' : 'none';
     }
 
     function checkUrgentTasks() {

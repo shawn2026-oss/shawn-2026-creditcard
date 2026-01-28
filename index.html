@@ -3351,116 +3351,107 @@
 </script>
     <script>
     // ==========================================
-    // Part 6: 管理卡片、資料備份與匯入 (V125.3 - 完整修復版)
+    // Part 6: 管理面板、匯入匯出與結尾 (V125.0)
     // ==========================================
 
     function openManageModal() {
-        const modal = document.getElementById('manageModal');
-        if (modal) {
-            modal.style.display = 'flex';
-            renderManageCards();
-            // 安全呼叫 renderScenes
-            if (typeof renderScenes === 'function') renderScenes();
-            history.pushState({ modal: true }, '');
-        }
+        renderManageList();
+        renderScenes();
+        document.getElementById('manageModal').style.display = 'flex';
+        history.pushState({ modal: true }, '');
     }
 
-    function renderManageCards() {
+    function renderManageList() {
         const container = document.getElementById('manageCardList');
-        if (!container) return;
         container.innerHTML = '';
         
-        // 安全取得 cards
-        const cardSource = (typeof cards !== 'undefined') ? cards : [];
-        const realCards = cardSource.filter(c => c.id !== 'add1');
-        
-        realCards.forEach(card => {
-            // 安全取得 visibleCards
-            const currentVisible = (typeof visibleCards !== 'undefined') ? visibleCards : [];
-            const isActive = currentVisible.includes(card.id);
+        cards.forEach(card => {
+            if (card.id === 'add1') return;
             
-            const div = document.createElement('div');
-            div.className = 'manage-card-btn' + (isActive ? ' active' : '');
+            const isActive = visibleCards.includes(card.id);
+            const nickname = cardSettings[card.id]?.nickname || '';
             
-            // 安全取得暱稱設定
-            const settings = (typeof cardSettings !== 'undefined') ? cardSettings : {};
-            const nickname = (settings[card.id]?.nickname) || card.nickname || '';
+            const btn = document.createElement('div');
+            btn.className = 'manage-card-btn' + (isActive ? ' active' : '');
+            btn.style.background = isActive ? '' : '#f5f5f5';
+            btn.setAttribute('data-card-id', card.id);
             
-            div.innerHTML = `
+            btn.innerHTML = `
                 <div class="m-check-mark">✓</div>
                 <div class="m-card-name">${card.name}</div>
-                <div class="m-card-nick">${nickname || '未設定暱稱'}</div>
-                <button class="m-setting-btn" onclick="event.stopPropagation(); openCardSettings('${card.id}')">⚙️</button>
+                <div class="m-card-nick">${nickname || card.nickname || ''}</div>
+                <div class="m-setting-btn" onclick="event.stopPropagation(); openCardSetting('${card.id}')">⚙️</div>
             `;
             
-            div.onclick = () => toggleCardVisibility(card.id);
-            container.appendChild(div);
+            btn.onclick = (e) => {
+                if (e.target.closest('.m-setting-btn')) return;
+                toggleCardVisibility(card.id);
+            };
+            
+            container.appendChild(btn);
         });
     }
 
     function toggleCardVisibility(cardId) {
-        if (typeof visibleCards === 'undefined') return;
-
-        const index = visibleCards.indexOf(cardId);
-        const realCards = visibleCards.filter(id => id !== 'add1');
+        const realCardIds = cards.map(c => c.id).filter(id => id !== 'add1');
+        let currentReal = visibleCards.filter(id => realCardIds.includes(id));
         
-        if (index > -1) {
-            visibleCards.splice(index, 1);
+        if (currentReal.includes(cardId)) {
+            currentReal = currentReal.filter(id => id !== cardId);
         } else {
-            if (realCards.length >= 8) {
-                alert('最多只能顯示 8 張卡片！');
+            if (currentReal.length >= 8) {
+                alert('最多只能顯示 8 張卡片');
                 return;
             }
-            visibleCards.push(cardId);
+            currentReal.push(cardId);
         }
         
-        const hasAdd1 = visibleCards.includes('add1');
-        const currentReal = visibleCards.filter(id => id !== 'add1');
-        
-        if (currentReal.length < 8 && !hasAdd1) {
-            visibleCards.push('add1');
-        } else if (currentReal.length >= 8 && hasAdd1) {
-            // 重新賦值需小心，這裡直接修改陣列內容比較安全，或是假設 visibleCards 是全域變數
-            const newVisible = visibleCards.filter(id => id !== 'add1');
-            visibleCards.length = 0;
-            visibleCards.push(...newVisible);
+        if (currentReal.length < 8) {
+            visibleCards = [...currentReal, 'add1'];
+        } else {
+            visibleCards = currentReal;
         }
         
         localStorage.setItem('visibleCards', JSON.stringify(visibleCards));
-        renderManageCards();
-        if (typeof renderGrid === 'function') renderGrid();
+        renderManageList();
+        renderGrid();
     }
 
-    function openCardSettings(cardId) {
-        if (typeof cardSettings === 'undefined') return;
-
+    function openCardSetting(cardId) {
+        const card = cards.find(c => c.id === cardId);
+        if (!card) return;
+        
         const currentNickname = cardSettings[cardId]?.nickname || '';
-        const newNickname = prompt('設定卡片暱稱 (例如: 日本專用卡)：', currentNickname);
+        const newNickname = prompt(`設定「${card.name}」的暱稱：`, currentNickname);
         
         if (newNickname !== null) {
             if (!cardSettings[cardId]) cardSettings[cardId] = {};
             cardSettings[cardId].nickname = newNickname.trim();
             localStorage.setItem('cardSettings', JSON.stringify(cardSettings));
-            renderManageCards();
-            if (typeof renderGrid === 'function') renderGrid();
+            renderManageList();
+            renderGrid();
         }
     }
 
     function filterManageCards() {
-        const input = document.getElementById('cardSearchInput');
-        if (!input) return;
-        
-        const query = input.value.toLowerCase();
+        const keyword = document.getElementById('cardSearchInput').value.trim().toLowerCase();
         const clearBtn = document.getElementById('btnSearchClear');
         
-        if (clearBtn) {
-            clearBtn.style.display = query ? 'flex' : 'none';
+        if (keyword) {
+            clearBtn.style.display = 'flex';
+        } else {
+            clearBtn.style.display = 'none';
         }
         
-        const cardBtns = document.querySelectorAll('.manage-card-btn');
-        cardBtns.forEach(btn => {
-            const text = btn.innerText.toLowerCase();
-            if (text.includes(query)) {
+        const allBtns = document.querySelectorAll('.manage-card-btn');
+        allBtns.forEach(btn => {
+            const cardId = btn.getAttribute('data-card-id');
+            const card = cards.find(c => c.id === cardId);
+            if (!card) return;
+            
+            const searchText = (card.name + ' ' + card.nickname + ' ' + (card.note || '')).toLowerCase();
+            
+            if (!keyword || searchText.includes(keyword)) {
                 btn.style.display = 'flex';
             } else {
                 btn.style.display = 'none';
@@ -3469,72 +3460,57 @@
     }
 
     function clearCardSearch() {
-        const input = document.getElementById('cardSearchInput');
-        const clearBtn = document.getElementById('btnSearchClear');
-        if (input) input.value = '';
-        if (clearBtn) clearBtn.style.display = 'none';
-        
-        const cardBtns = document.querySelectorAll('.manage-card-btn');
-        cardBtns.forEach(btn => btn.style.display = 'flex');
+        document.getElementById('cardSearchInput').value = '';
+        document.getElementById('btnSearchClear').style.display = 'none';
+        filterManageCards();
     }
 
     // ==========================================
-    // 資料備份與還原
+    // 匯入匯出功能
     // ==========================================
 
     function exportData() {
-        // 確保全域變數存在，避免報錯
-        const safeGet = (key) => localStorage.getItem(key) || null;
-        const safeVar = (v) => (typeof v !== 'undefined' ? v : {});
-
         const data = {
-            version: 'V125.3',
-            exportDate: new Date().toISOString(),
-            visibleCards: (typeof visibleCards !== 'undefined') ? visibleCards : [],
-            cardOrder: (typeof savedOrder !== 'undefined') ? savedOrder : [],
-            cardSettings: (typeof cardSettings !== 'undefined') ? cardSettings : {},
-            currentLocation: (typeof currentLocation !== 'undefined') ? currentLocation : 'TW',
-            exchangeRates: (typeof exchangeRates !== 'undefined') ? exchangeRates : {},
+            version: 'V125.0',
+            exportTime: new Date().toISOString(),
+            visibleCards: visibleCards,
+            cardOrder: savedOrder,
+            cardSettings: cardSettings,
             transactions: {},
             settings: {
-                uni: safeGet('uni_settings'),
-                uni_brands: safeGet('uni_brands'),
-                hsbc_tier: safeGet('hsbc_tier'),
-                hsbc_initial: safeGet('hsbc_initial'),
-                hsbc_redeemed: safeGet('hsbc_redeemed'),
-                currency_level: safeGet('currency_level'),
-                happy_used: safeGet('happy_used'),
-                scene_snapshots: safeGet('scene_snapshots')
+                current_location: currentLocation,
+                exchange_rates: exchangeRates,
+                uni_settings: localStorage.getItem('uni_settings'),
+                happy_used: localStorage.getItem('happy_used'),
+                hsbc_tier: localStorage.getItem('hsbc_tier'),
+                hsbc_initial: localStorage.getItem('hsbc_initial'),
+                hsbc_redeemed: localStorage.getItem('hsbc_redeemed'),
+                currency_level: localStorage.getItem('currency_level'),
+                uni_brands: localStorage.getItem('uni_brands'),
+                scene_snapshots: localStorage.getItem('scene_snapshots')
             }
         };
         
-        const cardSource = (typeof cards !== 'undefined') ? cards : [];
-        cardSource.forEach(card => {
-            if (card.id !== 'add1') {
-                if (typeof getTransactions === 'function') {
-                    const txs = getTransactions(card.id);
-                    if (txs.length > 0) {
-                        data.transactions[card.id] = txs;
-                    }
-                }
+        cards.forEach(card => {
+            const txs = getTransactions(card.id);
+            if (txs.length > 0) {
+                data.transactions[card.id] = txs;
             }
         });
         
-        const jsonStr = JSON.stringify(data, null, 2);
-        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `credit_card_backup_${new Date().toISOString().split('T')[0]}.json`;
-        link.click();
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `刷卡回饋管家_備份_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
         URL.revokeObjectURL(url);
         
-        alert('✅ 備份完成！檔案已下載');
+        alert('備份完成！');
     }
 
     function triggerImport() {
-        const input = document.getElementById('fileInput');
-        if (input) input.click();
+        document.getElementById('fileInput').click();
     }
 
     function importFile(input) {
@@ -3546,453 +3522,127 @@
             try {
                 const data = JSON.parse(e.target.result);
                 
-                if (!data.version) {
-                    alert('⚠️ 檔案格式不正確');
+                if (!confirm('確定要匯入備份檔？這會覆蓋目前的資料。')) {
                     return;
                 }
                 
-                if (!confirm(`確定要還原資料嗎？\n\n備份日期：${new Date(data.exportDate).toLocaleString('zh-TW')}\n版本：${data.version}\n\n⚠️ 此操作將覆蓋目前所有資料`)) {
-                    return;
+                if (data.visibleCards) {
+                    localStorage.setItem('visibleCards', JSON.stringify(data.visibleCards));
+                    visibleCards = data.visibleCards;
                 }
                 
-                if (data.visibleCards) localStorage.setItem('visibleCards', JSON.stringify(data.visibleCards));
-                if (data.cardOrder) localStorage.setItem('cardOrder', JSON.stringify(data.cardOrder));
-                if (data.cardSettings) localStorage.setItem('cardSettings', JSON.stringify(data.cardSettings));
-                if (data.currentLocation) localStorage.setItem('current_location', data.currentLocation);
-                if (data.exchangeRates) localStorage.setItem('exchange_rates', JSON.stringify(data.exchangeRates));
+                if (data.cardOrder) {
+                    localStorage.setItem('cardOrder', JSON.stringify(data.cardOrder));
+                    savedOrder = data.cardOrder;
+                }
                 
-                if (data.transactions && typeof saveTransactions === 'function') {
+                if (data.cardSettings) {
+                    localStorage.setItem('cardSettings', JSON.stringify(data.cardSettings));
+                    cardSettings = data.cardSettings;
+                }
+                
+                if (data.transactions) {
                     Object.keys(data.transactions).forEach(cardId => {
                         saveTransactions(cardId, data.transactions[cardId]);
                     });
                 }
                 
                 if (data.settings) {
-                    if (data.settings.uni) localStorage.setItem('uni_settings', data.settings.uni);
-                    if (data.settings.uni_brands) localStorage.setItem('uni_brands', data.settings.uni_brands);
-                    if (data.settings.hsbc_tier) localStorage.setItem('hsbc_tier', data.settings.hsbc_tier);
-                    if (data.settings.hsbc_initial) localStorage.setItem('hsbc_initial', data.settings.hsbc_initial);
-                    if (data.settings.hsbc_redeemed) localStorage.setItem('hsbc_redeemed', data.settings.hsbc_redeemed);
-                    if (data.settings.currency_level) localStorage.setItem('currency_level', data.settings.currency_level);
-                    if (data.settings.happy_used) localStorage.setItem('happy_used', data.settings.happy_used);
-                    if (data.settings.scene_snapshots) localStorage.setItem('scene_snapshots', data.settings.scene_snapshots);
+                    if (data.settings.current_location) {
+                        localStorage.setItem('current_location', data.settings.current_location);
+                        currentLocation = data.settings.current_location;
+                    }
+                    if (data.settings.exchange_rates) {
+                        localStorage.setItem('exchange_rates', JSON.stringify(data.settings.exchange_rates));
+                        exchangeRates = data.settings.exchange_rates;
+                    }
+                    if (data.settings.uni_settings) {
+                        localStorage.setItem('uni_settings', data.settings.uni_settings);
+                    }
+                    if (data.settings.happy_used) {
+                        localStorage.setItem('happy_used', data.settings.happy_used);
+                    }
+                    if (data.settings.hsbc_tier) {
+                        localStorage.setItem('hsbc_tier', data.settings.hsbc_tier);
+                    }
+                    if (data.settings.hsbc_initial) {
+                        localStorage.setItem('hsbc_initial', data.settings.hsbc_initial);
+                    }
+                    if (data.settings.hsbc_redeemed) {
+                        localStorage.setItem('hsbc_redeemed', data.settings.hsbc_redeemed);
+                    }
+                    if (data.settings.currency_level) {
+                        localStorage.setItem('currency_level', data.settings.currency_level);
+                    }
+                    if (data.settings.uni_brands) {
+                        localStorage.setItem('uni_brands', data.settings.uni_brands);
+                    }
+                    if (data.settings.scene_snapshots) {
+                        localStorage.setItem('scene_snapshots', data.settings.scene_snapshots);
+                    }
                 }
                 
-                alert('✅ 資料還原成功！頁面即將重新載入');
+                alert('匯入成功！頁面將重新載入。');
                 location.reload();
                 
-            } catch (error) {
-                console.error('Import error:', error);
-                alert('❌ 讀檔失敗：檔案格式錯誤');
+            } catch (err) {
+                alert('匯入失敗：檔案格式錯誤\n' + err.message);
             }
         };
-        
         reader.readAsText(file);
+        
         input.value = '';
     }
 
     function resetAllData() {
-        if (!confirm('⚠️ 確定要重置所有資料嗎？\n\n此操作將清除：\n• 所有卡片消費紀錄\n• 卡片顯示設定\n• 情境快照\n• 所有個人化設定\n\n此操作無法復原！')) {
+        if (!confirm('⚠️ 確定要重置所有資料？\n\n這將清除：\n• 所有消費記錄\n• 卡片設定\n• 情境快照\n\n此操作無法復原！')) {
             return;
         }
         
-        if (!confirm('⚠️ 最後確認：真的要清除所有資料嗎？')) {
+        if (!confirm('再次確認：真的要刪除所有資料嗎？')) {
             return;
         }
         
         const keysToRemove = [];
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
-            if (key) keysToRemove.push(key);
+            if (key.startsWith('transactions_') || 
+                key === 'visibleCards' || 
+                key === 'cardOrder' || 
+                key === 'cardSettings' ||
+                key === 'user_setup_done' ||
+                key === 'scene_snapshots' ||
+                key === 'uni_settings' ||
+                key === 'happy_used' ||
+                key === 'hsbc_tier' ||
+                key === 'hsbc_initial' ||
+                key === 'hsbc_redeemed' ||
+                key === 'currency_level' ||
+                key === 'uni_brands' ||
+                key === 'current_location' ||
+                key === 'exchange_rates' ||
+                key === 'last_rate_update') {
+                keysToRemove.push(key);
+            }
         }
+        
         keysToRemove.forEach(key => localStorage.removeItem(key));
         
-        alert('✅ 資料已重置！頁面即將重新載入');
+        alert('資料已重置！頁面將重新載入。');
         location.reload();
     }
 
     // ==========================================
-    // J1 富邦J卡額度追蹤（當地貨幣顯示）
+    // Service Worker 註冊
     // ==========================================
 
-    function getFubonJQuotaUsed() {
-        if (typeof getCurrentCycleTransactions !== 'function') return { jpkrRemain: 0, thRemain: 0, suicaRemain: 0 };
-        
-        const txs = getCurrentCycleTransactions('j1');
-        
-        let jpkrSpent = 0;
-        let thSpent = 0;
-        let physicalReward = 0;
-        
-        let suicaSpent = 0;
-        let suicaReward = 0;
-        
-        const physicalCap = 1000;
-        const suicaCap = 200;
-        const jpkrLimit = 33333;
-        const thLimit = 20000;
-        const suicaLimit = 2857;
-        
-        txs.sort((a, b) => new Date(a.timestamp || a.date) - new Date(b.timestamp || b.date));
-        
-        txs.forEach(tx => {
-            const amount = tx.amountTWD || tx.amount || 0;
-            const bonus = tx.fubonJBonus || 'none';
-            
-            if (bonus === 'jpkr_physical' && amount >= 1000) {
-                if (jpkrSpent < jpkrLimit && physicalReward < physicalCap) {
-                    const canSpend = Math.min(amount, jpkrLimit - jpkrSpent);
-                    const potentialReward = Math.floor(canSpend * 0.03);
-                    const canEarn = Math.min(potentialReward, physicalCap - physicalReward);
-                    
-                    const actualSpend = Math.floor(canEarn / 0.03);
-                    jpkrSpent += actualSpend;
-                    physicalReward += canEarn;
-                }
-            } else if (bonus === 'th_physical' && amount >= 1000) {
-                if (thSpent < thLimit && physicalReward < physicalCap) {
-                    const canSpend = Math.min(amount, thLimit - thSpent);
-                    const potentialReward = Math.floor(canSpend * 0.05);
-                    const canEarn = Math.min(potentialReward, physicalCap - physicalReward);
-                    
-                    const actualSpend = Math.floor(canEarn / 0.05);
-                    thSpent += actualSpend;
-                    physicalReward += canEarn;
-                }
-            } else if (bonus === 'suica' && amount >= 2000) {
-                if (suicaSpent < suicaLimit && suicaReward < suicaCap) {
-                    const canSpend = Math.min(amount, suicaLimit - suicaSpent);
-                    const potentialReward = Math.floor(canSpend * 0.07);
-                    const canEarn = Math.min(potentialReward, suicaCap - suicaReward);
-                    
-                    const actualSpend = Math.floor(canEarn / 0.07);
-                    suicaSpent += actualSpend;
-                    suicaReward += canEarn;
-                }
-            }
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('SW registered'))
+                .catch(err => console.log('SW registration failed'));
         });
-        
-        return {
-            jpkrSpent: jpkrSpent,
-            jpkrRemain: Math.max(0, jpkrLimit - jpkrSpent),
-            thSpent: thSpent,
-            thRemain: Math.max(0, thLimit - thSpent),
-            physicalReward: physicalReward,
-            physicalRemain: Math.max(0, physicalCap - physicalReward),
-            suicaSpent: suicaSpent,
-            suicaRemain: Math.max(0, suicaLimit - suicaSpent),
-            suicaReward: suicaReward
-        };
     }
-
-    function renderDetailProgressArea(cardId) {
-        const area = document.getElementById('detailProgressArea');
-        if (!area) return;
-        
-        // 僅 J1 卡顯示
-        if (cardId !== 'j1') {
-            area.style.display = 'none';
-            return;
-        }
-
-        // 安全檢查
-        if (typeof getFubonJQuotaUsed !== 'function' || typeof getCurrentRate !== 'function' || typeof getCurrencySign !== 'function') {
-            return;
-        }
-
-        try {
-            const quota = getFubonJQuotaUsed();
-            const rate = getCurrentRate();
-            const currentLoc = (typeof currentLocation !== 'undefined') ? currentLocation : 'TW';
-            const currencySign = getCurrencySign(LOCATION_CONFIG[currentLoc].currency);
-            
-            const jpkrRemainLocal = Math.floor(quota.jpkrRemain / rate);
-            const thRemainLocal = Math.floor(quota.thRemain / rate);
-            const suicaRemainLocal = Math.floor(quota.suicaRemain / rate);
-            
-            const isTW = (currentLoc === 'TW');
-            
-            area.innerHTML = `
-                <div style="font-size: 12px; color: #555; line-height: 1.8; padding: 4px 0; background: #f9f9f9; border-radius: 6px; margin-top: 5px;">
-                    📊 <b>本季可刷額度</b><br>
-                    🇯🇵🇰🇷 日韓：${isTW ? '可再刷 $'+quota.jpkrRemain.toLocaleString() : '可再刷 '+currencySign+jpkrRemainLocal.toLocaleString()}<br>
-                    🇹🇭 泰國：${isTW ? '可再刷 $'+quota.thRemain.toLocaleString() : '可再刷 '+currencySign+thRemainLocal.toLocaleString()}<br>
-                    🍎 交通：${isTW ? '可再刷 $'+quota.suicaRemain.toLocaleString() : '可再刷 '+currencySign+suicaRemainLocal.toLocaleString()}
-                </div>
-            `;
-            area.style.display = 'block';
-        } catch (e) {
-            console.error('Render progress error:', e);
-        }
-    }
-
-    // --- 關鍵修正：Open Card Modal Wrapper ---
-    if (typeof openCardModal === 'function' && !openCardModal.isWrapped) {
-        const originalOpenCardModal = openCardModal;
-        openCardModal = function(cardId) {
-            originalOpenCardModal(cardId);
-            if (typeof renderDetailProgressArea === 'function') {
-                renderDetailProgressArea(cardId);
-            }
-        };
-        openCardModal.isWrapped = true;
-    }
-
-    function calculateFubonJStats() {
-        if (typeof getCurrentCycleTransactions !== 'function' || typeof getFubonJQuotaUsed !== 'function') return { spent: 0, reward: 0, progress: 0, msg: '' };
-
-        const txs = getCurrentCycleTransactions('j1');
-        const quota = getFubonJQuotaUsed();
-        
-        let totalSpent = 0;
-        let totalBaseReward = 0;
-        
-        txs.forEach(tx => {
-            const amount = tx.amountTWD || tx.amount || 0;
-            totalSpent += amount;
-            
-            // 需要 extractOptionsFromTx 存在
-            const options = (typeof extractOptionsFromTx === 'function') ? extractOptionsFromTx('j1', tx) : {};
-            const region = options.region || 'domestic';
-            
-            let baseRate = 0.01;
-            if (region === 'jpkr') baseRate = 0.03;
-            else if (region === 'th') baseRate = 0.01;
-            
-            totalBaseReward += Math.floor(amount * baseRate);
-        });
-        
-        const totalReward = totalBaseReward + quota.physicalReward + quota.suicaReward;
-        const progress = 50; // 固定值或可改為計算
-        
-        let msg = '';
-        const rate = (typeof getCurrentRate === 'function') ? getCurrentRate() : 1;
-        const currentLoc = (typeof currentLocation !== 'undefined') ? currentLocation : 'TW';
-        const currencySign = (typeof getCurrencySign === 'function') ? getCurrencySign(LOCATION_CONFIG[currentLoc].currency) : '$';
-        
-        const jpkrAvail = quota.jpkrRemain > 0;
-        const thAvail = quota.thRemain > 0;
-        const suicaAvail = quota.suicaRemain > 0;
-        
-        if (!jpkrAvail && !thAvail && !suicaAvail) {
-            msg = '所有額度已封頂';
-        } else {
-            const parts = [];
-            if (jpkrAvail || thAvail) {
-                const maxRemain = Math.max(quota.jpkrRemain, quota.thRemain);
-                if (currentLoc === 'TW') {
-                    parts.push(`實體剩$${maxRemain.toLocaleString()}`);
-                } else {
-                    const maxRemainLocal = Math.floor(maxRemain / rate);
-                    parts.push(`實體剩${currencySign}${maxRemainLocal.toLocaleString()}`);
-                }
-            } else {
-                parts.push('實體封頂');
-            }
-            if (suicaAvail) {
-                if (currentLoc === 'TW') {
-                    parts.push(`交通剩$${quota.suicaRemain.toLocaleString()}`);
-                } else {
-                    const suicaRemainLocal = Math.floor(quota.suicaRemain / rate);
-                    parts.push(`交通剩${currencySign}${suicaRemainLocal.toLocaleString()}`);
-                }
-            } else {
-                parts.push('交通封頂');
-            }
-            msg = parts.join('｜');
-        }
-        
-        return { spent: totalSpent, reward: totalReward, progress: progress, msg: msg };
-    }
-
-    function calculateSingleRewardWithQuota(cardId, amount, options) {
-        if (typeof calculateSingleReward !== 'function') return { reward: 0, rate: 0, warningMsg: '', afterMsg: '' };
-
-        if (cardId !== 'j1') {
-            const result = calculateSingleReward(cardId, amount, options);
-            return { ...result, warningMsg: '', afterMsg: '' };
-        }
-        
-        const region = options.region || 'domestic';
-        const bonus = options.bonus || 'none';
-        const quota = getFubonJQuotaUsed();
-        const rate = (typeof getCurrentRate === 'function') ? getCurrentRate() : 1;
-        const currentLoc = (typeof currentLocation !== 'undefined') ? currentLocation : 'TW';
-        const currencySign = (typeof getCurrencySign === 'function') ? getCurrencySign(LOCATION_CONFIG[currentLoc].currency) : '$';
-        
-        let baseRate = 0.01;
-        if (region === 'jpkr') baseRate = 0.03;
-        else if (region === 'th') baseRate = 0.01;
-        
-        let totalReward = 0;
-        let finalRate = baseRate;
-        let warningMsg = '';
-        let afterMsg = '';
-        
-        // --- 邏輯保持原樣，僅簡化重複結構 ---
-        // 這裡直接引用傳入的完整邏輯，確保計算無誤
-        if (bonus === 'jpkr_physical') {
-            if (amount < 1000) {
-                warningMsg = '⚠️ 未達低消門檻 $1,000';
-                totalReward = Math.floor(amount * baseRate);
-            } else {
-                const available = quota.jpkrRemain;
-                if (available <= 0) {
-                    warningMsg = '⚠️ 日韓額度已封頂，僅享基礎 3%';
-                    totalReward = Math.floor(amount * 0.03);
-                    finalRate = 0.03;
-                } else if (amount > available) {
-                    const withinLimit = available;
-                    const exceed = amount - available;
-                    const baseWithin = Math.floor(withinLimit * 0.03);
-                    const bonusWithin = Math.floor(withinLimit * 0.03);
-                    const baseExceed = Math.floor(exceed * 0.03);
-                    totalReward = baseWithin + bonusWithin + baseExceed;
-                    finalRate = totalReward / amount;
-                    const availDisplay = (currentLoc === 'TW') ? `$${available.toLocaleString()}` : `${currencySign}${Math.floor(available/rate).toLocaleString()}`;
-                    warningMsg = `⚠️ 僅剩 ${availDisplay} 額度，超過部分無加碼`;
-                    afterMsg = '📊 刷完後日韓額度歸零';
-                } else {
-                    totalReward = Math.floor(amount * 0.06);
-                    finalRate = 0.06;
-                    const remainAfter = available - amount;
-                    const remainDisplay = (currentLoc === 'TW') ? `$${remainAfter.toLocaleString()}` : `${currencySign}${Math.floor(remainAfter/rate).toLocaleString()}`;
-                    afterMsg = `📊 刷完後日韓可再刷 ${remainDisplay}`;
-                }
-            }
-        } else if (bonus === 'th_physical') {
-             if (amount < 1000) {
-                warningMsg = '⚠️ 未達低消門檻 $1,000';
-                totalReward = Math.floor(amount * baseRate);
-            } else {
-                const available = quota.thRemain;
-                if (available <= 0) {
-                    warningMsg = '⚠️ 泰國額度已封頂，僅享基礎 1%';
-                    totalReward = Math.floor(amount * 0.01);
-                    finalRate = 0.01;
-                } else if (amount > available) {
-                    const withinLimit = available;
-                    const exceed = amount - available;
-                    const baseWithin = Math.floor(withinLimit * 0.01);
-                    const bonusWithin = Math.floor(withinLimit * 0.05);
-                    const baseExceed = Math.floor(exceed * 0.01);
-                    totalReward = baseWithin + bonusWithin + baseExceed;
-                    finalRate = totalReward / amount;
-                    const availDisplay = (currentLoc === 'TW') ? `$${available.toLocaleString()}` : `${currencySign}${Math.floor(available/rate).toLocaleString()}`;
-                    warningMsg = `⚠️ 僅剩 ${availDisplay} 額度，超過部分無加碼`;
-                    afterMsg = '📊 刷完後泰國額度歸零';
-                } else {
-                    totalReward = Math.floor(amount * 0.06);
-                    finalRate = 0.06;
-                    const remainAfter = available - amount;
-                    const remainDisplay = (currentLoc === 'TW') ? `$${remainAfter.toLocaleString()}` : `${currencySign}${Math.floor(remainAfter/rate).toLocaleString()}`;
-                    afterMsg = `📊 刷完後泰國可再刷 ${remainDisplay}`;
-                }
-            }
-        } else if (bonus === 'suica') {
-            if (amount < 2000) {
-                warningMsg = '⚠️ 未達低消門檻 $2,000';
-                totalReward = Math.floor(amount * baseRate);
-            } else {
-                const available = quota.suicaRemain;
-                if (available <= 0) {
-                    warningMsg = '⚠️ 交通卡額度已封頂，僅享基礎 3%';
-                    totalReward = Math.floor(amount * 0.03);
-                    finalRate = 0.03;
-                } else if (amount > available) {
-                    const withinLimit = available;
-                    const exceed = amount - available;
-                    const baseWithin = Math.floor(withinLimit * 0.03);
-                    const bonusWithin = Math.floor(withinLimit * 0.07);
-                    const baseExceed = Math.floor(exceed * 0.03);
-                    totalReward = baseWithin + bonusWithin + baseExceed;
-                    finalRate = totalReward / amount;
-                    const availDisplay = (currentLoc === 'TW') ? `$${available.toLocaleString()}` : `${currencySign}${Math.floor(available/rate).toLocaleString()}`;
-                    warningMsg = `⚠️ 僅剩 ${availDisplay} 額度，超過部分無加碼`;
-                    afterMsg = '📊 刷完後交通額度歸零';
-                } else {
-                    totalReward = Math.floor(amount * 0.10);
-                    finalRate = 0.10;
-                    const remainAfter = available - amount;
-                    const remainDisplay = (currentLoc === 'TW') ? `$${remainAfter.toLocaleString()}` : `${currencySign}${Math.floor(remainAfter/rate).toLocaleString()}`;
-                    afterMsg = `📊 刷完後交通可再刷 ${remainDisplay}`;
-                }
-            }
-        } else {
-            totalReward = Math.floor(amount * baseRate);
-            finalRate = baseRate;
-        }
-        
-        return { reward: totalReward, rate: finalRate, warningMsg: warningMsg, afterMsg: afterMsg };
-    }
-
-    // --- 關鍵修正：Update Preview Wrapper ---
-    if (typeof updateRewardPreview === 'function' && !updateRewardPreview.isWrapped) {
-        const originalUpdateRewardPreview = updateRewardPreview;
-        updateRewardPreview = function() {
-            const cardIdInput = document.getElementById('cardIdInput');
-            if (!cardIdInput) return;
-            
-            const cardId = cardIdInput.value;
-            const amountInput = document.getElementById('amountInput');
-            const amount = parseFloat(amountInput ? amountInput.value : 0) || 0;
-            const liveCalc = document.getElementById('liveRewardCalc');
-            
-            if (amount <= 0) {
-                if (liveCalc) liveCalc.style.display = 'none';
-                if (cardId === 'j1') {
-                    if (typeof checkFubonJMinSpend === 'function') checkFubonJMinSpend();
-                    renderDetailProgressArea(cardId);
-                }
-                return;
-            }
-            
-            if (cardId === 'j1') {
-                const rate = (typeof getCurrentRate === 'function') ? getCurrentRate() : 1;
-                const amountTWD = Math.round(amount * rate);
-                const options = (typeof getTransactionOptions === 'function') ? getTransactionOptions(cardId) : {};
-                
-                const result = calculateSingleRewardWithQuota(cardId, amountTWD, options);
-                
-                if (liveCalc) {
-                    let displayHtml = `預估獲得 <b>$${result.reward}</b> 回饋 (${(result.rate * 100).toFixed(1)}%)`;
-                    if (result.afterMsg) displayHtml += `<br><span style="font-size:11px; color:#666;">${result.afterMsg}</span>`;
-                    liveCalc.innerHTML = displayHtml;
-                    liveCalc.style.display = 'block';
-                }
-                
-                const warningEl = document.getElementById('fubonJMinSpendWarning');
-                if (warningEl) {
-                    if (result.warningMsg) {
-                        warningEl.innerHTML = result.warningMsg;
-                        warningEl.style.display = 'block';
-                    } else {
-                        warningEl.style.display = 'none';
-                    }
-                }
-                renderDetailProgressArea(cardId);
-                
-                // 仍執行一次 updateTWDPreview
-                if (typeof updateTWDPreview === 'function') updateTWDPreview();
-                
-            } else {
-                originalUpdateRewardPreview();
-            }
-        };
-        updateRewardPreview.isWrapped = true;
-    }
-
-    // --- 關鍵修正：Delete Transaction Wrapper ---
-    if (typeof deleteTransaction === 'function' && !deleteTransaction.isWrapped) {
-        const originalDeleteTransaction = deleteTransaction;
-        deleteTransaction = function(cardId, txId, shouldRender = true) {
-            originalDeleteTransaction(cardId, txId, shouldRender);
-            if (shouldRender && cardId === 'j1') {
-                renderDetailProgressArea(cardId);
-            }
-        };
-        deleteTransaction.isWrapped = true;
-    }
-
-    console.log('✅ V125.3 系統載入完成 - 完整功能與安全修正版');
 </script>
+</body>
+</html>

@@ -2417,7 +2417,7 @@
 </script>
     <script>
     // ==========================================
-    // Part 5: addTransaction、統計計算與 Grid 渲染 (V125.1 修正版)
+    // Part 5: addTransaction、統計計算與 Grid 渲染 (V125.2)
     // ==========================================
 
     function addTransaction(closeAfter = true) {
@@ -2444,20 +2444,15 @@
             note: note,
             date: dateVal,
             timestamp: new Date().toISOString(),
-            // C6 豬富卡
             isBonus10: document.getElementById('checkBonus10')?.checked || false,
             isBonus25: document.getElementById('checkBonus25')?.checked || false,
             isBill: document.getElementById('checkIsBill')?.checked || false,
-            // C5 賴點卡
             isLaiDianNew: document.getElementById('checkLaiDianNew')?.checked || false,
             laiDianMode: document.querySelector('input[name="laiDianMode"]:checked')?.value || 'general',
-            // C2 綠卡
             isGreenChannel: document.getElementById('checkGreenChannel')?.checked || false,
             isForeign: document.getElementById('checkForeign')?.checked || false,
-            // C7 UNI卡
             isUniUp: document.getElementById('checkUniUp')?.checked || false,
             isUniBonus: document.getElementById('checkUniBonus')?.checked || false,
-            // C8 樂家+卡
             isHappyPet: document.getElementById('checkHappyPet')?.checked || false,
             isHappyLife: document.getElementById('checkHappyLife')?.checked || false,
             isHappyPeace: document.getElementById('checkHappyPeace')?.checked || false,
@@ -2469,44 +2464,32 @@
                 if (document.getElementById('checkHappyForeign')?.checked) return 'foreign';
                 return 'general';
             })(),
-            // C9 旅人卡
             isHsbcForeign: document.getElementById('checkHsbcForeign')?.checked || false,
             hsbcTier: document.querySelector('input[name="hsbcTier"]:checked')?.value || 'infinite',
-            // C10 UniOpen卡
             isUniGroup: document.getElementById('checkUniGroup')?.checked || false,
             isUniIcash: document.getElementById('checkUniIcash')?.checked || false,
             isUniOverseas: document.getElementById('checkUniOverseas')?.checked || false,
             uniBrandCount: document.querySelectorAll('#uniBrandGrid .brand-btn.active').length,
-            // C11 Richart卡
             richartMode: document.querySelector('input[name="richartMode"]:checked')?.value || 'general',
-            // J1 富邦J卡
             fubonJRegion: document.querySelector('input[name="fubonJRegion"]:checked')?.value || 'domestic',
             fubonJBonus: document.querySelector('input[name="fubonJBonus"]:checked')?.value || 'none',
-            // J2 吉鶴卡
             isJiheJapan: document.getElementById('checkJiheJapan')?.checked || false,
             isJiheApple: document.getElementById('checkJiheApple')?.checked || false,
             isJiheDomesticJapanese: document.getElementById('checkJiheDomesticJapanese')?.checked || false,
-            // J3 熊本熊卡
             isKumamonJapan: document.getElementById('checkKumamonJapan')?.checked || false,
             isKumamonDesignated: document.getElementById('checkKumamonDesignated')?.checked || false,
             isKumamonPayPay: document.getElementById('checkKumamonPayPay')?.checked || false,
-            // J4 幣倍卡
             currencyLevel: document.querySelector('input[name="currencyLevel"]:checked')?.value || 'low',
             isCurrencySelected: document.querySelector('input[name="currencyType"]:checked')?.value === 'selected',
-            // J5 三井卡
             isSinopacMitsuiSelected: document.getElementById('checkSinopacMitsuiSelected')?.checked || false,
             isSinopacMitsuiTarget: document.getElementById('checkSinopacMitsuiTarget')?.checked || false,
-            // C12 JCB卡
             isSinopacJcbForeign: document.getElementById('checkSinopacJcbForeign')?.checked || false,
             isSinopacJcbBonus: document.getElementById('checkSinopacJcbBonus')?.checked || false,
             isSinopacJcbQuarterly: document.getElementById('checkSinopacJcbQuarterly')?.checked || false,
-            // C4 將將卡
             jiangMode: document.querySelector('input[name="jiangMode"]:checked')?.value || 'base',
-            // DBS1 eco卡
             isDbsLinePay: document.getElementById('checkDbsLinePay')?.checked || false,
             isDbsGreen: document.getElementById('checkDbsGreen')?.checked || false,
             isDbsForeign: document.getElementById('checkDbsForeign')?.checked || false,
-            // C1 傳說對決卡
             isLegendBonus: document.getElementById('checkLegendBonus')?.checked || false
         };
         
@@ -2514,9 +2497,7 @@
         txs.push(tx);
         saveTransactions(cardId, txs);
         
-        if (cardId === 'c8') {
-            updateHappyUsed(tx);
-        }
+        if (cardId === 'c8') updateHappyUsed(tx);
         
         renderGrid();
         renderModalHistory(cardId);
@@ -2546,7 +2527,6 @@
         } else if (tx.isHappyPeace || tx.happyMode === 'peace') {
             used[cycleKey].peace += Math.floor(amount * 0.035);
         }
-        
         localStorage.setItem('happy_used', JSON.stringify(used));
     }
 
@@ -2573,10 +2553,15 @@
             const txDate = parseFlexibleDate(tx.date);
             const dateStr = txDate ? txDate.toLocaleDateString('zh-TW', { month: 'short', day: 'numeric' }) : '';
             const amount = tx.amountTWD || tx.amount || 0;
-            const currencySymbol = tx.currency || 'TWD';
-            const displayAmount = (tx.currency && tx.currency !== 'TWD' && tx.amount) ? 
-                `${currencySymbol} ${tx.amount.toLocaleString()} (≈$${amount.toLocaleString()})` : 
-                `$${amount.toLocaleString()}`;
+            const txLoc = tx.location || tx.loc || 'TW';
+            const currency = tx.currency || LOCATION_CONFIG[txLoc]?.currency || 'TWD';
+            
+            let displayAmount;
+            if (txLoc === 'TW' || currency === 'TWD') {
+                displayAmount = `${amount.toLocaleString()} 元`;
+            } else {
+                displayAmount = `${(tx.amount || amount).toLocaleString()} ${currency}`;
+            }
             
             div.innerHTML = `
                 <div style="flex:1;" onclick="editTransaction('${cardId}', ${tx.id})">
@@ -2590,23 +2575,17 @@
         });
     }
 
-    // 日期格式容錯處理
     function parseFlexibleDate(dateStr) {
         if (!dateStr) return null;
-        
-        // 已經是 Date 物件
         if (dateStr instanceof Date) return dateStr;
         
-        // ISO 格式 2025-01-15 或 2025-01-15T00:00:00
         let d = new Date(dateStr);
         if (!isNaN(d.getTime())) return d;
         
-        // 斜線格式 2025/01/15
         if (typeof dateStr === 'string' && dateStr.includes('/')) {
             d = new Date(dateStr.replace(/\//g, '-'));
             if (!isNaN(d.getTime())) return d;
         }
-        
         return null;
     }
 
@@ -2617,7 +2596,11 @@
         
         document.getElementById('amountInput').value = tx.amount;
         document.getElementById('noteInput').value = tx.note || '';
-        if (tx.date) document.getElementById('dateInput').value = tx.date;
+        
+        const txDate = parseFlexibleDate(tx.date);
+        if (txDate) {
+            document.getElementById('dateInput').value = txDate.toISOString().split('T')[0];
+        }
         
         deleteTransaction(cardId, txId, false);
         updateRewardPreview();
@@ -2635,24 +2618,36 @@
     }
 
     // ==========================================
+    // 金額格式化函數
+    // ==========================================
+    
+    function formatAmountWithCurrency(amountTWD) {
+        if (currentLocation === 'TW') {
+            return `${amountTWD.toLocaleString()} 元`;
+        } else {
+            const rate = getCurrentRate();
+            const foreignAmount = Math.round(amountTWD / rate);
+            return `${foreignAmount.toLocaleString()} ${LOCATION_CONFIG[currentLocation].currency}`;
+        }
+    }
+
+    // ==========================================
     // 額度追蹤函數
     // ==========================================
     
-    // 取得卡片累積消費金額 (用於封頂檢查)
-    function getCardSpentAmount(cardId, filterFn = null) {
+    function getCardBonusSpent(cardId, filterFn) {
         const txs = getCurrentCycleTransactions(cardId);
         let total = 0;
         txs.forEach(tx => {
-            if (filterFn && !filterFn(tx)) return;
-            total += (tx.amountTWD || tx.amount || 0);
+            if (filterFn(tx)) {
+                total += (tx.amountTWD || tx.amount || 0);
+            }
         });
         return total;
     }
 
-    // J1 富邦J卡額度追蹤
     function getFubonJQuotaUsed() {
         const txs = getCurrentCycleTransactions('j1');
-        let physicalUsed = 0, suicaUsed = 0;
         let physicalSpent = 0, suicaSpent = 0;
         
         txs.forEach(tx => {
@@ -2660,134 +2655,79 @@
             const bonus = tx.fubonJBonus || 'none';
             
             if (bonus === 'jpkr_physical' && amount >= 1000) {
-                physicalUsed += Math.floor(amount * 0.03);
                 physicalSpent += amount;
             } else if (bonus === 'th_physical' && amount >= 1000) {
-                physicalUsed += Math.floor(amount * 0.05);
                 physicalSpent += amount;
             } else if (bonus === 'suica' && amount >= 2000) {
-                suicaUsed += Math.floor(amount * 0.07);
                 suicaSpent += amount;
             }
         });
         
+        // 封頂金額 (消費金額)
+        const physicalLimit = 33333; // 日韓實體刷 33,333 可拿 1,000 回饋
+        const suicaLimit = 2857;     // 交通卡刷 2,857 可拿 200 回饋
+        
         return {
-            physicalUsed, physicalCapped: Math.min(physicalUsed, 1000),
-            physicalRemain: Math.max(0, 1000 - physicalUsed), physicalSpent,
-            suicaUsed, suicaCapped: Math.min(suicaUsed, 200),
-            suicaRemain: Math.max(0, 200 - suicaUsed), suicaSpent
+            physicalSpent,
+            physicalLimit,
+            physicalRemain: Math.max(0, physicalLimit - physicalSpent),
+            suicaSpent,
+            suicaLimit,
+            suicaRemain: Math.max(0, suicaLimit - suicaSpent)
         };
     }
 
     // ==========================================
-    // 統計計算函數
+    // 統計計算
     // ==========================================
 
-    function calculateStats(cardId, locationFilter = null) {
+    function calculateStats(cardId) {
         const card = cards.find(c => c.id === cardId);
         if (!card || card.type === 'placeholder') return { spent: 0, reward: 0, progress: 0, msg: '' };
         
         if (cardId === 'j1') return calculateFubonJStats();
         
-        let txs = getCurrentCycleTransactions(cardId);
-        if (locationFilter) txs = txs.filter(tx => tx.location === locationFilter);
-        
+        const txs = getCurrentCycleTransactions(cardId);
         let totalSpent = 0, totalReward = 0;
-        let bonusSpent = 0; // 追蹤加碼消費
         
-        // 先計算加碼消費金額
         txs.forEach(tx => {
             const amount = tx.amountTWD || tx.amount || 0;
             totalSpent += amount;
-            if (isBonusTransaction(cardId, tx)) {
-                bonusSpent += amount;
-            }
-        });
-        
-        // 再計算回饋 (含封頂邏輯)
-        let runningBonusSpent = 0;
-        txs.forEach(tx => {
-            const amount = tx.amountTWD || tx.amount || 0;
-            const options = extractOptionsFromTx(cardId, tx);
-            const isBonus = isBonusTransaction(cardId, tx);
-            const limit = getCardBonusLimit(cardId, tx);
-            
-            // 計算此筆交易前的累積加碼消費
-            let prevBonusSpent = runningBonusSpent;
-            if (isBonus) runningBonusSpent += amount;
-            
-            // 計算回饋
-            const result = calculateTxRewardWithCap(cardId, amount, options, tx, prevBonusSpent, limit);
+            const result = calculateTxRewardWithCap(cardId, tx);
             totalReward += result.reward;
         });
         
-        // 計算進度條
         let progress = 0, msg = '';
         const limit = card.limit || 99999999;
         
-        if (card.type === 'ceiling' || card.type === 'custom_happy' || card.type === 'custom_legend' || card.type === 'custom_mitsui' || card.type === 'mixed') {
-            progress = Math.min(100, (bonusSpent / limit) * 100);
-            if (bonusSpent >= limit) {
+        if (card.type === 'ceiling' || card.type === 'custom_happy' || card.type === 'custom_legend' || card.type === 'mixed') {
+            progress = Math.min(100, (totalSpent / limit) * 100);
+            if (totalSpent >= limit) {
                 msg = card.msgDanger || '已封頂';
             } else {
-                msg = `可再刷 $${(limit - bonusSpent).toLocaleString()}`;
+                const remainTWD = limit - totalSpent;
+                msg = `可再刷 ${formatAmountWithCurrency(remainTWD)}`;
             }
         } else if (card.type === 'floor') {
             const target = card.target || 0;
             progress = Math.min(100, (totalSpent / target) * 100);
-            msg = totalSpent >= target ? (card.msgSuccess || '已達標') : `差 $${(target - totalSpent).toLocaleString()} 達標`;
+            if (totalSpent >= target) {
+                msg = card.msgSuccess || '已達標';
+            } else {
+                const remainTWD = target - totalSpent;
+                msg = `差 ${formatAmountWithCurrency(remainTWD)} 達標`;
+            }
         } else if (card.type === 'miles') {
             msg = '累積中';
             progress = 50;
-        } else if (card.type === 'uniopen_special') {
-            msg = `本期已刷 $${totalSpent.toLocaleString()}`;
+        } else if (card.type === 'uniopen_special' || card.type === 'custom_mitsui') {
+            msg = `本期已刷 ${formatAmountWithCurrency(totalSpent)}`;
             progress = 50;
         }
         
         return { spent: totalSpent, reward: totalReward, progress, msg };
     }
 
-    // 判斷是否為加碼交易
-    function isBonusTransaction(cardId, tx) {
-        if (cardId === 'c1') return tx.isLegendBonus && tx.location === 'TW';
-        if (cardId === 'c6') return tx.isBonus10 || tx.isBonus25;
-        if (cardId === 'c5') return tx.laiDianMode === 'even' || tx.laiDianMode === 'lp';
-        if (cardId === 'c2') return tx.isGreenChannel;
-        if (cardId === 'c7') return true; // UNI卡全部都算加碼
-        if (cardId === 'j2') return tx.isJiheApple || tx.isJiheDomesticJapanese;
-        if (cardId === 'j3') return tx.isKumamonDesignated || tx.isKumamonPayPay;
-        if (cardId === 'j4') return tx.isCurrencySelected;
-        if (cardId === 'c12') return tx.isSinopacJcbBonus;
-        if (cardId === 'dbs1') return tx.isDbsLinePay || tx.isDbsGreen || tx.isDbsForeign;
-        return false;
-    }
-
-    // 取得卡片加碼封頂金額
-    function getCardBonusLimit(cardId, tx) {
-        const card = cards.find(c => c.id === cardId);
-        if (!card) return 99999999;
-        
-        // 特殊情況
-        if (cardId === 'c6') {
-            if (tx?.isBonus10) return 8000;
-            if (tx?.isBonus25) return 400000;
-        }
-        if (cardId === 'c5') {
-            if (tx?.laiDianMode === 'even') return 3000;
-            if (tx?.laiDianMode === 'lp') return 20000;
-        }
-        if (cardId === 'c7') {
-            return tx?.isUniUp ? 140000 : 40000;
-        }
-        if (cardId === 'j2') {
-            if (tx?.isJiheApple) return 40000;
-            if (tx?.isJiheDomesticJapanese) return 12500;
-        }
-        
-        return card.limit || 99999999;
-    }
-
-    // J1 富邦J卡統計
     function calculateFubonJStats() {
         const txs = getCurrentCycleTransactions('j1');
         const quota = getFubonJQuotaUsed();
@@ -2797,511 +2737,342 @@
         txs.forEach(tx => {
             const amount = tx.amountTWD || tx.amount || 0;
             totalSpent += amount;
-            
             const region = tx.fubonJRegion || 'domestic';
-            let baseRate = (region === 'jpkr') ? 0.03 : 0.01;
+            const baseRate = (region === 'jpkr') ? 0.03 : 0.01;
             totalReward += Math.floor(amount * baseRate);
         });
         
-        totalReward += quota.physicalCapped + quota.suicaCapped;
+        // 加碼回饋 (封頂後不再累加)
+        const physicalBonusRate = 0.03; // 簡化：取日韓 3%
+        const suicaBonusRate = 0.07;
+        const physicalBonus = Math.min(Math.floor(quota.physicalSpent * physicalBonusRate), 1000);
+        const suicaBonus = Math.min(Math.floor(quota.suicaSpent * suicaBonusRate), 200);
+        totalReward += physicalBonus + suicaBonus;
         
-        const physicalLimit = 33333;
-        const progress = Math.min(100, (quota.physicalSpent / physicalLimit) * 100);
+        const progress = Math.min(100, (quota.physicalSpent / quota.physicalLimit) * 100);
         
+        // 訊息顯示 (用消費金額)
         let msg = '';
-        if (quota.physicalRemain <= 0 && quota.suicaRemain <= 0) {
+        const physicalCapped = quota.physicalRemain <= 0;
+        const suicaCapped = quota.suicaRemain <= 0;
+        
+        if (physicalCapped && suicaCapped) {
             msg = '加碼皆已封頂';
-        } else if (quota.physicalRemain <= 0) {
-            msg = `實體封頂｜交通剩$${quota.suicaRemain}`;
-        } else if (quota.suicaRemain <= 0) {
-            msg = `交通封頂｜實體剩$${quota.physicalRemain}`;
+        } else if (physicalCapped) {
+            msg = `實體封頂｜交通可再刷 ${formatAmountWithCurrency(quota.suicaRemain)}`;
+        } else if (suicaCapped) {
+            msg = `可再刷 ${formatAmountWithCurrency(quota.physicalRemain)}｜交通封頂`;
         } else {
-            msg = `實體剩$${quota.physicalRemain}｜交通剩$${quota.suicaRemain}`;
+            msg = `可再刷 ${formatAmountWithCurrency(quota.physicalRemain)}｜交通 ${formatAmountWithCurrency(quota.suicaRemain)}`;
         }
         
         return { spent: totalSpent, reward: totalReward, progress, msg };
     }
 
     function calculateStatsAllLocations(cardId) {
-        const card = cards.find(c => c.id === cardId);
-        if (!card || card.type === 'placeholder') return { spent: 0, reward: 0 };
-        if (cardId === 'j1') return calculateFubonJStats();
-        
-        return calculateStats(cardId, null);
+        return calculateStats(cardId);
     }
 
-    // 從交易記錄提取選項
-    function extractOptionsFromTx(cardId, tx) {
-        const options = {};
-        const txLocation = tx?.location || 'TW';
-        
-        if (cardId === 'c6') {
-            options.isBonus10 = tx.isBonus10 || false;
-            options.isBonus25 = tx.isBonus25 || false;
-            options.isBill = tx.isBill || false;
-            options.location = txLocation;
-        }
-        else if (cardId === 'c5') {
-            options.isNew = tx.isLaiDianNew || false;
-            options.mode = tx.laiDianMode || 'general';
-            options.location = txLocation;
-        }
-        else if (cardId === 'c2') {
-            options.isGreen = tx.isGreenChannel || false;
-            options.isForeign = tx.isForeign || false;
-        }
-        else if (cardId === 'c7') {
-            options.isUp = tx.isUniUp || false;
-            options.isBonus = tx.isUniBonus || false;
-            options.location = txLocation;
-        }
-        else if (cardId === 'c8') {
-            options.isPet = tx.isHappyPet || tx.happyMode === 'pet';
-            options.isLife = tx.isHappyLife || tx.happyMode === 'life';
-            options.isPeace = tx.isHappyPeace || tx.happyMode === 'peace';
-            options.isForeign = tx.isHappyForeign || tx.happyMode === 'foreign';
-        }
-        else if (cardId === 'c9') {
-            options.isForeign = tx.isHsbcForeign || false;
-            options.tier = tx.hsbcTier || 'infinite';
-        }
-        else if (cardId === 'c10') {
-            options.isGroup = tx.isUniGroup || false;
-            options.isIcash = tx.isUniIcash || false;
-            options.isOverseas = tx.isUniOverseas || false;
-            options.brandCount = tx.uniBrandCount || 0;
-        }
-        else if (cardId === 'c11') {
-            options.mode = tx.richartMode || 'general';
-        }
-        else if (cardId === 'j1') {
-            options.region = tx.fubonJRegion || 'domestic';
-            options.bonus = tx.fubonJBonus || 'none';
-        }
-        else if (cardId === 'j2') {
-            options.isJapan = tx.isJiheJapan || false;
-            options.isApple = tx.isJiheApple || false;
-            options.isDomesticJapanese = tx.isJiheDomesticJapanese || false;
-        }
-        else if (cardId === 'j3') {
-            options.isJapan = tx.isKumamonJapan || false;
-            options.isDesignated = tx.isKumamonDesignated || false;
-            options.isPayPay = tx.isKumamonPayPay || false;
-        }
-        else if (cardId === 'j4') {
-            options.level = tx.currencyLevel || 'low';
-            options.isSelected = tx.isCurrencySelected || false;
-        }
-        else if (cardId === 'j5') {
-            options.isSelected = tx.isSinopacMitsuiSelected || false;
-            options.isTarget = tx.isSinopacMitsuiTarget || false;
-        }
-        else if (cardId === 'c12') {
-            options.isForeign = tx.isSinopacJcbForeign || false;
-            options.isBonus = tx.isSinopacJcbBonus || false;
-            options.isQuarterly = tx.isSinopacJcbQuarterly || false;
-        }
-        else if (cardId === 'c4') {
-            options.mode = tx.jiangMode || 'base';
-        }
-        else if (cardId === 'dbs1') {
-            options.isLinePay = tx.isDbsLinePay || false;
-            options.isGreen = tx.isDbsGreen || false;
-            options.isForeign = tx.isDbsForeign || false;
-        }
-        else if (cardId === 'c1') {
-            options.isBonus = tx.isLegendBonus || false;
-            options.location = txLocation;
-        }
-        
-        return options;
-    }
+    // ==========================================
+    // 單筆回饋計算 (含封頂)
+    // ==========================================
 
-    // 計算單筆交易回饋 (含封頂邏輯)
-    function calculateTxRewardWithCap(cardId, amount, options, tx, prevBonusSpent, limit) {
+    function calculateTxRewardWithCap(cardId, tx) {
         const card = cards.find(c => c.id === cardId);
         if (!card) return { reward: 0, rate: 0 };
         
-        const txLocation = tx?.location || 'TW';
-        let baseRate = 0, bonusRate = 0;
+        const amount = tx.amountTWD || tx.amount || 0;
+        const txLocation = tx.location || tx.loc || 'TW';
         
-        // ===== C1 傳說對決卡 =====
+        // C1 傳說對決卡
         if (cardId === 'c1') {
-            baseRate = 0.012;
-            if (options.isBonus && txLocation === 'TW') {
-                if (prevBonusSpent < limit) {
-                    const availableForBonus = Math.min(amount, limit - prevBonusSpent);
-                    const bonusReward = Math.floor(availableForBonus * 0.088);
-                    const baseReward = Math.floor(amount * baseRate);
-                    return { reward: baseReward + bonusReward, rate: (baseReward + bonusReward) / amount };
+            const baseReward = Math.floor(amount * 0.012);
+            if (tx.isLegendBonus && txLocation === 'TW') {
+                const bonusSpent = getCardBonusSpent(cardId, t => t.isLegendBonus && (t.location || t.loc || 'TW') === 'TW' && t.id < tx.id);
+                const limit = 11363;
+                if (bonusSpent < limit) {
+                    const available = Math.min(amount, limit - bonusSpent);
+                    return { reward: baseReward + Math.floor(available * 0.088), rate: 0.10 };
                 }
             }
-            return { reward: Math.floor(amount * baseRate), rate: baseRate };
+            return { reward: baseReward, rate: 0.012 };
         }
         
-        // ===== C6 豬富卡 =====
+        // C6 豬富卡
         if (cardId === 'c6') {
-            if (options.isBill) {
-                return { reward: Math.floor(amount * 0.0015), rate: 0.0015 };
-            }
-            baseRate = 0.01;
-            let totalReward = Math.floor(amount * baseRate);
+            if (tx.isBill) return { reward: Math.floor(amount * 0.0015), rate: 0.0015 };
             
-            // 新戶 10%
-            if (options.isBonus10) {
-                const bonus10Limit = 8000;
-                const bonus10Spent = getCardSpentAmount(cardId, t => t.isBonus10);
-                if (bonus10Spent < bonus10Limit) {
-                    const availableForBonus = Math.min(amount, bonus10Limit - bonus10Spent);
-                    totalReward += Math.floor(availableForBonus * 0.10);
+            let totalReward = Math.floor(amount * 0.01);
+            
+            if (tx.isBonus10) {
+                const bonusSpent = getCardBonusSpent(cardId, t => t.isBonus10 && t.id < tx.id);
+                if (bonusSpent < 8000) {
+                    totalReward += Math.floor(Math.min(amount, 8000 - bonusSpent) * 0.10);
                 }
             }
-            // 精選 2.5%
-            if (options.isBonus25) {
-                const bonus25Limit = 400000;
-                const bonus25Spent = getCardSpentAmount(cardId, t => t.isBonus25);
-                if (bonus25Spent < bonus25Limit) {
-                    const availableForBonus = Math.min(amount, bonus25Limit - bonus25Spent);
+            if (tx.isBonus25) {
+                const bonusSpent = getCardBonusSpent(cardId, t => t.isBonus25 && t.id < tx.id);
+                if (bonusSpent < 400000) {
                     const bonusRate = (txLocation === 'JP') ? 0.01 : 0.025;
-                    totalReward += Math.floor(availableForBonus * bonusRate);
+                    totalReward += Math.floor(Math.min(amount, 400000 - bonusSpent) * bonusRate);
                 }
             }
             return { reward: totalReward, rate: totalReward / amount };
         }
         
-        // ===== C5 賴點卡 =====
+        // C5 賴點卡
         if (cardId === 'c5') {
-            baseRate = 0.01;
-            if (txLocation !== 'TW') {
-                return { reward: Math.floor(amount * baseRate), rate: baseRate };
-            }
+            let totalReward = Math.floor(amount * 0.01);
+            if (txLocation !== 'TW') return { reward: totalReward, rate: 0.01 };
             
-            let totalReward = Math.floor(amount * baseRate);
-            
-            if (options.mode === 'lp') {
-                // LP +1% (限2萬)
-                const lpSpent = getCardSpentAmount(cardId, t => t.laiDianMode === 'lp');
-                if (lpSpent < 20000) {
-                    totalReward += Math.floor(Math.min(amount, 20000 - lpSpent) * 0.01);
+            const mode = tx.laiDianMode || 'general';
+            if (mode === 'lp') {
+                const lpSpent = getCardBonusSpent(cardId, t => t.laiDianMode === 'lp' && t.id < tx.id);
+                if (lpSpent < 20000) totalReward += Math.floor(Math.min(amount, 20000 - lpSpent) * 0.01);
+                if (tx.isLaiDianNew) {
+                    const newSpent = getCardBonusSpent(cardId, t => t.laiDianMode === 'lp' && t.isLaiDianNew && t.id < tx.id);
+                    if (newSpent < 7500) totalReward += Math.floor(Math.min(amount, 7500 - newSpent) * 0.04);
                 }
-                // 新戶 +4% (限7500)
-                if (options.isNew) {
-                    const newSpent = getCardSpentAmount(cardId, t => t.laiDianMode === 'lp' && t.isLaiDianNew);
-                    if (newSpent < 7500) {
-                        totalReward += Math.floor(Math.min(amount, 7500 - newSpent) * 0.04);
-                    }
-                }
-            } else if (options.mode === 'even') {
-                // 偶數日 +5% (限3000)
-                const evenSpent = getCardSpentAmount(cardId, t => t.laiDianMode === 'even');
-                if (evenSpent < 3000) {
-                    totalReward += Math.floor(Math.min(amount, 3000 - evenSpent) * 0.05);
-                }
+            } else if (mode === 'even') {
+                const evenSpent = getCardBonusSpent(cardId, t => t.laiDianMode === 'even' && t.id < tx.id);
+                if (evenSpent < 3000) totalReward += Math.floor(Math.min(amount, 3000 - evenSpent) * 0.05);
             }
             return { reward: totalReward, rate: totalReward / amount };
         }
         
-        // ===== C2 綠卡 =====
+        // C2 綠卡
         if (cardId === 'c2') {
-            if (options.isForeign) {
-                return { reward: Math.floor(amount * 0.02), rate: 0.02 };
-            }
-            baseRate = 0.01;
-            if (options.isGreen) {
-                const greenSpent = getCardSpentAmount(cardId, t => t.isGreenChannel);
+            if (tx.isForeign) return { reward: Math.floor(amount * 0.02), rate: 0.02 };
+            if (tx.isGreenChannel) {
+                const greenSpent = getCardBonusSpent(cardId, t => t.isGreenChannel && t.id < tx.id);
                 if (greenSpent < 3000) {
-                    const availableForBonus = Math.min(amount, 3000 - greenSpent);
-                    const reward = Math.floor(amount * baseRate) + Math.floor(availableForBonus * 0.05);
-                    return { reward, rate: reward / amount };
+                    const available = Math.min(amount, 3000 - greenSpent);
+                    return { reward: Math.floor(amount * 0.01) + Math.floor(available * 0.05), rate: 0.06 };
                 }
             }
-            return { reward: Math.floor(amount * baseRate), rate: baseRate };
+            return { reward: Math.floor(amount * 0.01), rate: 0.01 };
         }
         
-        // ===== C7 UNI卡 =====
+        // C7 UNI卡
         if (cardId === 'c7') {
-            if (txLocation !== 'TW') {
-                return { reward: Math.floor(amount * 0.01), rate: 0.01 };
-            }
+            if (txLocation !== 'TW') return { reward: Math.floor(amount * 0.01), rate: 0.01 };
             
-            const uniLimit = options.isUp ? 140000 : 40000;
-            const uniRate = options.isUp ? 0.045 : 0.035;
-            const uniSpent = getCardSpentAmount(cardId, t => t.location === 'TW');
+            const isUp = tx.isUniUp;
+            const limit = isUp ? 140000 : 40000;
+            const rate = isUp ? 0.045 : 0.035;
+            const spent = getCardBonusSpent(cardId, t => (t.location || t.loc || 'TW') === 'TW' && t.id < tx.id);
             
             let totalReward = 0;
-            if (uniSpent < uniLimit) {
-                const availableForBonus = Math.min(amount, uniLimit - uniSpent);
-                totalReward = Math.floor(availableForBonus * uniRate);
-                const remaining = amount - availableForBonus;
-                if (remaining > 0) totalReward += Math.floor(remaining * 0.01);
+            if (spent < limit) {
+                const available = Math.min(amount, limit - spent);
+                totalReward = Math.floor(available * rate) + Math.floor((amount - available) * 0.01);
             } else {
                 totalReward = Math.floor(amount * 0.01);
             }
             
-            // 統一時代任務 +3%
-            if (options.isBonus) {
-                const bonusSpent = getCardSpentAmount(cardId, t => t.isUniBonus);
-                if (bonusSpent < 16000) {
-                    totalReward += Math.floor(Math.min(amount, 16000 - bonusSpent) * 0.03);
-                }
+            if (tx.isUniBonus) {
+                const bonusSpent = getCardBonusSpent(cardId, t => t.isUniBonus && t.id < tx.id);
+                if (bonusSpent < 16000) totalReward += Math.floor(Math.min(amount, 16000 - bonusSpent) * 0.03);
             }
             return { reward: totalReward, rate: totalReward / amount };
         }
         
-        // ===== C8 樂家+卡 =====
+        // C8 樂家+卡
         if (cardId === 'c8') {
-            baseRate = 0.005;
-            let totalReward = Math.floor(amount * baseRate);
-            
-            if (options.isForeign) {
+            let totalReward = Math.floor(amount * 0.005);
+            if (tx.isHappyForeign || tx.happyMode === 'foreign') {
                 totalReward += Math.floor(amount * 0.02);
-            } else if (options.isPet) {
-                const petSpent = getCardSpentAmount(cardId, t => t.isHappyPet || t.happyMode === 'pet');
-                if (petSpent < 5263) {
-                    totalReward += Math.floor(Math.min(amount, 5263 - petSpent) * 0.095);
-                }
-            } else if (options.isLife) {
-                const lifeSpent = getCardSpentAmount(cardId, t => t.isHappyLife || t.happyMode === 'life');
-                if (lifeSpent < 5714) {
-                    totalReward += Math.floor(Math.min(amount, 5714 - lifeSpent) * 0.035);
-                }
-            } else if (options.isPeace) {
-                const peaceSpent = getCardSpentAmount(cardId, t => t.isHappyPeace || t.happyMode === 'peace');
-                if (peaceSpent < 5714) {
-                    totalReward += Math.floor(Math.min(amount, 5714 - peaceSpent) * 0.035);
-                }
+            } else if (tx.isHappyPet || tx.happyMode === 'pet') {
+                const petSpent = getCardBonusSpent(cardId, t => (t.isHappyPet || t.happyMode === 'pet') && t.id < tx.id);
+                if (petSpent < 5263) totalReward += Math.floor(Math.min(amount, 5263 - petSpent) * 0.095);
+            } else if (tx.isHappyLife || tx.happyMode === 'life') {
+                const lifeSpent = getCardBonusSpent(cardId, t => (t.isHappyLife || t.happyMode === 'life') && t.id < tx.id);
+                if (lifeSpent < 5714) totalReward += Math.floor(Math.min(amount, 5714 - lifeSpent) * 0.035);
+            } else if (tx.isHappyPeace || tx.happyMode === 'peace') {
+                const peaceSpent = getCardBonusSpent(cardId, t => (t.isHappyPeace || t.happyMode === 'peace') && t.id < tx.id);
+                if (peaceSpent < 5714) totalReward += Math.floor(Math.min(amount, 5714 - peaceSpent) * 0.035);
             }
             return { reward: totalReward, rate: totalReward / amount };
         }
         
-        // ===== C9 旅人卡 =====
+        // C9 旅人卡
         if (cardId === 'c9') {
-            const tier = options.tier || 'infinite';
-            const milesPerDollar = options.isForeign ? (tier === 'infinite' ? 10 : 15) : 18;
-            const reward = Math.floor(amount / milesPerDollar);
-            return { reward, rate: 1 / milesPerDollar };
+            const tier = tx.hsbcTier || 'infinite';
+            const milesPerDollar = tx.isHsbcForeign ? (tier === 'infinite' ? 10 : 15) : 18;
+            return { reward: Math.floor(amount / milesPerDollar), rate: 1 / milesPerDollar };
         }
         
-        // ===== C10 UniOpen卡 =====
+        // C10 UniOpen卡
         if (cardId === 'c10') {
-            baseRate = 0.01;
-            let bonusRate = 0;
-            
-            if (options.isOverseas) {
-                // 海外 11% (限6250)
-                const overseasSpent = getCardSpentAmount(cardId, t => t.isUniOverseas);
+            let totalReward = Math.floor(amount * 0.01);
+            if (tx.isUniOverseas) {
+                const overseasSpent = getCardBonusSpent(cardId, t => t.isUniOverseas && t.id < tx.id);
                 if (overseasSpent < 6250) {
-                    const availableForBonus = Math.min(amount, 6250 - overseasSpent);
-                    const reward = Math.floor(availableForBonus * 0.11) + Math.floor((amount - availableForBonus) * 0.01);
-                    return { reward, rate: reward / amount };
+                    const available = Math.min(amount, 6250 - overseasSpent);
+                    return { reward: Math.floor(available * 0.11) + Math.floor((amount - available) * 0.01), rate: 0.11 };
                 }
-                return { reward: Math.floor(amount * 0.01), rate: 0.01 };
+                return { reward: totalReward, rate: 0.01 };
             }
-            
-            let totalReward = Math.floor(amount * baseRate);
-            
-            if (options.isGroup) {
-                const groupSpent = getCardSpentAmount(cardId, t => t.isUniGroup);
-                if (groupSpent < 25000) {
-                    totalReward += Math.floor(Math.min(amount, 25000 - groupSpent) * 0.02);
-                }
+            if (tx.isUniGroup) {
+                const groupSpent = getCardBonusSpent(cardId, t => t.isUniGroup && t.id < tx.id);
+                if (groupSpent < 25000) totalReward += Math.floor(Math.min(amount, 25000 - groupSpent) * 0.02);
             }
-            if (options.isIcash) {
-                const icashSpent = getCardSpentAmount(cardId, t => t.isUniIcash);
-                if (icashSpent < 3750) {
-                    totalReward += Math.floor(Math.min(amount, 3750 - icashSpent) * 0.04);
-                }
+            if (tx.isUniIcash) {
+                const icashSpent = getCardBonusSpent(cardId, t => t.isUniIcash && t.id < tx.id);
+                if (icashSpent < 3750) totalReward += Math.floor(Math.min(amount, 3750 - icashSpent) * 0.04);
             }
-            
-            // 踩點任務
-            const brandCount = options.brandCount || 0;
-            let taskRate = 0;
-            if (brandCount >= 5) taskRate = 0.04;
-            else if (brandCount >= 4) taskRate = 0.03;
-            else if (brandCount >= 3) taskRate = 0.02;
-            else if (brandCount >= 2) taskRate = 0.01;
+            const brandCount = tx.uniBrandCount || 0;
+            let taskRate = brandCount >= 5 ? 0.04 : brandCount >= 4 ? 0.03 : brandCount >= 3 ? 0.02 : brandCount >= 2 ? 0.01 : 0;
             if (taskRate > 0) {
-                const taskSpent = getCardSpentAmount(cardId, t => (t.uniBrandCount || 0) >= 2);
-                if (taskSpent < 12500) {
-                    totalReward += Math.floor(Math.min(amount, 12500 - taskSpent) * taskRate);
-                }
+                const taskSpent = getCardBonusSpent(cardId, t => (t.uniBrandCount || 0) >= 2 && t.id < tx.id);
+                if (taskSpent < 12500) totalReward += Math.floor(Math.min(amount, 12500 - taskSpent) * taskRate);
             }
-            
             return { reward: totalReward, rate: totalReward / amount };
         }
         
-        // ===== C11 Richart卡 =====
+        // C11 Richart卡
         if (cardId === 'c11') {
-            const mode = options.mode || 'general';
+            const mode = tx.richartMode || (tx.isRichartPay ? 'pay' : tx.isRichartOnline ? 'online' : tx.isRichartLine ? 'line' : tx.isRichartOverseas ? 'overseas' : 'general');
             const rates = { general: 0.003, pay: 0.038, online: 0.033, line: 0.023, overseas: 0.033 };
             const rate = rates[mode] || 0.003;
             return { reward: Math.floor(amount * rate), rate };
         }
         
-        // ===== J1 富邦J卡 =====
+        // J1 富邦J卡 (基礎回饋，加碼在 calculateFubonJStats 處理)
         if (cardId === 'j1') {
-            const region = options.region || 'domestic';
-            baseRate = (region === 'jpkr') ? 0.03 : 0.01;
+            const region = tx.fubonJRegion || 'domestic';
+            const baseRate = (region === 'jpkr') ? 0.03 : 0.01;
             return { reward: Math.floor(amount * baseRate), rate: baseRate };
         }
         
-        // ===== J2 吉鶴卡 =====
+        // J2 吉鶴卡
         if (cardId === 'j2') {
-            if (options.isJapan) {
-                baseRate = 0.025;
-                let totalReward = Math.floor(amount * baseRate);
-                if (options.isApple && amount >= 500) {
-                    const appleSpent = getCardSpentAmount(cardId, t => t.isJiheJapan && t.isJiheApple);
-                    if (appleSpent < 40000) {
-                        totalReward += Math.floor(Math.min(amount, 40000 - appleSpent) * 0.015);
-                    }
+            if (tx.isJiheJapan) {
+                let totalReward = Math.floor(amount * 0.025);
+                if (tx.isJiheApple && amount >= 500) {
+                    const appleSpent = getCardBonusSpent(cardId, t => t.isJiheJapan && t.isJiheApple && t.id < tx.id);
+                    if (appleSpent < 40000) totalReward += Math.floor(Math.min(amount, 40000 - appleSpent) * 0.015);
                 }
                 return { reward: totalReward, rate: totalReward / amount };
             } else {
-                baseRate = 0.01;
-                let totalReward = Math.floor(amount * baseRate);
-                if (options.isDomesticJapanese && amount >= 500) {
-                    const djSpent = getCardSpentAmount(cardId, t => t.isJiheDomesticJapanese);
-                    if (djSpent < 12500) {
-                        totalReward += Math.floor(Math.min(amount, 12500 - djSpent) * 0.04);
-                    }
-                }
-                if (options.isApple && !options.isDomesticJapanese && amount >= 500) {
-                    const appleSpent = getCardSpentAmount(cardId, t => !t.isJiheJapan && t.isJiheApple);
-                    if (appleSpent < 40000) {
-                        totalReward += Math.floor(Math.min(amount, 40000 - appleSpent) * 0.015);
-                    }
+                let totalReward = Math.floor(amount * 0.01);
+                if (tx.isJiheDomesticJapanese && amount >= 500) {
+                    const djSpent = getCardBonusSpent(cardId, t => t.isJiheDomesticJapanese && t.id < tx.id);
+                    if (djSpent < 12500) totalReward += Math.floor(Math.min(amount, 12500 - djSpent) * 0.04);
                 }
                 return { reward: totalReward, rate: totalReward / amount };
             }
         }
         
-        // ===== J3 熊本熊卡 =====
+        // J3 熊本熊卡
         if (cardId === 'j3') {
-            if (options.isPayPay) {
-                const paypaySpent = getCardSpentAmount(cardId, t => t.isKumamonPayPay);
+            if (tx.isKumamonPayPay) {
+                const paypaySpent = getCardBonusSpent(cardId, t => t.isKumamonPayPay && t.id < tx.id);
                 if (paypaySpent < 2857) {
-                    const reward = Math.floor(Math.min(amount, 2857 - paypaySpent) * 0.05);
-                    return { reward, rate: reward / amount };
+                    return { reward: Math.floor(Math.min(amount, 2857 - paypaySpent) * 0.05), rate: 0.05 };
                 }
                 return { reward: Math.floor(amount * 0.025), rate: 0.025 };
             }
-            
-            if (options.isJapan) {
-                baseRate = 0.025;
-                let totalReward = Math.floor(amount * baseRate);
-                if (options.isDesignated) {
-                    const designatedSpent = getCardSpentAmount(cardId, t => t.isKumamonJapan && t.isKumamonDesignated);
-                    if (designatedSpent < 8333) {
-                        totalReward += Math.floor(Math.min(amount, 8333 - designatedSpent) * 0.06);
-                    }
+            if (tx.isKumamonJapan) {
+                let totalReward = Math.floor(amount * 0.025);
+                if (tx.isKumamonDesignated) {
+                    const designatedSpent = getCardBonusSpent(cardId, t => t.isKumamonJapan && t.isKumamonDesignated && t.id < tx.id);
+                    if (designatedSpent < 8333) totalReward += Math.floor(Math.min(amount, 8333 - designatedSpent) * 0.06);
                 }
                 return { reward: totalReward, rate: totalReward / amount };
             }
             return { reward: Math.floor(amount * 0.005), rate: 0.005 };
         }
         
-        // ===== J4 幣倍卡 =====
+        // J4 幣倍卡
         if (cardId === 'j4') {
-            baseRate = 0.01;
-            if (options.isSelected) {
-                const level = options.level || 'low';
+            if (tx.isCurrencySelected || tx.isSinopacCurrencySelected) {
+                const level = tx.currencyLevel || 'low';
                 const limit = (level === 'high') ? 20000 : 7500;
-                const selectedSpent = getCardSpentAmount(cardId, t => t.isCurrencySelected);
+                const selectedSpent = getCardBonusSpent(cardId, t => (t.isCurrencySelected || t.isSinopacCurrencySelected) && t.id < tx.id);
                 if (selectedSpent < limit) {
-                    const availableForBonus = Math.min(amount, limit - selectedSpent);
-                    const reward = Math.floor(availableForBonus * 0.06) + Math.floor((amount - availableForBonus) * 0.01);
-                    return { reward, rate: reward / amount };
+                    const available = Math.min(amount, limit - selectedSpent);
+                    return { reward: Math.floor(available * 0.06) + Math.floor((amount - available) * 0.01), rate: 0.06 };
                 }
             }
-            return { reward: Math.floor(amount * baseRate), rate: baseRate };
+            return { reward: Math.floor(amount * 0.01), rate: 0.01 };
         }
         
-        // ===== J5 三井卡 =====
+        // J5 三井卡
         if (cardId === 'j5') {
-            baseRate = 0.003;
-            if (options.isSelected) {
-                const selectedSpent = getCardSpentAmount(cardId, t => t.isSinopacMitsuiSelected);
+            if (tx.isSinopacMitsuiSelected) {
+                const selectedSpent = getCardBonusSpent(cardId, t => t.isSinopacMitsuiSelected && t.id < tx.id);
                 if (selectedSpent < 1428) {
-                    const reward = Math.floor(Math.min(amount, 1428 - selectedSpent) * 0.073);
-                    return { reward, rate: reward / amount };
+                    return { reward: Math.floor(Math.min(amount, 1428 - selectedSpent) * 0.073), rate: 0.073 };
                 }
             }
-            return { reward: Math.floor(amount * baseRate), rate: baseRate };
+            return { reward: Math.floor(amount * 0.003), rate: 0.003 };
         }
         
-        // ===== C12 JCB卡 =====
+        // C12 JCB卡
         if (cardId === 'c12') {
-            baseRate = options.isForeign ? 0.02 : 0.01;
+            const baseRate = (tx.isSinopacJcbForeign || tx.isSinopacJcbJapan) ? 0.02 : 0.01;
             let totalReward = Math.floor(amount * baseRate);
-            
-            if (options.isBonus) {
-                const bonusSpent = getCardSpentAmount(cardId, t => t.isSinopacJcbBonus);
-                if (bonusSpent < 10000) {
-                    totalReward += Math.floor(Math.min(amount, 10000 - bonusSpent) * 0.03);
-                }
+            if (tx.isSinopacJcbBonus || tx.isSinopacJcbJapan) {
+                const bonusSpent = getCardBonusSpent(cardId, t => (t.isSinopacJcbBonus || t.isSinopacJcbJapan) && t.id < tx.id);
+                if (bonusSpent < 10000) totalReward += Math.floor(Math.min(amount, 10000 - bonusSpent) * 0.03);
             }
             return { reward: totalReward, rate: totalReward / amount };
         }
         
-        // ===== C4 將將卡 =====
+        // C4 將將卡
         if (cardId === 'c4') {
-            baseRate = 0.005;
-            if (options.mode === 'selected') {
-                const selectedSpent = getCardSpentAmount(cardId, t => t.jiangMode === 'selected');
+            const mode = tx.jiangMode || (tx.isJiangSelected ? 'selected' : tx.isJiangTravel ? 'travel' : 'base');
+            if (mode === 'selected') {
+                const selectedSpent = getCardBonusSpent(cardId, t => (t.jiangMode === 'selected' || t.isJiangSelected) && t.id < tx.id);
                 if (selectedSpent < 6666) {
-                    const reward = Math.floor(Math.min(amount, 6666 - selectedSpent) * 0.05);
-                    return { reward, rate: reward / amount };
+                    return { reward: Math.floor(Math.min(amount, 6666 - selectedSpent) * 0.05), rate: 0.05 };
                 }
-            } else if (options.mode === 'travel') {
-                const travelSpent = getCardSpentAmount(cardId, t => t.jiangMode === 'travel');
+            } else if (mode === 'travel') {
+                const travelSpent = getCardBonusSpent(cardId, t => (t.jiangMode === 'travel' || t.isJiangTravel) && t.id < tx.id);
                 if (travelSpent < 11111) {
-                    const reward = Math.floor(Math.min(amount, 11111 - travelSpent) * 0.05);
-                    return { reward, rate: reward / amount };
+                    return { reward: Math.floor(Math.min(amount, 11111 - travelSpent) * 0.05), rate: 0.05 };
                 }
             }
-            return { reward: Math.floor(amount * baseRate), rate: baseRate };
+            return { reward: Math.floor(amount * 0.005), rate: 0.005 };
         }
         
-        // ===== DBS1 eco卡 =====
+        // DBS1 eco卡
         if (cardId === 'dbs1') {
-            baseRate = 0.01;
-            
-            if (options.isLinePay) {
-                const lpSpent = getCardSpentAmount(cardId, t => t.isDbsLinePay);
+            if (tx.isDbsLinePay) {
+                const lpSpent = getCardBonusSpent(cardId, t => t.isDbsLinePay && t.id < tx.id);
                 if (lpSpent < 11111) {
-                    const reward = Math.floor(Math.min(amount, 11111 - lpSpent) * 0.10);
-                    return { reward, rate: reward / amount };
+                    return { reward: Math.floor(Math.min(amount, 11111 - lpSpent) * 0.10), rate: 0.10 };
                 }
-                return { reward: Math.floor(amount * baseRate), rate: baseRate };
             }
-            if (options.isGreen) {
-                const greenSpent = getCardSpentAmount(cardId, t => t.isDbsGreen);
+            if (tx.isDbsGreen) {
+                const greenSpent = getCardBonusSpent(cardId, t => t.isDbsGreen && t.id < tx.id);
                 if (greenSpent < 3333) {
-                    const reward = Math.floor(Math.min(amount, 3333 - greenSpent) * 0.10);
-                    return { reward, rate: reward / amount };
+                    return { reward: Math.floor(Math.min(amount, 3333 - greenSpent) * 0.10), rate: 0.10 };
                 }
-                return { reward: Math.floor(amount * baseRate), rate: baseRate };
             }
-            if (options.isForeign) {
-                const foreignSpent = getCardSpentAmount(cardId, t => t.isDbsForeign);
+            if (tx.isDbsForeign) {
+                const foreignSpent = getCardBonusSpent(cardId, t => t.isDbsForeign && t.id < tx.id);
                 if (foreignSpent < 15000) {
-                    const reward = Math.floor(Math.min(amount, 15000 - foreignSpent) * 0.05);
-                    return { reward, rate: reward / amount };
+                    return { reward: Math.floor(Math.min(amount, 15000 - foreignSpent) * 0.05), rate: 0.05 };
                 }
-                return { reward: Math.floor(amount * baseRate), rate: baseRate };
             }
-            return { reward: Math.floor(amount * baseRate), rate: baseRate };
+            return { reward: Math.floor(amount * 0.01), rate: 0.01 };
         }
         
-        // 其他卡片
+        // C3 Sport卡
+        if (cardId === 'c3') {
+            const spent = getCardBonusSpent(cardId, t => t.id < tx.id);
+            if (spent < 5000) {
+                const available = Math.min(amount, 5000 - spent);
+                return { reward: Math.floor(available * 0.05) + Math.floor((amount - available) * 0.02), rate: 0.05 };
+            }
+            return { reward: Math.floor(amount * 0.02), rate: 0.02 };
+        }
+        
+        // 預設
         const rate = card.tier1Rate || 0.01;
         return { reward: Math.floor(amount * rate), rate };
-    }
-
-    // 簡化版：用於即時預覽 (不含封頂檢查)
-    function calculateTxReward(cardId, amount, options, tx) {
-        return calculateTxRewardWithCap(cardId, amount, options, tx, 0, 99999999);
     }
 
     // ==========================================
@@ -3333,10 +3104,13 @@
                     </div>
                 `;
             } else {
-                const stats = calculateStats(card.id, currentLocation);
+                const stats = calculateStats(card.id);
                 const nickname = cardSettings[card.id]?.nickname || card.nickname || '';
                 const isMiles = card.type === 'miles';
-                const unit = isMiles ? '哩' : '元';
+                const rewardUnit = isMiles ? '哩' : '元';
+                
+                // 消費金額顯示
+                const spentDisplay = formatAmountWithCurrency(stats.spent);
                 
                 let cycleHint = '';
                 if (['j1', 'j3', 'j5', 'c12'].includes(card.id)) {
@@ -3364,10 +3138,10 @@
                     <span class="tile-note">${card.note || ''}</span>
                     <div class="tile-body">
                         <div class="tile-stat-group">
-                            <div class="tile-stat-main">$${stats.spent.toLocaleString()}</div>
+                            <div class="tile-stat-main">${spentDisplay}</div>
                             <div class="tile-stat-sub">本期已刷</div>
                         </div>
-                        <div class="tile-earned">+${stats.reward.toLocaleString()} ${unit}</div>
+                        <div class="tile-earned">+${stats.reward.toLocaleString()} ${rewardUnit}</div>
                     </div>
                     <div class="tile-footer">
                         <div class="progress-track"><div class="progress-fill" style="width:${stats.progress}%"></div></div>
@@ -3389,14 +3163,11 @@
 
     function updateTotalReward() {
         let totalReward = 0;
-        let rewardByLocation = {};
-        
         cards.forEach(card => {
             if (card.type === 'placeholder') return;
-            const stats = calculateStatsAllLocations(card.id);
+            const stats = calculateStats(card.id);
             totalReward += stats.reward;
         });
-        
         document.getElementById('totalRewardDisplay').innerText = `$${totalReward.toLocaleString()}`;
         
         const breakdownEl = document.getElementById('totalRewardBreakdown');
@@ -3404,8 +3175,7 @@
     }
 
     function updateDateDisplay() {
-        const now = new Date();
-        const dateStr = now.toLocaleDateString('zh-TW', { month: 'long', day: 'numeric', weekday: 'short' });
+        const dateStr = new Date().toLocaleDateString('zh-TW', { month: 'long', day: 'numeric', weekday: 'short' });
         document.getElementById('dateDisplay').innerText = dateStr;
     }
 
@@ -3415,7 +3185,7 @@
 </script>
     <script>
     // ==========================================
-    // Part 6: 管理面板、匯入匯出與結尾 (V125.1 修正版)
+    // Part 6: 管理面板、匯入匯出 (V125.1)
     // ==========================================
 
     function openManageModal() {
@@ -3437,7 +3207,6 @@
             
             const btn = document.createElement('div');
             btn.className = 'manage-card-btn' + (isActive ? ' active' : '');
-            btn.style.background = isActive ? '' : '#f5f5f5';
             btn.setAttribute('data-card-id', card.id);
             
             btn.innerHTML = `
@@ -3514,7 +3283,7 @@
     }
 
     // ==========================================
-    // 匯入匯出功能 (相容舊版格式)
+    // 匯入匯出 (相容舊版格式)
     // ==========================================
 
     function exportData() {
@@ -3541,9 +3310,7 @@
         
         cards.forEach(card => {
             const txs = getTransactions(card.id);
-            if (txs.length > 0) {
-                data.transactions[card.id] = txs;
-            }
+            if (txs.length > 0) data.transactions[card.id] = txs;
         });
         
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -3553,7 +3320,6 @@
         a.download = `刷卡回饋管家_備份_${new Date().toISOString().split('T')[0]}.json`;
         a.click();
         URL.revokeObjectURL(url);
-        
         alert('備份完成！');
     }
 
@@ -3578,64 +3344,67 @@
                 // 還原 visibleCards
                 if (data.visibleCards) {
                     localStorage.setItem('visibleCards', JSON.stringify(data.visibleCards));
-                    visibleCards = data.visibleCards;
                 }
                 
                 // 還原 cardOrder
                 if (data.cardOrder) {
                     localStorage.setItem('cardOrder', JSON.stringify(data.cardOrder));
-                    savedOrder = data.cardOrder;
                 }
                 
                 // 還原 cardSettings
                 if (data.cardSettings) {
                     localStorage.setItem('cardSettings', JSON.stringify(data.cardSettings));
-                    cardSettings = data.cardSettings;
                 }
                 
-                // ===== 還原交易記錄 (相容新舊格式) =====
+                // ===== 還原交易記錄 =====
                 
-                // 格式 A: 新版 { transactions: { c1: [...], c2: [...] } }
-                if (data.transactions && typeof data.transactions === 'object') {
+                // 格式 A: 舊版 - transactions 是陣列，每筆有 cardId
+                if (Array.isArray(data.transactions)) {
+                    const txsByCard = {};
+                    data.transactions.forEach(tx => {
+                        const cardId = tx.cardId;
+                        if (!cardId) return;
+                        if (!txsByCard[cardId]) txsByCard[cardId] = [];
+                        txsByCard[cardId].push(normalizeTx(tx));
+                    });
+                    Object.keys(txsByCard).forEach(cardId => {
+                        saveTransactions(cardId, txsByCard[cardId]);
+                    });
+                }
+                // 格式 B: 新版 - transactions 是物件 { c1: [...], c2: [...] }
+                else if (data.transactions && typeof data.transactions === 'object') {
                     Object.keys(data.transactions).forEach(cardId => {
                         const txs = data.transactions[cardId];
                         if (Array.isArray(txs)) {
-                            // 轉換舊欄位
-                            const normalizedTxs = txs.map(tx => normalizeTx(tx));
-                            saveTransactions(cardId, normalizedTxs);
-                        }
-                    });
-                }
-                
-                // 格式 B: 舊版直接存 transactions_xxx 在根層
-                Object.keys(data).forEach(key => {
-                    if (key.startsWith('transactions_')) {
-                        const cardId = key.replace('transactions_', '');
-                        const txs = data[key];
-                        if (Array.isArray(txs)) {
-                            const normalizedTxs = txs.map(tx => normalizeTx(tx));
-                            saveTransactions(cardId, normalizedTxs);
-                        }
-                    }
-                });
-                
-                // 格式 C: 檢查 localStorage 直接備份 (整個 localStorage dump)
-                if (data.localStorage) {
-                    Object.keys(data.localStorage).forEach(key => {
-                        if (key.startsWith('transactions_')) {
-                            try {
-                                const txs = JSON.parse(data.localStorage[key]);
-                                const cardId = key.replace('transactions_', '');
-                                if (Array.isArray(txs)) {
-                                    const normalizedTxs = txs.map(tx => normalizeTx(tx));
-                                    saveTransactions(cardId, normalizedTxs);
-                                }
-                            } catch (err) {}
+                            saveTransactions(cardId, txs.map(tx => normalizeTx(tx)));
                         }
                     });
                 }
                 
                 // 還原其他設定
+                if (data.uniOpenState) {
+                    localStorage.setItem('uni_brands', JSON.stringify(data.uniOpenState.brands || []));
+                }
+                if (data.currencyLevel) {
+                    localStorage.setItem('currency_level', data.currencyLevel);
+                }
+                if (data.hsbcTier) {
+                    localStorage.setItem('hsbc_tier', data.hsbcTier);
+                }
+                if (data.hsbcInitial) {
+                    localStorage.setItem('hsbc_initial', data.hsbcInitial);
+                }
+                if (data.hsbcRedeemed) {
+                    localStorage.setItem('hsbc_redeemed', data.hsbcRedeemed);
+                }
+                if (data.sceneSnapshots) {
+                    localStorage.setItem('scene_snapshots', JSON.stringify(data.sceneSnapshots));
+                }
+                if (data.currentLocation) {
+                    localStorage.setItem('current_location', data.currentLocation);
+                }
+                
+                // 新版 settings 物件
                 if (data.settings) {
                     const s = data.settings;
                     if (s.current_location) localStorage.setItem('current_location', s.current_location);
@@ -3655,95 +3424,57 @@
                 
             } catch (err) {
                 console.error('Import error:', err);
-                alert('匯入失敗：檔案格式錯誤\n' + err.message);
+                alert('匯入失敗：' + err.message);
             }
         };
         reader.readAsText(file);
         input.value = '';
     }
 
-    // 正規化交易記錄 (相容舊版欄位)
     function normalizeTx(tx) {
         const normalized = { ...tx };
         
-        // 確保有 id
-        if (!normalized.id) {
-            normalized.id = Date.now() + Math.random();
-        }
+        if (!normalized.id) normalized.id = Date.now() + Math.random();
+        if (!normalized.amountTWD && normalized.amount) normalized.amountTWD = normalized.amount;
+        if (!normalized.location && normalized.loc) normalized.location = normalized.loc;
+        if (!normalized.location) normalized.location = 'TW';
+        if (!normalized.currency) normalized.currency = 'TWD';
         
-        // 確保有 amountTWD
-        if (!normalized.amountTWD && normalized.amount) {
-            normalized.amountTWD = normalized.amount;
-        }
-        
-        // 確保有 date
-        if (!normalized.date && normalized.timestamp) {
-            const d = parseFlexibleDate(normalized.timestamp);
+        // 日期正規化
+        if (normalized.date) {
+            const d = parseFlexibleDate(normalized.date);
             if (d) normalized.date = d.toISOString().split('T')[0];
-        }
-        
-        // 確保有 location
-        if (!normalized.location) {
-            normalized.location = 'TW';
-        }
-        
-        // 確保有 currency
-        if (!normalized.currency) {
-            normalized.currency = 'TWD';
         }
         
         return normalized;
     }
 
     function resetAllData() {
-        if (!confirm('⚠️ 確定要重置所有資料？\n\n這將清除：\n• 所有消費記錄\n• 卡片設定\n• 情境快照\n\n此操作無法復原！')) {
-            return;
-        }
-        
-        if (!confirm('再次確認：真的要刪除所有資料嗎？')) {
-            return;
-        }
+        if (!confirm('⚠️ 確定要重置所有資料？\n\n這將清除：\n• 所有消費記錄\n• 卡片設定\n• 情境快照\n\n此操作無法復原！')) return;
+        if (!confirm('再次確認：真的要刪除所有資料嗎？')) return;
         
         const keysToRemove = [];
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
             if (key && (
                 key.startsWith('transactions_') || 
-                key === 'visibleCards' || 
-                key === 'cardOrder' || 
-                key === 'cardSettings' ||
-                key === 'user_setup_done' ||
-                key === 'scene_snapshots' ||
-                key === 'uni_settings' ||
-                key === 'happy_used' ||
-                key === 'hsbc_tier' ||
-                key === 'hsbc_initial' ||
-                key === 'hsbc_redeemed' ||
-                key === 'currency_level' ||
-                key === 'uni_brands' ||
-                key === 'current_location' ||
-                key === 'exchange_rates' ||
-                key === 'last_rate_update'
+                ['visibleCards', 'cardOrder', 'cardSettings', 'user_setup_done', 'scene_snapshots',
+                 'uni_settings', 'happy_used', 'hsbc_tier', 'hsbc_initial', 'hsbc_redeemed',
+                 'currency_level', 'uni_brands', 'current_location', 'exchange_rates', 'last_rate_update'].includes(key)
             )) {
                 keysToRemove.push(key);
             }
         }
-        
         keysToRemove.forEach(key => localStorage.removeItem(key));
         
-        alert('資料已重置！頁面將重新載入。');
+        alert('資料已重置！');
         location.reload();
     }
 
-    // ==========================================
-    // Service Worker 註冊
-    // ==========================================
-
+    // Service Worker
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('SW registered'))
-                .catch(err => console.log('SW registration failed'));
+            navigator.serviceWorker.register('sw.js').catch(() => {});
         });
     }
 </script>

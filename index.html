@@ -28,7 +28,7 @@
     <meta property="og:url" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/">
     <meta property="og:type" content="website">
 
-    <title>刷卡回饋管家 (V125.2 Fix)</title>
+    <title>刷卡回饋管家 (V125.3 Fix)</title>
         
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
@@ -308,6 +308,28 @@
         .option-row.expired { opacity: 0.5; pointer-events: none; background: #eee; padding: 4px; border-radius: 4px; }
         .option-row.overseas-disabled { opacity: 0.4; pointer-events: none; }
         .option-row.overseas-disabled::after { content: ' (國外無加碼)'; color: #FF3B30; font-size: 10px; }
+        
+        /* UniOpen 品牌分類折疊樣式 */
+        .brand-category { margin-bottom: 10px; }
+        .brand-category-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 8px 10px; 
+            background: #e8f4fc; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 12px; 
+            font-weight: 700; 
+            color: #007AFF;
+            transition: background 0.2s;
+        }
+        .brand-category-header:active { background: #d0e8f8; }
+        .brand-category-header .arrow { transition: transform 0.2s; }
+        .brand-category-header.collapsed .arrow { transform: rotate(-90deg); }
+        .brand-category-content { display: block; margin-top: 6px; }
+        .brand-category-content.collapsed { display: none; }
+        
         .brand-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
         .brand-btn { border: 1px solid #ddd; background: white; border-radius: 6px; padding: 6px 2px; font-size: 11px; color: #666; text-align: center; cursor: pointer; transition: 0.2s; font-weight: 600; display: flex; align-items: center; justify-content: center; }
         .brand-btn.active { background: #FF9800; color: white; border-color: #F57C00; box-shadow: 0 2px 4px rgba(255, 152, 0, 0.3); }
@@ -553,11 +575,10 @@
             <button class="welcome-btn" onclick="saveWelcomeSettings()">開始使用 🚀</button>
         </div>
     </div>
-
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V125.2 Fix</div>
+            <div class="version-tag">V125.3 Fix</div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -579,7 +600,7 @@
         <div class="subtitle"><span class="today-date" id="dateDisplay"></span></div>
         
         <div class="news-ticker">
-            <div class="ticker-content" id="news-text">🎉 V125.2 修復：UniOpen 海外倒數、賴點卡 (2025) 完整權益與低消檢查！</div>
+            <div class="ticker-content" id="news-text">🎉 V125.3 修復：備份還原紀錄遺失、UniOpen 完整品牌清單、JCB 封頂計算！</div>
         </div>
         
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
@@ -799,8 +820,72 @@
                     <div class="option-row"><label for="checkUniIcash">📱 icash Pay +4% (刷$3,750封頂)</label><input type="checkbox" id="checkUniIcash" onchange="toggleUniIcash()"></div>
                     
                     <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px; margin-top:6px; flex-direction:column; align-items:flex-start;">
-                        <label style="margin-bottom:4px;">🏃 踩點任務 (2家起跳，最高+4%)</label>
-                        <div class="brand-grid" id="uniBrandGrid"></div>
+                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:6px;">
+                            <label>🏃 踩點任務 (2家起跳，最高+4%)</label>
+                            <button onclick="toggleUniBrandList()" style="border:none; background:#007AFF; color:white; font-size:10px; padding:4px 8px; border-radius:4px; cursor:pointer;" id="btnToggleUniBrand">展開品牌 ▼</button>
+                        </div>
+                        <div id="uniBrandContainer" style="width:100%; display:none;">
+                            <!-- 便利商店/超市 -->
+                            <div class="brand-category">
+                                <div class="brand-category-header" onclick="toggleBrandCategory('cat1')">
+                                    <span>🏪 便利商店/超市</span>
+                                    <span class="arrow" id="arrow-cat1">▼</span>
+                                </div>
+                                <div class="brand-category-content" id="content-cat1">
+                                    <div class="brand-grid" id="uniBrandGrid-cat1"></div>
+                                </div>
+                            </div>
+                            <!-- 百貨/購物 -->
+                            <div class="brand-category">
+                                <div class="brand-category-header" onclick="toggleBrandCategory('cat2')">
+                                    <span>🛍️ 百貨/購物</span>
+                                    <span class="arrow" id="arrow-cat2">▼</span>
+                                </div>
+                                <div class="brand-category-content" id="content-cat2">
+                                    <div class="brand-grid" id="uniBrandGrid-cat2"></div>
+                                </div>
+                            </div>
+                            <!-- 餐飲/甜點 -->
+                            <div class="brand-category">
+                                <div class="brand-category-header" onclick="toggleBrandCategory('cat3')">
+                                    <span>🍽️ 餐飲/甜點</span>
+                                    <span class="arrow" id="arrow-cat3">▼</span>
+                                </div>
+                                <div class="brand-category-content" id="content-cat3">
+                                    <div class="brand-grid" id="uniBrandGrid-cat3"></div>
+                                </div>
+                            </div>
+                            <!-- 健身/休閒 -->
+                            <div class="brand-category">
+                                <div class="brand-category-header" onclick="toggleBrandCategory('cat4')">
+                                    <span>💪 健身/休閒</span>
+                                    <span class="arrow" id="arrow-cat4">▼</span>
+                                </div>
+                                <div class="brand-category-content" id="content-cat4">
+                                    <div class="brand-grid" id="uniBrandGrid-cat4"></div>
+                                </div>
+                            </div>
+                            <!-- 生活服務 -->
+                            <div class="brand-category">
+                                <div class="brand-category-header" onclick="toggleBrandCategory('cat5')">
+                                    <span>🏠 生活服務</span>
+                                    <span class="arrow" id="arrow-cat5">▼</span>
+                                </div>
+                                <div class="brand-category-content" id="content-cat5">
+                                    <div class="brand-grid" id="uniBrandGrid-cat5"></div>
+                                </div>
+                            </div>
+                            <!-- 旅遊/飯店 -->
+                            <div class="brand-category">
+                                <div class="brand-category-header" onclick="toggleBrandCategory('cat6')">
+                                    <span>🏨 旅遊/飯店</span>
+                                    <span class="arrow" id="arrow-cat6">▼</span>
+                                </div>
+                                <div class="brand-category-content" id="content-cat6">
+                                    <div class="brand-grid" id="uniBrandGrid-cat6"></div>
+                                </div>
+                            </div>
+                        </div>
                         <div style="font-size:10px; color:#FF9800; margin-top:6px; font-weight:700;" id="taskBonusDisplay">目前 0 家 (加碼 0%)</div>
                     </div>
                     <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px;">
@@ -1091,7 +1176,7 @@
                     
                     <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0; border-top:1px dashed #ddd; padding-top:6px;">
                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                             <label for="checkSinopacJcbBonus">🇯🇵 日本 / 🛍️ 特選 +3% (月刷1萬封頂/共用)</label>
+                             <label for="checkSinopacJcbBonus">🇯🇵 日本 / 🛍️ 特選 +3% (月刷1萬封頂)</label>
                              <input type="checkbox" id="checkSinopacJcbBonus" onchange="updateRewardPreview()">
                         </div>
                         <button onclick="toggleSinopacJcbDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看通路 (網購/百貨/餐廳)</button>
@@ -1196,10 +1281,9 @@
              </div>
         </div>
     </div>
-
     <script>
     // ==========================================
-    // Part 3: 核心設定、匯率與 UI 邏輯 (V125.1)
+    // Part 3: 核心設定、匯率與 UI 邏輯 (V125.3)
     // ==========================================
     
     const LOCATION_CONFIG = {
@@ -1334,6 +1418,36 @@
     function toggleSinopacJcbDetails() { const el = document.getElementById('sinopacJcbDetails'); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
     function toggleLaiDianDetails() { const el = document.getElementById('laiDianDetails'); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
     function toggleLegendDetails() { const el = document.getElementById('legendDetails'); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
+
+    // UniOpen 品牌列表展開/收合
+    function toggleUniBrandList() {
+        const container = document.getElementById('uniBrandContainer');
+        const btn = document.getElementById('btnToggleUniBrand');
+        if (container.style.display === 'none') {
+            container.style.display = 'block';
+            btn.innerText = '收合品牌 ▲';
+        } else {
+            container.style.display = 'none';
+            btn.innerText = '展開品牌 ▼';
+        }
+    }
+
+    // UniOpen 品牌分類折疊
+    function toggleBrandCategory(catId) {
+        const content = document.getElementById('content-' + catId);
+        const arrow = document.getElementById('arrow-' + catId);
+        const header = arrow.parentElement;
+        
+        if (content.classList.contains('collapsed')) {
+            content.classList.remove('collapsed');
+            header.classList.remove('collapsed');
+            arrow.innerText = '▼';
+        } else {
+            content.classList.add('collapsed');
+            header.classList.add('collapsed');
+            arrow.innerText = '▶';
+        }
+    }
 
     function toggleSelectedLogic() {
         if(document.getElementById('checkBonus25').checked) {
@@ -1518,7 +1632,7 @@
         { id: 'j3', name: '玉山熊本熊卡', nickname: '日本優等生', note: 'PayPay 5% (季) | 指定 8.5%', type: 'ceiling', limit: 8333, tier1Rate: 0.085, tier2Rate: 0.025, gradient: 'linear-gradient(135deg, #BDC3C7 0%, #2C3E50 100%)', textColor: 'white', msgDanger: '加碼已封頂', parking: `🐻 <b>指定通路 8.5%</b><br>(基本2.5% + 加碼6%)<br>⚠️ 加碼上限 $500/期 (約刷$8,333)<br>📱 <b>PayPay 5%</b> (3.5%+1.5%免手續費)<br>⚠️ 3.5%加碼上限 $100/季 (約刷$2,857)<br>🔰 <b>國內一般 0.5%</b> (無上限)`},
         { id: 'j4', name: '永豐幣倍卡 (大大/大戶)', nickname: '海外雙幣神卡', note: '海外精選 6% (刷 2萬封頂)', type: 'ceiling', limit: 80000, tier1Rate: 0.06, tier2Rate: 0.02, gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: 'white', msgDanger: '加碼已封頂', parking: `💰 <b>幣倍卡 2026</b><br><b>Level 1 (大大)</b><br>條件：自動扣繳+電子帳單<br>限刷：$7,500<br><br><b>Level 2 (大戶)</b><br>條件：往來資產≥10萬<br>限刷：$20,000`},
         { id: 'j5', name: '永豐三井聯名卡', nickname: '餐飲優等生/日韓泰附加', note: '餐飲 7.3% (底0.3%+7%)', type: 'custom_mitsui', target: 30000, tier1Rate: 0.073, tier2Rate: 0.003, gradient: 'linear-gradient(135deg, #00C9FF 0%, #92FE9D 100%)', textColor: '#333', msgSuccess: '已達標 (領$2000)', parking: `🍽️ <b>特選餐飲 7.3%</b> (0.3+7)<br>通路：館外餐飲(MCC 58xx) / 全盈+PAY<br>⚠️ 加碼上限僅 100 元 (約刷 $1,428)<br><br>🇯🇵 <b>日韓泰滿額禮 (需登錄)</b><br>每季累積滿 30,000 送 2,000 (回饋約6.9%)`},
-        { id: 'c12', name: '永豐現金回饋 JCB', nickname: '旅日神卡', note: '國內特選/日本 +3% (月$1萬共用)', type: 'ceiling', limit: 10000, tier1Rate: 0.04, tier2Rate: 0.01, gradient: 'linear-gradient(135deg, #8E0E00 0%, #1F1C18 100%)', textColor: 'white', msgDanger: '特選已封頂 (變1%)', parking: `🇯🇵 <b>日本消費</b><br>最高 5% (國外2% + 加碼3%)<br>🛍️ <b>特選通路</b><br>最高 5% (國外2% + 加碼3%) 或 4% (國內1% + 加碼3%)<br>⚠️ 日本+特選共用加碼上限 $300/月 (約刷 $10,000)<br>🔥 <b>日韓泰滿額</b> (需登錄)<br>每季累積滿 2 萬送 $1,000 (共用上限)`},
+        { id: 'c12', name: '永豐現金回饋 JCB', nickname: '旅日神卡', note: '國內特選/日本 +3% (月$1萬共用)', type: 'custom_jcb', limit: 10000, tier1Rate: 0.05, tier2Rate: 0.01, gradient: 'linear-gradient(135deg, #8E0E00 0%, #1F1C18 100%)', textColor: 'white', msgDanger: '特選已封頂 (變1%)', parking: `🇯🇵 <b>日本消費</b><br>最高 5% (國外2% + 加碼3%)<br>🛍️ <b>特選通路</b><br>最高 5% (國外2% + 加碼3%) 或 4% (國內1% + 加碼3%)<br>⚠️ 日本+特選共用加碼上限 $300/月 (約刷 $10,000)<br>🔥 <b>日韓泰滿額</b> (需登錄)<br>每季累積滿 2 萬送 $1,000 (共用上限)`},
         { id: 'add1', name: '新增卡片', nickname: '點擊選卡', note: '前往資料庫挑選', type: 'placeholder', gradient: 'linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%)', textColor: '#999', msgDanger: '' }
     ];
     let visibleCards = JSON.parse(localStorage.getItem('visibleCards')), savedOrder = JSON.parse(localStorage.getItem('cardOrder')), cards = [...defaultCards], sortableInstance = null;
@@ -1533,10 +1647,109 @@
         if (sortableInstance) sortableInstance.destroy();
         sortableInstance = new Sortable(document.getElementById('card-grid'), { animation: 150, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', delay: 200, delayOnTouchOnly: true, forceFallback: true, onEnd: function (evt) { const allIds = cards.map(c => c.id), vis = Array.from(evt.to.children).map(el => el.getAttribute('data-card-id')), hidden = allIds.filter(id => !vis.includes(id)); localStorage.setItem('cardOrder', JSON.stringify([...vis, ...hidden])); savedOrder = [...vis, ...hidden]; } });
     }
+
+    // ==========================================
+    // UniOpen 完整品牌清單 (依據統一企業集團)
+    // ==========================================
+    const uniBrandCategories = {
+        cat1: { 
+            name: '便利商店/超市', 
+            brands: ['7-ELEVEN', '康是美', '聖德科斯', '統一生機', 'Mia C\'bon', '家樂福'] 
+        },
+        cat2: { 
+            name: '百貨/購物', 
+            brands: ['統一時代', '夢時代', 'UNICCY', '博客來', 'Yahoo購物', '酷聖石'] 
+        },
+        cat3: { 
+            name: '餐飲/甜點', 
+            brands: ['星巴克', 'Mister Donut', 'Cold Stone', '21風味館', '21 Plus', '聖娜', 'Semeur'] 
+        },
+        cat4: { 
+            name: '健身/休閒', 
+            brands: ['BEING sport', 'BEING spa', 'BEING fit', '統一渡假村'] 
+        },
+        cat5: { 
+            name: '生活服務', 
+            brands: ['DUSKIN', '宅急便', 'ibon', 'foodomo', '速邁樂加油', '鮮拾'] 
+        },
+        cat6: { 
+            name: '旅遊/飯店', 
+            brands: ['W Taipei', 'Hotel Resonance', '玲瓏滿藝'] 
+        }
+    };
+
+    // 取得當期的踩點記錄 key
+    function getUniBrandCycleKey() {
+        const now = new Date();
+        return `uni_brands_${now.getFullYear()}_${now.getMonth() + 1}`;
+    }
+
+    // 初始化 UniOpen 品牌格 (分類版)
+    function initUniBrandGrid() {
+        const cycleKey = getUniBrandCycleKey();
+        const selected = JSON.parse(localStorage.getItem(cycleKey) || '[]');
+        
+        Object.keys(uniBrandCategories).forEach(catId => {
+            const grid = document.getElementById('uniBrandGrid-' + catId);
+            if (!grid) return;
+            grid.innerHTML = '';
+            
+            uniBrandCategories[catId].brands.forEach(brand => {
+                const btn = document.createElement('div');
+                btn.className = 'brand-btn' + (selected.includes(brand) ? ' active' : '');
+                btn.innerText = brand;
+                btn.onclick = () => { 
+                    btn.classList.toggle('active'); 
+                    saveUniBrands(); 
+                };
+                grid.appendChild(btn);
+            });
+        });
+        
+        updateTaskBonusDisplay();
+    }
+
+    // 儲存 UniOpen 品牌選擇 (按週期)
+    function saveUniBrands() {
+        const cycleKey = getUniBrandCycleKey();
+        const selected = [];
+        
+        Object.keys(uniBrandCategories).forEach(catId => {
+            const grid = document.getElementById('uniBrandGrid-' + catId);
+            if (!grid) return;
+            grid.querySelectorAll('.brand-btn.active').forEach(btn => {
+                selected.push(btn.innerText);
+            });
+        });
+        
+        localStorage.setItem(cycleKey, JSON.stringify(selected));
+        updateTaskBonusDisplay();
+        updateRewardPreview();
+    }
+
+    // 取得當期已選品牌數
+    function getUniBrandCount() {
+        const cycleKey = getUniBrandCycleKey();
+        const selected = JSON.parse(localStorage.getItem(cycleKey) || '[]');
+        return selected.length;
+    }
+
+    function updateTaskBonusDisplay() {
+        const count = getUniBrandCount();
+        let bonus = 0;
+        if (count >= 5) bonus = 4;
+        else if (count >= 4) bonus = 3;
+        else if (count >= 3) bonus = 2;
+        else if (count >= 2) bonus = 1;
+        const display = document.getElementById('taskBonusDisplay');
+        if (display) {
+            display.innerText = `目前 ${count} 家 (加碼 ${bonus}%)`;
+        }
+    }
 </script>
     <script>
     // ==========================================
-    // Part 4: 交易資料、Toggle 邏輯與運算核心 (V125.2)
+    // Part 4: 交易資料、Toggle 邏輯與運算核心 (V125.3)
     // ==========================================
 
     function getTransactionsKey(cardId) { return `transactions_${cardId}`; }
@@ -1577,42 +1790,47 @@
         return `${now.getFullYear()}-${now.getMonth() + 1}`;
     }
 
-    function getCurrentCycleTransactions(cardId) {
-        const txs = getTransactions(cardId);
-        const cycleKey = getCycleKey(cardId);
+    // 根據交易日期計算該筆交易屬於哪個週期
+    function getTxCycleKey(cardId, txDate) {
+        if (!txDate) return getCycleKey(cardId); // 無日期則歸入當期
         
-        // 取得卡片設定 (含結帳日)
+        const d = (txDate instanceof Date) ? txDate : new Date(txDate);
+        if (isNaN(d.getTime())) return getCycleKey(cardId); // 無效日期歸入當期
+        
         const settings = cardSettings[cardId] || {};
-        const cycleDay = parseInt(settings.cycleDay); 
+        const cycleDay = parseInt(settings.cycleDay);
         
-        return txs.filter(tx => {
-            if (!tx.date) return true;
-            const txDate = new Date(tx.date);
-            
-            // 季度卡片
-            if (['j1', 'j3', 'j5', 'c12'].includes(cardId)) {
-                const txQuarter = Math.floor(txDate.getMonth() / 3) + 1;
-                const txCycleKey = `${txDate.getFullYear()}-Q${txQuarter}`;
-                return txCycleKey === cycleKey;
-            }
-            
-            // 月度卡片 (需考慮結帳日)
-            let txYear = txDate.getFullYear();
-            let txMonth = txDate.getMonth() + 1;
-            
-            if (cycleDay && cycleDay > 0) {
-                const txDay = txDate.getDate();
-                if (txDay > cycleDay) {
-                     txMonth++;
-                     if (txMonth > 12) {
-                         txMonth = 1;
-                         txYear++;
-                     }
+        // 季度卡片
+        if (['j1', 'j3', 'j5', 'c12'].includes(cardId)) {
+            const txQuarter = Math.floor(d.getMonth() / 3) + 1;
+            return `${d.getFullYear()}-Q${txQuarter}`;
+        }
+        
+        // 月度卡片
+        let txYear = d.getFullYear();
+        let txMonth = d.getMonth() + 1;
+        
+        if (cycleDay && cycleDay > 0) {
+            const txDay = d.getDate();
+            if (txDay > cycleDay) {
+                txMonth++;
+                if (txMonth > 12) {
+                    txMonth = 1;
+                    txYear++;
                 }
             }
-            
-            const txCycleKey = `${txYear}-${txMonth}`;
-            return txCycleKey === cycleKey;
+        }
+        
+        return `${txYear}-${txMonth}`;
+    }
+
+    function getCurrentCycleTransactions(cardId) {
+        const txs = getTransactions(cardId);
+        const currentCycleKey = getCycleKey(cardId);
+        
+        return txs.filter(tx => {
+            const txCycleKey = getTxCycleKey(cardId, tx.date);
+            return txCycleKey === currentCycleKey;
         });
     }
 
@@ -2090,84 +2308,6 @@
         updateRewardPreview();
     }
 
-    // 統一 Open 品牌格
-    const uniBrands = ['7-11', '星巴克', '康是美', 'COLD STONE', '21風味館', '博客來', '聖娜', '酷聖石', '多拿滋'];
-    function initUniBrandGrid() {
-        const grid = document.getElementById('uniBrandGrid');
-        if (!grid) return;
-        grid.innerHTML = '';
-        const selected = JSON.parse(localStorage.getItem('uni_brands') || '[]');
-        uniBrands.forEach(brand => {
-            const btn = document.createElement('div');
-            btn.className = 'brand-btn' + (selected.includes(brand) ? ' active' : '');
-            btn.innerText = brand;
-            btn.onclick = () => { btn.classList.toggle('active'); saveUniBrands(); };
-            grid.appendChild(btn);
-        });
-        updateTaskBonusDisplay();
-    }
-    function saveUniBrands() {
-        const selected = Array.from(document.querySelectorAll('#uniBrandGrid .brand-btn.active')).map(b => b.innerText);
-        localStorage.setItem('uni_brands', JSON.stringify(selected));
-        updateTaskBonusDisplay();
-        updateRewardPreview();
-    }
-    function updateTaskBonusDisplay() {
-        const count = document.querySelectorAll('#uniBrandGrid .brand-btn.active').length;
-        let bonus = 0;
-        if (count >= 5) bonus = 4;
-        else if (count >= 4) bonus = 3;
-        else if (count >= 3) bonus = 2;
-        else if (count >= 2) bonus = 1;
-        document.getElementById('taskBonusDisplay').innerText = `目前 ${count} 家 (加碼 ${bonus}%)`;
-    }
-
-    // 回饋預覽計算
-    function updateRewardPreview() {
-        const cardId = document.getElementById('cardIdInput').value;
-        const amount = parseFloat(document.getElementById('amountInput').value) || 0;
-        const liveCalc = document.getElementById('liveRewardCalc');
-        
-        if (amount <= 0) {
-            liveCalc.style.display = 'none';
-            // J1 富邦J卡：金額為0時也要檢查低消警告
-            if (cardId === 'j1') {
-                checkFubonJMinSpend();
-            }
-            // C5 賴點卡：金額為0時也要檢查低消警告
-            if (cardId === 'c5') {
-                checkLaiDianMinSpend();
-            }
-            return;
-        }
-        
-        const rate = getCurrentRate();
-        const amountTWD = Math.round(amount * rate);
-        
-        // J1 富邦J卡：檢查低消
-        if (cardId === 'j1') {
-            checkFubonJMinSpend();
-        }
-        // C5 賴點卡：檢查低消
-        if (cardId === 'c5') {
-            checkLaiDianMinSpend();
-        }
-        
-        // 計算回饋
-        const result = calculateSingleReward(cardId, amountTWD, getTransactionOptions(cardId));
-        
-        liveCalc.style.display = 'block';
-        
-        if (cardId === 'c9') {
-            liveCalc.innerHTML = `預估獲得 <b>${result.reward}</b> 哩`;
-        } else {
-            liveCalc.innerHTML = `預估獲得 <b>$${result.reward}</b> 回饋 (${(result.rate * 100).toFixed(1)}%)`;
-        }
-        
-        // 更新 TWD 轉換顯示
-        updateTWDPreview();
-    }
-
     // 取得交易選項
     function getTransactionOptions(cardId) {
         const options = {};
@@ -2203,7 +2343,7 @@
             options.isGroup = document.getElementById('checkUniGroup')?.checked || false;
             options.isIcash = document.getElementById('checkUniIcash')?.checked || false;
             options.isOverseas = document.getElementById('checkUniOverseas')?.checked || false;
-            options.brandCount = document.querySelectorAll('#uniBrandGrid .brand-btn.active').length;
+            options.brandCount = getUniBrandCount();
         }
         else if (cardId === 'c11') {
             options.mode = document.querySelector('input[name="richartMode"]:checked')?.value || 'general';
@@ -2250,314 +2390,54 @@
         return options;
     }
 
-    // 單筆回饋計算
-    function calculateSingleReward(cardId, amount, options) {
-        let reward = 0;
-        let rate = 0;
+    // 回饋預覽計算
+    function updateRewardPreview() {
+        const cardId = document.getElementById('cardIdInput').value;
+        const amount = parseFloat(document.getElementById('amountInput').value) || 0;
+        const liveCalc = document.getElementById('liveRewardCalc');
         
-        const card = cards.find(c => c.id === cardId);
-        if (!card) return { reward: 0, rate: 0 };
-
-        // C6 豬富卡
-        if (cardId === 'c6') {
-            if (options.isBill) {
-                rate = 0.0015;
-            } else {
-                rate = 0.01; // 基本 1%
-                if (options.isBonus10) rate += 0.10;
-                if (options.isBonus25) {
-                    // 日本 PayPay 只有 +1%
-                    if (currentLocation === 'JP') {
-                        rate += 0.01;
-                    } else {
-                        rate += 0.025;
-                    }
-                }
+        if (amount <= 0) {
+            liveCalc.style.display = 'none';
+            // J1 富邦J卡：金額為0時也要檢查低消警告
+            if (cardId === 'j1') {
+                checkFubonJMinSpend();
             }
-            reward = Math.floor(amount * rate);
-        }
-        // C5 賴點卡
-        else if (cardId === 'c5') {
-            let totalReward = Math.floor(amount * 0.01); // 基本 1%
-            
-            // 國外只有基本 1% (且非一般消費選項時)
-            if (currentLocation !== 'TW' && options.mode !== 'general') {
-                return { reward: totalReward, rate: 0.01 };
+            // C5 賴點卡：金額為0時也要檢查低消警告
+            if (cardId === 'c5') {
+                checkLaiDianMinSpend();
             }
-
-            // LP 與 偶數日 模式皆需單筆滿 100 才享加碼
-            if (amount >= 100) {
-                // 1. LINE Pay 加碼 (+1%)
-                // 只要模式是 'lp' 或 'even' (偶數日必為LP)，都符合此條件
-                if (options.mode === 'lp' || options.mode === 'even') {
-                    // 計算已使用的 LP 額度 (包含 lp 和 even 的交易)
-                    const lpSpent = getCardBonusSpent(cardId, t => (t.laiDianMode === 'lp' || t.laiDianMode === 'even') && t.id < (options.id || Infinity));
-                    
-                    // LP +1% (限刷2萬)
-                    if (lpSpent < 20000) {
-                        totalReward += Math.floor(Math.min(amount, 20000 - lpSpent) * 0.01);
-                    }
-                    
-                    // 新戶 +4% (限刷7500，需綁定 LP)
-                    if (options.isNew) {
-                        const newSpent = getCardBonusSpent(cardId, t => (t.laiDianMode === 'lp' || t.laiDianMode === 'even') && t.isLaiDianNew && t.id < (options.id || Infinity));
-                        if (newSpent < 7500) {
-                            totalReward += Math.floor(Math.min(amount, 7500 - newSpent) * 0.04);
-                        }
-                    }
-                }
-
-                // 2. 偶數日加碼 (+5%)
-                if (options.mode === 'even') {
-                    const evenSpent = getCardBonusSpent(cardId, t => t.laiDianMode === 'even' && t.id < (options.id || Infinity));
-                    // 偶數日 +5% (限刷3000)
-                    if (evenSpent < 3000) {
-                        totalReward += Math.floor(Math.min(amount, 3000 - evenSpent) * 0.05);
-                    }
-                }
-            }
-            
-            rate = (amount > 0) ? (totalReward / amount) : 0.01;
-            return { reward: totalReward, rate: rate };
-        }
-        // C2 綠卡
-        else if (cardId === 'c2') {
-            if (options.isForeign) {
-                rate = 0.02;
-            } else if (options.isGreen) {
-                rate = 0.06;
-            } else {
-                rate = 0.01;
-            }
-            reward = Math.floor(amount * rate);
-        }
-        // C7 UNI卡
-        else if (cardId === 'c7') {
-            // 國外只有基本 1%
-            if (currentLocation !== 'TW') {
-                rate = 0.01;
-            } else if (options.isUp) {
-                rate = 0.045;
-            } else {
-                rate = 0.035;
-            }
-            if (options.isBonus && currentLocation === 'TW') rate += 0.03;
-            reward = Math.floor(amount * rate);
-        }
-        // C8 樂家+卡
-        else if (cardId === 'c8') {
-            rate = 0.005; // 基本 0.5%
-            if (options.isForeign) {
-                rate += 0.02; // 國外 +2%
-            } else if (options.isPet) {
-                rate += 0.095; // 寵物 +9.5%
-            } else if (options.isLife) {
-                rate += 0.035; // 生活 +3.5%
-            } else if (options.isPeace) {
-                rate += 0.035; // 安心 +3.5%
-            }
-            reward = Math.floor(amount * rate);
-        }
-        // C9 旅人卡 (哩程)
-        else if (cardId === 'c9') {
-            const tier = options.tier || 'infinite';
-            let milesPerDollar;
-            if (options.isForeign) {
-                milesPerDollar = (tier === 'infinite') ? 10 : 15;
-            } else {
-                milesPerDollar = 18;
-            }
-            reward = Math.floor(amount / milesPerDollar);
-            rate = 1 / milesPerDollar;
-        }
-        // C10 UniOpen卡
-        else if (cardId === 'c10') {
-            rate = 0.01; // 基本 1%
-            if (options.isOverseas) {
-                rate = 0.11; // 海外 11%
-            } else {
-                if (options.isGroup) rate += 0.02;
-                if (options.isIcash) rate += 0.04;
-                // 踩點任務
-                const brandCount = options.brandCount || 0;
-                if (brandCount >= 5) rate += 0.04;
-                else if (brandCount >= 4) rate += 0.03;
-                else if (brandCount >= 3) rate += 0.02;
-                else if (brandCount >= 2) rate += 0.01;
-            }
-            reward = Math.floor(amount * rate);
-        }
-        // C11 Richart卡
-        else if (cardId === 'c11') {
-            const mode = options.mode || 'general';
-            if (mode === 'general') rate = 0.003;
-            else if (mode === 'pay') rate = 0.038;
-            else if (mode === 'online') rate = 0.033;
-            else if (mode === 'line') rate = 0.023;
-            else if (mode === 'overseas') rate = 0.033;
-            reward = Math.floor(amount * rate);
-        }
-        // J1 富邦J卡 (修復版：加入封頂判斷)
-        else if (cardId === 'j1') {
-            const region = options.region || 'domestic';
-            const bonus = options.bonus || 'none';
-            const quota = getFubonJQuotaUsed();
-            
-            // 基礎回饋 (無上限)
-            const baseRate = (region === 'jpkr') ? 0.03 : 0.01;
-            reward = Math.floor(amount * baseRate);
-            
-            // 加碼回饋 (檢查剩餘額度)
-            let bonusRate = 0;
-            let cap = 0;
-            let spent = 0;
-
-            if (bonus === 'jpkr_physical' && amount >= 1000) {
-                bonusRate = 0.03;
-                cap = quota.physicalLimit;
-                spent = quota.physicalSpent;
-            } else if (bonus === 'th_physical' && amount >= 1000) {
-                bonusRate = 0.05;
-                cap = quota.physicalLimit; // 共用日韓實體額度
-                spent = quota.physicalSpent;
-            } else if (bonus === 'suica' && amount >= 2000) {
-                bonusRate = 0.07;
-                cap = quota.suicaLimit;
-                spent = quota.suicaSpent;
-            }
-
-            if (bonusRate > 0) {
-                const available = Math.max(0, cap - spent);
-                // 只有在額度內的金額才享加碼
-                const validForBonus = Math.min(amount, available);
-                reward += Math.floor(validForBonus * bonusRate);
-            }
-
-            rate = (amount > 0) ? (reward / amount) : baseRate;
-            return { reward, rate };
-        }
-        // J2 吉鶴卡
-        else if (cardId === 'j2') {
-            if (options.isJapan) {
-                let totalReward = Math.floor(amount * 0.025);
-                if (options.isApple && amount >= 500) {
-                    const appleSpent = getCardBonusSpent(cardId, t => t.isJiheJapan && t.isJiheApple && t.id < tx.id);
-                    if (appleSpent < 40000) totalReward += Math.floor(Math.min(amount, 40000 - appleSpent) * 0.015);
-                }
-                return { reward: totalReward, rate: totalReward / amount };
-            } else {
-                let totalReward = Math.floor(amount * 0.01);
-                if (options.isDomesticJapanese && amount >= 500) {
-                    const djSpent = getCardBonusSpent(cardId, t => t.isJiheDomesticJapanese && t.id < tx.id);
-                    if (djSpent < 12500) totalReward += Math.floor(Math.min(amount, 12500 - djSpent) * 0.04);
-                }
-                return { reward: totalReward, rate: totalReward / amount };
-            }
-        }
-        // J3 熊本熊卡
-        else if (cardId === 'j3') {
-            if (options.isKumamonPayPay) {
-                const paypaySpent = getCardBonusSpent(cardId, t => t.isKumamonPayPay && t.id < tx.id);
-                if (paypaySpent < 2857) {
-                    return { reward: Math.floor(Math.min(amount, 2857 - paypaySpent) * 0.05), rate: 0.05 };
-                }
-                return { reward: Math.floor(amount * 0.025), rate: 0.025 };
-            }
-            if (options.isKumamonJapan) {
-                let totalReward = Math.floor(amount * 0.025);
-                if (options.isKumamonDesignated) {
-                    const designatedSpent = getCardBonusSpent(cardId, t => t.isKumamonJapan && t.isKumamonDesignated && t.id < tx.id);
-                    if (designatedSpent < 8333) totalReward += Math.floor(Math.min(amount, 8333 - designatedSpent) * 0.06);
-                }
-                return { reward: totalReward, rate: totalReward / amount };
-            }
-            return { reward: Math.floor(amount * 0.005), rate: 0.005 };
-        }
-        // J4 幣倍卡
-        else if (cardId === 'j4') {
-            rate = 0.01; // 基本 1%
-            if (options.isSelected) {
-                rate += 0.05; // 海外/精選 +5% (共6%)
-            }
-            reward = Math.floor(amount * rate);
-        }
-        // J5 三井卡
-        else if (cardId === 'j5') {
-            rate = 0.003; // 基本 0.3%
-            if (options.isSelected) {
-                rate = 0.073; // 特選餐飲 7.3%
-            }
-            reward = Math.floor(amount * rate);
-        }
-        // C12 JCB卡
-        else if (cardId === 'c12') {
-            rate = 0.01; // 國內基本 1%
-            if (options.isForeign) {
-                rate = 0.02; // 國外 2%
-            }
-            // 日本/特選共用月額度
-            if (options.isBonus) {
-                rate += 0.03; // +3%
-            }
-            reward = Math.floor(amount * rate);
-        }
-        // C4 將將卡
-        else if (cardId === 'c4') {
-            const mode = options.mode || 'base';
-            if (mode === 'selected') {
-                const selectedSpent = getCardBonusSpent(cardId, t => (t.jiangMode === 'selected' || t.isJiangSelected) && t.id < tx.id);
-                if (selectedSpent < 6666) {
-                    return { reward: Math.floor(Math.min(amount, 6666 - selectedSpent) * 0.05), rate: 0.05 };
-                }
-            } else if (mode === 'travel') {
-                const travelSpent = getCardBonusSpent(cardId, t => (t.jiangMode === 'travel' || t.isJiangTravel) && t.id < tx.id);
-                if (travelSpent < 11111) {
-                    return { reward: Math.floor(Math.min(amount, 11111 - travelSpent) * 0.05), rate: 0.05 };
-                }
-            }
-            return { reward: Math.floor(amount * 0.005), rate: 0.005 };
-        }
-        // DBS1 eco卡
-        else if (cardId === 'dbs1') {
-            if (options.isLinePay) {
-                const lpSpent = getCardBonusSpent(cardId, t => t.isDbsLinePay && t.id < tx.id);
-                if (lpSpent < 11111) {
-                    return { reward: Math.floor(Math.min(amount, 11111 - lpSpent) * 0.10), rate: 0.10 };
-                }
-            }
-            if (options.isGreen) {
-                const greenSpent = getCardBonusSpent(cardId, t => t.isDbsGreen && t.id < tx.id);
-                if (greenSpent < 3333) {
-                    return { reward: Math.floor(Math.min(amount, 3333 - greenSpent) * 0.10), rate: 0.10 };
-                }
-            }
-            if (options.isForeign) {
-                const foreignSpent = getCardBonusSpent(cardId, t => t.isDbsForeign && t.id < tx.id);
-                if (foreignSpent < 15000) {
-                    return { reward: Math.floor(Math.min(amount, 15000 - foreignSpent) * 0.05), rate: 0.05 };
-                }
-            }
-            return { reward: Math.floor(amount * 0.01), rate: 0.01 };
-        }
-        // C1 傳說對決卡
-        else if (cardId === 'c1') {
-            const baseReward = Math.floor(amount * 0.012);
-            if (options.isBonus && (currentLocation === 'TW')) {
-                const bonusSpent = getCardBonusSpent(cardId, t => t.isLegendBonus && (t.location || t.loc || 'TW') === 'TW' && t.id < tx.id);
-                const limit = 11363;
-                if (bonusSpent < limit) {
-                    const available = Math.min(amount, limit - bonusSpent);
-                    return { reward: baseReward + Math.floor(available * 0.088), rate: 0.10 };
-                }
-            }
-            return { reward: baseReward, rate: 0.012 };
+            return;
         }
         
-        // 預設
-        rate = card.tier1Rate || 0.01;
-        return { reward: Math.floor(amount * rate), rate };
+        const rate = getCurrentRate();
+        const amountTWD = Math.round(amount * rate);
+        
+        // J1 富邦J卡：檢查低消
+        if (cardId === 'j1') {
+            checkFubonJMinSpend();
+        }
+        // C5 賴點卡：檢查低消
+        if (cardId === 'c5') {
+            checkLaiDianMinSpend();
+        }
+        
+        // 計算回饋
+        const options = getTransactionOptions(cardId);
+        const result = calculateSingleReward(cardId, amountTWD, options);
+        
+        liveCalc.style.display = 'block';
+        
+        if (cardId === 'c9') {
+            liveCalc.innerHTML = `預估獲得 <b>${result.reward}</b> 哩`;
+        } else {
+            liveCalc.innerHTML = `預估獲得 <b>$${result.reward}</b> 回饋 (${(result.rate * 100).toFixed(1)}%)`;
+        }
+        
+        // 更新 TWD 轉換顯示
+        updateTWDPreview();
     }
 
+    // 新增交易 (修復：加入 cardId 欄位)
     function addTransaction(closeAfter = true) {
         const cardId = document.getElementById('cardIdInput').value;
         const amountRaw = parseFloat(document.getElementById('amountInput').value);
@@ -2574,6 +2454,7 @@
         
         const tx = {
             id: Date.now(),
+            cardId: cardId, // ★ 修復：加入 cardId 欄位，確保備份還原不遺失
             amount: amountRaw,
             amountTWD: amountTWD,
             currency: LOCATION_CONFIG[currentLocation].currency,
@@ -2582,6 +2463,7 @@
             note: note,
             date: dateVal,
             timestamp: new Date().toISOString(),
+            // 以下為各卡片專屬選項
             isBonus10: document.getElementById('checkBonus10')?.checked || false,
             isBonus25: document.getElementById('checkBonus25')?.checked || false,
             isBill: document.getElementById('checkIsBill')?.checked || false,
@@ -2607,7 +2489,7 @@
             isUniGroup: document.getElementById('checkUniGroup')?.checked || false,
             isUniIcash: document.getElementById('checkUniIcash')?.checked || false,
             isUniOverseas: document.getElementById('checkUniOverseas')?.checked || false,
-            uniBrandCount: document.querySelectorAll('#uniBrandGrid .brand-btn.active').length,
+            uniBrandCount: getUniBrandCount(),
             richartMode: document.querySelector('input[name="richartMode"]:checked')?.value || 'general',
             fubonJRegion: document.querySelector('input[name="fubonJRegion"]:checked')?.value || 'domestic',
             fubonJBonus: document.querySelector('input[name="fubonJBonus"]:checked')?.value || 'none',
@@ -2805,11 +2687,353 @@
         };
     }
 
+    // JCB 卡封頂額度計算
+    function getJcbQuotaUsed() {
+        const txs = getCurrentCycleTransactions('c12');
+        let bonusSpent = 0;
+        
+        txs.forEach(tx => {
+            const amount = tx.amountTWD || tx.amount || 0;
+            // 有勾選加碼 (日本或特選) 的交易才計入
+            if (tx.isSinopacJcbBonus) {
+                bonusSpent += amount;
+            }
+        });
+        
+        // 加碼上限 $300/月 (約刷 $10,000)
+        const bonusLimit = 10000;
+        
+        return {
+            bonusSpent,
+            bonusLimit,
+            bonusRemain: Math.max(0, bonusLimit - bonusSpent)
+        };
+    }
+      // 單筆回饋計算
+    function calculateSingleReward(cardId, amount, options) {
+        let reward = 0;
+        let rate = 0;
+        
+        const card = cards.find(c => c.id === cardId);
+        if (!card) return { reward: 0, rate: 0 };
+
+        // C6 豬富卡
+        if (cardId === 'c6') {
+            if (options.isBill) {
+                rate = 0.0015;
+            } else {
+                rate = 0.01; // 基本 1%
+                if (options.isBonus10) rate += 0.10;
+                if (options.isBonus25) {
+                    // 日本 PayPay 只有 +1%
+                    if (currentLocation === 'JP') {
+                        rate += 0.01;
+                    } else {
+                        rate += 0.025;
+                    }
+                }
+            }
+            reward = Math.floor(amount * rate);
+        }
+        // C5 賴點卡
+        else if (cardId === 'c5') {
+            let totalReward = Math.floor(amount * 0.01); // 基本 1%
+            
+            // 國外只有基本 1% (且非一般消費選項時)
+            if (currentLocation !== 'TW' && options.mode !== 'general') {
+                return { reward: totalReward, rate: 0.01 };
+            }
+
+            // LP 與 偶數日 模式皆需單筆滿 100 才享加碼
+            if (amount >= 100) {
+                // 1. LINE Pay 加碼 (+1%)
+                // 只要模式是 'lp' 或 'even' (偶數日必為LP)，都符合此條件
+                if (options.mode === 'lp' || options.mode === 'even') {
+                    // 計算已使用的 LP 額度 (包含 lp 和 even 的交易)
+                    const lpSpent = getCardBonusSpent(cardId, t => (t.laiDianMode === 'lp' || t.laiDianMode === 'even') && (t.amountTWD || t.amount) >= 100);
+                    
+                    // LP +1% (限刷2萬)
+                    if (lpSpent < 20000) {
+                        totalReward += Math.floor(Math.min(amount, 20000 - lpSpent) * 0.01);
+                    }
+                    
+                    // 新戶 +4% (限刷7500，需綁定 LP)
+                    if (options.isNew) {
+                        const newSpent = getCardBonusSpent(cardId, t => (t.laiDianMode === 'lp' || t.laiDianMode === 'even') && t.isLaiDianNew && (t.amountTWD || t.amount) >= 100);
+                        if (newSpent < 7500) {
+                            totalReward += Math.floor(Math.min(amount, 7500 - newSpent) * 0.04);
+                        }
+                    }
+                }
+
+                // 2. 偶數日加碼 (+5%)
+                if (options.mode === 'even') {
+                    const evenSpent = getCardBonusSpent(cardId, t => t.laiDianMode === 'even' && (t.amountTWD || t.amount) >= 100);
+                    // 偶數日 +5% (限刷3000)
+                    if (evenSpent < 3000) {
+                        totalReward += Math.floor(Math.min(amount, 3000 - evenSpent) * 0.05);
+                    }
+                }
+            }
+            
+            rate = (amount > 0) ? (totalReward / amount) : 0.01;
+            return { reward: totalReward, rate: rate };
+        }
+        // C2 綠卡
+        else if (cardId === 'c2') {
+            if (options.isForeign) {
+                rate = 0.02;
+            } else if (options.isGreen) {
+                rate = 0.06;
+            } else {
+                rate = 0.01;
+            }
+            reward = Math.floor(amount * rate);
+        }
+        // C7 UNI卡
+        else if (cardId === 'c7') {
+            // 國外只有基本 1%
+            if (currentLocation !== 'TW') {
+                rate = 0.01;
+            } else if (options.isUp) {
+                rate = 0.045;
+            } else {
+                rate = 0.035;
+            }
+            if (options.isBonus && currentLocation === 'TW') rate += 0.03;
+            reward = Math.floor(amount * rate);
+        }
+        // C8 樂家+卡
+        else if (cardId === 'c8') {
+            rate = 0.005; // 基本 0.5%
+            if (options.isForeign) {
+                rate += 0.02; // 國外 +2%
+            } else if (options.isPet) {
+                rate += 0.095; // 寵物 +9.5%
+            } else if (options.isLife) {
+                rate += 0.035; // 生活 +3.5%
+            } else if (options.isPeace) {
+                rate += 0.035; // 安心 +3.5%
+            }
+            reward = Math.floor(amount * rate);
+        }
+        // C9 旅人卡 (哩程)
+        else if (cardId === 'c9') {
+            const tier = options.tier || 'infinite';
+            let milesPerDollar;
+            if (options.isForeign) {
+                milesPerDollar = (tier === 'infinite') ? 10 : 15;
+            } else {
+                milesPerDollar = 18;
+            }
+            reward = Math.floor(amount / milesPerDollar);
+            rate = 1 / milesPerDollar;
+        }
+        // C10 UniOpen卡
+        else if (cardId === 'c10') {
+            rate = 0.01; // 基本 1%
+            if (options.isOverseas) {
+                rate = 0.11; // 海外 11%
+            } else {
+                if (options.isGroup) rate += 0.02;
+                if (options.isIcash) rate += 0.04;
+                // 踩點任務
+                const brandCount = options.brandCount || 0;
+                if (brandCount >= 5) rate += 0.04;
+                else if (brandCount >= 4) rate += 0.03;
+                else if (brandCount >= 3) rate += 0.02;
+                else if (brandCount >= 2) rate += 0.01;
+            }
+            reward = Math.floor(amount * rate);
+        }
+        // C11 Richart卡
+        else if (cardId === 'c11') {
+            const mode = options.mode || 'general';
+            if (mode === 'general') rate = 0.003;
+            else if (mode === 'pay') rate = 0.038;
+            else if (mode === 'online') rate = 0.033;
+            else if (mode === 'line') rate = 0.023;
+            else if (mode === 'overseas') rate = 0.033;
+            reward = Math.floor(amount * rate);
+        }
+        // J1 富邦J卡 (含封頂判斷)
+        else if (cardId === 'j1') {
+            const region = options.region || 'domestic';
+            const bonus = options.bonus || 'none';
+            const quota = getFubonJQuotaUsed();
+            
+            // 基礎回饋 (無上限)
+            const baseRate = (region === 'jpkr') ? 0.03 : (region === 'th') ? 0.01 : 0.01;
+            reward = Math.floor(amount * baseRate);
+            
+            // 加碼回饋 (檢查剩餘額度)
+            let bonusRate = 0;
+            let cap = 0;
+            let spent = 0;
+
+            if (bonus === 'jpkr_physical' && amount >= 1000) {
+                bonusRate = 0.03;
+                cap = quota.physicalLimit;
+                spent = quota.physicalSpent;
+            } else if (bonus === 'th_physical' && amount >= 1000) {
+                bonusRate = 0.05;
+                cap = quota.physicalLimit;
+                spent = quota.physicalSpent;
+            } else if (bonus === 'suica' && amount >= 2000) {
+                bonusRate = 0.07;
+                cap = quota.suicaLimit;
+                spent = quota.suicaSpent;
+            }
+
+            if (bonusRate > 0) {
+                const available = Math.max(0, cap - spent);
+                const validForBonus = Math.min(amount, available);
+                reward += Math.floor(validForBonus * bonusRate);
+            }
+
+            rate = (amount > 0) ? (reward / amount) : baseRate;
+            return { reward, rate };
+        }
+        // J2 吉鶴卡
+        else if (cardId === 'j2') {
+            if (options.isJapan) {
+                let totalReward = Math.floor(amount * 0.025);
+                if (options.isApple && amount >= 500) {
+                    const appleSpent = getCardBonusSpent(cardId, t => t.isJiheJapan && t.isJiheApple);
+                    if (appleSpent < 40000) totalReward += Math.floor(Math.min(amount, 40000 - appleSpent) * 0.015);
+                }
+                return { reward: totalReward, rate: totalReward / amount };
+            } else {
+                let totalReward = Math.floor(amount * 0.01);
+                if (options.isDomesticJapanese && amount >= 500) {
+                    const djSpent = getCardBonusSpent(cardId, t => t.isJiheDomesticJapanese);
+                    if (djSpent < 12500) totalReward += Math.floor(Math.min(amount, 12500 - djSpent) * 0.04);
+                }
+                return { reward: totalReward, rate: totalReward / amount };
+            }
+        }
+        // J3 熊本熊卡
+        else if (cardId === 'j3') {
+            if (options.isPayPay) {
+                const paypaySpent = getCardBonusSpent(cardId, t => t.isKumamonPayPay);
+                if (paypaySpent < 2857) {
+                    return { reward: Math.floor(Math.min(amount, 2857 - paypaySpent) * 0.05), rate: 0.05 };
+                }
+                return { reward: Math.floor(amount * 0.025), rate: 0.025 };
+            }
+            if (options.isJapan) {
+                let totalReward = Math.floor(amount * 0.025);
+                if (options.isDesignated) {
+                    const designatedSpent = getCardBonusSpent(cardId, t => t.isKumamonJapan && t.isKumamonDesignated);
+                    if (designatedSpent < 8333) totalReward += Math.floor(Math.min(amount, 8333 - designatedSpent) * 0.06);
+                }
+                return { reward: totalReward, rate: totalReward / amount };
+            }
+            return { reward: Math.floor(amount * 0.005), rate: 0.005 };
+        }
+        // J4 幣倍卡
+        else if (cardId === 'j4') {
+            rate = 0.01; // 基本 1%
+            if (options.isSelected) {
+                rate += 0.05; // 海外/精選 +5% (共6%)
+            }
+            reward = Math.floor(amount * rate);
+        }
+        // J5 三井卡
+        else if (cardId === 'j5') {
+            rate = 0.003; // 基本 0.3%
+            if (options.isSelected) {
+                rate = 0.073; // 特選餐飲 7.3%
+            }
+            reward = Math.floor(amount * rate);
+        }
+        // C12 JCB卡 (修復：加入封頂計算)
+        else if (cardId === 'c12') {
+            const quota = getJcbQuotaUsed();
+            
+            // 基礎回饋
+            let baseRate = 0.01; // 國內 1%
+            if (options.isForeign) {
+                baseRate = 0.02; // 國外 2%
+            }
+            
+            let totalReward = Math.floor(amount * baseRate);
+            
+            // 加碼回饋 (+3%，需檢查封頂)
+            if (options.isBonus) {
+                const available = Math.max(0, quota.bonusLimit - quota.bonusSpent);
+                if (available > 0) {
+                    const validForBonus = Math.min(amount, available);
+                    totalReward += Math.floor(validForBonus * 0.03);
+                }
+            }
+            
+            rate = (amount > 0) ? (totalReward / amount) : baseRate;
+            return { reward: totalReward, rate };
+        }
+        // C4 將將卡
+        else if (cardId === 'c4') {
+            const mode = options.mode || 'base';
+            if (mode === 'selected') {
+                const selectedSpent = getCardBonusSpent(cardId, t => t.jiangMode === 'selected');
+                if (selectedSpent < 6666) {
+                    return { reward: Math.floor(Math.min(amount, 6666 - selectedSpent) * 0.05), rate: 0.05 };
+                }
+            } else if (mode === 'travel') {
+                const travelSpent = getCardBonusSpent(cardId, t => t.jiangMode === 'travel');
+                if (travelSpent < 11111) {
+                    return { reward: Math.floor(Math.min(amount, 11111 - travelSpent) * 0.05), rate: 0.05 };
+                }
+            }
+            return { reward: Math.floor(amount * 0.005), rate: 0.005 };
+        }
+        // DBS1 eco卡
+        else if (cardId === 'dbs1') {
+            if (options.isLinePay) {
+                const lpSpent = getCardBonusSpent(cardId, t => t.isDbsLinePay);
+                if (lpSpent < 11111) {
+                    return { reward: Math.floor(Math.min(amount, 11111 - lpSpent) * 0.10), rate: 0.10 };
+                }
+            }
+            if (options.isGreen) {
+                const greenSpent = getCardBonusSpent(cardId, t => t.isDbsGreen);
+                if (greenSpent < 3333) {
+                    return { reward: Math.floor(Math.min(amount, 3333 - greenSpent) * 0.10), rate: 0.10 };
+                }
+            }
+            if (options.isForeign) {
+                const foreignSpent = getCardBonusSpent(cardId, t => t.isDbsForeign);
+                if (foreignSpent < 15000) {
+                    return { reward: Math.floor(Math.min(amount, 15000 - foreignSpent) * 0.05), rate: 0.05 };
+                }
+            }
+            return { reward: Math.floor(amount * 0.01), rate: 0.01 };
+        }
+        // C1 傳說對決卡
+        else if (cardId === 'c1') {
+            const baseReward = Math.floor(amount * 0.012);
+            if (options.isBonus && currentLocation === 'TW') {
+                const bonusSpent = getCardBonusSpent(cardId, t => t.isLegendBonus && (t.location || 'TW') === 'TW');
+                const limit = 11363;
+                if (bonusSpent < limit) {
+                    const available = Math.min(amount, limit - bonusSpent);
+                    return { reward: baseReward + Math.floor(available * 0.088), rate: 0.10 };
+                }
+            }
+            return { reward: baseReward, rate: 0.012 };
+        }
+        
+        // 預設
+        rate = card.tier1Rate || 0.01;
+        return { reward: Math.floor(amount * rate), rate };
+    }
+
     function calculateStats(cardId) {
         const card = cards.find(c => c.id === cardId);
         if (!card || card.type === 'placeholder') return { spent: 0, reward: 0, progress: 0, msg: '' };
         
         if (cardId === 'j1') return calculateFubonJStats();
+        if (cardId === 'c12') return calculateJcbStats();
         
         const txs = getCurrentCycleTransactions(cardId);
         let totalSpent = 0, totalReward = 0;
@@ -2830,7 +3054,6 @@
             if (isOverseas) {
                 // 海外實體上限 6250
                 const overseasLimit = 6250;
-                // 計算符合海外加碼的消費 (非 TW 或有勾選海外)
                 const overseasSpent = txs.reduce((sum, t) => {
                     return (t.location !== 'TW' || t.isUniOverseas) ? sum + (t.amountTWD || t.amount) : sum;
                 }, 0);
@@ -2881,15 +3104,6 @@
                  const remain = Math.max(0, currencyLimit - qualSpent);
                  msg = (qualSpent >= currencyLimit) ? '海外加碼已封頂' : `海外可再刷 ${formatAmountWithCurrency(remain)}`;
                  progress = Math.min(100, (qualSpent / currencyLimit) * 100);
-                 return { spent: totalSpent, reward: totalReward, progress, msg };
-             }
-             // 永豐 JCB (c12) - 海外/特選共用 10000
-             if (cardId === 'c12') {
-                 const jcbLimit = 10000;
-                 const bonusSpent = txs.reduce((sum, t) => (t.isSinopacJcbBonus || t.isSinopacJcbForeign) ? sum + (t.amountTWD || t.amount) : sum, 0);
-                 const remain = Math.max(0, jcbLimit - bonusSpent);
-                 msg = (bonusSpent >= jcbLimit) ? '加碼已封頂' : `海外可再刷 ${formatAmountWithCurrency(remain)}`;
-                 progress = Math.min(100, (bonusSpent / jcbLimit) * 100);
                  return { spent: totalSpent, reward: totalReward, progress, msg };
              }
         }
@@ -2982,7 +3196,7 @@
             const amount = tx.amountTWD || tx.amount || 0;
             totalSpent += amount;
             const region = tx.fubonJRegion || 'domestic';
-            const baseRate = (region === 'jpkr') ? 0.03 : 0.01;
+            const baseRate = (region === 'jpkr') ? 0.03 : (region === 'th') ? 0.01 : 0.01;
             totalReward += Math.floor(amount * baseRate);
         });
         
@@ -3013,14 +3227,45 @@
         return { spent: totalSpent, reward: totalReward, progress, msg };
     }
 
+    // JCB 卡統計 (新增)
+    function calculateJcbStats() {
+        const txs = getCurrentCycleTransactions('c12');
+        const quota = getJcbQuotaUsed();
+        
+        let totalSpent = 0, totalReward = 0;
+        
+        txs.forEach(tx => {
+            const amount = tx.amountTWD || tx.amount || 0;
+            totalSpent += amount;
+            
+            // 基礎回饋
+            const baseRate = tx.isSinopacJcbForeign ? 0.02 : 0.01;
+            totalReward += Math.floor(amount * baseRate);
+        });
+        
+        // 加碼回饋 (封頂 $300，即刷 $10,000)
+        const bonusReward = Math.min(Math.floor(quota.bonusSpent * 0.03), 300);
+        totalReward += bonusReward;
+        
+        const progress = Math.min(100, (quota.bonusSpent / quota.bonusLimit) * 100);
+        
+        let msg = '';
+        if (quota.bonusRemain <= 0) {
+            msg = '加碼已封頂 (變1%/2%)';
+        } else {
+            msg = `加碼可再刷 ${formatAmountWithCurrency(quota.bonusRemain)}`;
+        }
+        
+        return { spent: totalSpent, reward: totalReward, progress, msg };
+    }
+
     function calculateStatsAllLocations(cardId) {
         return calculateStats(cardId);
     }
 
     function calculateTxRewardWithCap(cardId, tx) {
-        const result = calculateSingleReward(cardId, tx.amountTWD || tx.amount || 0, {
+        const options = {
             ...tx,
-            // 為了復用 calculateSingleReward，將 tx 的屬性映射回 options 結構
             mode: tx.laiDianMode || tx.richartMode || tx.jiangMode || 'general',
             tier: tx.hsbcTier,
             brandCount: tx.uniBrandCount,
@@ -3030,8 +3275,29 @@
             isSelected: tx.isCurrencySelected || tx.isSinopacMitsuiSelected,
             isTarget: tx.isSinopacMitsuiTarget,
             isQuarterly: tx.isSinopacJcbQuarterly,
-            isBonus: tx.isUniBonus || tx.isSinopacJcbBonus || tx.isLegendBonus
-        });
+            isBonus: tx.isUniBonus || tx.isSinopacJcbBonus || tx.isLegendBonus,
+            isNew: tx.isLaiDianNew,
+            isJapan: tx.isJiheJapan || tx.isKumamonJapan,
+            isApple: tx.isJiheApple,
+            isDomesticJapanese: tx.isJiheDomesticJapanese,
+            isDesignated: tx.isKumamonDesignated,
+            isPayPay: tx.isKumamonPayPay,
+            isPet: tx.isHappyPet,
+            isLife: tx.isHappyLife,
+            isPeace: tx.isHappyPeace,
+            isForeign: tx.isForeign || tx.isHappyForeign || tx.isHsbcForeign || tx.isSinopacJcbForeign || tx.isDbsForeign,
+            isGreen: tx.isGreenChannel || tx.isDbsGreen,
+            isLinePay: tx.isDbsLinePay,
+            isGroup: tx.isUniGroup,
+            isIcash: tx.isUniIcash,
+            isOverseas: tx.isUniOverseas,
+            isUp: tx.isUniUp,
+            isBonus10: tx.isBonus10,
+            isBonus25: tx.isBonus25,
+            isBill: tx.isBill
+        };
+        
+        const result = calculateSingleReward(cardId, tx.amountTWD || tx.amount || 0, options);
         return result;
     }
 
@@ -3287,9 +3553,10 @@
         filterManageCards();
     }
 
+    // 匯出資料 (修復：確保 cardId 欄位存在)
     function exportData() {
         const data = {
-            version: 'V125.1',
+            version: 'V125.3',
             exportTime: new Date().toISOString(),
             visibleCards: visibleCards,
             cardOrder: savedOrder,
@@ -3304,15 +3571,30 @@
                 hsbc_initial: localStorage.getItem('hsbc_initial'),
                 hsbc_redeemed: localStorage.getItem('hsbc_redeemed'),
                 currency_level: localStorage.getItem('currency_level'),
-                uni_brands: localStorage.getItem('uni_brands'),
                 scene_snapshots: localStorage.getItem('scene_snapshots')
             }
         };
         
+        // 匯出所有卡片的交易紀錄
         cards.forEach(card => {
             const txs = getTransactions(card.id);
-            if (txs.length > 0) data.transactions[card.id] = txs;
+            if (txs.length > 0) {
+                // 確保每筆交易都有 cardId 欄位
+                data.transactions[card.id] = txs.map(tx => ({
+                    ...tx,
+                    cardId: card.id
+                }));
+            }
         });
+        
+        // 匯出 UniOpen 各週期的踩點記錄
+        data.uniBrandsByPeriod = {};
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('uni_brands_')) {
+                data.uniBrandsByPeriod[key] = localStorage.getItem(key);
+            }
+        }
         
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -3328,6 +3610,7 @@
         document.getElementById('fileInput').click();
     }
 
+    // 匯入資料 (修復：改善匯入邏輯，處理 cardId 遺失問題)
     function importFile(input) {
         const file = input.files[0];
         if (!file) return;
@@ -3342,6 +3625,7 @@
                     return;
                 }
                 
+                // 匯入基本設定
                 if (data.visibleCards) {
                     localStorage.setItem('visibleCards', JSON.stringify(data.visibleCards));
                 }
@@ -3352,27 +3636,37 @@
                     localStorage.setItem('cardSettings', JSON.stringify(data.cardSettings));
                 }
                 
-                if (Array.isArray(data.transactions)) {
-                    const txsByCard = {};
-                    data.transactions.forEach(tx => {
-                        const cardId = tx.cardId;
-                        if (!cardId) return;
-                        if (!txsByCard[cardId]) txsByCard[cardId] = [];
-                        txsByCard[cardId].push(normalizeTx(tx));
-                    });
-                    Object.keys(txsByCard).forEach(cardId => {
-                        saveTransactions(cardId, txsByCard[cardId]);
-                    });
-                }
-                else if (data.transactions && typeof data.transactions === 'object') {
-                    Object.keys(data.transactions).forEach(cardId => {
-                        const txs = data.transactions[cardId];
-                        if (Array.isArray(txs)) {
-                            saveTransactions(cardId, txs.map(tx => normalizeTx(tx)));
-                        }
-                    });
+                // 匯入交易紀錄 (修復版)
+                if (data.transactions) {
+                    // 情況 A：新格式 (物件，key 為 cardId)
+                    if (typeof data.transactions === 'object' && !Array.isArray(data.transactions)) {
+                        Object.keys(data.transactions).forEach(cardId => {
+                            const txs = data.transactions[cardId];
+                            if (Array.isArray(txs)) {
+                                const normalizedTxs = txs.map(tx => normalizeTx(tx, cardId));
+                                saveTransactions(cardId, normalizedTxs);
+                            }
+                        });
+                    }
+                    // 情況 B：舊格式 (陣列，依賴 tx.cardId)
+                    else if (Array.isArray(data.transactions)) {
+                        const txsByCard = {};
+                        data.transactions.forEach(tx => {
+                            const cardId = tx.cardId;
+                            if (!cardId) {
+                                console.warn('跳過無 cardId 的交易:', tx);
+                                return;
+                            }
+                            if (!txsByCard[cardId]) txsByCard[cardId] = [];
+                            txsByCard[cardId].push(normalizeTx(tx, cardId));
+                        });
+                        Object.keys(txsByCard).forEach(cardId => {
+                            saveTransactions(cardId, txsByCard[cardId]);
+                        });
+                    }
                 }
                 
+                // 匯入設定
                 if (data.settings) {
                     const s = data.settings;
                     if (s.current_location) localStorage.setItem('current_location', s.current_location);
@@ -3383,8 +3677,19 @@
                     if (s.hsbc_initial) localStorage.setItem('hsbc_initial', s.hsbc_initial);
                     if (s.hsbc_redeemed) localStorage.setItem('hsbc_redeemed', s.hsbc_redeemed);
                     if (s.currency_level) localStorage.setItem('currency_level', s.currency_level);
-                    if (s.uni_brands) localStorage.setItem('uni_brands', s.uni_brands);
                     if (s.scene_snapshots) localStorage.setItem('scene_snapshots', s.scene_snapshots);
+                }
+                
+                // 匯入 UniOpen 踩點記錄 (按週期)
+                if (data.uniBrandsByPeriod) {
+                    Object.keys(data.uniBrandsByPeriod).forEach(key => {
+                        localStorage.setItem(key, data.uniBrandsByPeriod[key]);
+                    });
+                }
+                // 相容舊版 uni_brands (無週期)
+                if (data.settings && data.settings.uni_brands && !data.uniBrandsByPeriod) {
+                    const cycleKey = getUniBrandCycleKey();
+                    localStorage.setItem(cycleKey, data.settings.uni_brands);
                 }
                 
                 alert('匯入成功！頁面將重新載入。');
@@ -3399,8 +3704,14 @@
         input.value = '';
     }
 
-    function normalizeTx(tx) {
+    // 正規化交易資料 (修復：確保 cardId 存在)
+    function normalizeTx(tx, fallbackCardId) {
         const normalized = { ...tx };
+        
+        // 確保 cardId 存在
+        if (!normalized.cardId && fallbackCardId) {
+            normalized.cardId = fallbackCardId;
+        }
         
         if (!normalized.id) normalized.id = Date.now() + Math.random();
         if (!normalized.amountTWD && normalized.amount) normalized.amountTWD = normalized.amount;
@@ -3425,6 +3736,7 @@
             const key = localStorage.key(i);
             if (key && (
                 key.startsWith('transactions_') || 
+                key.startsWith('uni_brands_') ||
                 ['visibleCards', 'cardOrder', 'cardSettings', 'user_setup_done', 'scene_snapshots',
                  'uni_settings', 'happy_used', 'hsbc_tier', 'hsbc_initial', 'hsbc_redeemed',
                  'currency_level', 'uni_brands', 'current_location', 'exchange_rates', 'last_rate_update'].includes(key)

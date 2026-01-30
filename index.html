@@ -1746,10 +1746,9 @@
             display.innerText = `目前 ${count} 家 (加碼 ${bonus}%)`;
         }
     }
-</script>
-    <script>
+      
     // ==========================================
-    // Part 4: 交易資料、Toggle 邏輯與運算核心 (V125.3)
+    // Part 4: 交易資料、Toggle 邏輯與運算核心 (V125.4)
     // ==========================================
 
     function getTransactionsKey(cardId) { return `transactions_${cardId}`; }
@@ -1937,6 +1936,10 @@
         else if (cardId === 'c10') {
             document.getElementById('uniOpenOptions').style.display = 'block';
             initUniBrandGrid();
+            // 重置選項 (避免殘留)
+            document.getElementById('checkUniGroup').checked = false;
+            document.getElementById('checkUniIcash').checked = false;
+            document.getElementById('checkUniOverseas').checked = false;
         }
         // C11 Richart卡
         else if (cardId === 'c11') {
@@ -2006,6 +2009,8 @@
                 document.getElementById('jiangTravelRow').classList.add('expired');
                 document.getElementById('jiangTravelExpMsg').style.display = 'block';
             }
+            // 顯示低消警告
+            updateJiangMinSpendWarning();
         }
         // DBS1 eco卡
         else if (cardId === 'dbs1') {
@@ -2195,6 +2200,19 @@
         }
     }
 
+    // 將將卡低消警告
+    function updateJiangMinSpendWarning() {
+        const warning = document.getElementById('jiangMinSpendWarning');
+        const txs = getCurrentCycleTransactions('c4');
+        const totalSpent = txs.reduce((sum, tx) => sum + (tx.amountTWD || tx.amount || 0), 0);
+        
+        if (totalSpent < 3000) {
+            warning.style.display = 'block';
+        } else {
+            warning.style.display = 'none';
+        }
+    }
+
     function checkLaiDianMinSpend() {
         const amount = parseFloat(document.getElementById('amountInput').value) || 0;
         const mode = document.querySelector('input[name="laiDianMode"]:checked')?.value;
@@ -2290,6 +2308,8 @@
     function saveHsbcTier() {
         const tier = document.querySelector('input[name="hsbcTier"]:checked')?.value || 'infinite';
         localStorage.setItem('hsbc_tier', tier);
+        // 重新渲染以更新卡面名稱
+        renderGrid();
     }
     function saveHsbcInitial() {
         localStorage.setItem('hsbc_initial', document.getElementById('hsbcInitialMiles').value || '0');
@@ -2390,7 +2410,7 @@
         return options;
     }
 
-    // 回饋預覽計算
+    // 回饋預覽計算 (修復版)
     function updateRewardPreview() {
         const cardId = document.getElementById('cardIdInput').value;
         const amount = parseFloat(document.getElementById('amountInput').value) || 0;
@@ -2398,31 +2418,40 @@
         
         if (amount <= 0) {
             liveCalc.style.display = 'none';
-            // J1 富邦J卡：金額為0時也要檢查低消警告
-            if (cardId === 'j1') {
-                checkFubonJMinSpend();
-            }
-            // C5 賴點卡：金額為0時也要檢查低消警告
-            if (cardId === 'c5') {
-                checkLaiDianMinSpend();
-            }
+            if (cardId === 'j1') checkFubonJMinSpend();
+            if (cardId === 'c5') checkLaiDianMinSpend();
             return;
         }
         
         const rate = getCurrentRate();
         const amountTWD = Math.round(amount * rate);
         
-        // J1 富邦J卡：檢查低消
-        if (cardId === 'j1') {
-            checkFubonJMinSpend();
-        }
-        // C5 賴點卡：檢查低消
-        if (cardId === 'c5') {
-            checkLaiDianMinSpend();
+        if (cardId === 'j1') checkFubonJMinSpend();
+        if (cardId === 'c5') checkLaiDianMinSpend();
+        
+        // 取得選項
+        const options = getTransactionOptions(cardId);
+        
+        // ★ 將將卡：檢查是否達低消
+        if (cardId === 'c4') {
+            const txs = getCurrentCycleTransactions('c4');
+            const totalSpent = txs.reduce((sum, tx) => sum + (tx.amountTWD || tx.amount || 0), 0);
+            
+            // 尚未達低消 $3,000
+            if (totalSpent < 3000) {
+                const willReachMinSpend = (totalSpent + amountTWD) >= 3000;
+                
+                if (!willReachMinSpend) {
+                    // 這筆加上去還是不夠低消，只有基本 0.5%
+                    const baseReward = Math.floor(amountTWD * 0.005);
+                    liveCalc.style.display = 'block';
+                    liveCalc.innerHTML = `預估獲得 <b>$${baseReward}</b> 回饋 (0.5%) <span style="color:#e65100; font-size:11px;"><br>⚠️ 需累積滿$3,000才享加碼</span>`;
+                    updateTWDPreview();
+                    return;
+                }
+            }
         }
         
-        // 計算回饋
-        const options = getTransactionOptions(cardId);
         const result = calculateSingleReward(cardId, amountTWD, options);
         
         liveCalc.style.display = 'block';
@@ -2433,7 +2462,6 @@
             liveCalc.innerHTML = `預估獲得 <b>$${result.reward}</b> 回饋 (${(result.rate * 100).toFixed(1)}%)`;
         }
         
-        // 更新 TWD 轉換顯示
         updateTWDPreview();
     }
 
@@ -2622,6 +2650,13 @@
             document.getElementById('dateInput').value = txDate.toISOString().split('T')[0];
         }
         
+        // ★ 還原 UniOpen 選項
+        if (cardId === 'c10') {
+            document.getElementById('checkUniGroup').checked = tx.isUniGroup || false;
+            document.getElementById('checkUniIcash').checked = tx.isUniIcash || false;
+            document.getElementById('checkUniOverseas').checked = tx.isUniOverseas || false;
+        }
+        
         deleteTransaction(cardId, txId, false);
         updateRewardPreview();
     }
@@ -2686,7 +2721,51 @@
             suicaRemain: Math.max(0, suicaLimit - suicaSpent)
         };
     }
+// ★★★ 豬富卡封頂額度計算 (新增) ★★★
+    function getPigRichQuotaUsed() {
+        const txs = getCurrentCycleTransactions('c6');
+        let bonus10Spent = 0, bonus25Spent = 0;
+        
+        txs.forEach(tx => {
+            const amount = tx.amountTWD || tx.amount || 0;
+            if (tx.isBill) return;
+            if (tx.isBonus10) bonus10Spent += amount;
+            if (tx.isBonus25) bonus25Spent += amount;
+        });
+        
+        return {
+            bonus10Spent,
+            bonus10Limit: 8000,
+            bonus10Remain: Math.max(0, 8000 - bonus10Spent),
+            bonus25Spent,
+            bonus25Limit: 400000,
+            bonus25Remain: Math.max(0, 400000 - bonus25Spent)
+        };
+    }
 
+    // ★★★ UniOpen 封頂額度計算 (新增) ★★★
+    function getUniOpenQuotaUsed() {
+        const txs = getCurrentCycleTransactions('c10');
+        let groupSpent = 0, icashSpent = 0, overseasSpent = 0, brandSpent = 0;
+        
+        txs.forEach(tx => {
+            const amount = tx.amountTWD || tx.amount || 0;
+            if (tx.isUniOverseas) {
+                overseasSpent += amount;
+            } else {
+                if (tx.isUniGroup) groupSpent += amount;
+                if (tx.isUniIcash) icashSpent += amount;
+                if (tx.isUniGroup && (tx.uniBrandCount || 0) >= 5) brandSpent += amount;
+            }
+        });
+        
+        return {
+            groupSpent, groupLimit: 25000, groupRemain: Math.max(0, 25000 - groupSpent),
+            icashSpent, icashLimit: 3750, icashRemain: Math.max(0, 3750 - icashSpent),
+            overseasSpent, overseasLimit: 6250, overseasRemain: Math.max(0, 6250 - overseasSpent),
+            brandSpent, brandLimit: 12500, brandRemain: Math.max(0, 12500 - brandSpent)
+        };
+    }
     // JCB 卡封頂額度計算
     function getJcbQuotaUsed() {
         const txs = getCurrentCycleTransactions('c12');
@@ -2717,23 +2796,41 @@
         const card = cards.find(c => c.id === cardId);
         if (!card) return { reward: 0, rate: 0 };
 
-        // C6 豬富卡
+        // C6 豬富卡 (修復：加入封頂計算)
         if (cardId === 'c6') {
+            const quota = getPigRichQuotaUsed();
+            
             if (options.isBill) {
                 rate = 0.0015;
+                reward = Math.floor(amount * rate);
             } else {
-                rate = 0.01; // 基本 1%
-                if (options.isBonus10) rate += 0.10;
-                if (options.isBonus25) {
-                    // 日本 PayPay 只有 +1%
-                    if (currentLocation === 'JP') {
-                        rate += 0.01;
-                    } else {
-                        rate += 0.025;
+                let baseReward = Math.floor(amount * 0.01);
+                reward = baseReward;
+                rate = 0.01;
+                
+                if (options.isBonus10) {
+                    const available10 = Math.max(0, quota.bonus10Limit - quota.bonus10Spent);
+                    if (available10 > 0) {
+                        const validFor10 = Math.min(amount, available10);
+                        reward += Math.floor(validFor10 * 0.10);
                     }
                 }
+                
+                if (options.isBonus25) {
+                    const available25 = Math.max(0, quota.bonus25Limit - quota.bonus25Spent);
+                    if (available25 > 0) {
+                        const validFor25 = Math.min(amount, available25);
+                        if (currentLocation === 'JP') {
+                            reward += Math.floor(validFor25 * 0.01);
+                        } else {
+                            reward += Math.floor(validFor25 * 0.025);
+                        }
+                    }
+                }
+                
+                rate = (amount > 0) ? (reward / amount) : 0.01;
             }
-            reward = Math.floor(amount * rate);
+            return { reward, rate };
         }
         // C5 賴點卡
         else if (cardId === 'c5') {
@@ -2779,43 +2876,99 @@
             rate = (amount > 0) ? (totalReward / amount) : 0.01;
             return { reward: totalReward, rate: rate };
         }
-        // C2 綠卡
+       // C2 綠卡 (修復：綠色通路封頂)
         else if (cardId === 'c2') {
             if (options.isForeign) {
                 rate = 0.02;
+                reward = Math.floor(amount * rate);
             } else if (options.isGreen) {
-                rate = 0.06;
+                const greenSpent = getCardBonusSpent(cardId, t => t.isGreenChannel);
+                const greenLimit = 3000;
+                const baseReward = Math.floor(amount * 0.01);
+                
+                if (greenSpent >= greenLimit) {
+                    reward = baseReward;
+                    rate = 0.01;
+                } else {
+                    const available = greenLimit - greenSpent;
+                    const validForGreen = Math.min(amount, available);
+                    reward = baseReward + Math.floor(validForGreen * 0.05);
+                    rate = (amount > 0) ? (reward / amount) : 0.06;
+                }
             } else {
                 rate = 0.01;
+                reward = Math.floor(amount * rate);
             }
-            reward = Math.floor(amount * rate);
+            return { reward, rate };
         }
-        // C7 UNI卡
+    // C7 UNI卡 (修復：加入封頂計算)
         else if (cardId === 'c7') {
-            // 國外只有基本 1%
             if (currentLocation !== 'TW') {
                 rate = 0.01;
-            } else if (options.isUp) {
-                rate = 0.045;
+                reward = Math.floor(amount * rate);
             } else {
-                rate = 0.035;
+                const baseReward = Math.floor(amount * 0.01);
+                reward = baseReward;
+                
+                // 任意選/UP選 加碼
+                const isUp = options.isUp;
+                const bonusRate = isUp ? 0.035 : 0.025; // UP選+3.5%, 任意選+2.5%
+                const bonusLimit = isUp ? 140000 : 40000;
+                const bonusSpent = getCardBonusSpent(cardId, t => true); // 所有消費都計入
+                
+                if (bonusSpent < bonusLimit) {
+                    const available = bonusLimit - bonusSpent;
+                    const validForBonus = Math.min(amount, available);
+                    reward += Math.floor(validForBonus * bonusRate);
+                }
+                
+                // 新戶 +3%
+                if (options.isBonus) {
+                    const newUserLimit = 10000;
+                    const newUserSpent = getCardBonusSpent(cardId, t => t.isUniBonus);
+                    if (newUserSpent < newUserLimit) {
+                        const available = newUserLimit - newUserSpent;
+                        const validForNew = Math.min(amount, available);
+                        reward += Math.floor(validForNew * 0.03);
+                    }
+                }
+                
+                rate = (amount > 0) ? (reward / amount) : 0.01;
             }
-            if (options.isBonus && currentLocation === 'TW') rate += 0.03;
-            reward = Math.floor(amount * rate);
+            return { reward, rate };
         }
-        // C8 樂家+卡
+        // C8 樂家+卡 (修復：加入回饋上限)
         else if (cardId === 'c8') {
-            rate = 0.005; // 基本 0.5%
+            const baseReward = Math.floor(amount * 0.005);
+            reward = baseReward;
+            
             if (options.isForeign) {
-                rate += 0.02; // 國外 +2%
+                reward += Math.floor(amount * 0.02); // 國外 +2% 無上限
             } else if (options.isPet) {
-                rate += 0.095; // 寵物 +9.5%
+                // 寵物 +9.5%，回饋上限 $500
+                const petUsed = getCardBonusSpent(cardId, t => t.isHappyPet || t.happyMode === 'pet');
+                const petRewardUsed = Math.floor(petUsed * 0.095);
+                const petRewardRemain = Math.max(0, 500 - petRewardUsed);
+                const thisPetReward = Math.min(Math.floor(amount * 0.095), petRewardRemain);
+                reward += thisPetReward;
             } else if (options.isLife) {
-                rate += 0.035; // 生活 +3.5%
+                // 生活 +3.5%，回饋上限 $200
+                const lifeUsed = getCardBonusSpent(cardId, t => t.isHappyLife || t.happyMode === 'life');
+                const lifeRewardUsed = Math.floor(lifeUsed * 0.035);
+                const lifeRewardRemain = Math.max(0, 200 - lifeRewardUsed);
+                const thisLifeReward = Math.min(Math.floor(amount * 0.035), lifeRewardRemain);
+                reward += thisLifeReward;
             } else if (options.isPeace) {
-                rate += 0.035; // 安心 +3.5%
+                // 安心 +3.5%，回饋上限 $200
+                const peaceUsed = getCardBonusSpent(cardId, t => t.isHappyPeace || t.happyMode === 'peace');
+                const peaceRewardUsed = Math.floor(peaceUsed * 0.035);
+                const peaceRewardRemain = Math.max(0, 200 - peaceRewardUsed);
+                const thisPeaceReward = Math.min(Math.floor(amount * 0.035), peaceRewardRemain);
+                reward += thisPeaceReward;
             }
-            reward = Math.floor(amount * rate);
+            
+            rate = (amount > 0) ? (reward / amount) : 0.005;
+            return { reward, rate };
         }
         // C9 旅人卡 (哩程)
         else if (cardId === 'c9') {
@@ -2829,22 +2982,51 @@
             reward = Math.floor(amount / milesPerDollar);
             rate = 1 / milesPerDollar;
         }
-        // C10 UniOpen卡
+        // C10 UniOpen卡 (修復：加入封頂計算)
         else if (cardId === 'c10') {
-            rate = 0.01; // 基本 1%
+            const quota = getUniOpenQuotaUsed();
+            let baseReward = Math.floor(amount * 0.01);
+            reward = baseReward;
+            rate = 0.01;
+            
             if (options.isOverseas) {
-                rate = 0.11; // 海外 11%
+                const availableOverseas = Math.max(0, quota.overseasLimit - quota.overseasSpent);
+                if (availableOverseas > 0) {
+                    const validForOverseas = Math.min(amount, availableOverseas);
+                    reward = Math.floor(validForOverseas * 0.11);
+                    if (amount > availableOverseas) {
+                        reward += Math.floor((amount - availableOverseas) * 0.01);
+                    }
+                }
+                rate = (amount > 0) ? (reward / amount) : 0.11;
             } else {
-                if (options.isGroup) rate += 0.02;
-                if (options.isIcash) rate += 0.04;
-                // 踩點任務
+                if (options.isGroup) {
+                    const availableGroup = Math.max(0, quota.groupLimit - quota.groupSpent);
+                    if (availableGroup > 0) {
+                        reward += Math.floor(Math.min(amount, availableGroup) * 0.02);
+                    }
+                }
+                if (options.isIcash) {
+                    const availableIcash = Math.max(0, quota.icashLimit - quota.icashSpent);
+                    if (availableIcash > 0) {
+                        reward += Math.floor(Math.min(amount, availableIcash) * 0.04);
+                    }
+                }
                 const brandCount = options.brandCount || 0;
-                if (brandCount >= 5) rate += 0.04;
-                else if (brandCount >= 4) rate += 0.03;
-                else if (brandCount >= 3) rate += 0.02;
-                else if (brandCount >= 2) rate += 0.01;
+                if (brandCount >= 2 && options.isGroup) {
+                    const availableBrand = Math.max(0, quota.brandLimit - quota.brandSpent);
+                    if (availableBrand > 0) {
+                        let brandRate = 0;
+                        if (brandCount >= 5) brandRate = 0.04;
+                        else if (brandCount >= 4) brandRate = 0.03;
+                        else if (brandCount >= 3) brandRate = 0.02;
+                        else if (brandCount >= 2) brandRate = 0.01;
+                        reward += Math.floor(Math.min(amount, availableBrand) * brandRate);
+                    }
+                }
+                rate = (amount > 0) ? (reward / amount) : 0.01;
             }
-            reward = Math.floor(amount * rate);
+            return { reward, rate };
         }
         // C11 Richart卡
         else if (cardId === 'c11') {
@@ -2931,21 +3113,42 @@
             }
             return { reward: Math.floor(amount * 0.005), rate: 0.005 };
         }
-        // J4 幣倍卡
+        // J4 幣倍卡 (修復：加入封頂計算)
         else if (cardId === 'j4') {
-            rate = 0.01; // 基本 1%
+            const baseReward = Math.floor(amount * 0.01);
+            reward = baseReward;
+            
             if (options.isSelected) {
-                rate += 0.05; // 海外/精選 +5% (共6%)
+                const level = options.level || localStorage.getItem('currency_level') || 'low';
+                const bonusLimit = (level === 'high') ? 20000 : 7500;
+                const bonusSpent = getCardBonusSpent(cardId, t => t.isCurrencySelected);
+                
+                if (bonusSpent < bonusLimit) {
+                    const available = bonusLimit - bonusSpent;
+                    const validForBonus = Math.min(amount, available);
+                    reward += Math.floor(validForBonus * 0.05);
+                }
             }
-            reward = Math.floor(amount * rate);
+            
+            rate = (amount > 0) ? (reward / amount) : 0.01;
+            return { reward, rate };
         }
-        // J5 三井卡
+        // J5 三井卡 (修復：特選餐飲回饋上限)
         else if (cardId === 'j5') {
-            rate = 0.003; // 基本 0.3%
+            const baseReward = Math.floor(amount * 0.003);
+            reward = baseReward;
+            
             if (options.isSelected) {
-                rate = 0.073; // 特選餐飲 7.3%
+                // 特選餐飲 +7%，回饋上限 $100
+                const selectedSpent = getCardBonusSpent(cardId, t => t.isSinopacMitsuiSelected);
+                const selectedRewardUsed = Math.floor(selectedSpent * 0.07);
+                const selectedRewardRemain = Math.max(0, 100 - selectedRewardUsed);
+                const thisSelectedReward = Math.min(Math.floor(amount * 0.07), selectedRewardRemain);
+                reward += thisSelectedReward;
             }
-            reward = Math.floor(amount * rate);
+            
+            rate = (amount > 0) ? (reward / amount) : 0.003;
+            return { reward, rate };
         }
         // C12 JCB卡 (修復：加入封頂計算)
         else if (cardId === 'c12') {

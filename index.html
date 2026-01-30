@@ -3875,7 +3875,36 @@ if (cycleDay && cycleDay > 0) {
                     const cycleKey = getUniBrandCycleKey();
                     localStorage.setItem(cycleKey, data.settings.uni_brands);
                 }
-                
+                // ========== 相容舊格式（設定在根層級）==========
+                // currentLocation
+                if (!data.settings && data.currentLocation) {
+                    localStorage.setItem('current_location', data.currentLocation);
+                }
+                // currencyLevel
+                if (!data.settings && data.currencyLevel) {
+                    localStorage.setItem('currency_level', data.currencyLevel);
+                }
+                // hsbcTier / hsbcInitial / hsbcRedeemed
+                if (!data.settings && data.hsbcTier) {
+                    localStorage.setItem('hsbc_tier', data.hsbcTier);
+                }
+                if (!data.settings && data.hsbcInitial) {
+                    localStorage.setItem('hsbc_initial', data.hsbcInitial);
+                }
+                if (!data.settings && data.hsbcRedeemed) {
+                    localStorage.setItem('hsbc_redeemed', data.hsbcRedeemed);
+                }
+                // sceneSnapshots
+                if (!data.settings && data.sceneSnapshots) {
+                    localStorage.setItem('scene_snapshots', JSON.stringify(data.sceneSnapshots));
+                }
+                // uniOpenState
+                if (!data.settings && data.uniOpenState) {
+                    if (data.uniOpenState.brands) {
+                        const cycleKey = getUniBrandCycleKey();
+                        localStorage.setItem(cycleKey, JSON.stringify(data.uniOpenState.brands));
+                    }
+                }
                 alert('匯入成功！頁面將重新載入。');
                 location.reload();
                 

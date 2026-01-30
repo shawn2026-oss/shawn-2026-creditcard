@@ -2991,19 +2991,18 @@ function handleHappyExclusive(selected) {
             }
             return { reward, rate };
         }
-     // C8 樂家+卡 (修復：低消$3,000才享加碼，加入回饋上限)
+   // C8 樂家+卡 (修復：達低消後全部回溯享加碼)
         else if (cardId === 'c8') {
             const baseReward = Math.floor(amount * 0.005);
             reward = baseReward;
             
-            // 檢查是否達低消 $3,000
+            // 檢查整個週期是否達低消 $3,000
             const txs = getCurrentCycleTransactions(cardId);
-            const totalSpent = txs.reduce((sum, tx) => sum + (tx.amountTWD || tx.amount || 0), 0);
+            const totalCycleSpent = txs.reduce((sum, tx) => sum + (tx.amountTWD || tx.amount || 0), 0);
             const minSpend = 3000;
-            const reachedMinSpend = (totalSpent + amount) >= minSpend;
             
-            if (!reachedMinSpend) {
-                // 未達低消，只有基本 0.5%
+            if (totalCycleSpent < minSpend) {
+                // 整個週期未達低消，只有基本 0.5%
                 rate = 0.005;
                 return { reward, rate };
             }

@@ -1754,7 +1754,11 @@
     function getTransactionsKey(cardId) { return `transactions_${cardId}`; }
     function getTransactions(cardId) { return JSON.parse(localStorage.getItem(getTransactionsKey(cardId)) || '[]'); }
     function saveTransactions(cardId, txs) { localStorage.setItem(getTransactionsKey(cardId), JSON.stringify(txs)); }
-
+// 取得該月的實際結帳日（處理大小月）
+function getActualCycleDay(year, month, cycleDay) {
+    const lastDay = new Date(year, month + 1, 0).getDate();
+    return Math.min(cycleDay, lastDay);
+}
    function getCycleKey(cardId) {
     const settings = cardSettings[cardId] || {};
     const cycleDay = parseInt(settings.cycleDay);
@@ -3516,27 +3520,39 @@ else if (cardId === 'c4') {
                 // 消費金額顯示
                 const spentDisplay = formatAmountWithCurrency(stats.spent);
                 
-                let cycleHint = '';
+               let cycleHint = '';
 const settings = cardSettings[card.id] || {};
 const cycleDay = parseInt(settings.cycleDay);
 
 if (cycleDay && cycleDay > 0) {
     const now = new Date();
     const today = now.getDate();
+    const thisMonth = now.getMonth();
+    const thisYear = now.getFullYear();
     
-    let startMonth, endMonth;
+    // 取得本月和上月的實際結帳日
+    const actualCycleDayThisMonth = getActualCycleDay(thisYear, thisMonth, cycleDay);
+    const actualCycleDayLastMonth = getActualCycleDay(thisYear, thisMonth - 1, cycleDay);
     
-    if (today > cycleDay) {
-        startMonth = now.getMonth() + 1;
-        endMonth = now.getMonth() + 2;
-        if (endMonth > 12) endMonth = 1;
+    let startDate, endDate;
+    
+    if (today > actualCycleDayThisMonth) {
+        // 本期：這個月 結帳日+1 到 下個月 結帳日
+        const actualCycleDayNextMonth = getActualCycleDay(thisYear, thisMonth + 1, cycleDay);
+        startDate = new Date(thisYear, thisMonth, actualCycleDayThisMonth + 1);
+        endDate = new Date(thisYear, thisMonth + 1, actualCycleDayNextMonth);
     } else {
-        startMonth = now.getMonth();
-        if (startMonth < 1) startMonth = 12;
-        endMonth = now.getMonth() + 1;
+        // 本期：上個月 結帳日+1 到 這個月 結帳日
+        startDate = new Date(thisYear, thisMonth - 1, actualCycleDayLastMonth + 1);
+        endDate = new Date(thisYear, thisMonth, actualCycleDayThisMonth);
     }
     
-    cycleHint = `${startMonth}/${cycleDay + 1} - ${endMonth}/${cycleDay}`;
+    const sM = startDate.getMonth() + 1;
+    const sD = startDate.getDate();
+    const eM = endDate.getMonth() + 1;
+    const eD = endDate.getDate();
+    
+    cycleHint = `${sM}/${sD} - ${eM}/${eD}`;
 } else {
     const month = new Date().getMonth() + 1;
     cycleHint = `${month}月`;

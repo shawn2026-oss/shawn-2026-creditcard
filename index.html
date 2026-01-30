@@ -28,7 +28,7 @@
     <meta property="og:url" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/">
     <meta property="og:type" content="website">
 
-    <title>刷卡回饋管家 (V125.4 Fix)</title>
+    <title>刷卡回饋管家 (V125.4 )</title>
         
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
@@ -578,7 +578,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V125.4 Fix</div>
+            <div class="version-tag">V125.4 </div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -600,7 +600,7 @@
         <div class="subtitle"><span class="today-date" id="dateDisplay"></span></div>
         
         <div class="news-ticker">
-            <div class="ticker-content" id="news-text">🎉 V125.3 修復：備份還原紀錄遺失、UniOpen 完整品牌清單、JCB 封頂計算！</div>
+            <div class="ticker-content" id="news-text">🎉 V125.4修復：備份還原紀錄遺失、UniOpen 完整品牌清單、JCB 封頂計算！</div>
         </div>
         
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
@@ -1283,7 +1283,7 @@
     </div>
     <script>
     // ==========================================
-    // Part 3: 核心設定、匯率與 UI 邏輯 (V125.3)
+    // Part 3: 核心設定、匯率與 UI 邏輯 (V125.4)
     // ==========================================
     
     const LOCATION_CONFIG = {
@@ -3740,7 +3740,7 @@ if (cycleDay && cycleDay > 0) {
     // 匯出資料 (修復：確保 cardId 欄位存在)
     function exportData() {
         const data = {
-            version: 'V125.3',
+            version: 'V125.4',
             exportTime: new Date().toISOString(),
             visibleCards: visibleCards,
             cardOrder: savedOrder,

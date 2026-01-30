@@ -28,7 +28,7 @@
     <meta property="og:url" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/">
     <meta property="og:type" content="website">
 
-    <title>刷卡回饋管家 (V125.5 )</title>
+    <title>刷卡回饋管家 (V125.6 )</title>
         
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
@@ -578,7 +578,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V125.5 </div>
+            <div class="version-tag">V125.6 </div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -600,7 +600,7 @@
         <div class="subtitle"><span class="today-date" id="dateDisplay"></span></div>
         
         <div class="news-ticker">
-            <div class="ticker-content" id="news-text">🎉 V125.5修復：備份還原紀錄遺失、UniOpen 完整品牌清單、JCB 封頂計算！</div>
+            <div class="ticker-content" id="news-text">🎉 V125.6修復：備份還原紀錄遺失、UniOpen 完整品牌清單、JCB 封頂計算！</div>
         </div>
         
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
@@ -1283,7 +1283,7 @@
     </div>
     <script>
     // ==========================================
-    // Part 3: 核心設定、匯率與 UI 邏輯 (V125.5)
+    // Part 3: 核心設定、匯率與 UI 邏輯 (V125.6)
     // ==========================================
     
     const LOCATION_CONFIG = {
@@ -1529,6 +1529,7 @@
 
     fetch('config.json?t=' + Date.now()).then(response => response.json()).then(data => { if(data.news) document.getElementById('news-text').innerHTML = data.news; }).catch(error => {});
     let cardSettings = JSON.parse(localStorage.getItem('cardSettings')) || {};
+let editingTxId = null; // 追蹤正在編輯的交易 ID
 
     window.addEventListener('load', () => {
         injectDetails(); fetchExchangeRates();
@@ -1610,7 +1611,17 @@
         visibleCards = realCards; renderGrid();
     }
 
-    function closeModal() { document.getElementById('transactionModal').style.display = 'none'; document.getElementById('manageModal').style.display = 'none'; document.getElementById('sharePreviewModal').style.display = 'none'; document.getElementById('cardSettingsModal').style.display = 'none'; }
+    function closeModal() { 
+        document.getElementById('transactionModal').style.display = 'none'; 
+        document.getElementById('manageModal').style.display = 'none'; 
+        document.getElementById('sharePreviewModal').style.display = 'none'; 
+        document.getElementById('cardSettingsModal').style.display = 'none'; 
+        
+        // ★ 重置編輯狀態
+        editingTxId = null;
+        const btnConfirm = document.getElementById('btn-confirm');
+        if (btnConfirm) btnConfirm.innerText = '確認';
+    }
     window.addEventListener('popstate', closeModal);
     
     // Cards DB
@@ -1748,7 +1759,7 @@
     }
       
     // ==========================================
-    // Part 4: 交易資料、Toggle 邏輯與運算核心 (V125.5)
+    // Part 4: 交易資料、Toggle 邏輯與運算核心 (V125.6)
     // ==========================================
 
     function getTransactionsKey(cardId) { return `transactions_${cardId}`; }
@@ -1794,14 +1805,18 @@ function getActualCycleDay(year, month, cycleDay) {
         
         return txs.filter(tx => {
             const txCycleKey = getCycleKey(cardId, tx.date);
-            return txCycleKey === currentCycleKey;
+            return txCycleKey === currentCycleKey;125.6
         });
     }
 
-    function openCardModal(cardId) {
+   function openCardModal(cardId) {
         if (cardId === 'add1') { openManageModal(); return; }
         const card = cards.find(c => c.id === cardId);
         if (!card) return;
+        
+        // ★ 重置編輯狀態
+        editingTxId = null;
+        document.getElementById('btn-confirm').innerText = '確認';
         
         document.getElementById('cardIdInput').value = cardId;
         document.getElementById('modalTitle').innerText = card.name;
@@ -2516,7 +2531,7 @@ function handleHappyExclusive(selected) {
     }
 
     // 新增交易 (修復：加入 cardId 欄位)
-    function addTransaction(closeAfter = true) {
+   function addTransaction(closeAfter = true) {
         const cardId = document.getElementById('cardIdInput').value;
         const amountRaw = parseFloat(document.getElementById('amountInput').value);
         const note = document.getElementById('noteInput').value.trim();
@@ -2530,8 +2545,11 @@ function handleHappyExclusive(selected) {
         const rate = getCurrentRate();
         const amountTWD = Math.round(amountRaw * rate);
         
+        // ★ 編輯模式：保留原 ID；新增模式：產生新 ID
+        const txId = editingTxId || Date.now();
+        
         const tx = {
-            id: Date.now(),
+            id: txId,
             cardId: cardId, // ★ 修復：加入 cardId 欄位，確保備份還原不遺失
             amount: amountRaw,
             amountTWD: amountTWD,
@@ -2591,9 +2609,19 @@ function handleHappyExclusive(selected) {
             isLegendBonus: document.getElementById('checkLegendBonus')?.checked || false
         };
         
-        const txs = getTransactions(cardId);
+        let txs = getTransactions(cardId);
+        
+        // ★ 編輯模式：移除舊交易後加入更新後的交易
+        if (editingTxId) {
+            txs = txs.filter(t => t.id !== editingTxId);
+        }
+        
         txs.push(tx);
         saveTransactions(cardId, txs);
+        
+        // ★ 重置編輯狀態
+        editingTxId = null;
+        document.getElementById('btn-confirm').innerText = '確認';
         
         if (cardId === 'c8') updateHappyUsed(tx);
         
@@ -2692,6 +2720,10 @@ function handleHappyExclusive(selected) {
         const tx = txs.find(t => t.id === txId);
         if (!tx) return;
         
+        // 標記為編輯模式（不立即刪除）
+        editingTxId = txId;
+        
+        // 還原基本欄位
         document.getElementById('amountInput').value = tx.amount;
         document.getElementById('noteInput').value = tx.note || '';
         
@@ -2700,14 +2732,107 @@ function handleHappyExclusive(selected) {
             document.getElementById('dateInput').value = txDate.toISOString().split('T')[0];
         }
         
-        // ★ 還原 UniOpen 選項
-        if (cardId === 'c10') {
+        // ★ 根據卡片類型還原所有專屬選項
+        if (cardId === 'c6') {
+            document.getElementById('checkBonus10').checked = tx.isBonus10 || false;
+            document.getElementById('checkBonus25').checked = tx.isBonus25 || false;
+            document.getElementById('checkIsBill').checked = tx.isBill || false;
+            if (tx.isBill) {
+                document.getElementById('labelBaseRate').innerText = "🔰 基本回饋 0.15% (無上限)";
+            }
+        }
+        else if (cardId === 'c5') {
+            document.getElementById('checkLaiDianNew').checked = tx.isLaiDianNew || false;
+            const mode = tx.laiDianMode || 'general';
+            document.querySelector(`input[name="laiDianMode"][value="${mode}"]`).checked = true;
+        }
+        else if (cardId === 'c2') {
+            document.getElementById('checkGreenChannel').checked = tx.isGreenChannel || false;
+            document.getElementById('checkForeign').checked = tx.isForeign || false;
+        }
+        else if (cardId === 'c7') {
+            document.getElementById('checkUniUp').checked = tx.isUniUp || false;
+            document.getElementById('checkUniBonus').checked = tx.isUniBonus || false;
+        }
+        else if (cardId === 'c8') {
+            document.getElementById('checkHappyPet').checked = tx.isHappyPet || (tx.happyMode === 'pet') || false;
+            document.getElementById('checkHappyLife').checked = tx.isHappyLife || (tx.happyMode === 'life') || false;
+            document.getElementById('checkHappyPeace').checked = tx.isHappyPeace || (tx.happyMode === 'peace') || false;
+            document.getElementById('checkHappyForeign').checked = tx.isHappyForeign || (tx.happyMode === 'foreign') || false;
+        }
+        else if (cardId === 'c9') {
+            document.getElementById('checkHsbcForeign').checked = tx.isHsbcForeign || false;
+            const tier = tx.hsbcTier || 'infinite';
+            const tierRadio = document.querySelector(`input[name="hsbcTier"][value="${tier}"]`);
+            if (tierRadio) tierRadio.checked = true;
+        }
+        else if (cardId === 'c10') {
             document.getElementById('checkUniGroup').checked = tx.isUniGroup || false;
             document.getElementById('checkUniIcash').checked = tx.isUniIcash || false;
             document.getElementById('checkUniOverseas').checked = tx.isUniOverseas || false;
         }
+        else if (cardId === 'c11') {
+            const mode = tx.richartMode || 'general';
+            const modeRadio = document.querySelector(`input[name="richartMode"][value="${mode}"]`);
+            if (modeRadio) modeRadio.checked = true;
+        }
+        else if (cardId === 'j1') {
+            const region = tx.fubonJRegion || '';
+            const bonus = tx.fubonJBonus || '';
+            if (region) {
+                const regionRadio = document.querySelector(`input[name="fubonJRegion"][value="${region}"]`);
+                if (regionRadio) regionRadio.checked = true;
+            }
+            if (bonus && bonus !== 'none') {
+                const bonusRadio = document.querySelector(`input[name="fubonJBonus"][value="${bonus}"]`);
+                if (bonusRadio) bonusRadio.checked = true;
+            }
+        }
+        else if (cardId === 'j2') {
+            document.getElementById('checkJiheJapan').checked = tx.isJiheJapan || false;
+            document.getElementById('checkJiheApple').checked = tx.isJiheApple || false;
+            document.getElementById('checkJiheDomesticJapanese').checked = tx.isJiheDomesticJapanese || false;
+            if (tx.isJiheJapan) toggleJiheLogic();
+        }
+        else if (cardId === 'j3') {
+            document.getElementById('checkKumamonJapan').checked = tx.isKumamonJapan || false;
+            document.getElementById('checkKumamonDesignated').checked = tx.isKumamonDesignated || false;
+            document.getElementById('checkKumamonPayPay').checked = tx.isKumamonPayPay || false;
+            if (tx.isKumamonJapan) toggleKumamonLogic();
+        }
+        else if (cardId === 'j4') {
+            const level = tx.currencyLevel || 'low';
+            const levelRadio = document.querySelector(`input[name="currencyLevel"][value="${level}"]`);
+            if (levelRadio) levelRadio.checked = true;
+            const isSelected = tx.isCurrencySelected || false;
+            document.querySelector(`input[name="currencyType"][value="${isSelected ? 'selected' : 'domestic'}"]`).checked = true;
+        }
+        else if (cardId === 'j5') {
+            document.getElementById('checkSinopacMitsuiSelected').checked = tx.isSinopacMitsuiSelected || false;
+            document.getElementById('checkSinopacMitsuiTarget').checked = tx.isSinopacMitsuiTarget || false;
+        }
+        else if (cardId === 'c12') {
+            document.getElementById('checkSinopacJcbForeign').checked = tx.isSinopacJcbForeign || false;
+            document.getElementById('checkSinopacJcbBonus').checked = tx.isSinopacJcbBonus || false;
+            document.getElementById('checkSinopacJcbQuarterly').checked = tx.isSinopacJcbQuarterly || false;
+        }
+        else if (cardId === 'c4') {
+            const mode = tx.jiangMode || 'base';
+            const modeRadio = document.querySelector(`input[name="jiangMode"][value="${mode}"]`);
+            if (modeRadio) modeRadio.checked = true;
+        }
+        else if (cardId === 'dbs1') {
+            document.getElementById('checkDbsLinePay').checked = tx.isDbsLinePay || false;
+            document.getElementById('checkDbsGreen').checked = tx.isDbsGreen || false;
+            document.getElementById('checkDbsForeign').checked = tx.isDbsForeign || false;
+        }
+        else if (cardId === 'c1') {
+            document.getElementById('checkLegendBonus').checked = tx.isLegendBonus || false;
+        }
         
-        deleteTransaction(cardId, txId, false);
+        // 更新確認按鈕文字
+        document.getElementById('btn-confirm').innerText = '更新';
+        
         updateRewardPreview();
     }
 
@@ -3923,7 +4048,7 @@ if (cycleDay && cycleDay > 0) {
     // 匯出資料 (修復：確保 cardId 欄位存在)
     function exportData() {
         const data = {
-            version: 'V125.5',
+            version: 'V125.6',
             exportTime: new Date().toISOString(),
             visibleCards: visibleCards,
             cardOrder: savedOrder,

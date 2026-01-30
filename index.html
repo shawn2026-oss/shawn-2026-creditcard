@@ -3787,7 +3787,9 @@ if (cycleDay && cycleDay > 0) {
         a.download = `刷卡回饋管家_備份_${new Date().toISOString().split('T')[0]}.json`;
         a.click();
         URL.revokeObjectURL(url);
-        alert('備份完成！');
+        setTimeout(() => {
+            alert('備份完成！');
+        }, 500);
     }
 
     function triggerImport() {

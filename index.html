@@ -3816,10 +3816,18 @@ if (cycleDay && cycleDay > 0) {
                 if (data.cardOrder) {
                     localStorage.setItem('cardOrder', JSON.stringify(data.cardOrder));
                 }
-                if (data.cardSettings) {
-                    localStorage.setItem('cardSettings', JSON.stringify(data.cardSettings));
+               if (data.cardSettings) {
+                    // 相容舊版 billingDay → cycleDay
+                    const newSettings = {};
+                    Object.keys(data.cardSettings).forEach(cardId => {
+                        const old = data.cardSettings[cardId];
+                        newSettings[cardId] = {
+                            nickname: old.nickname || '',
+                            cycleDay: old.cycleDay || old.billingDay || ''
+                        };
+                    });
+                    localStorage.setItem('cardSettings', JSON.stringify(newSettings));
                 }
-                
                 // 匯入交易紀錄 (修復版)
                 if (data.transactions) {
                     // 情況 A：新格式 (物件，key 為 cardId)

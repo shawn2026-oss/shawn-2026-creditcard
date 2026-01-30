@@ -3624,7 +3624,7 @@ function handleHappyExclusive(selected) {
     function calculateTxRewardWithCap(cardId, tx) {
         const options = {
             ...tx,
-            mode: tx.laiDianMode || tx.richartMode || tx.jiangMode || 'general',
+           mode: tx.jiangMode || tx.laiDianMode || tx.richartMode || 'general',
             tier: tx.hsbcTier,
             brandCount: tx.uniBrandCount,
             region: tx.fubonJRegion,

@@ -1755,74 +1755,27 @@
     function getTransactions(cardId) { return JSON.parse(localStorage.getItem(getTransactionsKey(cardId)) || '[]'); }
     function saveTransactions(cardId, txs) { localStorage.setItem(getTransactionsKey(cardId), JSON.stringify(txs)); }
 
-    function getCycleKey(cardId) {
-        const now = new Date();
-        
-        // 取得卡片設定 (含結帳日)
-        const settings = cardSettings[cardId] || {};
-        const cycleDay = parseInt(settings.cycleDay); 
-        
-        // 季度卡片不支援自訂結帳日 (維持原樣)
-        if (['j1', 'j3', 'j5', 'c12'].includes(cardId)) {
-            const quarter = Math.floor(now.getMonth() / 3) + 1;
-            return `${now.getFullYear()}-Q${quarter}`;
-        }
-        
-        // 有設定結帳日
-        if (cycleDay && cycleDay > 0) {
-             const today = now.getDate();
-             let targetYear = now.getFullYear();
-             let targetMonth = now.getMonth() + 1; // 1-12
-             
-             // 如果今天日期 > 結帳日，代表屬於下個月的帳單
-             if (today > cycleDay) {
-                 targetMonth++;
-                 if (targetMonth > 12) {
-                     targetMonth = 1;
-                     targetYear++;
-                 }
-             }
-             return `${targetYear}-${targetMonth}`;
-        }
-        
-        // 無設定，預設為自然月
-        return `${now.getFullYear()}-${now.getMonth() + 1}`;
-    }
-
-    // 根據交易日期計算該筆交易屬於哪個週期
-    function getTxCycleKey(cardId, txDate) {
-        if (!txDate) return getCycleKey(cardId); // 無日期則歸入當期
-        
-        const d = (txDate instanceof Date) ? txDate : new Date(txDate);
-        if (isNaN(d.getTime())) return getCycleKey(cardId); // 無效日期歸入當期
-        
-        const settings = cardSettings[cardId] || {};
-        const cycleDay = parseInt(settings.cycleDay);
-        
-        // 季度卡片
-        if (['j1', 'j3', 'j5', 'c12'].includes(cardId)) {
-            const txQuarter = Math.floor(d.getMonth() / 3) + 1;
-            return `${d.getFullYear()}-Q${txQuarter}`;
-        }
-        
-        // 月度卡片
-        let txYear = d.getFullYear();
-        let txMonth = d.getMonth() + 1;
-        
-        if (cycleDay && cycleDay > 0) {
-            const txDay = d.getDate();
-            if (txDay > cycleDay) {
-                txMonth++;
-                if (txMonth > 12) {
-                    txMonth = 1;
-                    txYear++;
-                }
+   function getCycleKey(cardId) {
+    const settings = cardSettings[cardId] || {};
+    const cycleDay = parseInt(settings.cycleDay);
+    const now = new Date();
+    
+    let year = now.getFullYear();
+    let month = now.getMonth() + 1;
+    
+    if (cycleDay && cycleDay > 0) {
+        const today = now.getDate();
+        if (today > cycleDay) {
+            month++;
+            if (month > 12) {
+                month = 1;
+                year++;
             }
         }
-        
-        return `${txYear}-${txMonth}`;
     }
-
+    
+    return `${year}-${month}`;
+}
     function getCurrentCycleTransactions(cardId) {
         const txs = getTransactions(cardId);
         const currentCycleKey = getCycleKey(cardId);
@@ -2004,7 +1957,7 @@
             document.getElementById('jiangOptions').style.display = 'block';
             // 檢查旅遊加碼是否過期
             const now = new Date();
-            const expDate = new Date('2025-03-31');
+           const expDate = new Date('2026-03-31');
             if (now > expDate) {
                 document.getElementById('jiangTravelRow').classList.add('expired');
                 document.getElementById('jiangTravelExpMsg').style.display = 'block';
@@ -2116,16 +2069,28 @@
         }
     }
 
-    function toggleUniGroup() { updateRewardPreview(); }
-    function toggleUniIcash() { updateRewardPreview(); }
-    function toggleUniOverseas() {
-        const isOverseas = document.getElementById('checkUniOverseas').checked;
-        if (isOverseas) {
-            document.getElementById('checkUniGroup').checked = false;
-            document.getElementById('checkUniIcash').checked = false;
-        }
-        updateRewardPreview();
+    function toggleUniGroup() {
+    const isGroup = document.getElementById('checkUniGroup').checked;
+    if (isGroup) {
+        document.getElementById('checkUniOverseas').checked = false;
     }
+    updateRewardPreview();
+}
+function toggleUniIcash() {
+    const isIcash = document.getElementById('checkUniIcash').checked;
+    if (isIcash) {
+        document.getElementById('checkUniOverseas').checked = false;
+    }
+    updateRewardPreview();
+}
+function toggleUniOverseas() {
+    const isOverseas = document.getElementById('checkUniOverseas').checked;
+    if (isOverseas) {
+        document.getElementById('checkUniGroup').checked = false;
+        document.getElementById('checkUniIcash').checked = false;
+    }
+    updateRewardPreview();
+}
 
     function toggleRichartLogic() { updateRewardPreview(); }
 
@@ -3174,22 +3139,36 @@
             rate = (amount > 0) ? (totalReward / amount) : baseRate;
             return { reward: totalReward, rate };
         }
-        // C4 將將卡
-        else if (cardId === 'c4') {
-            const mode = options.mode || 'base';
-            if (mode === 'selected') {
-                const selectedSpent = getCardBonusSpent(cardId, t => t.jiangMode === 'selected');
-                if (selectedSpent < 6666) {
-                    return { reward: Math.floor(Math.min(amount, 6666 - selectedSpent) * 0.05), rate: 0.05 };
-                }
-            } else if (mode === 'travel') {
-                const travelSpent = getCardBonusSpent(cardId, t => t.jiangMode === 'travel');
-                if (travelSpent < 11111) {
-                    return { reward: Math.floor(Math.min(amount, 11111 - travelSpent) * 0.05), rate: 0.05 };
-                }
-            }
+      // C4 將將卡 (修復：生活低消3000，旅遊低消6000)
+else if (cardId === 'c4') {
+    const mode = options.mode || 'base';
+    const txs = getCurrentCycleTransactions(cardId);
+    const historySpent = txs.reduce((sum, tx) => sum + (tx.amountTWD || tx.amount || 0), 0);
+    const totalSpentWithThis = historySpent + amount; // 包含當前這筆
+    
+    if (mode === 'selected') {
+        // 生活升級：低消 $3,000，封頂刷 $6,666
+        if (totalSpentWithThis < 3000) {
             return { reward: Math.floor(amount * 0.005), rate: 0.005 };
         }
+        const selectedSpent = getCardBonusSpent(cardId, t => t.jiangMode === 'selected');
+        if (selectedSpent < 6666) {
+            const available = Math.min(amount, 6666 - selectedSpent);
+            return { reward: Math.floor(available * 0.05), rate: 0.05 };
+        }
+    } else if (mode === 'travel') {
+        // 旅遊加碼：低消 $6,000，封頂刷 $11,111
+        if (totalSpentWithThis < 6000) {
+            return { reward: Math.floor(amount * 0.005), rate: 0.005 };
+        }
+        const travelSpent = getCardBonusSpent(cardId, t => t.jiangMode === 'travel');
+        if (travelSpent < 11111) {
+            const available = Math.min(amount, 11111 - travelSpent);
+            return { reward: Math.floor(available * 0.05), rate: 0.05 };
+        }
+    }
+    return { reward: Math.floor(amount * 0.005), rate: 0.005 };
+}
         // DBS1 eco卡
         else if (cardId === 'dbs1') {
             if (options.isLinePay) {
@@ -3538,44 +3517,30 @@
                 const spentDisplay = formatAmountWithCurrency(stats.spent);
                 
                 let cycleHint = '';
-                if (['j1', 'j3', 'j5', 'c12'].includes(card.id)) {
-                    const quarter = Math.floor(new Date().getMonth() / 3) + 1;
-                    cycleHint = `Q${quarter} 季度`;
-                } else {
-                    // 顯示帳單週期
-                    const cycleKey = getCycleKey(card.id);
-                    // 解析 cycleKey (YYYY-MM)
-                    const [yearStr, monthStr] = cycleKey.split('-');
-                    const billYear = parseInt(yearStr);
-                    const billMonth = parseInt(monthStr); // 1-based
-                    
-                    const settings = cardSettings[card.id] || {};
-                    const cycleDay = parseInt(settings.cycleDay);
-                    
-                    if (cycleDay) {
-                         // 計算結帳週期：
-                         // 結束日：本期結帳日 (billYear, billMonth-1, cycleDay)
-                         // 開始日：上期結帳日 + 1天
-                         
-                         const endDate = new Date(billYear, billMonth - 1, cycleDay);
-                         
-                         // 取得上個月的結帳日 (月份 -2 是因為 Date 月份是 0-based，所以本月是 -1，上月是 -2)
-                         const prevCloseDate = new Date(billYear, billMonth - 2, cycleDay);
-                         
-                         // 開始日 = 上月結帳日 + 1天
-                         const startDate = new Date(prevCloseDate);
-                         startDate.setDate(prevCloseDate.getDate() + 1);
-                         
-                         const sM = startDate.getMonth() + 1;
-                         const sD = startDate.getDate();
-                         const eM = endDate.getMonth() + 1;
-                         const eD = endDate.getDate();
-                         
-                         cycleHint = `${sM}/${sD} - ${eM}/${eD}`;
-                    } else {
-                         cycleHint = `${billMonth}月`;
-                    }
-                }
+const settings = cardSettings[card.id] || {};
+const cycleDay = parseInt(settings.cycleDay);
+
+if (cycleDay && cycleDay > 0) {
+    const now = new Date();
+    const today = now.getDate();
+    
+    let startMonth, endMonth;
+    
+    if (today > cycleDay) {
+        startMonth = now.getMonth() + 1;
+        endMonth = now.getMonth() + 2;
+        if (endMonth > 12) endMonth = 1;
+    } else {
+        startMonth = now.getMonth();
+        if (startMonth < 1) startMonth = 12;
+        endMonth = now.getMonth() + 1;
+    }
+    
+    cycleHint = `${startMonth}/${cycleDay + 1} - ${endMonth}/${cycleDay}`;
+} else {
+    const month = new Date().getMonth() + 1;
+    cycleHint = `${month}月`;
+}
                 
                 let overseasWarning = '';
                 if (currentLocation !== 'TW') {

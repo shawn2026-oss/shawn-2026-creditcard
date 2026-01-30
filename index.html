@@ -1759,27 +1759,35 @@ function getActualCycleDay(year, month, cycleDay) {
     const lastDay = new Date(year, month + 1, 0).getDate();
     return Math.min(cycleDay, lastDay);
 }
-   function getCycleKey(cardId) {
-    const settings = cardSettings[cardId] || {};
-    const cycleDay = parseInt(settings.cycleDay);
-    const now = new Date();
-    
-    let year = now.getFullYear();
-    let month = now.getMonth() + 1;
-    
-    if (cycleDay && cycleDay > 0) {
-        const today = now.getDate();
-        if (today > cycleDay) {
-            month++;
-            if (month > 12) {
-                month = 1;
-                year++;
+  function getCycleKey(cardId, dateInput) {
+        const settings = cardSettings[cardId] || {};
+        const cycleDay = parseInt(settings.cycleDay) || 0;
+        
+        // 如果有傳入日期就用那個日期，否則用今天
+        let targetDate;
+        if (dateInput) {
+            targetDate = (typeof dateInput === 'string') ? new Date(dateInput) : dateInput;
+        } else {
+            targetDate = new Date();
+        }
+        
+        let year = targetDate.getFullYear();
+        let month = targetDate.getMonth() + 1;
+        const day = targetDate.getDate();
+        
+        if (cycleDay && cycleDay > 0) {
+            // 如果今天的日期 > 結帳日，表示已進入下一個週期
+            if (day > cycleDay) {
+                month++;
+                if (month > 12) {
+                    month = 1;
+                    year++;
+                }
             }
         }
+        
+        return `${year}-${month}`;
     }
-    
-    return `${year}-${month}`;
-}
     function getCurrentCycleTransactions(cardId) {
         const txs = getTransactions(cardId);
         const currentCycleKey = getCycleKey(cardId);

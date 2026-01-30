@@ -1785,7 +1785,7 @@ function getActualCycleDay(year, month, cycleDay) {
         const currentCycleKey = getCycleKey(cardId);
         
         return txs.filter(tx => {
-            const txCycleKey = getTxCycleKey(cardId, tx.date);
+            const txCycleKey = getCycleKey(cardId, tx.date);
             return txCycleKey === currentCycleKey;
         });
     }

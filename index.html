@@ -2172,10 +2172,20 @@ function toggleUniOverseas() {
     // 將將卡低消警告
     function updateJiangMinSpendWarning() {
         const warning = document.getElementById('jiangMinSpendWarning');
+        const mode = document.querySelector('input[name="jiangMode"]:checked')?.value || 'base';
         const txs = getCurrentCycleTransactions('c4');
         const totalSpent = txs.reduce((sum, tx) => sum + (tx.amountTWD || tx.amount || 0), 0);
         
-        if (totalSpent < 3000) {
+        let minSpend = 0;
+        if (mode === 'selected') {
+            minSpend = 3000;
+            warning.innerHTML = '⚠️ 需當月累積滿 $3,000 才享加碼回饋';
+        } else if (mode === 'travel') {
+            minSpend = 6000;
+            warning.innerHTML = '⚠️ 需當月累積滿 $6,000 才享加碼回饋';
+        }
+        
+        if (minSpend > 0 && totalSpent < minSpend) {
             warning.style.display = 'block';
         } else {
             warning.style.display = 'none';
@@ -2401,20 +2411,25 @@ function toggleUniOverseas() {
         // 取得選項
         const options = getTransactionOptions(cardId);
         
-        // ★ 將將卡：檢查是否達低消
+      // ★ 將將卡：檢查是否達低消
         if (cardId === 'c4') {
+            const mode = document.querySelector('input[name="jiangMode"]:checked')?.value || 'base';
+            const minSpend = (mode === 'travel') ? 6000 : 3000;
             const txs = getCurrentCycleTransactions('c4');
             const totalSpent = txs.reduce((sum, tx) => sum + (tx.amountTWD || tx.amount || 0), 0);
             
-            // 尚未達低消 $3,000
-            if (totalSpent < 3000) {
-                const willReachMinSpend = (totalSpent + amountTWD) >= 3000;
+            // 更新警語
+            updateJiangMinSpendWarning();
+            
+            // 尚未達低消
+            if (mode !== 'base' && totalSpent < minSpend) {
+                const willReachMinSpend = (totalSpent + amountTWD) >= minSpend;
                 
                 if (!willReachMinSpend) {
                     // 這筆加上去還是不夠低消，只有基本 0.5%
                     const baseReward = Math.floor(amountTWD * 0.005);
                     liveCalc.style.display = 'block';
-                    liveCalc.innerHTML = `預估獲得 <b>$${baseReward}</b> 回饋 (0.5%) <span style="color:#e65100; font-size:11px;"><br>⚠️ 需累積滿$3,000才享加碼</span>`;
+                    liveCalc.innerHTML = `預估獲得 <b>$${baseReward}</b> 回饋 (0.5%) <span style="color:#e65100; font-size:11px;"><br>⚠️ 需累積滿$${minSpend.toLocaleString()}才享加碼</span>`;
                     updateTWDPreview();
                     return;
                 }
@@ -3146,36 +3161,44 @@ function toggleUniOverseas() {
             rate = (amount > 0) ? (totalReward / amount) : baseRate;
             return { reward: totalReward, rate };
         }
-      // C4 將將卡 (修復：生活低消3000，旅遊低消6000)
-else if (cardId === 'c4') {
-    const mode = options.mode || 'base';
-    const txs = getCurrentCycleTransactions(cardId);
-    const historySpent = txs.reduce((sum, tx) => sum + (tx.amountTWD || tx.amount || 0), 0);
-    const totalSpentWithThis = historySpent + amount; // 包含當前這筆
-    
-    if (mode === 'selected') {
-        // 生活升級：低消 $3,000，封頂刷 $6,666
-        if (totalSpentWithThis < 3000) {
+     // C4 將將卡 (修復：生活低消3000，旅遊低消6000，加封頂)
+        else if (cardId === 'c4') {
+            const mode = options.mode || 'base';
+            const txs = getCurrentCycleTransactions(cardId);
+            const historySpent = txs.reduce((sum, tx) => sum + (tx.amountTWD || tx.amount || 0), 0);
+            const totalSpentWithThis = historySpent + amount;
+            
+            if (mode === 'selected') {
+                // 生活升級：低消 $3,000，封頂刷 $6,666
+                if (totalSpentWithThis < 3000) {
+                    return { reward: Math.floor(amount * 0.005), rate: 0.005 };
+                }
+                const selectedSpent = getCardBonusSpent(cardId, t => t.jiangMode === 'selected');
+                const selectedLimit = 6666;
+                if (selectedSpent >= selectedLimit) {
+                    return { reward: Math.floor(amount * 0.005), rate: 0.005 };
+                }
+                const available = Math.min(amount, selectedLimit - selectedSpent);
+                const bonusReward = Math.floor(available * 0.05);
+                const baseReward = Math.floor((amount - available) * 0.005);
+                return { reward: bonusReward + baseReward, rate: (bonusReward + baseReward) / amount };
+            } else if (mode === 'travel') {
+                // 旅遊加碼：低消 $6,000，封頂刷 $11,111
+                if (totalSpentWithThis < 6000) {
+                    return { reward: Math.floor(amount * 0.005), rate: 0.005 };
+                }
+                const travelSpent = getCardBonusSpent(cardId, t => t.jiangMode === 'travel');
+                const travelLimit = 11111;
+                if (travelSpent >= travelLimit) {
+                    return { reward: Math.floor(amount * 0.005), rate: 0.005 };
+                }
+                const available = Math.min(amount, travelLimit - travelSpent);
+                const bonusReward = Math.floor(available * 0.05);
+                const baseReward = Math.floor((amount - available) * 0.005);
+                return { reward: bonusReward + baseReward, rate: (bonusReward + baseReward) / amount };
+            }
             return { reward: Math.floor(amount * 0.005), rate: 0.005 };
         }
-        const selectedSpent = getCardBonusSpent(cardId, t => t.jiangMode === 'selected');
-        if (selectedSpent < 6666) {
-            const available = Math.min(amount, 6666 - selectedSpent);
-            return { reward: Math.floor(available * 0.05), rate: 0.05 };
-        }
-    } else if (mode === 'travel') {
-        // 旅遊加碼：低消 $6,000，封頂刷 $11,111
-        if (totalSpentWithThis < 6000) {
-            return { reward: Math.floor(amount * 0.005), rate: 0.005 };
-        }
-        const travelSpent = getCardBonusSpent(cardId, t => t.jiangMode === 'travel');
-        if (travelSpent < 11111) {
-            const available = Math.min(amount, 11111 - travelSpent);
-            return { reward: Math.floor(available * 0.05), rate: 0.05 };
-        }
-    }
-    return { reward: Math.floor(amount * 0.005), rate: 0.005 };
-}
         // DBS1 eco卡
         else if (cardId === 'dbs1') {
             if (options.isLinePay) {

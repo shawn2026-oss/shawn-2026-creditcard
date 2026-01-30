@@ -967,7 +967,7 @@
                       <div class="option-row" style="flex-direction:column; align-items:flex-start; margin-bottom:10px; margin-top:6px;">
                           <div class="option-row" style="width:100%; justify-content:space-between;">
                               <label>🐶 指定寵物 +9.5%  <span id="happyPetRemain" style="font-size:10px;color:#aaa"></span></label>
-                              <input type="checkbox" id="checkHappyPet" onchange="updateRewardPreview()">
+                             <input type="checkbox" id="checkHappyPet" onchange="handleHappyExclusive('pet')">
                           </div>
                           <button onclick="toggleHappyPetDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:0 0 8px 24px; text-align:left;">🔽 查看寵物通路</button>
                           <div id="happyPetDetails" class="details-content" style="margin-left:8px; margin-bottom:8px;">
@@ -978,7 +978,7 @@
                           
                           <div class="option-row" style="width:100%; justify-content:space-between;">
                               <label>🍽️ 指定生活 +3.5%  <span id="happyLifeRemain" style="font-size:10px;color:#aaa"></span></label>
-                              <input type="checkbox" id="checkHappyLife" onchange="updateRewardPreview()">
+                              <input type="checkbox" id="checkHappyLife" onchange="handleHappyExclusive('life')">
                           </div>
                           <button onclick="toggleHappyLifeDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:0 0 8px 24px; text-align:left;">🔽 查看百貨/量販/交通</button>
                           <div id="happyLifeDetails" class="details-content" style="margin-left:8px; margin-bottom:8px;">
@@ -990,7 +990,7 @@
                           
                           <div class="option-row" style="width:100%; justify-content:space-between;">
                               <label>📡 指定安心 +3.5%  <span id="happyPeaceRemain" style="font-size:10px;color:#aaa"></span></label>
-                              <input type="checkbox" id="checkHappyPeace" onchange="updateRewardPreview()">
+                              <input type="checkbox" id="checkHappyPeace" onchange="handleHappyExclusive('peace')">
                           </div>
                             <button onclick="toggleHappyPeaceDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:0 0 8px 24px; text-align:left;">🔽 查看餐廳/藥局/居家</button>
                             <div id="happyPeaceDetails" class="details-content" style="margin-left:8px; margin-bottom:8px;">
@@ -1001,7 +1001,7 @@
 
                           <div class="option-row" style="width:100%; justify-content:space-between;">
                               <label>✈️ 國外消費 +2.0% </label>
-                              <input type="checkbox" id="checkHappyForeign" onchange="updateRewardPreview()">
+                              <input type="checkbox" id="checkHappyForeign" onchange="handleHappyExclusive('foreign')">
                           </div>
                       </div>
                     <div id="happyDashboard" class="happy-dashboard"></div>
@@ -2275,15 +2275,50 @@ function toggleUniOverseas() {
     function saveUniSettings() {
         localStorage.setItem('uni_settings', JSON.stringify({ isUp: document.getElementById('checkUniUp').checked }));
     }
-
-    function loadHappySettings() {
-        const used = JSON.parse(localStorage.getItem('happy_used') || '{}');
-        const cycleKey = getCycleKey('c8');
-        const cycleUsed = used[cycleKey] || { pet: 0, life: 0, peace: 0 };
+function handleHappyExclusive(selected) {
+        const pet = document.getElementById('checkHappyPet');
+        const life = document.getElementById('checkHappyLife');
+        const peace = document.getElementById('checkHappyPeace');
+        const foreign = document.getElementById('checkHappyForeign');
         
-        document.getElementById('happyPetRemain').innerText = `(剩 $${Math.max(0, 500 - cycleUsed.pet)})`;
-        document.getElementById('happyLifeRemain').innerText = `(剩 $${Math.max(0, 200 - cycleUsed.life)})`;
-        document.getElementById('happyPeaceRemain').innerText = `(剩 $${Math.max(0, 200 - cycleUsed.peace)})`;
+        if (selected === 'pet' && pet.checked) {
+            life.checked = false;
+            peace.checked = false;
+            foreign.checked = false;
+        } else if (selected === 'life' && life.checked) {
+            pet.checked = false;
+            peace.checked = false;
+            foreign.checked = false;
+        } else if (selected === 'peace' && peace.checked) {
+            pet.checked = false;
+            life.checked = false;
+            foreign.checked = false;
+        } else if (selected === 'foreign' && foreign.checked) {
+            pet.checked = false;
+            life.checked = false;
+            peace.checked = false;
+        }
+        
+        updateRewardPreview();
+    }
+    function loadHappySettings() {
+        const txs = getCurrentCycleTransactions('c8');
+        let petSpent = 0, lifeSpent = 0, peaceSpent = 0;
+        
+        txs.forEach(tx => {
+            const amount = tx.amountTWD || tx.amount || 0;
+            if (tx.isHappyPet) petSpent += amount;
+            if (tx.isHappyLife) lifeSpent += amount;
+            if (tx.isHappyPeace) peaceSpent += amount;
+        });
+        
+        const petLimit = 5263;
+        const lifeLimit = 5714;
+        const peaceLimit = 5714;
+        
+        document.getElementById('happyPetRemain').innerText = `(已刷$${petSpent.toLocaleString()}/$${petLimit.toLocaleString()})`;
+        document.getElementById('happyLifeRemain').innerText = `(已刷$${lifeSpent.toLocaleString()}/$${lifeLimit.toLocaleString()})`;
+        document.getElementById('happyPeaceRemain').innerText = `(已刷$${peaceSpent.toLocaleString()}/$${peaceLimit.toLocaleString()})`;
     }
 
     function loadHsbcSettings() {
@@ -2441,6 +2476,29 @@ function toggleUniOverseas() {
                     updateTWDPreview();
                     return;
                 }
+            }
+        }
+        
+        // ★ 樂家卡：檢查是否達低消 $3,000
+        if (cardId === 'c8') {
+            const txs = getCurrentCycleTransactions('c8');
+            const totalSpent = txs.reduce((sum, tx) => sum + (tx.amountTWD || tx.amount || 0), 0);
+            const minSpend = 3000;
+            const warning = document.getElementById('happyMinSpendWarning');
+            
+            if (totalSpent < minSpend) {
+                warning.style.display = 'block';
+                const willReachMinSpend = (totalSpent + amountTWD) >= minSpend;
+                
+                if (!willReachMinSpend) {
+                    const baseReward = Math.floor(amountTWD * 0.005);
+                    liveCalc.style.display = 'block';
+                    liveCalc.innerHTML = `預估獲得 <b>$${baseReward}</b> 回饋 (0.5%) <span style="color:#e65100; font-size:11px;"><br>⚠️ 需累積滿$3,000才享加碼</span>`;
+                    updateTWDPreview();
+                    return;
+                }
+            } else {
+                warning.style.display = 'none';
             }
         }
         
@@ -2933,10 +2991,22 @@ function toggleUniOverseas() {
             }
             return { reward, rate };
         }
-        // C8 樂家+卡 (修復：加入回饋上限)
+     // C8 樂家+卡 (修復：低消$3,000才享加碼，加入回饋上限)
         else if (cardId === 'c8') {
             const baseReward = Math.floor(amount * 0.005);
             reward = baseReward;
+            
+            // 檢查是否達低消 $3,000
+            const txs = getCurrentCycleTransactions(cardId);
+            const totalSpent = txs.reduce((sum, tx) => sum + (tx.amountTWD || tx.amount || 0), 0);
+            const minSpend = 3000;
+            const reachedMinSpend = (totalSpent + amount) >= minSpend;
+            
+            if (!reachedMinSpend) {
+                // 未達低消，只有基本 0.5%
+                rate = 0.005;
+                return { reward, rate };
+            }
             
             if (options.isForeign) {
                 reward += Math.floor(amount * 0.02); // 國外 +2% 無上限
@@ -3173,20 +3243,20 @@ function toggleUniOverseas() {
             rate = (amount > 0) ? (totalReward / amount) : baseRate;
             return { reward: totalReward, rate };
         }
-     // C4 將將卡 (修復：生活低消3000，旅遊低消6000，加封頂)
+    // C4 將將卡 (修復：達低消後全部回溯享加碼)
         else if (cardId === 'c4') {
             const mode = options.mode || 'base';
             const txs = getCurrentCycleTransactions(cardId);
-            const historySpent = txs.reduce((sum, tx) => sum + (tx.amountTWD || tx.amount || 0), 0);
-            const totalSpentWithThis = historySpent + amount;
+            const totalCycleSpent = txs.reduce((sum, tx) => sum + (tx.amountTWD || tx.amount || 0), 0);
             
             if (mode === 'selected') {
-                // 生活升級：低消 $3,000，封頂刷 $6,666
-                if (totalSpentWithThis < 3000) {
+                const minSpend = 3000;
+                const selectedLimit = 6666;
+                // 用整個週期的總消費判斷是否達低消
+                if (totalCycleSpent < minSpend) {
                     return { reward: Math.floor(amount * 0.005), rate: 0.005 };
                 }
                 const selectedSpent = getCardBonusSpent(cardId, t => t.jiangMode === 'selected');
-                const selectedLimit = 6666;
                 if (selectedSpent >= selectedLimit) {
                     return { reward: Math.floor(amount * 0.005), rate: 0.005 };
                 }
@@ -3195,12 +3265,12 @@ function toggleUniOverseas() {
                 const baseReward = Math.floor((amount - available) * 0.005);
                 return { reward: bonusReward + baseReward, rate: (bonusReward + baseReward) / amount };
             } else if (mode === 'travel') {
-                // 旅遊加碼：低消 $6,000，封頂刷 $11,111
-                if (totalSpentWithThis < 6000) {
+                const minSpend = 6000;
+                const travelLimit = 11111;
+                if (totalCycleSpent < minSpend) {
                     return { reward: Math.floor(amount * 0.005), rate: 0.005 };
                 }
                 const travelSpent = getCardBonusSpent(cardId, t => t.jiangMode === 'travel');
-                const travelLimit = 11111;
                 if (travelSpent >= travelLimit) {
                     return { reward: Math.floor(amount * 0.005), rate: 0.005 };
                 }
@@ -3262,11 +3332,37 @@ function toggleUniOverseas() {
         const txs = getCurrentCycleTransactions(cardId);
         let totalSpent = 0, totalReward = 0;
         
-        txs.forEach(tx => {
+       txs.forEach(tx => {
             const amount = tx.amountTWD || tx.amount || 0;
             totalSpent += amount;
-            const result = calculateTxRewardWithCap(cardId, tx);
-            totalReward += result.reward;
+        });
+        
+        const jiangMinSpend = 3000;
+        const happyMinSpend = 3000;
+        const jiangReachedMin = (cardId === 'c4') ? (totalSpent >= jiangMinSpend) : true;
+        const happyReachedMin = (cardId === 'c8') ? (totalSpent >= happyMinSpend) : true;
+        
+        txs.forEach(tx => {
+            const amount = tx.amountTWD || tx.amount || 0;
+            
+            if (cardId === 'c4') {
+                if (!jiangReachedMin) {
+                    totalReward += Math.floor(amount * 0.005);
+                } else {
+                    const result = calculateTxRewardWithCap(cardId, tx);
+                    totalReward += result.reward;
+                }
+            } else if (cardId === 'c8') {
+                if (!happyReachedMin) {
+                    totalReward += Math.floor(amount * 0.005);
+                } else {
+                    const result = calculateTxRewardWithCap(cardId, tx);
+                    totalReward += result.reward;
+                }
+            } else {
+                const result = calculateTxRewardWithCap(cardId, tx);
+                totalReward += result.reward;
+            }
         });
         
         let progress = 0, msg = '';
@@ -3331,7 +3427,45 @@ function toggleUniOverseas() {
                  return { spent: totalSpent, reward: totalReward, progress, msg };
              }
         }
-        
+        // 特殊處理：樂家卡顯示各類別封頂狀態
+        if (cardId === 'c8') {
+            const txs = getCurrentCycleTransactions('c8');
+            let petSpent = 0, lifeSpent = 0, peaceSpent = 0;
+            
+            txs.forEach(tx => {
+                const amount = tx.amountTWD || tx.amount || 0;
+                if (tx.isHappyPet) petSpent += amount;
+                if (tx.isHappyLife) lifeSpent += amount;
+                if (tx.isHappyPeace) peaceSpent += amount;
+            });
+            
+            const petLimit = 5263;
+            const lifeLimit = 5714;
+            const peaceLimit = 5714;
+            
+            let statusParts = [];
+            if (petSpent >= petLimit) {
+                statusParts.push('寵物封頂');
+            } else {
+                statusParts.push(`寵物$${(petLimit - petSpent).toLocaleString()}`);
+            }
+            if (lifeSpent >= lifeLimit) {
+                statusParts.push('生活封頂');
+            } else {
+                statusParts.push(`生活$${(lifeLimit - lifeSpent).toLocaleString()}`);
+            }
+            if (peaceSpent >= peaceLimit) {
+                statusParts.push('安心封頂');
+            } else {
+                statusParts.push(`安心$${(peaceLimit - peaceSpent).toLocaleString()}`);
+            }
+            
+            msg = statusParts.join('/');
+            progress = Math.min(100, (totalSpent / 26000) * 100);
+            
+            return { spent: totalSpent, reward: totalReward, progress, msg };
+        }
+
         // 特殊處理：旅人卡顯示累積哩程
         if (cardId === 'c9') {
             const initial = parseInt(localStorage.getItem('hsbc_initial') || '0');

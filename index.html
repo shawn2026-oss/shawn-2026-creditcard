@@ -2780,7 +2780,7 @@ function toggleUniOverseas() {
         const card = cards.find(c => c.id === cardId);
         if (!card) return { reward: 0, rate: 0 };
 
-        // C6 豬富卡 (修復：加入封頂計算)
+       // C6 豬富卡 (修復：加入封頂計算)
         if (cardId === 'c6') {
             const quota = getPigRichQuotaUsed();
             
@@ -2793,16 +2793,20 @@ function toggleUniOverseas() {
                 rate = 0.01;
                 
                 if (options.isBonus10) {
-                    const available10 = Math.max(0, quota.bonus10Limit - quota.bonus10Spent);
-                    if (available10 > 0) {
+                    if (quota.bonus10Spent >= quota.bonus10Limit) {
+                        // 已封頂，不加碼
+                    } else {
+                        const available10 = quota.bonus10Limit - quota.bonus10Spent;
                         const validFor10 = Math.min(amount, available10);
                         reward += Math.floor(validFor10 * 0.10);
                     }
                 }
                 
                 if (options.isBonus25) {
-                    const available25 = Math.max(0, quota.bonus25Limit - quota.bonus25Spent);
-                    if (available25 > 0) {
+                    if (quota.bonus25Spent >= quota.bonus25Limit) {
+                        // 已封頂，不加碼
+                    } else {
+                        const available25 = quota.bonus25Limit - quota.bonus25Spent;
                         const validFor25 = Math.min(amount, available25);
                         if (currentLocation === 'JP') {
                             reward += Math.floor(validFor25 * 0.01);

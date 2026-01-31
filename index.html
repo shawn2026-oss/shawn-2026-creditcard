@@ -895,12 +895,12 @@
                 </div>
                 
                 <div id="jiangOptions">
-                    <div class="option-row read-only" style="background:#eee; padding:8px; border-radius:6px; margin-bottom:8px;"><label>🔰 基本回饋 0.5% (無上限)</label><input type="radio" name="jiangMode" value="base" checked onchange="updateRewardPreview()"></div>
+                    <div class="option-row read-only"><label>🔰 基本回饋 0.5% (無上限)</label><input type="checkbox" checked disabled></div>
                     
                     <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0px; border-top:1px dashed #ddd; padding-top:8px;">
                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:4px;">
-                            <label for="rbJiangSelected">🛍️ 生活升級 +4.5% (刷$6,666封頂)</label>
-                            <input type="radio" name="jiangMode" id="rbJiangSelected" value="selected" onchange="updateRewardPreview()">
+                            <label for="checkJiangSelected">🛍️ 生活升級 +4.5% (刷$6,666封頂)</label>
+                            <input type="checkbox" id="checkJiangSelected" onchange="toggleJiangSelected()">
                         </div>
                         <button onclick="toggleJiangDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:0 0 6px 0;">🔽 點擊查看指定通路清單</button>
                         <div id="jiangDetails" class="details-content">
@@ -918,8 +918,8 @@
                     
                     <div class="option-row" id="jiangTravelRow" style="border-top:1px dashed #ddd; padding-top:8px; margin-top:4px; flex-direction:column; align-items:flex-start;">
                           <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="rbJiangTravel">✈️ 旅遊加碼 +4.5% (刷$1.1萬封頂)</label>
-                            <input type="radio" name="jiangMode" id="rbJiangTravel" value="travel" onchange="updateRewardPreview()">
+                            <label for="checkJiangTravel">✈️ 旅遊加碼 +4.5% (刷$1.1萬封頂)</label>
+                            <input type="checkbox" id="checkJiangTravel" onchange="toggleJiangTravel()">
                         </div>
                         <button onclick="toggleJiangTravelDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看旅遊/航空/旅行社</button>
                         <div id="jiangTravelDetails" class="details-content">
@@ -2192,18 +2192,36 @@ function toggleUniOverseas() {
         }
     }
 
+   // 將將卡加碼互斥 toggle
+    function toggleJiangSelected() {
+        if (document.getElementById('checkJiangSelected').checked) {
+            document.getElementById('checkJiangTravel').checked = false;
+        }
+        updateJiangMinSpendWarning();
+        updateRewardPreview();
+    }
+    
+    function toggleJiangTravel() {
+        if (document.getElementById('checkJiangTravel').checked) {
+            document.getElementById('checkJiangSelected').checked = false;
+        }
+        updateJiangMinSpendWarning();
+        updateRewardPreview();
+    }
+
     // 將將卡低消警告
     function updateJiangMinSpendWarning() {
         const warning = document.getElementById('jiangMinSpendWarning');
-        const mode = document.querySelector('input[name="jiangMode"]:checked')?.value || 'base';
+        const isSelected = document.getElementById('checkJiangSelected')?.checked || false;
+        const isTravel = document.getElementById('checkJiangTravel')?.checked || false;
         const txs = getCurrentCycleTransactions('c4');
         const totalSpent = txs.reduce((sum, tx) => sum + (tx.amountTWD || tx.amount || 0), 0);
         
         let minSpend = 0;
-        if (mode === 'selected') {
+        if (isSelected) {
             minSpend = 3000;
             warning.innerHTML = '⚠️ 需當月累積滿 $3,000 才享加碼回饋';
-        } else if (mode === 'travel') {
+        } else if (isTravel) {
             minSpend = 6000;
             warning.innerHTML = '⚠️ 需當月累積滿 $6,000 才享加碼回饋';
         }
@@ -2432,8 +2450,9 @@ function handleHappyExclusive(selected) {
             options.isBonus = document.getElementById('checkSinopacJcbBonus')?.checked || false;
             options.isQuarterly = document.getElementById('checkSinopacJcbQuarterly')?.checked || false;
         }
-        else if (cardId === 'c4') {
-            options.mode = document.querySelector('input[name="jiangMode"]:checked')?.value || 'base';
+       else if (cardId === 'c4') {
+            options.isJiangSelected = document.getElementById('checkJiangSelected')?.checked || false;
+            options.isJiangTravel = document.getElementById('checkJiangTravel')?.checked || false;
         }
         else if (cardId === 'dbs1') {
             options.isLinePay = document.getElementById('checkDbsLinePay')?.checked || false;
@@ -2469,10 +2488,12 @@ function handleHappyExclusive(selected) {
         // 取得選項
         const options = getTransactionOptions(cardId);
         
-      // ★ 將將卡：檢查是否達低消
+     // ★ 將將卡：檢查是否達低消
         if (cardId === 'c4') {
-            const mode = document.querySelector('input[name="jiangMode"]:checked')?.value || 'base';
-            const minSpend = (mode === 'travel') ? 6000 : 3000;
+            const isSelected = document.getElementById('checkJiangSelected')?.checked || false;
+            const isTravel = document.getElementById('checkJiangTravel')?.checked || false;
+            const hasBonus = isSelected || isTravel;
+            const minSpend = isTravel ? 6000 : 3000;
             const txs = getCurrentCycleTransactions('c4');
             const totalSpent = txs.reduce((sum, tx) => sum + (tx.amountTWD || tx.amount || 0), 0);
             
@@ -2480,7 +2501,7 @@ function handleHappyExclusive(selected) {
             updateJiangMinSpendWarning();
             
             // 尚未達低消
-            if (mode !== 'base' && totalSpent < minSpend) {
+            if (hasBonus && totalSpent < minSpend) {
                 const willReachMinSpend = (totalSpent + amountTWD) >= minSpend;
                 
                 if (!willReachMinSpend) {
@@ -2602,7 +2623,8 @@ function handleHappyExclusive(selected) {
             isSinopacJcbForeign: document.getElementById('checkSinopacJcbForeign')?.checked || false,
             isSinopacJcbBonus: document.getElementById('checkSinopacJcbBonus')?.checked || false,
             isSinopacJcbQuarterly: document.getElementById('checkSinopacJcbQuarterly')?.checked || false,
-            jiangMode: document.querySelector('input[name="jiangMode"]:checked')?.value || 'base',
+           isJiangSelected: document.getElementById('checkJiangSelected')?.checked || false,
+            isJiangTravel: document.getElementById('checkJiangTravel')?.checked || false,
             isDbsLinePay: document.getElementById('checkDbsLinePay')?.checked || false,
             isDbsGreen: document.getElementById('checkDbsGreen')?.checked || false,
             isDbsForeign: document.getElementById('checkDbsForeign')?.checked || false,
@@ -2817,9 +2839,9 @@ function handleHappyExclusive(selected) {
             document.getElementById('checkSinopacJcbQuarterly').checked = tx.isSinopacJcbQuarterly || false;
         }
         else if (cardId === 'c4') {
-            const mode = tx.jiangMode || 'base';
-            const modeRadio = document.querySelector(`input[name="jiangMode"][value="${mode}"]`);
-            if (modeRadio) modeRadio.checked = true;
+            document.getElementById('checkJiangSelected').checked = tx.isJiangSelected || false;
+            document.getElementById('checkJiangTravel').checked = tx.isJiangTravel || false;
+            updateJiangMinSpendWarning();
         }
         else if (cardId === 'dbs1') {
             document.getElementById('checkDbsLinePay').checked = tx.isDbsLinePay || false;
@@ -3377,18 +3399,18 @@ function handleHappyExclusive(selected) {
         }
     // C4 將將卡 (修復：達低消後全部回溯享加碼)
         else if (cardId === 'c4') {
-            const mode = options.mode || 'base';
+            const isSelected = options.isJiangSelected || false;
+            const isTravel = options.isJiangTravel || false;
             const txs = getCurrentCycleTransactions(cardId);
             const totalCycleSpent = txs.reduce((sum, tx) => sum + (tx.amountTWD || tx.amount || 0), 0);
             
-            if (mode === 'selected') {
+            if (isSelected) {
                 const minSpend = 3000;
                 const selectedLimit = 6666;
-                // 用整個週期的總消費判斷是否達低消
                 if (totalCycleSpent < minSpend) {
                     return { reward: Math.floor(amount * 0.005), rate: 0.005 };
                 }
-                const selectedSpent = getCardBonusSpent(cardId, t => t.jiangMode === 'selected');
+                const selectedSpent = getCardBonusSpent(cardId, t => t.isJiangSelected);
                 if (selectedSpent >= selectedLimit) {
                     return { reward: Math.floor(amount * 0.005), rate: 0.005 };
                 }
@@ -3396,13 +3418,13 @@ function handleHappyExclusive(selected) {
                 const bonusReward = Math.floor(available * 0.05);
                 const baseReward = Math.floor((amount - available) * 0.005);
                 return { reward: bonusReward + baseReward, rate: (bonusReward + baseReward) / amount };
-            } else if (mode === 'travel') {
+            } else if (isTravel) {
                 const minSpend = 6000;
                 const travelLimit = 11111;
                 if (totalCycleSpent < minSpend) {
                     return { reward: Math.floor(amount * 0.005), rate: 0.005 };
                 }
-                const travelSpent = getCardBonusSpent(cardId, t => t.jiangMode === 'travel');
+                const travelSpent = getCardBonusSpent(cardId, t => t.isJiangTravel);
                 if (travelSpent >= travelLimit) {
                     return { reward: Math.floor(amount * 0.005), rate: 0.005 };
                 }

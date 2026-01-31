@@ -4130,27 +4130,41 @@ function handleHappyExclusive(selected) {
             }
             return { reward: Math.floor(amount * 0.005), rate: 0.005 };
         }
-        // DBS1 eco卡
+       // DBS1 eco卡 (修復：基本回饋 + 加碼分開計算)
         else if (cardId === 'dbs1') {
+            // 基本回饋 1%（無上限）
+            let baseReward = Math.floor(amount * 0.01);
+            let bonusReward = 0;
+            
             if (options.isLinePay) {
+                // 新戶 LINE Pay +9%（加碼上限 1000 點）
                 const lpSpent = getCardBonusSpent(cardId, t => t.isDbsLinePay);
-                if (lpSpent < 11111) {
-                    return { reward: Math.floor(Math.min(amount, 11111 - lpSpent) * 0.10), rate: 0.10 };
+                const lpBonusUsed = Math.floor(lpSpent * 0.09); // 已用掉的加碼點數
+                const lpBonusRemain = Math.max(0, 1000 - lpBonusUsed); // 剩餘可用加碼點數
+                if (lpBonusRemain > 0) {
+                    bonusReward = Math.min(Math.floor(amount * 0.09), lpBonusRemain);
                 }
-            }
-            if (options.isGreen) {
+            } else if (options.isGreen) {
+                // 綠色/特斯拉 +9%（加碼上限 300 點）
                 const greenSpent = getCardBonusSpent(cardId, t => t.isDbsGreen);
-                if (greenSpent < 3333) {
-                    return { reward: Math.floor(Math.min(amount, 3333 - greenSpent) * 0.10), rate: 0.10 };
+                const greenBonusUsed = Math.floor(greenSpent * 0.09);
+                const greenBonusRemain = Math.max(0, 300 - greenBonusUsed);
+                if (greenBonusRemain > 0) {
+                    bonusReward = Math.min(Math.floor(amount * 0.09), greenBonusRemain);
                 }
-            }
-            if (options.isForeign) {
+            } else if (options.isForeign) {
+                // 國外實體 +4%（月刷 $15,000 封頂）
                 const foreignSpent = getCardBonusSpent(cardId, t => t.isDbsForeign);
-                if (foreignSpent < 15000) {
-                    return { reward: Math.floor(Math.min(amount, 15000 - foreignSpent) * 0.05), rate: 0.05 };
+                const foreignRemain = Math.max(0, 15000 - foreignSpent);
+                if (foreignRemain > 0) {
+                    const validAmount = Math.min(amount, foreignRemain);
+                    bonusReward = Math.floor(validAmount * 0.04);
                 }
             }
-            return { reward: Math.floor(amount * 0.01), rate: 0.01 };
+            
+            const totalReward = baseReward + bonusReward;
+            const rate = (amount > 0) ? (totalReward / amount) : 0.01;
+            return { reward: totalReward, rate: rate };
         }
         // C1 傳說對決卡
         else if (cardId === 'c1') {

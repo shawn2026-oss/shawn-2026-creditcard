@@ -1116,26 +1116,40 @@
                     </div>
                 </div>
                 
-                <div id="kumamonOptions">
+               <div id="kumamonOptions">
                     <div class="option-row read-only"><label id="labelKumamonBase">🔰 國內消費 0.5% (無上限)</label><input type="checkbox" checked disabled></div>
-                    <div class="option-row" id="rowKumamonJapan"><label for="checkKumamonJapan">🇯🇵 切換為日本消費 (2.5%)</label><input type="checkbox" id="checkKumamonJapan" onchange="toggleKumamonLogic()"></div>
-                    <div id="groupKumamonJapan" style="display:none;">
-                        <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px; flex-direction:column; align-items:flex-start;">
-                            <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                                <label for="checkKumamonDesignated">🐻 指定通路 +6% (刷$8,333封頂)</label>
-                                <input type="checkbox" id="checkKumamonDesignated" onchange="toggleKumamonSub('designated')">
-                            </div>
-                            <button onclick="toggleKumamonDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看指定通路 (熊好系列)</button>
-                            <div id="kumamonDetails" class="details-content">
-                                <b>(1) 熊好遊 (交通/住宿)：</b><br>交通IC卡：SUICA、PASMO、ICOCA<br>自駕租車：TOYOTA Rent a Car、Times Car Rental、NIPPON RENT-A-CAR、OTS租車、ORIX租車<br>鐵路/航空：JR鐵路公司、日本航空<br>住宿：樂天旅遊、東橫INN、星野集團<br>
-                                <b>(2) 熊好玩 (樂園)：</b><br>東京迪士尼、華納兄弟哈利波特影城、日本環球影城、豪斯登堡、九州非洲獅樂園、名古屋樂高樂園、吉伊卡哇樂園<br>
-                                <b>(3) 熊好吃 (餐飲)：</b><br>燒肉：勝烈亭、敘敘苑、牛角、力丸燒肉、六歌仙<br>漢堡/咖啡：shake shack、DOUTOR Coffee、Fuglen<br>其他：鳥貴族、一蘭拉麵、松屋、SUKIYA、壽司郎、藏壽司<br>
-                                <b>(4) 熊好買 (購物)：</b><br>家電/藥妝：BicCamera、Yodobashi、松本清、唐吉軻德、大國藥妝<br>生活/商城：無印良品、日本MITSUI購物園區<br>服飾：UNIQLO、GU
+                    
+                    <!-- 日本消費區塊 -->
+                    <div id="kumamonJapanSection" style="border-top:1px dashed #ddd; padding-top:8px; margin-top:8px;">
+                        <div class="option-row"><label for="checkKumamonJapan">🇯🇵 日本消費 (基本 2.5%)</label><input type="checkbox" id="checkKumamonJapan" onchange="toggleKumamonJapan()"></div>
+                        
+                        <div id="groupKumamonJapan" style="display:none;">
+                            <div class="option-row" style="padding-top:6px; padding-left:20px; flex-direction:column; align-items:flex-start;">
+                                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                                    <label for="checkKumamonDesignated">🐻 指定通路 +6% (刷$8,333封頂)</label>
+                                    <input type="checkbox" id="checkKumamonDesignated" onchange="toggleKumamonDesignated()">
+                                </div>
+                                <button onclick="toggleKumamonDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看指定通路 (熊好系列)</button>
+                                <div id="kumamonDetails" class="details-content">
+                                    <b>(1) 熊好遊 (交通/住宿)：</b><br>交通IC卡：SUICA、PASMO、ICOCA<br>自駕租車：TOYOTA Rent a Car、Times Car Rental、NIPPON RENT-A-CAR、OTS租車、ORIX租車<br>鐵路/航空：JR鐵路公司、日本航空<br>住宿：樂天旅遊、東橫INN、星野集團<br>
+                                    <b>(2) 熊好玩 (樂園)：</b><br>東京迪士尼、華納兄弟哈利波特影城、日本環球影城、豪斯登堡、九州非洲獅樂園、名古屋樂高樂園、吉伊卡哇樂園<br>
+                                    <b>(3) 熊好吃 (餐飲)：</b><br>燒肉：勝烈亭、敘敘苑、牛角、力丸燒肉、六歌仙<br>漢堡/咖啡：shake shack、DOUTOR Coffee、Fuglen<br>其他：鳥貴族、一蘭拉麵、松屋、SUKIYA、壽司郎、藏壽司<br>
+                                    <b>(4) 熊好買 (購物)：</b><br>家電/藥妝：BicCamera、Yodobashi、松本清、唐吉軻德、大國藥妝<br>生活/商城：無印良品、日本MITSUI購物園區<br>服飾：UNIQLO、GU
+                                </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px;"><label for="checkKumamonPayPay">📱 PayPay 5% (季刷$2,857封頂)</label><input type="checkbox" id="checkKumamonPayPay" onchange="toggleKumamonSub('paypay')"></div>
+                    <!-- PayPay 獨立區塊（與日本消費互斥） -->
+                    <div id="kumamonPayPaySection" style="border-top:1px dashed #ddd; padding-top:8px; margin-top:8px;">
+                        <div class="option-row" style="flex-direction:column; align-items:flex-start;">
+                            <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                                <label for="checkKumamonPayPay">📱 日本 PayPay 5% (季刷$2,857封頂)</label>
+                                <input type="checkbox" id="checkKumamonPayPay" onchange="toggleKumamonPayPay()">
+                            </div>
+                            <div style="font-size:10px; color:#888; margin-top:2px;">含 3.5% 回饋 + 免 1.5% 海外交易手續費</div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div id="sinopacCurrencyOptions">
@@ -1466,9 +1480,14 @@
             updateJiheByLocation();
         }
         
-        // ★ 連動富邦J卡：根據地點自動切換模式
+       // ★ 連動富邦J卡：根據地點自動切換模式
         if (document.getElementById('fubonJOptions')?.style.display !== 'none') {
             updateFubonJByLocation();
+        }
+        
+        // ★ 連動熊本熊卡：根據地點自動切換模式
+        if (document.getElementById('kumamonOptions')?.style.display !== 'none') {
+            updateKumamonByLocation();
         }
     }
     function updateAmountPlaceholder() {
@@ -2255,11 +2274,8 @@ function getActualCycleDay(year, month, cycleDay) {
         // J3 熊本熊卡
         else if (cardId === 'j3') {
             document.getElementById('kumamonOptions').style.display = 'block';
-            // 根據地點預選
-            if (currentLocation === 'JP') {
-                document.getElementById('checkKumamonJapan').checked = true;
-                toggleKumamonLogic();
-            }
+            // 根據地點自動設定模式
+            updateKumamonByLocation();
         }
         // J4 幣倍卡
         else if (cardId === 'j4') {
@@ -2755,24 +2771,104 @@ function toggleUniOverseas() {
         }
     }
 
-    function toggleKumamonLogic() {
+    // 熊本熊卡：切換日本消費
+    function toggleKumamonJapan() {
         const isJapan = document.getElementById('checkKumamonJapan').checked;
-        document.getElementById('labelKumamonBase').innerText = isJapan ? '🔰 日本消費 2.5% (無上限)' : '🔰 國內消費 0.5% (無上限)';
-        document.getElementById('groupKumamonJapan').style.display = isJapan ? 'block' : 'none';
+        const payPaySection = document.getElementById('kumamonPayPaySection');
+        
+        if (isJapan) {
+            // 切換到日本模式
+            document.getElementById('labelKumamonBase').innerText = '🔰 日本消費 2.5% (無上限)';
+            document.getElementById('groupKumamonJapan').style.display = 'block';
+            // 禁用 PayPay 並取消勾選
+            payPaySection.style.opacity = '0.4';
+            payPaySection.style.pointerEvents = 'none';
+            document.getElementById('checkKumamonPayPay').checked = false;
+        } else {
+            // 切換到國內模式
+            document.getElementById('labelKumamonBase').innerText = '🔰 國內消費 0.5% (無上限)';
+            document.getElementById('groupKumamonJapan').style.display = 'none';
+            document.getElementById('checkKumamonDesignated').checked = false;
+            // 啟用 PayPay
+            payPaySection.style.opacity = '1';
+            payPaySection.style.pointerEvents = 'auto';
+        }
+        
         updateRewardPreview();
     }
-
+    
+    // 熊本熊卡：勾選指定通路（自動勾日本消費）
+    function toggleKumamonDesignated() {
+        const isDesignated = document.getElementById('checkKumamonDesignated').checked;
+        
+        if (isDesignated) {
+            // 自動勾選日本消費
+            document.getElementById('checkKumamonJapan').checked = true;
+            toggleKumamonJapan();
+        }
+        
+        updateRewardPreview();
+    }
+    
+    // 熊本熊卡：勾選 PayPay（與日本消費互斥）
+    function toggleKumamonPayPay() {
+        const isPayPay = document.getElementById('checkKumamonPayPay').checked;
+        const japanSection = document.getElementById('kumamonJapanSection');
+        
+        if (isPayPay) {
+            // 禁用日本消費區塊並取消勾選
+            japanSection.style.opacity = '0.4';
+            japanSection.style.pointerEvents = 'none';
+            document.getElementById('checkKumamonJapan').checked = false;
+            document.getElementById('checkKumamonDesignated').checked = false;
+            document.getElementById('groupKumamonJapan').style.display = 'none';
+            document.getElementById('labelKumamonBase').innerText = '🔰 國內消費 0.5% (無上限)';
+        } else {
+            // 啟用日本消費區塊
+            japanSection.style.opacity = '1';
+            japanSection.style.pointerEvents = 'auto';
+        }
+        
+        updateRewardPreview();
+    }
+    
+    // 熊本熊卡：根據地點自動設定模式
+    function updateKumamonByLocation() {
+        const japanSection = document.getElementById('kumamonJapanSection');
+        const payPaySection = document.getElementById('kumamonPayPaySection');
+        
+        // 先重置所有狀態
+        japanSection.style.opacity = '1';
+        japanSection.style.pointerEvents = 'auto';
+        payPaySection.style.opacity = '1';
+        payPaySection.style.pointerEvents = 'auto';
+        
+        if (currentLocation === 'JP') {
+            // 自動切換到日本模式
+            document.getElementById('checkKumamonJapan').checked = true;
+            document.getElementById('checkKumamonPayPay').checked = false;
+            toggleKumamonJapan();
+        } else {
+            // 切換到國內模式
+            document.getElementById('checkKumamonJapan').checked = false;
+            document.getElementById('checkKumamonDesignated').checked = false;
+            document.getElementById('checkKumamonPayPay').checked = false;
+            document.getElementById('labelKumamonBase').innerText = '🔰 國內消費 0.5% (無上限)';
+            document.getElementById('groupKumamonJapan').style.display = 'none';
+        }
+    }
+    
+    // 保留舊函數名稱以相容
+    function toggleKumamonLogic() {
+        toggleKumamonJapan();
+    }
+    
     function toggleKumamonSub(type) {
         if (type === 'designated') {
-            if (document.getElementById('checkKumamonDesignated').checked) {
-                document.getElementById('checkKumamonPayPay').checked = false;
-            }
+            toggleKumamonDesignated();
         } else if (type === 'paypay') {
-            if (document.getElementById('checkKumamonPayPay').checked) {
-                document.getElementById('checkKumamonDesignated').checked = false;
-            }
+            toggleKumamonPayPay();
         }
-        updateRewardPreview();
     }
 
     function toggleCurrencyLogic() { updateRewardPreview(); }

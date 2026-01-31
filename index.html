@@ -3981,15 +3981,26 @@ function handleHappyExclusive(selected) {
                 return { reward: totalReward, rate: totalRate };
             }
         }
-        // J3 熊本熊卡
+       // J3 熊本熊卡
         else if (cardId === 'j3') {
+            // PayPay 獨立計算（不與其他回饋疊加）
             if (options.isPayPay) {
+                const paypayLimit = 2857;
                 const paypaySpent = getCardBonusSpent(cardId, t => t.isKumamonPayPay);
-                if (paypaySpent < 2857) {
-                    return { reward: Math.floor(Math.min(amount, 2857 - paypaySpent) * 0.05), rate: 0.05 };
+                
+                if (paypaySpent >= paypayLimit) {
+                    // 已封頂，回饋 0%
+                    return { reward: 0, rate: 0 };
                 }
-                return { reward: Math.floor(amount * 0.025), rate: 0.025 };
+                
+                const available = paypayLimit - paypaySpent;
+                const validForPayPay = Math.min(amount, available);
+                const payPayReward = Math.floor(validForPayPay * 0.05);
+                // 超出封頂的部分也是 0%
+                
+                return { reward: payPayReward, rate: (amount > 0) ? (payPayReward / amount) : 0.05 };
             }
+            // 日本消費
             if (options.isJapan) {
                 let totalReward = Math.floor(amount * 0.025);
                 if (options.isDesignated) {
@@ -3998,6 +4009,7 @@ function handleHappyExclusive(selected) {
                 }
                 return { reward: totalReward, rate: totalReward / amount };
             }
+            // 國內一般消費
             return { reward: Math.floor(amount * 0.005), rate: 0.005 };
         }
         // J4 幣倍卡 (修復：加入封頂計算)

@@ -28,7 +28,7 @@
     <meta property="og:url" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/">
     <meta property="og:type" content="website">
 
-    <title>刷卡回饋管家 (V125.6 )</title>
+    <title>刷卡回饋管家 (V125.7 )</title>
         
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
@@ -578,7 +578,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V125.6 </div>
+            <div class="version-tag">V125.7 </div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -600,7 +600,7 @@
         <div class="subtitle"><span class="today-date" id="dateDisplay"></span></div>
         
         <div class="news-ticker">
-            <div class="ticker-content" id="news-text">🎉 V125.6修復：備份還原紀錄遺失、UniOpen 完整品牌清單、JCB 封頂計算！</div>
+            <div class="ticker-content" id="news-text">🎉 V125.7修復：備份還原紀錄遺失、UniOpen 完整品牌清單、JCB 封頂計算！</div>
         </div>
         
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
@@ -1096,7 +1096,7 @@
                             <b>(1) 服飾：</b><br>UNIQLO、GU、思夢樂、GLOBAL WORK、niko and …、LOWRYS FARM、LAKOLE、studio CLIP、repipi armario、HARE、Heather、PAGEBOY、RAGEBLUE、LEPSIM、JEANASIS<br>
                             <b>(2) 生活/藥妝：</b><br>DAISO大創、Standard Products、THREEPPY、日藥本舖、松本清、Tomod's、札幌藥妝、TSUTAYA BOOKSTORE、HANDS台隆手創館、宜得利家居<br>
                         </div>
-                        <div style="font-size:10px; color:#888; margin-top:2px;">⚠️ 需單筆滿 ¥500 日圓</div>
+ 
                     </div>
                     
                     <!-- 日本專屬區塊 -->
@@ -1110,7 +1110,7 @@
                             <label for="checkJiheApple">🍎 Apple Pay +1.5% (刷$4萬封頂)</label>
                             <input type="checkbox" id="checkJiheApple" onchange="toggleJiheApple()">
                         </div>
-                        <div style="font-size:10px; color:#888; margin-top:2px; padding-left:20px;">⚠️ 需單筆滿 ¥500 日圓，勾選自動切換為日本消費</div>
+                        <div style="font-size:10px; color:#888; margin-top:2px; padding-left:20px;">⚠️ 需單筆等值台幣 $100，勾選自動切換為日本消費</div>
                     </div>
                 </div>
                 
@@ -1297,7 +1297,7 @@
     </div>
     <script>
     // ==========================================
-    // Part 3: 核心設定、匯率與 UI 邏輯 (V125.6)
+    // Part 3: 核心設定、匯率與 UI 邏輯 (V125.7)
     // ==========================================
     
     const LOCATION_CONFIG = {
@@ -1810,7 +1810,7 @@ let editingTxId = null; // 追蹤正在編輯的交易 ID
     }
       
     // ==========================================
-    // Part 4: 交易資料、Toggle 邏輯與運算核心 (V125.6)
+    // Part 4: 交易資料、Toggle 邏輯與運算核心 (V125.7)
     // ==========================================
 
     function getTransactionsKey(cardId) { return `transactions_${cardId}`; }
@@ -1856,7 +1856,7 @@ function getActualCycleDay(year, month, cycleDay) {
         
         return txs.filter(tx => {
             const txCycleKey = getCycleKey(cardId, tx.date);
-            return txCycleKey === currentCycleKey;125.6
+            return txCycleKey === currentCycleKey;125.7
         });
     }
 
@@ -2785,6 +2785,20 @@ function handleHappyExclusive(selected) {
             }
         }
         
+        // ★ 吉鶴卡 Apple Pay 低消檢查
+        if (cardId === 'j2') {
+            const isApple = document.getElementById('checkJiheApple')?.checked || false;
+            const isJapan = document.getElementById('checkJiheJapan')?.checked || false;
+            
+            if (isJapan && isApple && amountTWD < 100) {
+                const baseReward = Math.floor(amountTWD * 0.025);
+                liveCalc.style.display = 'block';
+                liveCalc.innerHTML = `預估獲得 <b>$${baseReward}</b> 回饋 (2.5%) <span style="color:#e65100; font-size:11px;"><br>⚠️ 未達低消 $100，無法享有 Apple Pay +1.5%</span>`;
+                updateTWDPreview();
+                return;
+            }
+        }
+        
         // ★ 傳入原始金額供低消判斷使用
         options.originalAmount = amount;
         const result = calculateSingleReward(cardId, amountTWD, options);
@@ -3571,27 +3585,32 @@ function handleHappyExclusive(selected) {
             rate = (amount > 0) ? (reward / amount) : baseRate;
             return { reward, rate };
         }
-        // J2 吉鶴卡
+       // J2 吉鶴卡
         else if (cardId === 'j2') {
-            // 取得原始金額（用於低消判斷）
-            const originalAmount = options.originalAmount || amount;
-            
             if (options.isJapan) {
                 let totalReward = Math.floor(amount * 0.025);
-                // Apple Pay 低消門檻：JPY 500（用原始金額判斷）
-                if (options.isApple && originalAmount >= 500) {
+                let totalRate = 0.025;
+                // Apple Pay 低消門檻：等值台幣 $100
+                if (options.isApple && amount >= 100) {
                     const appleSpent = getCardBonusSpent(cardId, t => t.isJiheJapan && t.isJiheApple);
-                    if (appleSpent < 40000) totalReward += Math.floor(Math.min(amount, 40000 - appleSpent) * 0.015);
+                    if (appleSpent < 40000) {
+                        totalReward += Math.floor(Math.min(amount, 40000 - appleSpent) * 0.015);
+                        totalRate = 0.04; // 2.5% + 1.5% = 4%
+                    }
                 }
-                return { reward: totalReward, rate: totalReward / amount };
+                return { reward: totalReward, rate: totalRate };
             } else {
                 let totalReward = Math.floor(amount * 0.01);
-                // 國內日系低消門檻：TWD 500
-                if (options.isDomesticJapanese && amount >= 500) {
+                let totalRate = 0.01;
+                // 國內日系名店（無低消門檻）
+                if (options.isDomesticJapanese) {
                     const djSpent = getCardBonusSpent(cardId, t => t.isJiheDomesticJapanese);
-                    if (djSpent < 12500) totalReward += Math.floor(Math.min(amount, 12500 - djSpent) * 0.04);
+                    if (djSpent < 12500) {
+                        totalReward += Math.floor(Math.min(amount, 12500 - djSpent) * 0.04);
+                        totalRate = 0.05; // 1% + 4% = 5%
+                    }
                 }
-                return { reward: totalReward, rate: totalReward / amount };
+                return { reward: totalReward, rate: totalRate };
             }
         }
         // J3 熊本熊卡
@@ -4354,7 +4373,7 @@ if (cycleDay && cycleDay > 0) {
     // 匯出資料 (修復：確保 cardId 欄位存在)
     function exportData() {
         const data = {
-            version: 'V125.6',
+            version: 'V125.7',
             exportTime: new Date().toISOString(),
             visibleCards: visibleCards,
             cardOrder: savedOrder,

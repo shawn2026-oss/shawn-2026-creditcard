@@ -1042,39 +1042,44 @@
                     </div>
                 </div>
 
-                <div id="fubonJOptions">
-                    <div class="option-row read-only"><label>🔰 國內消費 1% (無上限)</label><input type="checkbox" checked disabled></div>
+               <div id="fubonJOptions">
+                    <div class="option-row read-only"><label id="labelFubonJBase">🔰 國內消費 1% (無上限)</label><input type="checkbox" checked disabled></div>
                     
-                    <div style="margin-top:8px; padding-top:8px; border-top:1px dashed #ddd;">
-                        <div style="font-size:12px; font-weight:700; color:#555; margin-bottom:6px;">海外基礎回饋：</div>
+                    <!-- 日韓專屬區塊 -->
+                    <div id="fubonJJpkrSection" style="border-top:1px dashed #ddd; padding-top:8px; margin-top:8px;">
                         <div class="option-row">
-                            <label>🇯🇵🇰🇷 日韓消費 (3%，無上限)</label>
-                            <input type="radio" name="fubonJRegion" value="jpkr" onchange="toggleFubonJRegion()">
+                            <label for="checkFubonJJpkr">🇯🇵🇰🇷 日韓消費 (基本 3%)</label>
+                            <input type="checkbox" id="checkFubonJJpkr" onchange="toggleFubonJJpkr()">
                         </div>
-                        <div class="option-row">
-                            <label>🇹🇭 泰國消費 (1%，無上限)</label>
-                            <input type="radio" name="fubonJRegion" value="th" onchange="toggleFubonJRegion()">
+                        
+                        <div class="option-row" id="rowFubonJJpkrBonus" style="margin-top:6px; padding-left:20px;">
+                            <label for="checkFubonJJpkrBonus">🛍️ 日韓實體 +3%</label>
+                            <input type="checkbox" id="checkFubonJJpkrBonus" onchange="toggleFubonJJpkrBonus()">
                         </div>
+                        <div id="fubonJJpkrMinSpend" style="font-size:10px; color:#888; margin-top:2px; padding-left:20px;"></div>
+                        
+                        <div class="option-row" id="rowFubonJSuica" style="margin-top:6px; padding-left:20px;">
+                            <label for="checkFubonJSuica">🍎 日本交通卡 +7%</label>
+                            <input type="checkbox" id="checkFubonJSuica" onchange="toggleFubonJSuica()">
+                        </div>
+                        <div id="fubonJSuicaMinSpend" style="font-size:10px; color:#888; margin-top:2px; padding-left:20px;"></div>
                     </div>
                     
-                    <div style="margin-top:8px; padding-top:8px; border-top:1px dashed #ddd;">
-                        <div style="font-size:12px; font-weight:700; color:#555; margin-bottom:6px;">加碼回饋：</div>
+                    <!-- 泰國專屬區塊 -->
+                    <div id="fubonJThSection" style="border-top:1px dashed #ddd; padding-top:8px; margin-top:8px;">
                         <div class="option-row">
-                            <label>🛍️ 日韓實體 +3% (需滿$1,000)</label>
-                            <input type="radio" name="fubonJBonus" value="jpkr_physical" onchange="toggleFubonJBonus()">
+                            <label for="checkFubonJTh">🇹🇭 泰國消費 (基本 1%)</label>
+                            <input type="checkbox" id="checkFubonJTh" onchange="toggleFubonJTh()">
                         </div>
-                        <div class="option-row">
-                            <label>🇹🇭 泰國實體 +5% (需滿$1,000)</label>
-                            <input type="radio" name="fubonJBonus" value="th_physical" onchange="toggleFubonJBonus()">
+                        
+                        <div class="option-row" id="rowFubonJThBonus" style="margin-top:6px; padding-left:20px;">
+                            <label for="checkFubonJThBonus">🛍️ 泰國實體 +5%</label>
+                            <input type="checkbox" id="checkFubonJThBonus" onchange="toggleFubonJThBonus()">
                         </div>
-                        <div class="option-row">
-                            <label>🍎 日本交通卡 +7% (需滿$2,000)</label>
-                            <input type="radio" name="fubonJBonus" value="suica" onchange="toggleFubonJBonus()">
-                        </div>
+                        <div id="fubonJThMinSpend" style="font-size:10px; color:#888; margin-top:2px; padding-left:20px;"></div>
                     </div>
                     
-                    <div id="fubonJMinSpendWarning" style="display:none; margin-top:8px; padding:8px; background:#ffebee; border-radius:6px; font-size:11px; color:#c62828;">
-                    </div>
+                    <div id="fubonJMinSpendWarning" style="display:none; margin-top:8px; padding:8px; background:#ffebee; border-radius:6px; font-size:11px; color:#c62828;"></div>
                 </div>
 
                 <div id="jiheOptions">
@@ -1360,6 +1365,11 @@
         // ★ 連動吉鶴卡：根據地點自動切換模式
         if (document.getElementById('jiheOptions')?.style.display !== 'none') {
             updateJiheByLocation();
+        }
+        
+        // ★ 連動富邦J卡：根據地點自動切換模式
+        if (document.getElementById('fubonJOptions')?.style.display !== 'none') {
+            updateFubonJByLocation();
         }
     }
 
@@ -1966,23 +1976,11 @@ function getActualCycleDay(year, month, cycleDay) {
         else if (cardId === 'c11') {
             document.getElementById('richartOptions').style.display = 'block';
         }
-        // J1 富邦J卡
+       // J1 富邦J卡
         else if (cardId === 'j1') {
             document.getElementById('fubonJOptions').style.display = 'block';
-            // 重置選項
-            const regionRadios = document.querySelectorAll('input[name="fubonJRegion"]');
-            regionRadios.forEach(r => r.checked = false);
-            const bonusRadios = document.querySelectorAll('input[name="fubonJBonus"]');
-            bonusRadios.forEach(r => r.checked = false);
-            // 隱藏警告
-            document.getElementById('fubonJMinSpendWarning').style.display = 'none';
-            
-            // 根據地點預選
-            if (currentLocation === 'JP' || currentLocation === 'KR') {
-                document.querySelector('input[name="fubonJRegion"][value="jpkr"]').checked = true;
-            } else if (currentLocation === 'TH') {
-                document.querySelector('input[name="fubonJRegion"][value="th"]').checked = true;
-            }
+            // 根據地點自動設定模式
+            updateFubonJByLocation();
         }
        // J2 吉鶴卡
         else if (cardId === 'j2') {
@@ -2159,55 +2157,200 @@ function toggleUniOverseas() {
 
     function toggleRichartLogic() { updateRewardPreview(); }
 
-    // J1 富邦J卡 Toggle 函數
-    function toggleFubonJRegion() {
-        updateRewardPreview();
+    // J1 富邦J卡：取得低消門檻顯示（統一用台幣）
+    function getFubonJMinSpendDisplay(twdAmount) {
+        return `需單筆等值台幣 $${twdAmount.toLocaleString()}`;
     }
-
-    function toggleFubonJBonus() {
-        const selectedBonus = document.querySelector('input[name="fubonJBonus"]:checked')?.value;
-        const warning = document.getElementById('fubonJMinSpendWarning');
+    
+    // J1 富邦J卡：更新低消門檻顯示
+    function updateFubonJMinSpendDisplay() {
+        const jpkrEl = document.getElementById('fubonJJpkrMinSpend');
+        const suicaEl = document.getElementById('fubonJSuicaMinSpend');
+        const thEl = document.getElementById('fubonJThMinSpend');
         
-        // 根據加碼選擇自動調整地區
-        if (selectedBonus === 'jpkr_physical' || selectedBonus === 'suica') {
-            document.querySelector('input[name="fubonJRegion"][value="jpkr"]').checked = true;
-        } else if (selectedBonus === 'th_physical') {
-            document.querySelector('input[name="fubonJRegion"][value="th"]').checked = true;
+        if (jpkrEl) jpkrEl.innerText = '⚠️ ' + getFubonJMinSpendDisplay(1000);
+        if (suicaEl) suicaEl.innerText = '⚠️ ' + getFubonJMinSpendDisplay(2000);
+        if (thEl) thEl.innerText = '⚠️ ' + getFubonJMinSpendDisplay(1000);
+    }
+    
+    // J1 富邦J卡：切換日韓消費
+    function toggleFubonJJpkr() {
+        const isJpkr = document.getElementById('checkFubonJJpkr').checked;
+        const thSection = document.getElementById('fubonJThSection');
+        
+        if (isJpkr) {
+            // 切換到日韓模式
+            document.getElementById('labelFubonJBase').innerText = '🔰 日韓消費 3% (無上限)';
+            // 禁用泰國區塊
+            thSection.style.opacity = '0.4';
+            thSection.style.pointerEvents = 'none';
+            document.getElementById('checkFubonJTh').checked = false;
+            document.getElementById('checkFubonJThBonus').checked = false;
+        } else {
+            // 切換到國內模式
+            document.getElementById('labelFubonJBase').innerText = '🔰 國內消費 1% (無上限)';
+            // 啟用泰國區塊
+            thSection.style.opacity = '1';
+            thSection.style.pointerEvents = 'auto';
+            // 取消日韓加碼
+            document.getElementById('checkFubonJJpkrBonus').checked = false;
+            document.getElementById('checkFubonJSuica').checked = false;
         }
         
-        // 檢查低消並顯示警告
+        updateRewardPreview();
+    }
+    
+    // J1 富邦J卡：日韓實體加碼（自動勾日韓消費，與交通卡互斥）
+    function toggleFubonJJpkrBonus() {
+        const isBonus = document.getElementById('checkFubonJJpkrBonus').checked;
+        
+        if (isBonus) {
+            // 自動勾選日韓消費
+            document.getElementById('checkFubonJJpkr').checked = true;
+            toggleFubonJJpkr();
+            // 取消交通卡
+            document.getElementById('checkFubonJSuica').checked = false;
+        }
+        
         checkFubonJMinSpend();
         updateRewardPreview();
     }
-
+    
+    // J1 富邦J卡：日本交通卡加碼（自動勾日韓消費，與日韓實體互斥）
+    function toggleFubonJSuica() {
+        const isSuica = document.getElementById('checkFubonJSuica').checked;
+        
+        if (isSuica) {
+            // 自動勾選日韓消費
+            document.getElementById('checkFubonJJpkr').checked = true;
+            toggleFubonJJpkr();
+            // 取消日韓實體
+            document.getElementById('checkFubonJJpkrBonus').checked = false;
+        }
+        
+        checkFubonJMinSpend();
+        updateRewardPreview();
+    }
+    
+    // J1 富邦J卡：切換泰國消費
+    function toggleFubonJTh() {
+        const isTh = document.getElementById('checkFubonJTh').checked;
+        const jpkrSection = document.getElementById('fubonJJpkrSection');
+        
+        if (isTh) {
+            // 切換到泰國模式
+            document.getElementById('labelFubonJBase').innerText = '🔰 泰國消費 1% (無上限)';
+            // 禁用日韓區塊
+            jpkrSection.style.opacity = '0.4';
+            jpkrSection.style.pointerEvents = 'none';
+            document.getElementById('checkFubonJJpkr').checked = false;
+            document.getElementById('checkFubonJJpkrBonus').checked = false;
+            document.getElementById('checkFubonJSuica').checked = false;
+        } else {
+            // 切換到國內模式
+            document.getElementById('labelFubonJBase').innerText = '🔰 國內消費 1% (無上限)';
+            // 啟用日韓區塊
+            jpkrSection.style.opacity = '1';
+            jpkrSection.style.pointerEvents = 'auto';
+            // 取消泰國加碼
+            document.getElementById('checkFubonJThBonus').checked = false;
+        }
+        
+        updateRewardPreview();
+    }
+    
+    // J1 富邦J卡：泰國實體加碼（自動勾泰國消費）
+    function toggleFubonJThBonus() {
+        const isBonus = document.getElementById('checkFubonJThBonus').checked;
+        
+        if (isBonus) {
+            // 自動勾選泰國消費
+            document.getElementById('checkFubonJTh').checked = true;
+            toggleFubonJTh();
+        }
+        
+        checkFubonJMinSpend();
+        updateRewardPreview();
+    }
+    
+    // J1 富邦J卡：根據地點自動設定模式
+    function updateFubonJByLocation() {
+        const jpkrSection = document.getElementById('fubonJJpkrSection');
+        const thSection = document.getElementById('fubonJThSection');
+        
+        // 先重置所有狀態
+        jpkrSection.style.opacity = '1';
+        jpkrSection.style.pointerEvents = 'auto';
+        thSection.style.opacity = '1';
+        thSection.style.pointerEvents = 'auto';
+        
+        if (currentLocation === 'JP' || currentLocation === 'KR') {
+            // 自動切換到日韓模式
+            document.getElementById('checkFubonJJpkr').checked = true;
+            document.getElementById('checkFubonJTh').checked = false;
+            document.getElementById('checkFubonJThBonus').checked = false;
+            document.getElementById('labelFubonJBase').innerText = '🔰 日韓消費 3% (無上限)';
+            thSection.style.opacity = '0.4';
+            thSection.style.pointerEvents = 'none';
+        } else if (currentLocation === 'TH') {
+            // 自動切換到泰國模式
+            document.getElementById('checkFubonJTh').checked = true;
+            document.getElementById('checkFubonJJpkr').checked = false;
+            document.getElementById('checkFubonJJpkrBonus').checked = false;
+            document.getElementById('checkFubonJSuica').checked = false;
+            document.getElementById('labelFubonJBase').innerText = '🔰 泰國消費 1% (無上限)';
+            jpkrSection.style.opacity = '0.4';
+            jpkrSection.style.pointerEvents = 'none';
+        } else {
+            // 國內模式
+            document.getElementById('checkFubonJJpkr').checked = false;
+            document.getElementById('checkFubonJTh').checked = false;
+            document.getElementById('checkFubonJJpkrBonus').checked = false;
+            document.getElementById('checkFubonJSuica').checked = false;
+            document.getElementById('checkFubonJThBonus').checked = false;
+            document.getElementById('labelFubonJBase').innerText = '🔰 國內消費 1% (無上限)';
+        }
+        
+        // 更新低消門檻顯示
+        updateFubonJMinSpendDisplay();
+    }
+    
+    // J1 富邦J卡：檢查低消
     function checkFubonJMinSpend() {
-        const amount = parseFloat(document.getElementById('amountInput').value) || 0;
-        const selectedBonus = document.querySelector('input[name="fubonJBonus"]:checked')?.value;
+        const amountRaw = parseFloat(document.getElementById('amountInput').value) || 0;
+        const rate = getCurrentRate();
+        const amountTWD = Math.round(amountRaw * rate);
         const warning = document.getElementById('fubonJMinSpendWarning');
         
-        if (!selectedBonus) {
-            warning.style.display = 'none';
-            return;
-        }
+        const isJpkrBonus = document.getElementById('checkFubonJJpkrBonus')?.checked;
+        const isSuica = document.getElementById('checkFubonJSuica')?.checked;
+        const isThBonus = document.getElementById('checkFubonJThBonus')?.checked;
         
         let minSpend = 0;
-        let warningText = '';
+        let bonusType = '';
         
-        if (selectedBonus === 'jpkr_physical' || selectedBonus === 'th_physical') {
+        if (isJpkrBonus) {
             minSpend = 1000;
-            warningText = '🔴 未達低消門檻 $1,000，無法享有加碼回饋';
-        } else if (selectedBonus === 'suica') {
+            bonusType = '日韓實體 +3%';
+        } else if (isSuica) {
             minSpend = 2000;
-            warningText = '🔴 未達低消門檻 $2,000，無法享有加碼回饋';
+            bonusType = '日本交通卡 +7%';
+        } else if (isThBonus) {
+            minSpend = 1000;
+            bonusType = '泰國實體 +5%';
         }
         
-        if (minSpend > 0 && amount > 0 && amount < minSpend) {
-            warning.innerHTML = warningText;
+        if (minSpend > 0 && amountTWD > 0 && amountTWD < minSpend) {
+            warning.innerHTML = `🔴 未達低消門檻（${getFubonJMinSpendDisplay(minSpend)}），無法享有${bonusType}`;
             warning.style.display = 'block';
         } else {
             warning.style.display = 'none';
         }
     }
+    
+    // 保留舊函數名稱以相容
+    function toggleFubonJRegion() { updateRewardPreview(); }
+    function toggleFubonJBonus() { updateRewardPreview(); }
 
    // 吉鶴卡：切換日本消費
     function toggleJiheJapan() {
@@ -2525,8 +2668,11 @@ function handleHappyExclusive(selected) {
             options.mode = document.querySelector('input[name="richartMode"]:checked')?.value || 'general';
         }
         else if (cardId === 'j1') {
-            options.region = document.querySelector('input[name="fubonJRegion"]:checked')?.value || 'domestic';
-            options.bonus = document.querySelector('input[name="fubonJBonus"]:checked')?.value || 'none';
+            options.isJpkr = document.getElementById('checkFubonJJpkr')?.checked || false;
+            options.isTh = document.getElementById('checkFubonJTh')?.checked || false;
+            options.isJpkrBonus = document.getElementById('checkFubonJJpkrBonus')?.checked || false;
+            options.isSuica = document.getElementById('checkFubonJSuica')?.checked || false;
+            options.isThBonus = document.getElementById('checkFubonJThBonus')?.checked || false;
         }
         else if (cardId === 'j2') {
             options.isJapan = document.getElementById('checkJiheJapan')?.checked || false;
@@ -2712,8 +2858,11 @@ function handleHappyExclusive(selected) {
             isUniOverseas: document.getElementById('checkUniOverseas')?.checked || false,
             uniBrandCount: getUniBrandCount(),
             richartMode: document.querySelector('input[name="richartMode"]:checked')?.value || 'general',
-            fubonJRegion: document.querySelector('input[name="fubonJRegion"]:checked')?.value || 'domestic',
-            fubonJBonus: document.querySelector('input[name="fubonJBonus"]:checked')?.value || 'none',
+            isFubonJJpkr: document.getElementById('checkFubonJJpkr')?.checked || false,
+            isFubonJTh: document.getElementById('checkFubonJTh')?.checked || false,
+            isFubonJJpkrBonus: document.getElementById('checkFubonJJpkrBonus')?.checked || false,
+            isFubonJSuica: document.getElementById('checkFubonJSuica')?.checked || false,
+            isFubonJThBonus: document.getElementById('checkFubonJThBonus')?.checked || false,
             isJiheJapan: document.getElementById('checkJiheJapan')?.checked || false,
             isJiheApple: document.getElementById('checkJiheApple')?.checked || false,
             isJiheDomesticJapanese: document.getElementById('checkJiheDomesticJapanese')?.checked || false,
@@ -2903,15 +3052,28 @@ function handleHappyExclusive(selected) {
             if (modeRadio) modeRadio.checked = true;
         }
         else if (cardId === 'j1') {
-            const region = tx.fubonJRegion || '';
-            const bonus = tx.fubonJBonus || '';
-            if (region) {
-                const regionRadio = document.querySelector(`input[name="fubonJRegion"][value="${region}"]`);
-                if (regionRadio) regionRadio.checked = true;
+            // 相容舊格式
+            const oldRegion = tx.fubonJRegion || '';
+            const oldBonus = tx.fubonJBonus || '';
+            
+            // 還原日韓/泰國消費
+            if (tx.isFubonJJpkr || oldRegion === 'jpkr') {
+                document.getElementById('checkFubonJJpkr').checked = true;
+                toggleFubonJJpkr();
+            } else if (tx.isFubonJTh || oldRegion === 'th') {
+                document.getElementById('checkFubonJTh').checked = true;
+                toggleFubonJTh();
             }
-            if (bonus && bonus !== 'none') {
-                const bonusRadio = document.querySelector(`input[name="fubonJBonus"][value="${bonus}"]`);
-                if (bonusRadio) bonusRadio.checked = true;
+            
+            // 還原加碼選項
+            if (tx.isFubonJJpkrBonus || oldBonus === 'jpkr_physical') {
+                document.getElementById('checkFubonJJpkrBonus').checked = true;
+            }
+            if (tx.isFubonJSuica || oldBonus === 'suica') {
+                document.getElementById('checkFubonJSuica').checked = true;
+            }
+            if (tx.isFubonJThBonus || oldBonus === 'th_physical') {
+                document.getElementById('checkFubonJThBonus').checked = true;
             }
         }
         else if (cardId === 'j2') {
@@ -3365,30 +3527,36 @@ function handleHappyExclusive(selected) {
             else if (mode === 'overseas') rate = 0.033;
             reward = Math.floor(amount * rate);
         }
-        // J1 富邦J卡 (含封頂判斷)
+       // J1 富邦J卡 (含封頂判斷)
         else if (cardId === 'j1') {
-            const region = options.region || 'domestic';
-            const bonus = options.bonus || 'none';
+            const isJpkr = options.isJpkr || options.region === 'jpkr' || false;
+            const isTh = options.isTh || options.region === 'th' || false;
+            const isJpkrBonus = options.isJpkrBonus || options.bonus === 'jpkr_physical' || options.isFubonJJpkrBonus || false;
+            const isSuica = options.isSuica || options.bonus === 'suica' || options.isFubonJSuica || false;
+            const isThBonus = options.isThBonus || options.bonus === 'th_physical' || options.isFubonJThBonus || false;
             const quota = getFubonJQuotaUsed();
             
             // 基礎回饋 (無上限)
-            const baseRate = (region === 'jpkr') ? 0.03 : (region === 'th') ? 0.01 : 0.01;
+            let baseRate = 0.01; // 國內
+            if (isJpkr) baseRate = 0.03;
+            else if (isTh) baseRate = 0.01;
+            
             reward = Math.floor(amount * baseRate);
             
-            // 加碼回饋 (檢查剩餘額度)
+            // 加碼回饋 (檢查剩餘額度，用 TWD 金額判斷低消)
             let bonusRate = 0;
             let cap = 0;
             let spent = 0;
 
-            if (bonus === 'jpkr_physical' && amount >= 1000) {
+            if (isJpkrBonus && amount >= 1000) {
                 bonusRate = 0.03;
                 cap = quota.physicalLimit;
                 spent = quota.physicalSpent;
-            } else if (bonus === 'th_physical' && amount >= 1000) {
+            } else if (isThBonus && amount >= 1000) {
                 bonusRate = 0.05;
                 cap = quota.physicalLimit;
                 spent = quota.physicalSpent;
-            } else if (bonus === 'suica' && amount >= 2000) {
+            } else if (isSuica && amount >= 2000) {
                 bonusRate = 0.07;
                 cap = quota.suicaLimit;
                 spent = quota.suicaSpent;

@@ -1312,7 +1312,7 @@
         </div>
     </div>
     
-    <!-- 編輯情境 Modal -->
+   <!-- 編輯情境 Modal -->
     <div id="sceneEditModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10001; justify-content:center; align-items:center;">
         <div style="background:#fff; border-radius:16px; width:90%; max-width:400px; max-height:85vh; overflow-y:auto; padding:20px;">
             <h3 id="sceneEditTitle" style="margin:0 0 16px 0; font-size:18px;">新增情境</h3>
@@ -1324,19 +1324,11 @@
             
             <div style="margin-bottom:16px;">
                 <label style="font-size:13px; color:#555; display:block; margin-bottom:6px;">切換國家時自動套用（可多選）</label>
-                <div id="sceneLocationOptions" style="display:flex; flex-wrap:wrap; gap:8px;">
-                    <label style="display:flex; align-items:center; gap:4px; padding:8px 12px; border:1px solid #ddd; border-radius:8px; cursor:pointer;">
-                        <input type="checkbox" name="sceneLocation" value="TW" onchange="checkSceneLocationConflict()"> 🇹🇼 台灣
-                    </label>
-                    <label style="display:flex; align-items:center; gap:4px; padding:8px 12px; border:1px solid #ddd; border-radius:8px; cursor:pointer;">
-                        <input type="checkbox" name="sceneLocation" value="JP" onchange="checkSceneLocationConflict()"> 🇯🇵 日本
-                    </label>
-                    <label style="display:flex; align-items:center; gap:4px; padding:8px 12px; border:1px solid #ddd; border-radius:8px; cursor:pointer;">
-                        <input type="checkbox" name="sceneLocation" value="KR" onchange="checkSceneLocationConflict()"> 🇰🇷 韓國
-                    </label>
-                    <label style="display:flex; align-items:center; gap:4px; padding:8px 12px; border:1px solid #ddd; border-radius:8px; cursor:pointer;">
-                        <input type="checkbox" name="sceneLocation" value="TH" onchange="checkSceneLocationConflict()"> 🇹🇭 泰國
-                    </label>
+                <div id="sceneLocationOptions" style="display:grid; grid-template-columns:repeat(2,1fr); gap:8px;">
+                    <label style="display:flex; align-items:center; gap:8px; padding:12px; border:1px solid #ddd; border-radius:8px; cursor:pointer;"><input type="checkbox" name="sceneLocation" value="TW" onchange="checkSceneLocationConflict()"><span>🇹🇼 台灣</span></label>
+                    <label style="display:flex; align-items:center; gap:8px; padding:12px; border:1px solid #ddd; border-radius:8px; cursor:pointer;"><input type="checkbox" name="sceneLocation" value="JP" onchange="checkSceneLocationConflict()"><span>🇯🇵 日本</span></label>
+                    <label style="display:flex; align-items:center; gap:8px; padding:12px; border:1px solid #ddd; border-radius:8px; cursor:pointer;"><input type="checkbox" name="sceneLocation" value="KR" onchange="checkSceneLocationConflict()"><span>🇰🇷 韓國</span></label>
+                    <label style="display:flex; align-items:center; gap:8px; padding:12px; border:1px solid #ddd; border-radius:8px; cursor:pointer;"><input type="checkbox" name="sceneLocation" value="TH" onchange="checkSceneLocationConflict()"><span>🇹🇭 泰國</span></label>
                 </div>
                 <div id="sceneLocationWarning" style="display:none; margin-top:8px; padding:8px; background:#fff3e0; border-radius:6px; font-size:11px; color:#e65100;"></div>
             </div>
@@ -1769,8 +1761,10 @@ let editingTxId = null; // 追蹤正在編輯的交易 ID
         cards.filter(c => c.id !== 'add1').forEach(card => {
             const isChecked = selectedCards.includes(card.id);
             const label = document.createElement('label');
-            label.style.cssText = 'display:flex; align-items:center; gap:6px; padding:8px; border:1px solid #ddd; border-radius:8px; cursor:pointer; font-size:13px;';
-            label.innerHTML = `<input type="checkbox" name="sceneCard" value="${card.id}" ${isChecked ? 'checked' : ''}> ${card.icon} ${card.name}`;
+            label.style.cssText = 'display:flex; align-items:center; gap:6px; padding:8px; border:1px solid #ddd; border-radius:8px; cursor:pointer; font-size:12px; white-space:nowrap; overflow:hidden;';
+            const iconText = (card.icon && card.icon !== 'undefined') ? card.icon : '💳';
+            const cardName = card.name || card.id;
+            label.innerHTML = `<input type="checkbox" name="sceneCard" value="${card.id}" ${isChecked ? 'checked' : ''}>${iconText}&nbsp;${cardName}`;
             cardOptions.appendChild(label);
         });
         

@@ -3285,8 +3285,16 @@ function handleHappyExclusive(selected) {
             const quota = getPigRichQuotaUsed();
             
             if (options.isBill) {
+                reward = Math.floor(amount * 0.0015);
                 rate = 0.0015;
-                reward = Math.floor(amount * rate);
+                if (options.isBonus10) {
+                    if (quota.bonus10Spent < quota.bonus10Limit) {
+                        const available10 = quota.bonus10Limit - quota.bonus10Spent;
+                        const validFor10 = Math.min(amount, available10);
+                        reward += Math.floor(validFor10 * 0.10);
+                        rate = (amount > 0) ? (reward / amount) : 0.0015;
+                    }
+                }
             } else {
                 let baseReward = Math.floor(amount * 0.01);
                 reward = baseReward;

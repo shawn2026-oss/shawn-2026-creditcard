@@ -1762,13 +1762,11 @@ let editingTxId = null; // 追蹤正在編輯的交易 ID
         // 產生卡片選項
         cardOptions.innerHTML = '';
         const selectedCards = scene ? scene.cards : visibleCards;
-        cards.filter(c => c.id !== 'add1').forEach(card => {
+      cards.filter(c => c.id !== 'add1').forEach(card => {
             const isChecked = selectedCards.includes(card.id);
             const label = document.createElement('label');
-            label.style.cssText = 'display:flex; align-items:center; gap:6px; padding:8px; border:1px solid #ddd; border-radius:8px; cursor:pointer; font-size:12px; white-space:nowrap; overflow:hidden;';
-            const iconText = (card.icon && card.icon !== 'undefined') ? card.icon : '💳';
-            const cardName = card.name || card.id;
-            label.innerHTML = `<input type="checkbox" name="sceneCard" value="${card.id}" ${isChecked ? 'checked' : ''}>${iconText}&nbsp;${cardName}`;
+            label.style.cssText = 'display:flex; align-items:center; padding:8px; border:1px solid #ddd; border-radius:8px; cursor:pointer; font-size:11px; overflow:hidden; text-overflow:ellipsis;';
+            label.innerHTML = `<input type="checkbox" name="sceneCard" value="${card.id}" ${isChecked ? 'checked' : ''} style="margin-right:6px; flex-shrink:0;">${card.icon || '💳'} ${card.name || card.id}`;
             cardOptions.appendChild(label);
         });
         

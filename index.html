@@ -1451,7 +1451,7 @@
             rateRow.style.display = 'flex';
             document.getElementById('currencySymbolInRate').innerText = currencySymbol;
             let rateVal = exchangeRates[currencySymbol] || 1;
-            rateInput.value = parseFloat(rateVal).toFixed(2);
+            rateInput.value = parseFloat(rateVal).toFixed(4);
         } else {
             rateRow.style.display = 'none';
         }
@@ -1686,7 +1686,7 @@ let editingTxId = null; // 追蹤正在編輯的交易 ID
                 rateRow.style.display = 'flex';
                 document.getElementById('currencySymbolInRate').innerText = LOCATION_CONFIG[savedLoc].currency;
                 let rateVal = exchangeRates[LOCATION_CONFIG[savedLoc].currency] || 1;
-                document.getElementById('exchangeRateInput').value = parseFloat(rateVal).toFixed(2);
+                document.getElementById('exchangeRateInput').value = parseFloat(rateVal).toFixed(4);
             }
         }
         

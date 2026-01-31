@@ -1765,8 +1765,15 @@ let editingTxId = null; // 追蹤正在編輯的交易 ID
       cards.filter(c => c.id !== 'add1').forEach(card => {
             const isChecked = selectedCards.includes(card.id);
             const label = document.createElement('label');
-            label.style.cssText = 'display:flex; align-items:center; padding:8px; border:1px solid #ddd; border-radius:8px; cursor:pointer; font-size:11px; overflow:hidden; text-overflow:ellipsis;';
-            label.innerHTML = `<input type="checkbox" name="sceneCard" value="${card.id}" ${isChecked ? 'checked' : ''} style="margin-right:6px; flex-shrink:0;">${card.icon || '💳'} ${card.name || card.id}`;
+            label.style.cssText = 'display:flex; align-items:center; padding:8px; border:1px solid #ddd; border-radius:8px; cursor:pointer; font-size:11px;';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.name = 'sceneCard';
+            checkbox.value = card.id;
+            checkbox.checked = isChecked;
+            checkbox.style.marginRight = '6px';
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode('💳 ' + card.name));
             cardOptions.appendChild(label);
         });
         

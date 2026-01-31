@@ -1079,24 +1079,33 @@
 
                 <div id="jiheOptions">
                     <div class="option-row read-only"><label id="labelJiheBase">🔰 國內消費 1% (無上限)</label><input type="checkbox" checked disabled></div>
-                    <div class="option-row"><label for="checkJiheJapan">🇯🇵 切換為日本消費 (2.5%)</label><input type="checkbox" id="checkJiheJapan" onchange="toggleJiheLogic()"></div>
-                    <div class="option-row" id="rowJiheApple" style="border-top:1px dashed #ddd; padding-top:6px;"><label for="checkJiheApple">🍎 Apple Pay +1.5% (刷$4萬封頂)</label><input type="checkbox" id="checkJiheApple" onchange="updateRewardPreview()"></div>
                     
+                    <!-- 國內專屬：日系名店 -->
                     <div class="option-row" id="rowJiheDomesticJapanese" style="border-top:1px dashed #ddd; padding-top:6px; flex-direction:column; align-items:flex-start;">
                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
                              <label for="checkJiheDomesticJapanese">🇹🇼 國內日系名店 +4% (刷$1.25萬封頂)</label>
-                             <input type="checkbox" id="checkJiheDomesticJapanese" onchange="updateRewardPreview()">
-                          </div>
-
+                             <input type="checkbox" id="checkJiheDomesticJapanese" onchange="toggleJiheDomestic()">
+                        </div>
                         <button onclick="toggleJiheDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看指定通路</button>
                         <div id="jiheDetails" class="details-content">
                             <b>(1) 服飾：</b><br>UNIQLO、GU、思夢樂、GLOBAL WORK、niko and …、LOWRYS FARM、LAKOLE、studio CLIP、repipi armario、HARE、Heather、PAGEBOY、RAGEBLUE、LEPSIM、JEANASIS<br>
                             <b>(2) 生活/藥妝：</b><br>DAISO大創、Standard Products、THREEPPY、日藥本舖、松本清、Tomod's、札幌藥妝、TSUTAYA BOOKSTORE、HANDS台隆手創館、宜得利家居<br>
                         </div>
+                        <div style="font-size:10px; color:#888; margin-top:2px;">⚠️ 需單筆滿 ¥500 日圓</div>
                     </div>
                     
-                    <div id="jiheMinSpendWarning" style="display:none; margin-top:8px; padding:8px; background:#fff3e0; border-radius:6px; font-size:11px; color:#e65100;">
-                        ⚠️ Apple Pay 需單筆滿 $500；國內日系需單筆滿 $500
+                    <!-- 日本專屬區塊 -->
+                    <div id="jiheJapanSection" style="border-top:1px dashed #ddd; padding-top:8px; margin-top:8px;">
+                        <div class="option-row">
+                            <label for="checkJiheJapan">🇯🇵 日本消費 (基本 2.5%)</label>
+                            <input type="checkbox" id="checkJiheJapan" onchange="toggleJiheJapan()">
+                        </div>
+                        
+                        <div class="option-row" id="rowJiheApple" style="margin-top:6px; padding-left:20px;">
+                            <label for="checkJiheApple">🍎 Apple Pay +1.5% (刷$4萬封頂)</label>
+                            <input type="checkbox" id="checkJiheApple" onchange="toggleJiheApple()">
+                        </div>
+                        <div style="font-size:10px; color:#888; margin-top:2px; padding-left:20px;">⚠️ 需單筆滿 ¥500 日圓，勾選自動切換為日本消費</div>
                     </div>
                 </div>
                 
@@ -1346,7 +1355,12 @@
         }
         
         updateAmountPlaceholder();
-        renderGrid(); 
+        renderGrid();
+        
+        // ★ 連動吉鶴卡：根據地點自動切換模式
+        if (document.getElementById('jiheOptions')?.style.display !== 'none') {
+            updateJiheByLocation();
+        }
     }
 
     function updateAmountPlaceholder() {
@@ -1970,14 +1984,11 @@ function getActualCycleDay(year, month, cycleDay) {
                 document.querySelector('input[name="fubonJRegion"][value="th"]').checked = true;
             }
         }
-        // J2 吉鶴卡
+       // J2 吉鶴卡
         else if (cardId === 'j2') {
             document.getElementById('jiheOptions').style.display = 'block';
-            // 根據地點預選
-            if (currentLocation === 'JP') {
-                document.getElementById('checkJiheJapan').checked = true;
-                toggleJiheLogic();
-            }
+            // 根據地點自動設定模式
+            updateJiheByLocation();
         }
         // J3 熊本熊卡
         else if (cardId === 'j3') {
@@ -2198,25 +2209,88 @@ function toggleUniOverseas() {
         }
     }
 
-    function toggleJiheLogic() {
+   // 吉鶴卡：切換日本消費
+    function toggleJiheJapan() {
         const isJapan = document.getElementById('checkJiheJapan').checked;
-        document.getElementById('labelJiheBase').innerText = isJapan ? '🔰 日本消費 2.5% (無上限)' : '🔰 國內消費 1% (無上限)';
-        // 顯示低消警告
-        updateJiheMinSpendWarning();
+        const domesticRow = document.getElementById('rowJiheDomesticJapanese');
+        
+        if (isJapan) {
+            // 切換到日本模式
+            document.getElementById('labelJiheBase').innerText = '🔰 日本消費 2.5% (無上限)';
+            // 禁用並取消國內日系選項
+            domesticRow.style.opacity = '0.4';
+            domesticRow.style.pointerEvents = 'none';
+            document.getElementById('checkJiheDomesticJapanese').checked = false;
+        } else {
+            // 切換到國內模式
+            document.getElementById('labelJiheBase').innerText = '🔰 國內消費 1% (無上限)';
+            // 啟用國內日系選項
+            domesticRow.style.opacity = '1';
+            domesticRow.style.pointerEvents = 'auto';
+            // 取消 Apple Pay
+            document.getElementById('checkJiheApple').checked = false;
+        }
+        
         updateRewardPreview();
     }
-
-    // 吉鶴卡低消警告
-    function updateJiheMinSpendWarning() {
-        const warning = document.getElementById('jiheMinSpendWarning');
-        const isApple = document.getElementById('checkJiheApple')?.checked;
-        const isDomesticJapanese = document.getElementById('checkJiheDomesticJapanese')?.checked;
+    
+    // 吉鶴卡：勾選 Apple Pay 自動勾日本消費
+    function toggleJiheApple() {
+        const isApple = document.getElementById('checkJiheApple').checked;
         
-        if (isApple || isDomesticJapanese) {
-            warning.style.display = 'block';
-        } else {
-            warning.style.display = 'none';
+        if (isApple) {
+            // 自動勾選日本消費
+            document.getElementById('checkJiheJapan').checked = true;
+            toggleJiheJapan(); // 更新 UI 狀態
         }
+        
+        updateRewardPreview();
+    }
+    
+    // 吉鶴卡：勾選國內日系
+    function toggleJiheDomestic() {
+        const isDomestic = document.getElementById('checkJiheDomesticJapanese').checked;
+        
+        if (isDomestic) {
+            // 取消日本模式和 Apple Pay
+            document.getElementById('checkJiheJapan').checked = false;
+            document.getElementById('checkJiheApple').checked = false;
+            // 還原國內模式 UI
+            document.getElementById('labelJiheBase').innerText = '🔰 國內消費 1% (無上限)';
+        }
+        
+        updateRewardPreview();
+    }
+    
+    // 吉鶴卡：根據地點自動設定模式
+    function updateJiheByLocation() {
+        const isJapan = currentLocation === 'JP';
+        const domesticRow = document.getElementById('rowJiheDomesticJapanese');
+        
+        if (isJapan) {
+            // 自動切換到日本模式
+            document.getElementById('checkJiheJapan').checked = true;
+            document.getElementById('labelJiheBase').innerText = '🔰 日本消費 2.5% (無上限)';
+            domesticRow.style.opacity = '0.4';
+            domesticRow.style.pointerEvents = 'none';
+            document.getElementById('checkJiheDomesticJapanese').checked = false;
+        } else {
+            // 切換到國內模式
+            document.getElementById('checkJiheJapan').checked = false;
+            document.getElementById('checkJiheApple').checked = false;
+            document.getElementById('labelJiheBase').innerText = '🔰 國內消費 1% (無上限)';
+            domesticRow.style.opacity = '1';
+            domesticRow.style.pointerEvents = 'auto';
+        }
+    }
+    
+    // 保留舊函數名稱以相容
+    function toggleJiheLogic() {
+        toggleJiheJapan();
+    }
+    
+    function updateJiheMinSpendWarning() {
+        // 低消提示已直接顯示在各選項下方
     }
 
    // 將將卡加碼互斥 toggle
@@ -2565,7 +2639,10 @@ function handleHappyExclusive(selected) {
             }
         }
         
+        // ★ 傳入原始金額供低消判斷使用
+        options.originalAmount = amount;
         const result = calculateSingleReward(cardId, amountTWD, options);
+
         
         liveCalc.style.display = 'block';
         
@@ -3328,15 +3405,20 @@ function handleHappyExclusive(selected) {
         }
         // J2 吉鶴卡
         else if (cardId === 'j2') {
+            // 取得原始金額（用於低消判斷）
+            const originalAmount = options.originalAmount || amount;
+            
             if (options.isJapan) {
                 let totalReward = Math.floor(amount * 0.025);
-                if (options.isApple && amount >= 500) {
+                // Apple Pay 低消門檻：JPY 500（用原始金額判斷）
+                if (options.isApple && originalAmount >= 500) {
                     const appleSpent = getCardBonusSpent(cardId, t => t.isJiheJapan && t.isJiheApple);
                     if (appleSpent < 40000) totalReward += Math.floor(Math.min(amount, 40000 - appleSpent) * 0.015);
                 }
                 return { reward: totalReward, rate: totalReward / amount };
             } else {
                 let totalReward = Math.floor(amount * 0.01);
+                // 國內日系低消門檻：TWD 500
                 if (options.isDomesticJapanese && amount >= 500) {
                     const djSpent = getCardBonusSpent(cardId, t => t.isJiheDomesticJapanese);
                     if (djSpent < 12500) totalReward += Math.floor(Math.min(amount, 12500 - djSpent) * 0.04);

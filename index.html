@@ -1339,7 +1339,7 @@
             
             <div style="margin-bottom:16px;">
                 <label style="font-size:13px; color:#555; display:block; margin-bottom:6px;">選擇卡片</label>
-                <div id="sceneCardOptions" style="display:flex; flex-direction:column; gap:6px; max-height:200px; overflow-y:auto;"></div>
+               <div id="sceneCardOptions" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; max-height:250px; overflow-y:auto;"></div>
             </div>
             
             <div style="display:flex; gap:10px; margin-top:20px;">
@@ -1762,12 +1762,24 @@ let editingTxId = null; // 追蹤正在編輯的交易 ID
         // 產生卡片選項
         cardOptions.innerHTML = '';
         const selectedCards = scene ? scene.cards : visibleCards;
-   cards.filter(c => c.id !== 'add1').forEach(card => {
+  cards.filter(c => c.id !== 'add1').forEach(card => {
             const isChecked = selectedCards.includes(card.id);
-            const label = document.createElement('label');
-            label.style.cssText = 'display:flex; align-items:center; padding:10px 12px; border:1px solid #ddd; border-radius:8px; cursor:pointer; font-size:13px;';
-            label.innerHTML = '<input type="checkbox" name="sceneCard" value="' + card.id + '"' + (isChecked ? ' checked' : '') + ' style="margin-right:10px; width:18px; height:18px; flex-shrink:0;">' + card.name;
-            cardOptions.appendChild(label);
+            const div = document.createElement('div');
+            div.style.cssText = 'position:relative; padding:12px; border:2px solid ' + (isChecked ? '#007AFF' : '#ddd') + '; border-radius:12px; cursor:pointer; background:#fff;';
+            div.innerHTML = '<input type="checkbox" name="sceneCard" value="' + card.id + '"' + (isChecked ? ' checked' : '') + ' style="position:absolute; top:8px; right:8px; width:20px; height:20px;">' +
+                '<div style="font-size:13px; font-weight:600; margin-bottom:4px; padding-right:28px;">' + card.name + '</div>' +
+                '<div style="font-size:10px; color:#888;">' + (card.tag || '') + '</div>';
+            div.onclick = function(e) {
+                if (e.target.type !== 'checkbox') {
+                    const cb = div.querySelector('input[type="checkbox"]');
+                    cb.checked = !cb.checked;
+                    div.style.borderColor = cb.checked ? '#007AFF' : '#ddd';
+                }
+            };
+            div.querySelector('input').onchange = function() {
+                div.style.borderColor = this.checked ? '#007AFF' : '#ddd';
+            };
+            cardOptions.appendChild(div);
         });
         
         // 檢查衝突

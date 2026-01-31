@@ -1324,11 +1324,15 @@
             
             <div style="margin-bottom:16px;">
                 <label style="font-size:13px; color:#555; display:block; margin-bottom:6px;">切換國家時自動套用（可多選）</label>
-                <div id="sceneLocationOptions" style="display:grid; grid-template-columns:repeat(2,1fr); gap:8px;">
-                    <label style="display:flex; align-items:center; gap:8px; padding:12px; border:1px solid #ddd; border-radius:8px; cursor:pointer;"><input type="checkbox" name="sceneLocation" value="TW" onchange="checkSceneLocationConflict()"><span>🇹🇼 台灣</span></label>
-                    <label style="display:flex; align-items:center; gap:8px; padding:12px; border:1px solid #ddd; border-radius:8px; cursor:pointer;"><input type="checkbox" name="sceneLocation" value="JP" onchange="checkSceneLocationConflict()"><span>🇯🇵 日本</span></label>
-                    <label style="display:flex; align-items:center; gap:8px; padding:12px; border:1px solid #ddd; border-radius:8px; cursor:pointer;"><input type="checkbox" name="sceneLocation" value="KR" onchange="checkSceneLocationConflict()"><span>🇰🇷 韓國</span></label>
-                    <label style="display:flex; align-items:center; gap:8px; padding:12px; border:1px solid #ddd; border-radius:8px; cursor:pointer;"><input type="checkbox" name="sceneLocation" value="TH" onchange="checkSceneLocationConflict()"><span>🇹🇭 泰國</span></label>
+                <div id="sceneLocationOptions">
+                    <div style="display:flex; gap:8px; margin-bottom:8px;">
+                        <label style="flex:1; padding:12px; border:1px solid #ddd; border-radius:8px; cursor:pointer; text-align:center;"><input type="checkbox" name="sceneLocation" value="TW" onchange="checkSceneLocationConflict()" style="margin-right:6px;">🇹🇼台灣</label>
+                        <label style="flex:1; padding:12px; border:1px solid #ddd; border-radius:8px; cursor:pointer; text-align:center;"><input type="checkbox" name="sceneLocation" value="JP" onchange="checkSceneLocationConflict()" style="margin-right:6px;">🇯🇵日本</label>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <label style="flex:1; padding:12px; border:1px solid #ddd; border-radius:8px; cursor:pointer; text-align:center;"><input type="checkbox" name="sceneLocation" value="KR" onchange="checkSceneLocationConflict()" style="margin-right:6px;">🇰🇷韓國</label>
+                        <label style="flex:1; padding:12px; border:1px solid #ddd; border-radius:8px; cursor:pointer; text-align:center;"><input type="checkbox" name="sceneLocation" value="TH" onchange="checkSceneLocationConflict()" style="margin-right:6px;">🇹🇭泰國</label>
+                    </div>
                 </div>
                 <div id="sceneLocationWarning" style="display:none; margin-top:8px; padding:8px; background:#fff3e0; border-radius:6px; font-size:11px; color:#e65100;"></div>
             </div>

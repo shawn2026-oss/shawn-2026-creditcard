@@ -1295,6 +1295,48 @@
              </div>
         </div>
     </div>
+    
+    <!-- 編輯情境 Modal -->
+    <div id="sceneEditModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10001; justify-content:center; align-items:center;">
+        <div style="background:#fff; border-radius:16px; width:90%; max-width:400px; max-height:85vh; overflow-y:auto; padding:20px;">
+            <h3 id="sceneEditTitle" style="margin:0 0 16px 0; font-size:18px;">新增情境</h3>
+            
+            <div style="margin-bottom:16px;">
+                <label style="font-size:13px; color:#555; display:block; margin-bottom:6px;">情境名稱</label>
+                <input type="text" id="sceneNameInput" placeholder="例如：🇯🇵 日本旅遊" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:15px; box-sizing:border-box;">
+            </div>
+            
+            <div style="margin-bottom:16px;">
+                <label style="font-size:13px; color:#555; display:block; margin-bottom:6px;">切換國家時自動套用（可多選）</label>
+                <div id="sceneLocationOptions" style="display:flex; flex-wrap:wrap; gap:8px;">
+                    <label style="display:flex; align-items:center; gap:4px; padding:8px 12px; border:1px solid #ddd; border-radius:8px; cursor:pointer;">
+                        <input type="checkbox" name="sceneLocation" value="TW" onchange="checkSceneLocationConflict()"> 🇹🇼 台灣
+                    </label>
+                    <label style="display:flex; align-items:center; gap:4px; padding:8px 12px; border:1px solid #ddd; border-radius:8px; cursor:pointer;">
+                        <input type="checkbox" name="sceneLocation" value="JP" onchange="checkSceneLocationConflict()"> 🇯🇵 日本
+                    </label>
+                    <label style="display:flex; align-items:center; gap:4px; padding:8px 12px; border:1px solid #ddd; border-radius:8px; cursor:pointer;">
+                        <input type="checkbox" name="sceneLocation" value="KR" onchange="checkSceneLocationConflict()"> 🇰🇷 韓國
+                    </label>
+                    <label style="display:flex; align-items:center; gap:4px; padding:8px 12px; border:1px solid #ddd; border-radius:8px; cursor:pointer;">
+                        <input type="checkbox" name="sceneLocation" value="TH" onchange="checkSceneLocationConflict()"> 🇹🇭 泰國
+                    </label>
+                </div>
+                <div id="sceneLocationWarning" style="display:none; margin-top:8px; padding:8px; background:#fff3e0; border-radius:6px; font-size:11px; color:#e65100;"></div>
+            </div>
+            
+            <div style="margin-bottom:16px;">
+                <label style="font-size:13px; color:#555; display:block; margin-bottom:6px;">選擇卡片</label>
+                <div id="sceneCardOptions" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; max-height:200px; overflow-y:auto;"></div>
+            </div>
+            
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button onclick="closeSceneEditModal()" style="flex:1; padding:12px; border:1px solid #ddd; background:#fff; border-radius:8px; font-size:15px; cursor:pointer;">取消</button>
+                <button onclick="saveSceneEdit()" style="flex:1; padding:12px; border:none; background:#007AFF; color:#fff; border-radius:8px; font-size:15px; cursor:pointer;">儲存</button>
+            </div>
+        </div>
+    </div>
+    
     <script>
     // ==========================================
     // Part 3: 核心設定、匯率與 UI 邏輯 (V125.7)
@@ -1360,6 +1402,18 @@
         }
         
         updateAmountPlaceholder();
+        
+        // ★ 自動載入該國家綁定的情境
+        const scenes = getScenes();
+        const linkedScene = scenes.find(s => s.linkedLocations && s.linkedLocations.includes(code));
+        if (linkedScene) {
+            visibleCards = [...linkedScene.cards];
+            if (!visibleCards.includes('add1') && visibleCards.length < 8) {
+                visibleCards.push('add1');
+            }
+            localStorage.setItem('visibleCards', JSON.stringify(visibleCards));
+        }
+        
         renderGrid();
         
         // ★ 連動吉鶴卡：根據地點自動切換模式
@@ -1372,7 +1426,6 @@
             updateFubonJByLocation();
         }
     }
-
     function updateAmountPlaceholder() {
         const config = LOCATION_CONFIG[currentLocation];
         const input = document.getElementById('amountInput');
@@ -1599,15 +1652,157 @@ let editingTxId = null; // 追蹤正在編輯的交易 ID
         location.reload();
     }
     
-    function getScenes() { return JSON.parse(localStorage.getItem('scene_snapshots') || '[]'); }
+   function getScenes() { return JSON.parse(localStorage.getItem('scene_snapshots') || '[]'); }
+    
+    let editingSceneIndex = null; // 追蹤正在編輯的情境
+    
+    // 開啟新增情境彈窗
     function saveCurrentScene() {
         if (!visibleCards || visibleCards.length <= 1) { alert("請先選擇至少一張卡片！"); return; }
-        const name = prompt("情境命名 (例如: 🇯🇵 日本旅遊):");
-        if (!name) return;
-        const scenes = getScenes(); scenes.push({ name: name, cards: [...visibleCards] });
-        localStorage.setItem('scene_snapshots', JSON.stringify(scenes)); renderScenes();
+        editingSceneIndex = null;
+        openSceneEditModal(null);
     }
-    function renderScenes() {
+    
+    // 開啟編輯情境彈窗
+    function editScene(index) {
+        editingSceneIndex = index;
+        openSceneEditModal(index);
+    }
+    
+    // 開啟情境編輯彈窗
+    function openSceneEditModal(index) {
+        const modal = document.getElementById('sceneEditModal');
+        const title = document.getElementById('sceneEditTitle');
+        const nameInput = document.getElementById('sceneNameInput');
+        const cardOptions = document.getElementById('sceneCardOptions');
+        
+        // 設定標題
+        title.innerText = (index === null) ? '新增情境' : '編輯情境';
+        
+        // 取得現有資料
+        const scenes = getScenes();
+        const scene = (index !== null) ? scenes[index] : null;
+        
+        // 填入名稱
+        nameInput.value = scene ? scene.name : '';
+        
+        // 重置國家選項
+        document.querySelectorAll('input[name="sceneLocation"]').forEach(cb => {
+            cb.checked = false;
+        });
+        
+        // 填入已綁定的國家
+        if (scene && scene.linkedLocations) {
+            scene.linkedLocations.forEach(loc => {
+                const cb = document.querySelector(`input[name="sceneLocation"][value="${loc}"]`);
+                if (cb) cb.checked = true;
+            });
+        }
+        
+        // 產生卡片選項
+        cardOptions.innerHTML = '';
+        const selectedCards = scene ? scene.cards : visibleCards;
+        cards.filter(c => c.id !== 'add1').forEach(card => {
+            const isChecked = selectedCards.includes(card.id);
+            const label = document.createElement('label');
+            label.style.cssText = 'display:flex; align-items:center; gap:6px; padding:8px; border:1px solid #ddd; border-radius:8px; cursor:pointer; font-size:13px;';
+            label.innerHTML = `<input type="checkbox" name="sceneCard" value="${card.id}" ${isChecked ? 'checked' : ''}> ${card.icon} ${card.name}`;
+            cardOptions.appendChild(label);
+        });
+        
+        // 檢查衝突
+        checkSceneLocationConflict();
+        
+        // 顯示彈窗
+        modal.style.display = 'flex';
+    }
+    
+    // 關閉情境編輯彈窗
+    function closeSceneEditModal() {
+        document.getElementById('sceneEditModal').style.display = 'none';
+        editingSceneIndex = null;
+    }
+    
+    // 檢查國家綁定衝突
+    function checkSceneLocationConflict() {
+        const warning = document.getElementById('sceneLocationWarning');
+        const scenes = getScenes();
+        const checkedLocations = Array.from(document.querySelectorAll('input[name="sceneLocation"]:checked')).map(cb => cb.value);
+        
+        const conflicts = [];
+        checkedLocations.forEach(loc => {
+            scenes.forEach((scene, idx) => {
+                // 跳過正在編輯的情境本身
+                if (idx === editingSceneIndex) return;
+                if (scene.linkedLocations && scene.linkedLocations.includes(loc)) {
+                    const locName = {TW:'台灣', JP:'日本', KR:'韓國', TH:'泰國'}[loc];
+                    conflicts.push(`${locName} 已綁定「${scene.name}」`);
+                }
+            });
+        });
+        
+        if (conflicts.length > 0) {
+            warning.innerHTML = '⚠️ ' + conflicts.join('、') + '，儲存後將覆蓋';
+            warning.style.display = 'block';
+        } else {
+            warning.style.display = 'none';
+        }
+    }
+    
+    // 儲存情境編輯
+    function saveSceneEdit() {
+        const nameInput = document.getElementById('sceneNameInput');
+        const name = nameInput.value.trim();
+        
+        if (!name) {
+            alert('請輸入情境名稱');
+            return;
+        }
+        
+        // 取得選中的卡片
+        const selectedCards = Array.from(document.querySelectorAll('input[name="sceneCard"]:checked')).map(cb => cb.value);
+        if (selectedCards.length === 0) {
+            alert('請至少選擇一張卡片');
+            return;
+        }
+        
+        // 取得選中的國家
+        const selectedLocations = Array.from(document.querySelectorAll('input[name="sceneLocation"]:checked')).map(cb => cb.value);
+        
+        // 取得現有情境
+        let scenes = getScenes();
+        
+        // 移除其他情境中已被選中的國家綁定（處理衝突）
+        selectedLocations.forEach(loc => {
+            scenes.forEach((scene, idx) => {
+                if (idx === editingSceneIndex) return;
+                if (scene.linkedLocations) {
+                    scene.linkedLocations = scene.linkedLocations.filter(l => l !== loc);
+                }
+            });
+        });
+        
+        // 新增或更新情境
+        const newScene = {
+            name: name,
+            cards: selectedCards,
+            linkedLocations: selectedLocations
+        };
+        
+        if (editingSceneIndex !== null) {
+            scenes[editingSceneIndex] = newScene;
+        } else {
+            scenes.push(newScene);
+        }
+        
+        // 儲存
+        localStorage.setItem('scene_snapshots', JSON.stringify(scenes));
+        
+        // 關閉彈窗並重新渲染
+        closeSceneEditModal();
+        renderScenes();
+    }
+   function renderScenes() {
         const container = document.getElementById('sceneList'); 
         container.innerHTML = '';
         const scenes = getScenes();
@@ -1619,9 +1814,33 @@ let editingTxId = null; // 追蹤正在編輯的交易 ID
             const btn = document.createElement('div'); 
             btn.className = 'btn-scene';
             
+            // 連動圖示
+            if (scene.linkedLocations && scene.linkedLocations.length > 0) {
+                const linkIcon = document.createElement('span');
+                linkIcon.innerText = '🔗';
+                linkIcon.title = '已連動：' + scene.linkedLocations.map(l => ({TW:'台灣', JP:'日本', KR:'韓國', TH:'泰國'}[l])).join('、');
+                linkIcon.style.cssText = 'font-size:12px; margin-right:2px;';
+                btn.appendChild(linkIcon);
+            }
+            
+            // 情境名稱
             const nameSpan = document.createElement('span');
             nameSpan.innerText = scene.name;
+            nameSpan.style.cssText = 'flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;';
+            btn.appendChild(nameSpan);
             
+            // 編輯按鈕
+            const editBtn = document.createElement('span');
+            editBtn.className = 'btn-scene-edit';
+            editBtn.innerText = '✏️';
+            editBtn.style.cssText = 'font-size:12px; margin-left:4px; cursor:pointer;';
+            editBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                editScene(index);
+            });
+            btn.appendChild(editBtn);
+            
+            // 刪除按鈕
             const delBtn = document.createElement('span');
             delBtn.className = 'btn-scene-del';
             delBtn.innerText = '✕';
@@ -1629,9 +1848,9 @@ let editingTxId = null; // 追蹤正在編輯的交易 ID
                 e.stopPropagation();
                 deleteScene(index);
             });
-            
-            btn.appendChild(nameSpan);
             btn.appendChild(delBtn);
+            
+            // 點擊載入情境
             btn.addEventListener('click', function() {
                 loadScene(index);
             });

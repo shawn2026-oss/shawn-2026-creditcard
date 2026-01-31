@@ -1584,23 +1584,50 @@ let editingTxId = null; // 追蹤正在編輯的交易 ID
         localStorage.setItem('scene_snapshots', JSON.stringify(scenes)); renderScenes();
     }
     function renderScenes() {
-        const container = document.getElementById('sceneList'); container.innerHTML = '';
+        const container = document.getElementById('sceneList'); 
+        container.innerHTML = '';
         const scenes = getScenes();
-        if (scenes.length === 0) { container.innerHTML = '<span style="font-size:11px; color:#aaa; padding:6px;">尚無情境</span>'; return; }
+        if (scenes.length === 0) { 
+            container.innerHTML = '<span style="font-size:11px; color:#aaa; padding:6px;">尚無情境</span>'; 
+            return; 
+        }
         scenes.forEach((scene, index) => {
-            const btn = document.createElement('div'); btn.className = 'btn-scene';
-            btn.innerHTML = `${scene.name} <span class="btn-scene-del" onclick="event.stopPropagation(); deleteScene(${index})">✕</span>`;
-            btn.onclick = () => loadScene(index);
+            const btn = document.createElement('div'); 
+            btn.className = 'btn-scene';
+            
+            const nameSpan = document.createElement('span');
+            nameSpan.innerText = scene.name;
+            
+            const delBtn = document.createElement('span');
+            delBtn.className = 'btn-scene-del';
+            delBtn.innerText = '✕';
+            delBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                deleteScene(index);
+            });
+            
+            btn.appendChild(nameSpan);
+            btn.appendChild(delBtn);
+            btn.addEventListener('click', function() {
+                loadScene(index);
+            });
+            
             container.appendChild(btn);
         });
     }
-    function deleteScene(index) { if(confirm('刪除情境？')) { const s = getScenes(); s.splice(index, 1); localStorage.setItem('scene_snapshots', JSON.stringify(s)); renderScenes(); } }
+    function deleteScene(index) { 
+        if(confirm('確定要刪除這個情境嗎？')) { 
+            const s = getScenes(); 
+            s.splice(index, 1); 
+            localStorage.setItem('scene_snapshots', JSON.stringify(s)); 
+            renderScenes(); 
+        } 
+    }
     function loadScene(index) {
         if(!confirm('切換情境？')) return;
         visibleCards = getScenes()[index].cards; localStorage.setItem('visibleCards', JSON.stringify(visibleCards)); renderGrid(); openManageModal();
     }
     function clearVisibleCards() { if(confirm('清空所有卡片？')) { visibleCards = ['add1']; localStorage.setItem('visibleCards', JSON.stringify(visibleCards)); renderGrid(); openManageModal(); } }
-
     function loadAndRenderApp() {
         let currentCards = JSON.parse(localStorage.getItem('visibleCards')) || [];
         const realCardIds = cards.map(c => c.id).filter(id => id !== 'add1');

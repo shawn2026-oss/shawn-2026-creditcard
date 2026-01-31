@@ -2836,7 +2836,14 @@ function handleHappyExclusive(selected) {
         updateRewardPreview();
     }
 
-    function deleteTransaction(cardId, txId, shouldRender = true) {
+  function deleteTransaction(cardId, txId, shouldRender = true, skipConfirm = false) {
+        // ★ 若非跳過確認模式，顯示確認彈窗
+        if (!skipConfirm) {
+            if (!confirm('確定要刪除這筆消費紀錄嗎？')) {
+                return;
+            }
+        }
+        
         let txs = getTransactions(cardId);
         txs = txs.filter(t => t.id !== txId);
         saveTransactions(cardId, txs);

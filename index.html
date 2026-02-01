@@ -3897,15 +3897,11 @@ function handleHappyExclusive(selected) {
                 // 國內消費：先計算總回饋率，最後才 floor
                 let totalRate = 0.01; // 基本 1%
                 
-                // 統一集團 +2%
+               // 統一集團 +2%
                 if (options.isGroup) {
                     const availableGroup = Math.max(0, quota.groupLimit - quota.groupSpent);
-                    if (availableGroup >= amount) {
+                    if (availableGroup > 0) {
                         totalRate += 0.02;
-                    } else if (availableGroup > 0) {
-                        // 部分封頂，分開計算
-                        const groupReward = Math.floor(availableGroup * (totalRate + 0.02)) + Math.floor((amount - availableGroup) * totalRate);
-                        return { reward: groupReward, rate: groupReward / amount };
                     }
                 }
                 

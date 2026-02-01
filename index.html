@@ -3130,26 +3130,35 @@ function handleHappyExclusive(selected) {
             }
         }
         
-        // ★ 樂家卡：檢查是否達低消 $3,000
+       // ★ 樂家卡：檢查是否達低消 $3,000（國外消費不需要低消）
         if (cardId === 'c8') {
-            const txs = getCurrentCycleTransactions('c8');
-            const totalSpent = txs.reduce((sum, tx) => sum + (tx.amountTWD || tx.amount || 0), 0);
-            const minSpend = 3000;
-            const warning = document.getElementById('happyMinSpendWarning');
+            const isForeign = document.getElementById('checkHappyForeign')?.checked || false;
             
-            if (totalSpent < minSpend) {
-                warning.style.display = 'block';
-                const willReachMinSpend = (totalSpent + amountTWD) >= minSpend;
+            // 國外消費不需要低消，跳過檢查
+            if (!isForeign) {
+                const txs = getCurrentCycleTransactions('c8');
+                const totalSpent = txs.reduce((sum, tx) => sum + (tx.amountTWD || tx.amount || 0), 0);
+                const minSpend = 3000;
+                const warning = document.getElementById('happyMinSpendWarning');
                 
-                if (!willReachMinSpend) {
-                    const baseReward = Math.floor(amountTWD * 0.005);
-                    liveCalc.style.display = 'block';
-                    liveCalc.innerHTML = `預估獲得 <b>$${baseReward}</b> 回饋 (0.5%) <span style="color:#e65100; font-size:11px;"><br>⚠️ 需累積滿$3,000才享加碼</span>`;
-                    updateTWDPreview();
-                    return;
+                if (totalSpent < minSpend) {
+                    warning.style.display = 'block';
+                    const willReachMinSpend = (totalSpent + amountTWD) >= minSpend;
+                    
+                    if (!willReachMinSpend) {
+                        const baseReward = Math.floor(amountTWD * 0.005);
+                        liveCalc.style.display = 'block';
+                        liveCalc.innerHTML = `預估獲得 <b>$${baseReward}</b> 回饋 (0.5%) <span style="color:#e65100; font-size:11px;"><br>⚠️ 需累積滿$3,000才享加碼</span>`;
+                        updateTWDPreview();
+                        return;
+                    }
+                } else {
+                    warning.style.display = 'none';
                 }
             } else {
-                warning.style.display = 'none';
+                // 國外消費時隱藏低消警告
+                const warning = document.getElementById('happyMinSpendWarning');
+                if (warning) warning.style.display = 'none';
             }
         }
         
@@ -3801,12 +3810,19 @@ function handleHappyExclusive(selected) {
             }
             return { reward, rate };
         }
-     // C8 樂家+卡 (修復：低消$3,000才享加碼，加入回饋上限)
+   // C8 樂家+卡 (修復：國外消費不需低消，其他需$3,000才享加碼)
         else if (cardId === 'c8') {
             const baseReward = Math.floor(amount * 0.005);
             reward = baseReward;
             
-            // 檢查是否達低消 $3,000
+            // 國外消費 +2% 無上限，不需要低消
+            if (options.isForeign) {
+                reward += Math.floor(amount * 0.02);
+                rate = (amount > 0) ? (reward / amount) : 0.025;
+                return { reward, rate };
+            }
+            
+            // 其他加碼需檢查是否達低消 $3,000
             const txs = getCurrentCycleTransactions(cardId);
             const totalSpent = txs.reduce((sum, tx) => sum + (tx.amountTWD || tx.amount || 0), 0);
             const minSpend = 3000;
@@ -3818,9 +3834,7 @@ function handleHappyExclusive(selected) {
                 return { reward, rate };
             }
             
-            if (options.isForeign) {
-                reward += Math.floor(amount * 0.02); // 國外 +2% 無上限
-            } else if (options.isPet) {
+            if (options.isPet) {
                 // 寵物 +9.5%，回饋上限 $500
                 const petUsed = getCardBonusSpent(cardId, t => t.isHappyPet || t.happyMode === 'pet');
                 const petRewardUsed = Math.floor(petUsed * 0.095);

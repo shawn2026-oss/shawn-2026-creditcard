@@ -2165,7 +2165,8 @@ function getActualCycleDay(year, month, cycleDay) {
         document.getElementById('modalSubtitle').innerText = card.note || '';
         document.getElementById('amountInput').value = '';
         document.getElementById('noteInput').value = '';
-        document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
+      const today = new Date();
+document.getElementById('dateInput').value = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
         document.getElementById('liveRewardCalc').style.display = 'none';
         document.getElementById('twdConversionDisplay').style.display = 'none';
         

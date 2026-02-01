@@ -2919,6 +2919,7 @@ function toggleUniOverseas() {
     }
     function saveUniSettings() {
         localStorage.setItem('uni_settings', JSON.stringify({ isUp: document.getElementById('checkUniUp').checked }));
+        renderGrid();
     }
 function handleHappyExclusive(selected) {
         const pet = document.getElementById('checkHappyPet');
@@ -4243,7 +4244,13 @@ function handleHappyExclusive(selected) {
         });
         
         let progress = 0, msg = '';
-        const limit = card.limit || 99999999;
+        let limit = card.limit || 99999999;
+        
+        // UNI卡：根據是否 UP 選調整封頂
+        if (cardId === 'c7') {
+            const uniSettings = JSON.parse(localStorage.getItem('uni_settings') || '{}');
+            limit = uniSettings.isUp ? 140000 : 40000;
+        }
         const isOverseas = currentLocation !== 'TW';
 
         // 特殊處理：UniOpen 卡 (c10)
@@ -4542,9 +4549,31 @@ function getCardDisplayName(card) {
         }
         if (card.id === 'c7') {
             const settings = JSON.parse(localStorage.getItem('uni_settings') || '{}');
-            return settings.isUp ? '玉山 UNI 卡（升級UP選）' : '玉山 UNI 卡';
+            return settings.isUp ? '玉山 UNI 卡（UP選）' : '玉山 UNI 卡';
         }
         return card.name;
+    }
+    
+    function getCardDisplayNote(card) {
+        // 旅人卡：根據等級顯示不同元/哩
+        if (card.id === 'c9') {
+            const tier = localStorage.getItem('hsbc_tier') || 'infinite';
+            if (tier === 'infinite') {
+                return '國內 18元/哩 | 國外 10元/哩';
+            } else {
+                return '國內 18元/哩 | 國外 15元/哩';
+            }
+        }
+        // UNI卡：根據是否訂閱 UP 顯示不同回饋率和封頂
+        if (card.id === 'c7') {
+            const settings = JSON.parse(localStorage.getItem('uni_settings') || '{}');
+            if (settings.isUp) {
+                return 'UP選 4.5% (刷$14萬封頂)';
+            } else {
+                return '任意選 3.5% (刷$4萬封頂)';
+            }
+        }
+        return card.note || '';
     }
     function renderGrid() {
         const grid = document.getElementById('card-grid');
@@ -4627,13 +4656,13 @@ if (cycleDay && cycleDay > 0) {
                     }
                 }
                 
-                tile.innerHTML = `
+               tile.innerHTML = `
                     <div class="tile-nickname-badge ${nickname ? '' : 'placeholder'}">${nickname || '點擊設定暱稱'}</div>
                     <div class="tile-header">
-                        <div class="tile-name">${card.name}</div>
+                        <div class="tile-name">${getCardDisplayName(card)}</div>
                         ${card.rule ? `<span class="rate-badge">${card.rule}</span>` : ''}
                     </div>
-                    <span class="tile-note">${card.note || ''}</span>
+                    <span class="tile-note">${getCardDisplayNote(card)}</span>
                     <div class="tile-body">
                         <div class="tile-stat-group">
                             <div class="tile-stat-sub" style="margin-bottom:2px;">本期已刷</div>

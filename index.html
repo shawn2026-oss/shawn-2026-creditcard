@@ -4553,7 +4553,31 @@ function getCardDisplayName(card) {
         }
         return card.name;
     }
-    
+    function getCardMaxRate(card) {
+        switch (card.id) {
+            case 'c9': return '';
+            case 'c7':
+                const uniSettings = JSON.parse(localStorage.getItem('uni_settings') || '{}');
+                return uniSettings.isUp ? '4.5%' : '3.5%';
+            case 'c10': return '11%';
+            case 'c6': return '13.5%';
+            case 'c1': return '10%';
+            case 'c5': return '11%';
+            case 'c3': return '5%';
+            case 'c4': return '5%';
+            case 'c2': return '6%';
+            case 'c8': return '10%';
+            case 'c11': return '3.8%';
+            case 'j1': return '10%';
+            case 'j2': return '5%';
+            case 'j3': return '8.5%';
+            case 'j4': return '6%';
+            case 'j5': return '7.3%';
+            case 'c12': return '5%';
+            case 'dbs1': return '10%';
+            default: return '';
+        }
+    }
     function getCardDisplayNote(card) {
         // 旅人卡：根據等級顯示不同元/哩
         if (card.id === 'c9') {
@@ -4660,7 +4684,7 @@ if (cycleDay && cycleDay > 0) {
                     <div class="tile-nickname-badge ${nickname ? '' : 'placeholder'}">${nickname || '點擊設定暱稱'}</div>
                     <div class="tile-header">
                         <div class="tile-name">${getCardDisplayName(card)}</div>
-                        ${card.rule ? `<span class="rate-badge">${card.rule}</span>` : ''}
+                      ${getCardMaxRate(card) ? `<span class="rate-badge">${getCardMaxRate(card)}</span>` : ''}
                     </div>
                     <span class="tile-note">${getCardDisplayNote(card)}</span>
                     <div class="tile-body">

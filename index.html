@@ -3912,7 +3912,7 @@ function handleHappyExclusive(selected) {
                 // icash Pay +4%
                 if (options.isIcash) {
                     const availableIcash = Math.max(0, quota.icashLimit - quota.icashSpent);
-                    if (availableIcash >= amount) {
+                   if (availableIcash > 0) {
                         totalRate += 0.04;
                     }
                 }
@@ -3921,7 +3921,7 @@ function handleHappyExclusive(selected) {
                 const brandCount = options.brandCount || 0;
                 if (brandCount >= 2 && options.isGroup) {
                     const availableBrand = Math.max(0, quota.brandLimit - quota.brandSpent);
-                    if (availableBrand >= amount) {
+                    if (availableBrand > 0) {
                         if (brandCount >= 5) totalRate += 0.04;
                         else if (brandCount >= 4) totalRate += 0.03;
                         else if (brandCount >= 3) totalRate += 0.02;

@@ -4370,37 +4370,30 @@ function handleHappyExclusive(selected) {
 
         // 特殊處理：UniOpen 卡 (c10)
         if (cardId === 'c10') {
-            if (isOverseas) {
-                // 海外實體上限 6250
-                const overseasLimit = 6250;
-                const overseasSpent = txs.reduce((sum, t) => {
-                    return (t.location !== 'TW' || t.isUniOverseas) ? sum + (t.amountTWD || t.amount) : sum;
-                }, 0);
-                const remain = Math.max(0, overseasLimit - overseasSpent);
-                
-                if (overseasSpent >= overseasLimit) {
-                    msg = '海外加碼已封頂';
-                    progress = 100;
-                } else {
-                    msg = `海外可再刷 ${formatAmountWithCurrency(remain)}`;
-                    progress = (overseasSpent / overseasLimit) * 100;
-                }
-            } else {
-                // 國內預設：集團上限 25000 (最常用情境)
-                const groupLimit = 25000;
-                const groupSpent = txs.reduce((sum, t) => {
-                    return (t.isUniGroup) ? sum + (t.amountTWD || t.amount) : sum;
-                }, 0);
-                const remain = Math.max(0, groupLimit - groupSpent);
-                
-                if (groupSpent >= groupLimit) {
-                    msg = '集團加碼已封頂';
-                    progress = 100;
-                } else {
-                    msg = `集團可再刷 ${formatAmountWithCurrency(remain)}`;
-                    progress = (groupSpent / groupLimit) * 100;
-                }
-            }
+            let groupSpent = 0, icashSpent = 0, overseasSpent = 0;
+            txs.forEach(t => {
+                const a = t.amountTWD || t.amount || 0;
+                if (t.isUniOverseas) overseasSpent += a;
+                if (t.isUniGroup) groupSpent += a;
+                if (t.isUniIcash) icashSpent += a;
+            });
+            const groupLimit = 25000, icashLimit = 3750, overseasLimit = 6250;
+            
+            let parts = [];
+            if (groupSpent >= groupLimit) parts.push('集團⚡');
+            else parts.push(`集團$${(groupLimit - groupSpent).toLocaleString()}`);
+            
+            if (icashSpent >= icashLimit) parts.push('icp⚡');
+            else parts.push(`icp$${(icashLimit - icashSpent).toLocaleString()}`);
+            
+            if (overseasSpent >= overseasLimit) parts.push('海外⚡');
+            else parts.push(`海外$${(overseasLimit - overseasSpent).toLocaleString()}`);
+            
+            msg = parts.join('/');
+            const mainSpent = isOverseas ? overseasSpent : groupSpent;
+            const mainLimit = isOverseas ? overseasLimit : groupLimit;
+            progress = Math.min(100, (mainSpent / mainLimit) * 100);
+            
             return { spent: totalSpent, reward: totalReward, progress, msg };
         }
 

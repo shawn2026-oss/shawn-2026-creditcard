@@ -4216,6 +4216,7 @@ function handleHappyExclusive(selected) {
         const happyMinSpend = 3000;
         const jiangReachedMin = (cardId === 'c4') ? (totalSpent >= jiangMinSpend) : true;
         const happyReachedMin = (cardId === 'c8') ? (totalSpent >= happyMinSpend) : true;
+        let legendBonusCumulative = 0;
         
         txs.forEach(tx => {
             const amount = tx.amountTWD || tx.amount || 0;
@@ -4233,6 +4234,19 @@ function handleHappyExclusive(selected) {
                 } else {
                     const result = calculateTxRewardWithCap(cardId, tx);
                     totalReward += result.reward;
+                } else if (cardId === 'c1') {
+                const baseReward = Math.floor(amount * 0.012);
+                if (tx.isLegendBonus && (tx.location || 'TW') === 'TW') {
+                    const limit = 11363;
+                    if (legendBonusCumulative < limit) {
+                        const available = Math.min(amount, limit - legendBonusCumulative);
+                        totalReward += baseReward + Math.floor(available * 0.088);
+                    } else {
+                        totalReward += baseReward;
+                    }
+                    legendBonusCumulative += amount;
+                } else {
+                    totalReward += baseReward;
                 }
             } else {
                 const result = calculateTxRewardWithCap(cardId, tx);
@@ -5088,3 +5102,4 @@ if (cycleDay && cycleDay > 0) {
 </script>
 </body>
 </html>
+

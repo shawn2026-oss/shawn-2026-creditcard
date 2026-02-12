@@ -3919,39 +3919,40 @@ function handleHappyExclusive(selected) {
                 reward = overseasReward + baseReward;
                 rate = (availableOverseas >= amount) ? 0.11 : (amount > 0 ? (reward / amount) : 0.11);
             } else {
-                // 國內消費：先計算總回饋率，最後才 floor
-                let totalRate = 0.01; // 基本 1%
+                // 國內消費：基本 + 各項加碼分開算封頂
+                reward = Math.floor(amount * 0.01);
                 
-               // 統一集團 +2%
+                // 統一集團 +2%
                 if (options.isGroup) {
-                    const availableGroup = Math.max(0, quota.groupLimit - quota.groupSpent);
-                    if (availableGroup > 0) {
-                        totalRate += 0.02;
+                    const available = Math.max(0, quota.groupLimit - quota.groupSpent);
+                    if (available > 0) {
+                        reward += Math.floor(Math.min(amount, available) * 0.02);
                     }
                 }
                 
                 // icash Pay +4%
                 if (options.isIcash) {
-                    const availableIcash = Math.max(0, quota.icashLimit - quota.icashSpent);
-                   if (availableIcash > 0) {
-                        totalRate += 0.04;
+                    const available = Math.max(0, quota.icashLimit - quota.icashSpent);
+                    if (available > 0) {
+                        reward += Math.floor(Math.min(amount, available) * 0.04);
                     }
                 }
                 
                 // 踩點任務 +1%~4%
                 const brandCount = options.brandCount || 0;
                 if (brandCount >= 2 && options.isGroup) {
-                    const availableBrand = Math.max(0, quota.brandLimit - quota.brandSpent);
-                    if (availableBrand > 0) {
-                        if (brandCount >= 5) totalRate += 0.04;
-                        else if (brandCount >= 4) totalRate += 0.03;
-                        else if (brandCount >= 3) totalRate += 0.02;
-                        else if (brandCount >= 2) totalRate += 0.01;
+                    const available = Math.max(0, quota.brandLimit - quota.brandSpent);
+                    if (available > 0) {
+                        let brandRate = 0;
+                        if (brandCount >= 5) brandRate = 0.04;
+                        else if (brandCount >= 4) brandRate = 0.03;
+                        else if (brandCount >= 3) brandRate = 0.02;
+                        else brandRate = 0.01;
+                        reward += Math.floor(Math.min(amount, available) * brandRate);
                     }
                 }
                 
-                reward = Math.floor(amount * totalRate);
-                rate = totalRate;
+                rate = (amount > 0) ? (reward / amount) : 0.01;
             }
             return { reward, rate };
         }

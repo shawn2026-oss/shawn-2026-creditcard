@@ -4379,15 +4379,17 @@ function handleHappyExclusive(selected) {
             });
             const groupLimit = 25000, icashLimit = 3750, overseasLimit = 6250;
             
-            let parts = [];
-            if (groupSpent >= groupLimit) parts.push('集團⚡');
-            else parts.push(`集團$${(groupLimit - groupSpent).toLocaleString()}`);
-            
-            if (icashSpent >= icashLimit) parts.push('icp⚡');
-            else parts.push(`icp$${(icashLimit - icashSpent).toLocaleString()}`);
-            
-            if (overseasSpent >= overseasLimit) parts.push('海外⚡');
-            else parts.push(`海外$${(overseasLimit - overseasSpent).toLocaleString()}`);
+           let parts = [];
+            if (isOverseas) {
+                if (overseasSpent >= overseasLimit) parts.push('海外已封頂');
+                else parts.push(`海外可再刷 ${formatAmountWithCurrency(overseasLimit - overseasSpent)}`);
+            } else {
+                if (groupSpent >= groupLimit) parts.push('集團⚡');
+                else parts.push(`集團$${(groupLimit - groupSpent).toLocaleString()}`);
+                
+                if (icashSpent >= icashLimit) parts.push('icp⚡');
+                else parts.push(`icp$${(icashLimit - icashSpent).toLocaleString()}`);
+            }
             
             msg = parts.join('/');
             const mainSpent = isOverseas ? overseasSpent : groupSpent;

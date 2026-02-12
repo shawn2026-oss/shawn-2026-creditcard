@@ -4433,7 +4433,7 @@ function handleHappyExclusive(selected) {
             }
             else if (card.type === 'uniopen_special' || card.type === 'custom_mitsui') {
                  msg = `本期已刷 ${formatAmountWithCurrency(totalSpent)}`;
-                 progress = 50;
+                 progress = (card.target && card.target > 0) ? Math.min(100, (totalSpent / card.target) * 100) : 0;
             }
             else if (card.type === 'custom_laidian') {
                  // 賴點卡優先顯示偶數日額度

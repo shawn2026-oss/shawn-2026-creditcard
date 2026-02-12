@@ -3345,7 +3345,10 @@ function handleHappyExclusive(selected) {
             div.className = 'history-item';
             
             const txDate = parseFlexibleDate(tx.date);
-            const dateStr = txDate ? txDate.toLocaleDateString('zh-TW', { month: 'short', day: 'numeric' }) : '';
+            const txTime = tx.timestamp ? new Date(tx.timestamp) : (tx.id ? new Date(tx.id) : null);
+            const timeStr = txTime ? txTime.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false }) : '';
+            const dateStr = txDate ?
+                txDate.toLocaleDateString('zh-TW', { month: 'short', day: 'numeric' }) + (timeStr ? ' ' + timeStr : '') : '';
             const amount = tx.amountTWD || tx.amount || 0;
             const txLoc = tx.location || tx.loc || 'TW';
             const currency = tx.currency || LOCATION_CONFIG[txLoc]?.currency || 'TWD';
@@ -3395,10 +3398,8 @@ function handleHappyExclusive(selected) {
         document.getElementById('amountInput').value = tx.amount;
         document.getElementById('noteInput').value = tx.note || '';
         
-        const txDate = parseFlexibleDate(tx.date);
-        if (txDate) {
-            document.getElementById('dateInput').value = txDate.toISOString().split('T')[0];
-        }
+        if (tx.date) document.getElementById('dateInput').value = tx.date;
+        
         
         // ★ 根據卡片類型還原所有專屬選項
         if (cardId === 'c6') {
@@ -4182,11 +4183,12 @@ function handleHappyExclusive(selected) {
         else if (cardId === 'c1') {
             const baseReward = Math.floor(amount * 0.012);
             if (options.isBonus && currentLocation === 'TW') {
-                const bonusSpent = getCardBonusSpent(cardId, t => t.isLegendBonus && (t.location || 'TW') === 'TW');
+               const bonusSpent = getCardBonusSpent(cardId, t => t.isLegendBonus && (t.location || 'TW') === 'TW' && (!editingTxId || t.id < editingTxId));
                 const limit = 11363;
                 if (bonusSpent < limit) {
                     const available = Math.min(amount, limit - bonusSpent);
-                    return { reward: baseReward + Math.floor(available * 0.088), rate: 0.10 };
+                    const totalReward = baseReward + Math.floor(available * 0.088);
+                    return { reward: totalReward, rate: (amount > 0) ? (totalReward / amount) : 0.10 };
                 }
             }
             return { reward: baseReward, rate: 0.012 };

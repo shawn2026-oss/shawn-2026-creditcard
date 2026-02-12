@@ -3096,7 +3096,12 @@ function handleHappyExclusive(selected) {
             return;
         }
         
-        const rate = getCurrentRate();
+        let rate = getCurrentRate();
+        if (editingTxId) {
+            const txs = getTransactions(cardId);
+            const editTx = txs.find(t => t.id === editingTxId);
+            if (editTx && editTx.exchangeRate) rate = editTx.exchangeRate;
+        }
         const amountTWD = Math.round(amount * rate);
         
         if (cardId === 'j1') checkFubonJMinSpend();

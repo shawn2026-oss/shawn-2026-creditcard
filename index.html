@@ -4225,6 +4225,9 @@ function handleHappyExclusive(selected) {
         let uniTimeCumulative = 0;
         let jiangSelectedCumulative = 0;
         let jiangTravelCumulative = 0;
+        let uniOpenGroupCumulative = 0;
+        let uniOpenIcashCumulative = 0;
+        let uniOpenOverseasCumulative = 0;
         
         txs.forEach(tx => {
             const amount = tx.amountTWD || tx.amount || 0;
@@ -4296,6 +4299,37 @@ function handleHappyExclusive(selected) {
             }
             totalReward += txReward;
         }
+    } else if (cardId === 'c10') {
+                let txReward = Math.floor(amount * 0.01);
+                if (tx.isUniOverseas) {
+                    const overseasLimit = 6250;
+                    if (uniOpenOverseasCumulative < overseasLimit) {
+                        const available = Math.min(amount, overseasLimit - uniOpenOverseasCumulative);
+                        txReward = Math.floor(available * 0.11) + Math.floor((amount - available) * 0.01);
+                    }
+                    uniOpenOverseasCumulative += amount;
+                } else {
+                    let bonusRate = 0;
+                    if (tx.isUniGroup) {
+                        const groupLimit = 25000;
+                        if (uniOpenGroupCumulative < groupLimit) bonusRate += 0.02;
+                    }
+                    if (tx.isUniIcash) {
+                        const icashLimit = 3750;
+                        if (uniOpenIcashCumulative < icashLimit) bonusRate += 0.04;
+                    }
+                    if (tx.isUniGroup && (tx.uniBrandCount || 0) >= 2) {
+                        const bc = tx.uniBrandCount;
+                        if (bc >= 5) bonusRate += 0.04;
+                        else if (bc >= 4) bonusRate += 0.03;
+                        else if (bc >= 3) bonusRate += 0.02;
+                        else bonusRate += 0.01;
+                    }
+                    txReward = Math.floor(amount * (0.01 + bonusRate));
+                    if (tx.isUniGroup) uniOpenGroupCumulative += amount;
+                    if (tx.isUniIcash) uniOpenIcashCumulative += amount;
+                }
+                totalReward += txReward;
     } else {
         const result = calculateTxRewardWithCap(cardId, tx);
         totalReward += result.reward;

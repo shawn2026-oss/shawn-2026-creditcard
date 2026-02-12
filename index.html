@@ -4117,7 +4117,7 @@ function handleHappyExclusive(selected) {
             if (isSelected) {
                 const minSpend = 3000;
                 const selectedLimit = 6666;
-                if (totalCycleSpent < minSpend) {
+                if ((totalCycleSpent + amount) < minSpend) {
                     return { reward: Math.floor(amount * 0.005), rate: 0.005 };
                 }
                 const selectedSpent = getCardBonusSpent(cardId, t => t.isJiangSelected);
@@ -4128,10 +4128,10 @@ function handleHappyExclusive(selected) {
                 const bonusReward = Math.floor(available * 0.05);
                 const baseReward = Math.floor((amount - available) * 0.005);
                 return { reward: bonusReward + baseReward, rate: (bonusReward + baseReward) / amount };
-            } else if (isTravel) {
+           } else if (isTravel) {
                 const minSpend = 6000;
                 const travelLimit = 11111;
-                if (totalCycleSpent < minSpend) {
+                if ((totalCycleSpent + amount) < minSpend) {
                     return { reward: Math.floor(amount * 0.005), rate: 0.005 };
                 }
                 const travelSpent = getCardBonusSpent(cardId, t => t.isJiangTravel);
@@ -4223,17 +4223,34 @@ function handleHappyExclusive(selected) {
         let legendBonusCumulative = 0;
         let uniBonusCumulative = 0;
         let uniTimeCumulative = 0;
+        let jiangSelectedCumulative = 0;
+        let jiangTravelCumulative = 0;
         
         txs.forEach(tx => {
             const amount = tx.amountTWD || tx.amount || 0;
             
             if (cardId === 'c4') {
-                if (!jiangReachedMin) {
-                    totalReward += Math.floor(amount * 0.005);
-                } else {
-                    const result = calculateTxRewardWithCap(cardId, tx);
-                    totalReward += result.reward;
+            if (!jiangReachedMin) {
+                totalReward += Math.floor(amount * 0.005);
+            } else {
+                let txReward = Math.floor(amount * 0.005);
+                if (tx.isJiangSelected) {
+                    const selectedLimit = 6666;
+                    if (jiangSelectedCumulative < selectedLimit) {
+                        const available = Math.min(amount, selectedLimit - jiangSelectedCumulative);
+                        txReward = Math.floor(available * 0.05) + Math.floor((amount - available) * 0.005);
+                    }
+                    jiangSelectedCumulative += amount;
+                } else if (tx.isJiangTravel) {
+                    const travelLimit = 11111;
+                    if (jiangTravelCumulative < travelLimit) {
+                        const available = Math.min(amount, travelLimit - jiangTravelCumulative);
+                        txReward = Math.floor(available * 0.05) + Math.floor((amount - available) * 0.005);
+                    }
+                    jiangTravelCumulative += amount;
                 }
+                totalReward += txReward;
+            }
             } else if (cardId === 'c8') {
                 if (!happyReachedMin) {
                     totalReward += Math.floor(amount * 0.005);

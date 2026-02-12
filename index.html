@@ -3792,7 +3792,7 @@ function handleHappyExclusive(selected) {
                 const isUp = options.isUp;
                 const bonusRate = isUp ? 0.035 : 0.025; // UP選+3.5%, 任意選+2.5%
                 const bonusLimit = isUp ? 140000 : 40000;
-                const bonusSpent = getCardBonusSpent(cardId, t => true); // 所有消費都計入
+               const bonusSpent = getCardBonusSpent(cardId, t => !editingTxId || t.id < editingTxId);
                 
                 if (bonusSpent < bonusLimit) {
                     const available = bonusLimit - bonusSpent;
@@ -3800,14 +3800,14 @@ function handleHappyExclusive(selected) {
                     reward += Math.floor(validForBonus * bonusRate);
                 }
                 
-                // 新戶 +3%
+               // 統一時代任務 +3%
                 if (options.isBonus) {
-                    const newUserLimit = 10000;
-                    const newUserSpent = getCardBonusSpent(cardId, t => t.isUniBonus);
-                    if (newUserSpent < newUserLimit) {
-                        const available = newUserLimit - newUserSpent;
-                        const validForNew = Math.min(amount, available);
-                        reward += Math.floor(validForNew * 0.03);
+                    const timeLimit = 16000;
+                    const timeSpent = getCardBonusSpent(cardId, t => t.isUniBonus && (!editingTxId || t.id < editingTxId));
+                    if (timeSpent < timeLimit) {
+                        const available = timeLimit - timeSpent;
+                        const validForTime = Math.min(amount, available);
+                        reward += Math.floor(validForTime * 0.03);
                     }
                 }
                 
@@ -4221,6 +4221,8 @@ function handleHappyExclusive(selected) {
        const jiangReachedMin = (cardId === 'c4') ? (totalSpent >= jiangMinSpend) : true;
         const happyReachedMin = (cardId === 'c8') ? (totalSpent >= happyMinSpend) : true;
         let legendBonusCumulative = 0;
+        let uniBonusCumulative = 0;
+        let uniTimeCumulative = 0;
         
         txs.forEach(tx => {
             const amount = tx.amountTWD || tx.amount || 0;
@@ -4253,10 +4255,34 @@ function handleHappyExclusive(selected) {
                 } else {
                     totalReward += baseReward;
                 }
-            } else {
-                const result = calculateTxRewardWithCap(cardId, tx);
-                totalReward += result.reward;
+            } else if (cardId === 'c7') {
+        if (currentLocation !== 'TW') {
+            totalReward += Math.floor(amount * 0.01);
+        } else {
+            const uniSettings = JSON.parse(localStorage.getItem('uni_settings') || '{}');
+            const isUp = tx.isUniUp || uniSettings.isUp;
+            const bonusRate = isUp ? 0.035 : 0.025;
+            const bonusLimit = isUp ? 140000 : 40000;
+            let txReward = Math.floor(amount * 0.01);
+            if (uniBonusCumulative < bonusLimit) {
+                const available = Math.min(amount, bonusLimit - uniBonusCumulative);
+                txReward += Math.floor(available * bonusRate);
             }
+            uniBonusCumulative += amount;
+            if (tx.isUniBonus) {
+                const timeLimit = 16000;
+                if (uniTimeCumulative < timeLimit) {
+                    const available = Math.min(amount, timeLimit - uniTimeCumulative);
+                    txReward += Math.floor(available * 0.03);
+                }
+                uniTimeCumulative += amount;
+            }
+            totalReward += txReward;
+        }
+    } else {
+        const result = calculateTxRewardWithCap(cardId, tx);
+        totalReward += result.reward;
+    }
         });
         
         let progress = 0, msg = '';

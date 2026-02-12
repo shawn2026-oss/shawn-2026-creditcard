@@ -3561,16 +3561,18 @@ function handleHappyExclusive(selected) {
         const txs = getCurrentCycleTransactions('j1');
         let physicalSpent = 0, suicaSpent = 0;
         
-        txs.forEach(tx => {
-            const amount = tx.amountTWD || tx.amount || 0;
-            const bonus = tx.fubonJBonus || 'none';
-            
-            if ((bonus === 'jpkr_physical' || bonus === 'th_physical') && amount >= 1000) {
-                physicalSpent += amount;
-            } else if (bonus === 'suica' && amount >= 2000) {
-                suicaSpent += amount;
-            }
-        });
+       txs.forEach(tx => {
+        const amount = tx.amountTWD || tx.amount || 0;
+        const bonus = tx.fubonJBonus || 'none';
+        const isPhysical = (bonus === 'jpkr_physical') || (bonus === 'th_physical') || tx.isFubonJJpkrBonus || tx.isFubonJThBonus;
+        const isSuica = (bonus === 'suica') || tx.isFubonJSuica;
+        
+        if (isPhysical && amount >= 1000) {
+            physicalSpent += amount;
+        } else if (isSuica && amount >= 2000) {
+            suicaSpent += amount;
+        }
+    });
         
         // 封頂金額 (消費金額)
         const physicalLimit = 33333; // 日韓實體刷 33,333 可拿 1,000 回饋
@@ -4448,20 +4450,27 @@ function handleHappyExclusive(selected) {
         
         let totalSpent = 0, totalReward = 0;
         
-        txs.forEach(tx => {
-            const amount = tx.amountTWD || tx.amount || 0;
-            totalSpent += amount;
-            const region = tx.fubonJRegion || 'domestic';
-            const baseRate = (region === 'jpkr') ? 0.03 : (region === 'th') ? 0.01 : 0.01;
-            totalReward += Math.floor(amount * baseRate);
-        });
+       txs.forEach(tx => {
+        const amount = tx.amountTWD || tx.amount || 0;
+        totalSpent += amount;
+        const isJpkr = tx.isFubonJJpkr || (tx.fubonJRegion === 'jpkr');
+        const isTh = tx.isFubonJTh || (tx.fubonJRegion === 'th');
+        const baseRate = isJpkr ? 0.03 : isTh ? 0.01 : 0.01;
+        totalReward += Math.floor(amount * baseRate);
         
-        // 加碼回饋 (封頂後不再累加)
-        const physicalBonusRate = 0.03; // 簡化：取日韓 3%
-        const suicaBonusRate = 0.07;
-        const physicalBonus = Math.min(Math.floor(quota.physicalSpent * physicalBonusRate), 1000);
-        const suicaBonus = Math.min(Math.floor(quota.suicaSpent * suicaBonusRate), 200);
-        totalReward += physicalBonus + suicaBonus;
+        const bonus = tx.fubonJBonus || 'none';
+        const isPhysicalJpkr = tx.isFubonJJpkrBonus || (bonus === 'jpkr_physical');
+        const isPhysicalTh = tx.isFubonJThBonus || (bonus === 'th_physical');
+        const isSuica = tx.isFubonJSuica || (bonus === 'suica');
+        
+        if (isPhysicalJpkr && amount >= 1000) {
+            totalReward += Math.floor(Math.min(amount, Math.max(0, quota.physicalLimit - (quota.physicalSpent - amount))) * 0.03);
+        } else if (isPhysicalTh && amount >= 1000) {
+            totalReward += Math.floor(Math.min(amount, Math.max(0, quota.physicalLimit - (quota.physicalSpent - amount))) * 0.05);
+        } else if (isSuica && amount >= 2000) {
+            totalReward += Math.floor(Math.min(amount, Math.max(0, quota.suicaLimit - (quota.suicaSpent - amount))) * 0.07);
+        }
+    });
         
         const progress = Math.min(100, (quota.physicalSpent / quota.physicalLimit) * 100);
         

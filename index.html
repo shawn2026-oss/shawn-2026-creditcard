@@ -235,7 +235,7 @@
         .details-content { display: none; background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 10px; margin-top: 6px; font-size: 11px; color: #666; line-height: 1.6; }
         
         .modal { display: none; position: fixed !important; top: 0 !important; left: 0 !important; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 10000; align-items: center; justify-content: center; }
-        .modal-content { background: white; width: 85%; max-width: 320px; border-radius: 20px; padding: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.25); animation: modalPop 0.2s; display: flex; flex-direction: column; max-height: 85vh; overflow-y: auto; position: relative; z-index: 10001; }
+        .modal-content { background: white; width: 85%; max-width: 320px; border-radius: 20px; padding: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.25); animation: modalPop 0.2s; display: flex; flex-direction: column; max-height: 85vh; overflow-y: auto; overflow-x: hidden; position: relative; z-index: 10001; box-sizing: border-box; }
         .modal-body-input { flex-shrink: 0; }
         
         .location-modal-content { background: white; width: 85%; max-width: 300px; border-radius: 20px; padding: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.25); animation: modalPop 0.2s; }
@@ -1043,12 +1043,28 @@
                         ⚠️ 需綁定 Richart 帳戶自動扣繳 (未綁僅0.3%)
                     </div>
                     <div class="option-row"><label for="rbRichartGeneral">🔰 一般消費 (0.3%)</label><input type="radio" name="richartMode" id="rbRichartGeneral" value="general" checked onchange="toggleRichartLogic()"></div>
-                    <div class="option-row"><label for="rbRichartPay">📱 台新Pay/Pay+ (3.8%)</label><input type="radio" name="richartMode" id="rbRichartPay" value="pay" onchange="toggleRichartLogic()"></div>
-                    <div class="option-row"><label for="rbRichartOnline">🛍️ 指定網購/影音 (3.3%)</label><input type="radio" name="richartMode" id="rbRichartOnline" value="online" onchange="toggleRichartLogic()"></div>
-                    <div class="option-row"><label for="rbRichartLine">🟢 LINE Pay (2.3%)</label><input type="radio" name="richartMode" id="rbRichartLine" value="line" onchange="toggleRichartLogic()"></div>
-                   <div class="option-row" style="border-top:1px dashed #ddd; margin-top:6px; padding-top:6px;"><label for="rbRichartOverseas">✈️ 海外消費 (3.3%)</label><input type="radio" name="richartMode" id="rbRichartOverseas" value="overseas" onchange="toggleRichartLogic()"></div>
-                    <div class="option-row" id="rbRichartJpPaypayRow" style="display:none;"><label for="rbRichartJpPaypay">🇯🇵 台新Pay+ 日本PayPay (3.8%+免1.5%手續費)</label><input type="radio" name="richartMode" id="rbRichartJpPaypay" value="jpPaypay" onchange="toggleRichartLogic()"></div>
-                        💡 小撇步：若網購使用台新Pay，請勾選「台新Pay (3.8%)」
+                    <div class="option-row"><label for="rbRichartTaishinPay">📱 Pay著刷－台新Pay (3.8%)</label><input type="radio" name="richartMode" id="rbRichartTaishinPay" value="taishinpay" onchange="toggleRichartLogic()"></div>
+                    <div class="option-row"><label for="rbRichartLinePay">🟢 Pay著刷－LINE Pay (2.3%)</label><input type="radio" name="richartMode" id="rbRichartLinePay" value="linepay" onchange="toggleRichartLogic()"></div>
+                    <div class="option-row"><label for="rbRichartPlan33">📋 指定方案 (3.3%)</label><input type="radio" name="richartMode" id="rbRichartPlan33" value="plan33" onchange="toggleRichartLogic()"></div>
+                    <div id="richartPlan33Sub" style="display:none; margin-left:28px; margin-top:4px; margin-bottom:4px;">
+                        <select id="selRichartPlan33" onchange="toggleRichartLogic()" style="width:100%; padding:6px 8px; border-radius:6px; border:1px solid #ccc; font-size:13px;">
+                            <option value="tianti">天天刷 (超商量販/通勤交通/藥妝藥局)</option>
+                            <option value="dabi">大筆刷 (指定百貨/Outlet/居家裝修)</option>
+                            <option value="haoxiang">好饗刷 (餐飲/外送/訂房/娛樂)</option>
+                            <option value="shuqu">數趣刷 (網購/線上課程/遊戲影音)</option>
+                            <option value="wanlv">玩旅刷 (海外消費/航空/訂房旅行)</option>
+                        </select>
+                    </div>
+                    <div class="option-row"><label for="rbRichartHoliday">🎉 假日刷 (2%)</label><input type="radio" name="richartMode" id="rbRichartHoliday" value="holiday" onchange="toggleRichartLogic()"></div>
+                    <div class="option-row" id="rbRichartJpPaypayRow" style="display:none; border-top:1px dashed #ddd; margin-top:6px; padding-top:6px;">
+                        <label for="rbRichartJpPaypay">🇯🇵 台新Pay+ 日本PayPay (3.8%+免1.5%手續費)</label>
+                        <input type="radio" name="richartMode" id="rbRichartJpPaypay" value="jpPaypay" onchange="toggleRichartLogic()">
+                    </div>
+                    <div id="richartJpPaypayNote" style="display:none; font-size:10px; color:#555; margin-top:4px; opacity:0.8;">
+                        💡 需搭配 Pay著刷 權益，透過 Richart Life APP 掃碼付款
+                    </div>
+                    <div style="font-size:10px; color:#555; margin-top:8px; opacity:0.8;">
+                        💡 小撇步：若網購使用台新Pay，請勾選「Pay著刷－台新Pay (3.8%)」
                     </div>
                 </div>
 
@@ -1987,7 +2003,7 @@ let editingTxId = null; // 追蹤正在編輯的交易 ID
         { id: 'c7', name: '玉山 UNI 卡', nickname: '行支/百貨優等生', note: 'UP 4.5% (刷 14萬封頂)', type: 'ceiling', limit: 40000, tier1Rate: 0.035, tier2Rate: 0.01, gradient: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)', parking: `🔥 <b>任意選 3.5%</b> (限刷$4萬)<br>🆙 <b>UP 選 4.5%</b> (限刷$14萬)<br>ℹ️ <b>訂閱建議</b>：<br>消費滿 $14,900 以上建議訂閱 UP 選`, getDynamicName: function() { const settings = JSON.parse(localStorage.getItem('uni_settings') || '{}'); return settings.isUp ? '玉山 UNI 卡（升級UP選）' : '玉山 UNI 卡'; }},
         { id: 'c8', name: '遠東樂家+卡', nickname: '生活/寵物神卡', note: '寵物10% / 生活安心4% ', type: 'custom_happy', limit: 5263, minSpend: 3000, tier1Rate: 0.1, tier2Rate: 0.005, gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)', textColor: 'white', msgDanger: '已封頂 (變0.5%)', parking: `🐶 <b>寵物 10%</b> (限刷$5,263)<br>🍽️ <b>安心/生活 4%</b> (限刷$5,714)<br>✈️ <b>國外 2.5%</b> (無上限)`},
         { id: 'c9', name: '滙豐旅人卡', nickname: '哩程累積', note: '無限:國內18/國外10 | 御璽:國內18/國外15', type: 'miles', gradient: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)', textColor: 'white', msgDanger: '', parking: `✈️ <b>哩程累積神卡</b>`, getDynamicName: function() { const tier = localStorage.getItem('hsbc_tier') || 'infinite'; return tier === 'infinite' ? '滙豐旅人無限卡' : '滙豐旅人御璽卡'; }},
-      { id: 'c11', name: '台新 Richart 卡', nickname: '權益自由選', note: '台新Pay 3.8% (無上限)', type: 'ceiling', limit: 99999999,tier1Rate: 0.038, tier2Rate: 0.003, gradient: 'linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%)', textColor: 'white', msgDanger: '', parking: `🐶 <b>權益自由選 (無上限回饋)</b>`},
+        { id: 'c11', name: '台新 Richart 卡', nickname: '權益自由選', note: '台新Pay 3.8% (無上限)', type: 'ceiling', limit: 99999999, tier1Rate: 0.038, tier2Rate: 0.003, gradient: 'linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%)', textColor: 'white', msgDanger: '', parking: `🐶 <b>權益自由選 (無上限回饋)</b>`},
         { id: 'j1', name: '富邦 J 卡', nickname: '日韓旅遊優等生', note: '日韓泰$3.3萬/交通卡$2,857(季)',type: 'custom_j', limit: 0, gradient: 'linear-gradient(135deg, #FF7E5F 0%, #FEB47B 100%)', textColor: 'white', msgDanger: '', parking: `🇯🇵🇰🇷🇹🇭 <b>實體消費加碼</b> (共用季上限$1000回饋)<br>• 日韓實體：3%+3%=6% (刷$33,333封頂)<br>• 泰國實體：1%+5%=6% (刷$20,000封頂)<br>⚠️ 需單筆滿 $1,000<br><br>🍎 <b>日本交通卡</b> (獨立季上限$200回饋)<br>• Suica/PASMO等：3%+7%=10% (刷$2,857封頂)<br>⚠️ 需單筆滿 $2,000`},
         { id: 'j2', name: '聯邦吉鶴卡', nickname: '日本/ApplePay首選', note: '日本 AP 4% (刷 4萬封頂) | 國內日系 5%', type: 'ceiling', limit: 40000, tier1Rate: 0.04, tier2Rate: 0.025, gradient: 'linear-gradient(135deg, #DC143C 0%, #FFFFFF 150%)', textColor: 'white', msgDanger: '加碼已封頂 (變2.5%)', parking: `🍎 <b>日本 QUICPay (Apple Pay)</b><br>日本 2.5% + 加碼 1.5% = 4%<br>⚠️ 加碼上限 $600/月 (約刷$4萬)<br>🇹🇼 <b>國內日系名店 5%</b><br>國內 1% + 加碼 4% (刷$1.25萬封頂)`},
         { id: 'j3', name: '玉山熊本熊卡', nickname: '日本優等生', note: 'PayPay 5% (季) | 指定 8.5%', type: 'ceiling', limit: 8333, tier1Rate: 0.085, tier2Rate: 0.025, gradient: 'linear-gradient(135deg, #BDC3C7 0%, #2C3E50 100%)', textColor: 'white', msgDanger: '加碼已封頂', parking: `🐻 <b>指定通路 8.5%</b><br>(基本2.5% + 加碼6%)<br>⚠️ 加碼上限 $500/期 (約刷$8,333)<br>📱 <b>PayPay 5%</b> (3.5%+1.5%免手續費)<br>⚠️ 3.5%加碼上限 $100/季 (約刷$2,857)<br>🔰 <b>國內一般 0.5%</b> (無上限)`},
@@ -2070,18 +2086,12 @@ let editingTxId = null; // 追蹤正在編輯的交易 ID
             container.style.display = 'none';
             btn.innerText = '展開通路 ▼';
         }
-        showUniChannelSummary();
     }
 
     function initUniChannelGrid() {
         const container = document.getElementById('uniChannelContainer');
         if (!container) return;
-        let saved = JSON.parse(localStorage.getItem('uni_channels') || '[]');
-        const allItems = Object.values(uniChannelCategories).flatMap(c => c.items);
-        if (saved.length > 0 && !allItems.includes(saved[0])) {
-            saved = [];
-            localStorage.setItem('uni_channels', '[]');
-        }
+        const saved = JSON.parse(localStorage.getItem('uni_channels') || '[]');
         container.innerHTML = '';
 
         Object.keys(uniChannelCategories).forEach(catId => {
@@ -2116,23 +2126,6 @@ let editingTxId = null; // 追蹤正在編輯的交易 ID
         });
 
         document.getElementById('uniChannelCount').innerText = `(${saved.length}/8)`;
-        showUniChannelSummary();
-    }
-
-    function showUniChannelSummary() {
-        let summary = document.getElementById('uniChannelSummary');
-        if (!summary) {
-            summary = document.createElement('div');
-            summary.id = 'uniChannelSummary';
-            summary.style.cssText = 'display:flex; flex-wrap:wrap; gap:3px; margin-top:6px;';
-            document.getElementById('uniChannelSection').appendChild(summary);
-        }
-        const saved = JSON.parse(localStorage.getItem('uni_channels') || '[]');
-        if (saved.length === 0) {
-            summary.innerHTML = '<div style="font-size:11px; color:#aaa;">尚未選擇通路</div>';
-        } else {
-            summary.innerHTML = saved.map(s => `<span style="font-size:10px; background:#e8f0fe; color:#1a73e8; padding:2px 6px; border-radius:4px;">${s}</span>`).join('');
-        }
     }
 
     function initUniBrandGrid() {
@@ -2248,7 +2241,7 @@ function getActualCycleDay(year, month, cycleDay) {
         });
     }
 
-   function getUniOpenDailyPromo() {
+    function getUniOpenDailyPromo() {
         const now = new Date();
         const day = now.getDay();
         const date = now.getDate();
@@ -2294,13 +2287,12 @@ document.getElementById('dateInput').value = today.getFullYear() + '-' + String(
         document.getElementById('uniUpSuggestion').style.display = 'none';
         
         const parkingInfo = document.getElementById('modalParkingInfo');
-      if (card.parking) {
+        if (card.parking) {
             let parkingHtml = card.parking;
             if (card.id === 'c10') parkingHtml = getUniOpenDailyPromo() + parkingHtml;
             parkingInfo.innerHTML = parkingHtml;
             parkingInfo.style.display = 'block';
-        }
-        else parkingInfo.style.display = 'none';
+        } else parkingInfo.style.display = 'none';
 
         // 顯示對應卡片的選項
         showCardSpecificOptions(cardId);
@@ -2396,7 +2388,8 @@ document.getElementById('dateInput').value = today.getFullYear() + '-' + String(
                 document.getElementById('rbRichartJpPaypay').checked = true;
             } else {
                 jpRow.style.display = 'none';
-                if (document.getElementById('rbRichartJpPaypay').checked) document.getElementById('rbRichartGeneral').checked = true;
+                if (document.getElementById('rbRichartJpPaypay').checked)
+                    document.getElementById('rbRichartGeneral').checked = true;
             }
             toggleRichartLogic();
         }
@@ -2580,7 +2573,19 @@ function toggleUniOverseas() {
     updateRewardPreview();
 }
 
-    function toggleRichartLogic() { updateRewardPreview(); }
+    function toggleRichartLogic() {
+        const mode = document.querySelector('input[name="richartMode"]:checked')?.value || 'general';
+        const sub = document.getElementById('richartPlan33Sub');
+        if (sub) sub.style.display = (mode === 'plan33') ? 'block' : 'none';
+        const jpNote = document.getElementById('richartJpPaypayNote');
+        if (jpNote) jpNote.style.display = (mode === 'jpPaypay') ? 'block' : 'none';
+        // 儲存當前方案到 localStorage（供卡面顯示）
+        localStorage.setItem('richart_mode', mode);
+        if (mode === 'plan33') {
+            localStorage.setItem('richart_plan33', document.getElementById('selRichartPlan33')?.value || 'tianti');
+        }
+        updateRewardPreview();
+    }
 
     // J1 富邦J卡：取得低消門檻顯示（統一用台幣）
     function getFubonJMinSpendDisplay(twdAmount) {
@@ -3172,6 +3177,7 @@ function handleHappyExclusive(selected) {
         }
         else if (cardId === 'c11') {
             options.mode = document.querySelector('input[name="richartMode"]:checked')?.value || 'general';
+            options.plan33 = document.getElementById('selRichartPlan33')?.value || 'tianti';
         }
         else if (cardId === 'j1') {
             options.isJpkr = document.getElementById('checkFubonJJpkr')?.checked || false;
@@ -3392,6 +3398,7 @@ function handleHappyExclusive(selected) {
             isUniOverseas: document.getElementById('checkUniOverseas')?.checked || false,
             uniBrandCount: getUniBrandCount(),
             richartMode: document.querySelector('input[name="richartMode"]:checked')?.value || 'general',
+            richartPlan33: document.getElementById('selRichartPlan33')?.value || 'tianti',
             isFubonJJpkr: document.getElementById('checkFubonJJpkr')?.checked || false,
             isFubonJTh: document.getElementById('checkFubonJTh')?.checked || false,
             isFubonJJpkrBonus: document.getElementById('checkFubonJJpkrBonus')?.checked || false,
@@ -3442,9 +3449,8 @@ function handleHappyExclusive(selected) {
         document.getElementById('liveRewardCalc').style.display = 'none';
         document.getElementById('twdConversionDisplay').style.display = 'none';
         
-       if (closeAfter) {
-            // 留在 modal，清空輸入但不關閉，讓用戶看到紀錄更新
-            document.getElementById('amountInput').focus();
+        if (closeAfter) {
+            document.getElementById('transactionModal').style.display = 'none';
         } else {
             document.getElementById('amountInput').focus();
         }
@@ -3595,9 +3601,18 @@ function handleHappyExclusive(selected) {
             document.getElementById('checkUniOverseas').checked = tx.isUniOverseas || false;
         }
         else if (cardId === 'c11') {
-            const mode = tx.richartMode || 'general';
+            let mode = tx.richartMode || 'general';
+            // 相容舊版：pay→taishinpay, online/overseas→plan33, line→linepay
+            if (mode === 'pay') mode = 'taishinpay';
+            else if (mode === 'online' || mode === 'overseas') mode = 'plan33';
+            else if (mode === 'line') mode = 'linepay';
             const modeRadio = document.querySelector(`input[name="richartMode"][value="${mode}"]`);
             if (modeRadio) modeRadio.checked = true;
+            if (mode === 'plan33' && tx.richartPlan33) {
+                const sel = document.getElementById('selRichartPlan33');
+                if (sel) sel.value = tx.richartPlan33;
+            }
+            toggleRichartLogic();
         }
         else if (cardId === 'j1') {
             // 相容舊格式
@@ -4110,11 +4125,15 @@ function handleHappyExclusive(selected) {
         else if (cardId === 'c11') {
             const mode = options.mode || 'general';
             if (mode === 'general') rate = 0.003;
-            else if (mode === 'pay') rate = 0.038;
-            else if (mode === 'online') rate = 0.033;
-            else if (mode === 'line') rate = 0.023;
-          else if (mode === 'overseas') rate = 0.033;
+            else if (mode === 'taishinpay') rate = 0.038;
+            else if (mode === 'linepay') rate = 0.023;
+            else if (mode === 'plan33') rate = 0.033;
+            else if (mode === 'holiday') rate = 0.02;
             else if (mode === 'jpPaypay') rate = 0.053;
+            // 相容舊版 mode 值
+            else if (mode === 'pay') rate = 0.038;
+            else if (mode === 'online' || mode === 'overseas') rate = 0.033;
+            else if (mode === 'line') rate = 0.023;
             reward = Math.floor(amount * rate);
             return { reward, rate };
         }
@@ -4524,6 +4543,16 @@ function handleHappyExclusive(selected) {
         }
         const isOverseas = currentLocation !== 'TW';
 
+        // 特殊處理：Richart卡 (c11) - 無封頂，顯示方案名
+        if (cardId === 'c11') {
+            const rm = localStorage.getItem('richart_mode') || 'general';
+            const rp = localStorage.getItem('richart_plan33') || 'tianti';
+            const plan = getRichartPlanDisplay(rm, rp);
+            msg = `${plan.name} ${plan.rate}`;
+            progress = 0;
+            return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
+        }
+
         // 特殊處理：UniOpen 卡 (c10)
         if (cardId === 'c10') {
             let groupSpent = 0, icashSpent = 0, overseasSpent = 0;
@@ -4883,6 +4912,23 @@ function getCardDisplayName(card) {
         }
         return card.name;
     }
+    function getRichartPlanDisplay(mode, plan33) {
+        const plan33Names = { tianti: '天天刷', dabi: '大筆刷', haoxiang: '好饗刷', shuqu: '數趣刷', wanlv: '玩旅刷' };
+        switch (mode) {
+            case 'taishinpay': return { name: 'Pay著刷(台新Pay)', rate: '3.8%' };
+            case 'linepay': return { name: 'Pay著刷(LINE Pay)', rate: '2.3%' };
+            case 'plan33': return { name: plan33Names[plan33] || '天天刷', rate: '3.3%' };
+            case 'holiday': return { name: '假日刷', rate: '2%' };
+            case 'jpPaypay': return { name: 'PayPay', rate: '5.3%' };
+            // 相容舊版
+            case 'pay': return { name: 'Pay著刷(台新Pay)', rate: '3.8%' };
+            case 'online': return { name: '數趣刷', rate: '3.3%' };
+            case 'overseas': return { name: '玩旅刷', rate: '3.3%' };
+            case 'line': return { name: 'Pay著刷(LINE Pay)', rate: '2.3%' };
+            default: return { name: '一般消費', rate: '0.3%' };
+        }
+    }
+
     function getCardMaxRate(card) {
         switch (card.id) {
             case 'c9': return '';
@@ -4898,12 +4944,9 @@ function getCardDisplayName(card) {
             case 'c2': return '6%';
             case 'c8': return '10%';
             case 'c11': {
-                const rm = document.querySelector('input[name="richartMode"]:checked')?.value;
-                if (rm === 'jpPaypay') return '5.3%';
-                if (rm === 'pay') return '3.8%';
-                if (rm === 'online' || rm === 'overseas') return '3.3%';
-                if (rm === 'line') return '2.3%';
-                return '0.3%';
+                const rm = localStorage.getItem('richart_mode') || 'general';
+                const rp = localStorage.getItem('richart_plan33') || 'tianti';
+                return getRichartPlanDisplay(rm, rp).rate;
             }
             case 'j1': return '10%';
             case 'j2': return '5%';
@@ -4916,6 +4959,13 @@ function getCardDisplayName(card) {
         }
     }
     function getCardDisplayNote(card) {
+        // Richart卡：顯示當前方案
+        if (card.id === 'c11') {
+            const rm = localStorage.getItem('richart_mode') || 'general';
+            const rp = localStorage.getItem('richart_plan33') || 'tianti';
+            const plan = getRichartPlanDisplay(rm, rp);
+            return `${plan.name} ${plan.rate} (無上限)`;
+        }
         // 旅人卡：根據等級顯示不同元/哩
         if (card.id === 'c9') {
             const tier = localStorage.getItem('hsbc_tier') || 'infinite';

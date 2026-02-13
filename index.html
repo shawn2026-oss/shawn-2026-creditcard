@@ -1249,7 +1249,7 @@
             </div>
             <div class="modal-history-section">
                 <div class="modal-history-title" id="modalHistoryTitle"><span>📅 本月消費紀錄</span><span style="font-weight:normal; font-size:10px; color:#aaa;">(點擊文字修改 / ✕ 刪除)</span></div>
-                <div id="modalHistoryList"></div>
+                <div id="modalHistoryList" style="max-height:40vh; overflow-y:auto;"></div>
             </div>
         </div>
     </div>
@@ -3341,11 +3341,16 @@ function handleHappyExclusive(selected) {
         txs.sort((a, b) => {
             const dateA = parseFlexibleDate(a.date || a.timestamp);
             const dateB = parseFlexibleDate(b.date || b.timestamp);
-            return dateB - dateA;
+            if (dateB - dateA !== 0) return dateB - dateA;
+            const timeA = a.timestamp ? new Date(a.timestamp).getTime() : (a.id || 0);
+            const timeB = b.timestamp ? new Date(b.timestamp).getTime() : (b.id || 0);
+            return timeB - timeA;
         });
         
         container.innerHTML = '';
-        txs.forEach(tx => {
+        const showCount = parseInt(container.dataset.showCount || '5');
+        const displayTxs = txs.slice(0, showCount);
+        displayTxs.forEach(tx => {
             const div = document.createElement('div');
             div.className = 'history-item';
             
@@ -3374,7 +3379,14 @@ function handleHappyExclusive(selected) {
                 <button class="btn-delete-single" onclick="event.stopPropagation(); deleteTransaction('${cardId}', ${tx.id})">✕</button>
             `;
             container.appendChild(div);
-        });
+       });
+        if (txs.length > showCount) {
+            const moreBtn = document.createElement('div');
+            moreBtn.style.cssText = 'text-align:center; padding:10px; color:#007AFF; font-size:13px; cursor:pointer; border-top:1px solid #eee;';
+            moreBtn.innerText = `載入更多 (還有 ${txs.length - showCount} 筆)`;
+            moreBtn.onclick = () => { container.dataset.showCount = showCount + 10; renderModalHistory(cardId); };
+            container.insertBefore(moreBtn, container.firstChild);
+        }
     }
 
     function parseFlexibleDate(dateStr) {
@@ -3519,6 +3531,7 @@ function handleHappyExclusive(selected) {
         
         // 更新確認按鈕文字
         document.getElementById('btn-confirm').innerText = '更新';
+        document.querySelector('.modal-content').scrollTop = 0;
         
         updateRewardPreview();
     }
@@ -5080,9 +5093,12 @@ if (cycleDay && cycleDay > 0) {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `刷卡回饋管家_備份_${new Date().toISOString().split('T')[0]}.json`;
-       a.click();
+       const now = new Date();
+        const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+        a.download = `刷卡回饋管家_備份_${dateStr}.json`;
+        a.click();
         URL.revokeObjectURL(url);
+        alert('備份成功！');
     }
 
     function triggerImport() {

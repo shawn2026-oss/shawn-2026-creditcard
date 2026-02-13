@@ -809,6 +809,14 @@
                 <div id="uniOptions">
                     <div class="option-row read-only"><label id="labelUniBase">🔰 任意選 3.5% (刷$4萬封頂)</label><input type="checkbox" checked disabled></div>
                     <div class="option-row"><label for="checkUniUp">🆙 訂閱 UP 選 4.5% (刷$14萬封頂)</label><input type="checkbox" id="checkUniUp" onchange="toggleUniUpLogic()"></div>
+                    <div id="uniChannelSection" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px;">
+                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:6px;">
+                            <label style="font-size:13px;">📋 我的 8 項通路 <span id="uniChannelCount" style="font-size:11px; color:#999;"></span></label>
+                            <button onclick="toggleUniChannelList()" style="border:none; background:#007AFF; color:white; font-size:10px; padding:4px 8px; border-radius:4px; cursor:pointer;" id="btnToggleUniChannel">展開通路 ▼</button>
+                        </div>
+                        <div id="uniChannelContainer" style="width:100%; display:none;"></div>
+                    </div>
+
                     <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;"><label for="checkUniBonus">🔥 統一時代任務 +3% (刷$1.6萬封頂)</label><input type="checkbox" id="checkUniBonus" onchange="updateRewardPreview()"></div>
                     
                     <div id="uniOverseasWarning" style="display:none; margin-top:8px; padding:8px; background:#ffebee; border-radius:6px; font-size:11px; color:#c62828;">
@@ -2038,6 +2046,95 @@ let editingTxId = null; // 追蹤正在編輯的交易 ID
     }
 
     // 初始化 UniOpen 品牌格 (分類版)
+    const uniChannelCategories = {
+        pay: { name: '行動支付', items: ['玉山Wallet', 'LINE Pay', '全支付', '街口支付', '悠遊付', '全盈+PAY', 'iPASS MONEY', 'icash Pay'] },
+        ecom: { name: '電商平台', items: ['momo購物網', '蝦皮購物', '淘寶網', 'Coupang酷澎'] },
+        dept: { name: '國內百貨', items: ['新光三越', '台北101', '華泰名品城', '三井OUTLET', '京站', '美麗華', '秀泰生活', 'LaLaport', '統領廣場', '采盟', '昇恆昌', '統一時代百貨', '遠東百貨', '漢神百貨', '微風百貨', '誠品生活'] },
+        life: { name: '生活採買', items: ['家樂福', '屈臣氏', '康是美', '特力屋', 'HOLA', 'hoi好好生活', 'UNIQLO', 'NET', '大樹藥局', '丁丁藥妝'] },
+        food: { name: '餐飲美食', items: ['Uber Eats', 'foodpanda', 'EZTABLE', '王品瘋Pay', '饗賓餐飲', '瓦城料理', '乾杯燒肉', '漢來美食', '鼎王餐飲', '爭鮮餐飲'] },
+        transport: { name: '加油交通', items: ['台灣中油', '55688', '台鐵', '高鐵', 'Uber', 'Yoxi'] },
+        travel: { name: '航空旅遊', items: ['中華航空', '長榮航空', '日本航空', '台灣虎航', '樂桃航空', '酷航', 'Trip.com', 'Booking.com', 'Hotels.com', 'AsiaYo', 'Expedia', 'KKday', 'Klook', '雄獅旅遊', '可樂旅遊', '東南旅遊', 'Agoda'] },
+        overseas: { name: '國外實體', items: ['日本', '韓國', '泰國', '越南', '新加坡', '馬來西亞', '菲律賓', '中國', '香港', '澳門', '美國', '加拿大', '英國', '法國', '德國', '義大利', '澳洲'] },
+        select: { name: '精選商家', items: ['Apple直營店', '小米台灣', '全國電子', '燦坤', '迪卡儂'] },
+        esg: { name: 'ESG永續', items: ['玉山Wallet愛心捐款', '特斯拉', 'Gogoro電池資費', 'YouBike 2.0'] }
+    };
+
+    function toggleUniChannelList() {
+        const container = document.getElementById('uniChannelContainer');
+        const btn = document.getElementById('btnToggleUniChannel');
+        if (container.style.display === 'none') {
+            container.style.display = 'block';
+            btn.innerText = '收合通路 ▲';
+            initUniChannelGrid();
+        } else {
+            container.style.display = 'none';
+            btn.innerText = '展開通路 ▼';
+        }
+        showUniChannelSummary();
+    }
+
+    function initUniChannelGrid() {
+        const container = document.getElementById('uniChannelContainer');
+        if (!container) return;
+        let saved = JSON.parse(localStorage.getItem('uni_channels') || '[]');
+        const allItems = Object.values(uniChannelCategories).flatMap(c => c.items);
+        if (saved.length > 0 && !allItems.includes(saved[0])) {
+            saved = [];
+            localStorage.setItem('uni_channels', '[]');
+        }
+        container.innerHTML = '';
+
+        Object.keys(uniChannelCategories).forEach(catId => {
+            const cat = uniChannelCategories[catId];
+            const section = document.createElement('div');
+            section.style.cssText = 'margin-bottom:8px;';
+            section.innerHTML = `<div style="font-size:11px; font-weight:bold; color:#555; margin-bottom:4px;">${cat.name}</div>`;
+            const grid = document.createElement('div');
+            grid.style.cssText = 'display:flex; flex-wrap:wrap; gap:4px;';
+            cat.items.forEach(item => {
+                const btn = document.createElement('div');
+                const isActive = saved.includes(item);
+                btn.className = 'brand-btn' + (isActive ? ' active' : '');
+                btn.innerText = item;
+                btn.onclick = () => {
+                    const current = JSON.parse(localStorage.getItem('uni_channels') || '[]');
+                    if (current.includes(item)) {
+                        localStorage.setItem('uni_channels', JSON.stringify(current.filter(c => c !== item)));
+                    } else if (current.length >= 8) {
+                        alert('最多只能選 8 個通路');
+                        return;
+                    } else {
+                        current.push(item);
+                        localStorage.setItem('uni_channels', JSON.stringify(current));
+                    }
+                    initUniChannelGrid();
+                };
+                grid.appendChild(btn);
+            });
+            section.appendChild(grid);
+            container.appendChild(section);
+        });
+
+        document.getElementById('uniChannelCount').innerText = `(${saved.length}/8)`;
+        showUniChannelSummary();
+    }
+
+    function showUniChannelSummary() {
+        let summary = document.getElementById('uniChannelSummary');
+        if (!summary) {
+            summary = document.createElement('div');
+            summary.id = 'uniChannelSummary';
+            summary.style.cssText = 'display:flex; flex-wrap:wrap; gap:3px; margin-top:6px;';
+            document.getElementById('uniChannelSection').appendChild(summary);
+        }
+        const saved = JSON.parse(localStorage.getItem('uni_channels') || '[]');
+        if (saved.length === 0) {
+            summary.innerHTML = '<div style="font-size:11px; color:#aaa;">尚未選擇通路</div>';
+        } else {
+            summary.innerHTML = saved.map(s => `<span style="font-size:10px; background:#e8f0fe; color:#1a73e8; padding:2px 6px; border-radius:4px;">${s}</span>`).join('');
+        }
+    }
+
     function initUniBrandGrid() {
         const cycleKey = getUniBrandCycleKey();
         const selected = JSON.parse(localStorage.getItem(cycleKey) || '[]');
@@ -2225,6 +2322,10 @@ document.getElementById('dateInput').value = today.getFullYear() + '-' + String(
         else if (cardId === 'c7') {
             document.getElementById('uniOptions').style.display = 'block';
             loadUniSettings();
+            // UP選不需要選通路
+            const uniSettings = JSON.parse(localStorage.getItem('uni_settings') || '{}');
+            const channelSection = document.getElementById('uniChannelSection');
+            if (channelSection) channelSection.style.display = uniSettings.isUp ? 'none' : 'block';
             // 國外警告
             const overseasWarning = document.getElementById('uniOverseasWarning');
             if (currentLocation !== 'TW') {
@@ -2404,6 +2505,10 @@ document.getElementById('dateInput').value = today.getFullYear() + '-' + String(
         const isUp = document.getElementById('checkUniUp').checked;
         saveUniSettings();
         updateRewardPreview();
+        
+        // UP選不需要選通路
+        const channelSection = document.getElementById('uniChannelSection');
+        if (channelSection) channelSection.style.display = isUp ? 'none' : 'block';
         
         // 顯示 UP 選建議
         const suggestion = document.getElementById('uniUpSuggestion');

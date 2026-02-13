@@ -4651,11 +4651,12 @@ function handleHappyExclusive(selected) {
         const txs = getCurrentCycleTransactions('c12');
         const quota = getJcbQuotaUsed();
         
-        let totalSpent = 0, totalReward = 0;
+        let totalSpent = 0, totalReward = 0, totalSpentForeign = 0;
         
         txs.forEach(tx => {
             const amount = tx.amountTWD || tx.amount || 0;
             totalSpent += amount;
+            if (tx.location && tx.location !== 'TW' && tx.amount) totalSpentForeign += tx.amount;
             
             // 基礎回饋
             const baseRate = tx.isSinopacJcbForeign ? 0.02 : 0.01;

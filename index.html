@@ -1046,8 +1046,8 @@
                     <div class="option-row"><label for="rbRichartPay">📱 台新Pay/Pay+ (3.8%)</label><input type="radio" name="richartMode" id="rbRichartPay" value="pay" onchange="toggleRichartLogic()"></div>
                     <div class="option-row"><label for="rbRichartOnline">🛍️ 指定網購/影音 (3.3%)</label><input type="radio" name="richartMode" id="rbRichartOnline" value="online" onchange="toggleRichartLogic()"></div>
                     <div class="option-row"><label for="rbRichartLine">🟢 LINE Pay (2.3%)</label><input type="radio" name="richartMode" id="rbRichartLine" value="line" onchange="toggleRichartLogic()"></div>
-                    <div class="option-row" style="border-top:1px dashed #ddd; margin-top:6px; padding-top:6px;"><label for="rbRichartOverseas">✈️ 海外消費 (3.3%)</label><input type="radio" name="richartMode" id="rbRichartOverseas" value="overseas" onchange="toggleRichartLogic()"></div>
-                    <div style="font-size:10px; color:#555; margin-top:8px; opacity:0.8;">
+                   <div class="option-row" style="border-top:1px dashed #ddd; margin-top:6px; padding-top:6px;"><label for="rbRichartOverseas">✈️ 海外消費 (3.3%)</label><input type="radio" name="richartMode" id="rbRichartOverseas" value="overseas" onchange="toggleRichartLogic()"></div>
+                    <div class="option-row" id="rbRichartJpPaypayRow" style="display:none;"><label for="rbRichartJpPaypay">🇯🇵 台新Pay+ 日本PayPay (3.8%+免1.5%手續費)</label><input type="radio" name="richartMode" id="rbRichartJpPaypay" value="jpPaypay" onchange="toggleRichartLogic()"></div>
                         💡 小撇步：若網購使用台新Pay，請勾選「台新Pay (3.8%)」
                     </div>
                 </div>
@@ -2390,6 +2390,15 @@ document.getElementById('dateInput').value = today.getFullYear() + '-' + String(
         // C11 Richart卡
         else if (cardId === 'c11') {
             document.getElementById('richartOptions').style.display = 'block';
+            const jpRow = document.getElementById('rbRichartJpPaypayRow');
+            if (currentLocation === 'JP') {
+                jpRow.style.display = '';
+                document.getElementById('rbRichartJpPaypay').checked = true;
+            } else {
+                jpRow.style.display = 'none';
+                if (document.getElementById('rbRichartJpPaypay').checked) document.getElementById('rbRichartGeneral').checked = true;
+            }
+            toggleRichartLogic();
         }
        // J1 富邦J卡
         else if (cardId === 'j1') {
@@ -4104,7 +4113,8 @@ function handleHappyExclusive(selected) {
             else if (mode === 'pay') rate = 0.038;
             else if (mode === 'online') rate = 0.033;
             else if (mode === 'line') rate = 0.023;
-            else if (mode === 'overseas') rate = 0.033;
+           else if (mode === 'overseas') rate = 0.033;
+            else if (mode === 'jpPaypay') rate = 0.053;
             reward = Math.floor(amount * rate);
         }
        // J1 富邦J卡 (含封頂判斷)
@@ -4886,7 +4896,14 @@ function getCardDisplayName(card) {
             case 'c4': return '5%';
             case 'c2': return '6%';
             case 'c8': return '10%';
-            case 'c11': return '3.8%';
+            case 'c11': {
+                const rm = document.querySelector('input[name="richartMode"]:checked')?.value;
+                if (rm === 'jpPaypay') return '5.3%';
+                if (rm === 'pay') return '3.8%';
+                if (rm === 'online' || rm === 'overseas') return '3.3%';
+                if (rm === 'line') return '2.3%';
+                return '0.3%';
+            }
             case 'j1': return '10%';
             case 'j2': return '5%';
             case 'j3': return '8.5%';

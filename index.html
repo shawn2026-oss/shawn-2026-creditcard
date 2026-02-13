@@ -3411,8 +3411,9 @@ function handleHappyExclusive(selected) {
         document.getElementById('liveRewardCalc').style.display = 'none';
         document.getElementById('twdConversionDisplay').style.display = 'none';
         
-        if (closeAfter) {
-            document.getElementById('transactionModal').style.display = 'none';
+       if (closeAfter) {
+            // 留在 modal，清空輸入但不關閉，讓用戶看到紀錄更新
+            document.getElementById('amountInput').focus();
         } else {
             document.getElementById('amountInput').focus();
         }

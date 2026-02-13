@@ -4230,13 +4230,16 @@ function handleHappyExclusive(selected) {
         
         if (cardId === 'j1') return calculateFubonJStats();
         if (cardId === 'c12') return calculateJcbStats();
+        if (cardId === 'j3') return calculateKumamonStats();
         
         const txs = getCurrentCycleTransactions(cardId);
         let totalSpent = 0, totalReward = 0;
         
+       let totalSpentForeign = 0;
        txs.forEach(tx => {
             const amount = tx.amountTWD || tx.amount || 0;
             totalSpent += amount;
+            if (tx.location && tx.location !== 'TW' && tx.amount) totalSpentForeign += tx.amount;
         });
         
         const jiangMinSpend = 3000;
@@ -4397,7 +4400,7 @@ function handleHappyExclusive(selected) {
             const mainLimit = isOverseas ? overseasLimit : groupLimit;
             progress = Math.min(100, (mainSpent / mainLimit) * 100);
             
-            return { spent: totalSpent, reward: totalReward, progress, msg };
+            return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
         }
 
         // 全域國外模式強制倒數 (針對有海外上限的卡片)
@@ -4409,7 +4412,7 @@ function handleHappyExclusive(selected) {
                  const remain = Math.max(0, overseasLimit - overseasSpent);
                  msg = (overseasSpent >= overseasLimit) ? '海外加碼已封頂' : `海外可再刷 ${formatAmountWithCurrency(remain)}`;
                  progress = Math.min(100, (overseasSpent / overseasLimit) * 100);
-                 return { spent: totalSpent, reward: totalReward, progress, msg };
+                 return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
              }
              // 幣倍卡 (j4) - 海外上限依等級
              if (cardId === 'j4') {
@@ -4419,7 +4422,7 @@ function handleHappyExclusive(selected) {
                  const remain = Math.max(0, currencyLimit - qualSpent);
                  msg = (qualSpent >= currencyLimit) ? '海外加碼已封頂' : `海外可再刷 ${formatAmountWithCurrency(remain)}`;
                  progress = Math.min(100, (qualSpent / currencyLimit) * 100);
-                 return { spent: totalSpent, reward: totalReward, progress, msg };
+                 return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
              }
         }
         // 特殊處理：樂家卡顯示各類別封頂狀態
@@ -4458,7 +4461,7 @@ function handleHappyExclusive(selected) {
             msg = statusParts.join('/');
             progress = Math.min(100, (totalSpent / 26000) * 100);
             
-            return { spent: totalSpent, reward: totalReward, progress, msg };
+            return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
         }
 
         // 特殊處理：旅人卡顯示累積哩程
@@ -4478,7 +4481,7 @@ function handleHappyExclusive(selected) {
             msg = `目前累積 ${currentBalance.toLocaleString()} 哩`;
             progress = 50; // 固定進度
             
-            return { spent: totalSpent, reward: totalReward, progress, msg };
+            return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
         }
 
         // 優先級 1: 低消任務 (Min Spend Task)
@@ -4536,7 +4539,61 @@ function handleHappyExclusive(selected) {
             progress = 50;
         }
         
-        return { spent: totalSpent, reward: totalReward, progress, msg };
+        return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
+    }
+
+    function calculateKumamonStats() {
+        const txs = getCurrentCycleTransactions('j3');
+        let totalSpent = 0, totalReward = 0, totalSpentForeign = 0;
+        let designatedCumulative = 0, paypayCumulative = 0;
+        
+        const designatedLimit = 8333;
+        const paypayLimit = 2857;
+        
+        txs.forEach(tx => {
+            const amount = tx.amountTWD || tx.amount || 0;
+            totalSpent += amount;
+            if (tx.location && tx.location !== 'TW' && tx.amount) totalSpentForeign += tx.amount;
+            
+            if (tx.isKumamonPayPay) {
+                if (paypayCumulative < paypayLimit) {
+                    const available = Math.min(amount, paypayLimit - paypayCumulative);
+                    totalReward += Math.floor(available * 0.05);
+                }
+                paypayCumulative += amount;
+            } else if (tx.isKumamonJapan) {
+                let txReward = Math.floor(amount * 0.025);
+                if (tx.isKumamonDesignated) {
+                    if (designatedCumulative < designatedLimit) {
+                        const available = Math.min(amount, designatedLimit - designatedCumulative);
+                        txReward += Math.floor(available * 0.06);
+                    }
+                    designatedCumulative += amount;
+                }
+                totalReward += txReward;
+            } else {
+                totalReward += Math.floor(amount * 0.005);
+            }
+        });
+        
+        let parts = [];
+        if (currentLocation === 'JP') {
+            if (designatedCumulative >= designatedLimit) parts.push('指定⚡');
+            else parts.push(`指定${formatAmountWithCurrency(designatedLimit - designatedCumulative)}`);
+            
+            if (paypayCumulative >= paypayLimit) parts.push('PP⚡');
+            else parts.push(`PP${formatAmountWithCurrency(paypayLimit - paypayCumulative)}`);
+       } else {
+            if (totalSpent > 0) parts.push(`國內 0.5%`);
+            else parts.push(`可刷國內/日本`);
+        }
+        
+        const msg = parts.join('/');
+        const mainSpent = (currentLocation === 'JP') ? designatedCumulative : totalSpent;
+        const mainLimit = (currentLocation === 'JP') ? designatedLimit : 99999;
+        const progress = Math.min(100, (mainSpent / mainLimit) * 100);
+        
+        return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
     }
 
     function calculateFubonJStats() {
@@ -4545,9 +4602,11 @@ function handleHappyExclusive(selected) {
         
         let totalSpent = 0, totalReward = 0;
         
+       let totalSpentForeign = 0;
        txs.forEach(tx => {
         const amount = tx.amountTWD || tx.amount || 0;
         totalSpent += amount;
+        if (tx.location && tx.location !== 'TW' && tx.amount) totalSpentForeign += tx.amount;
         const isJpkr = tx.isFubonJJpkr || (tx.fubonJRegion === 'jpkr');
         const isTh = tx.isFubonJTh || (tx.fubonJRegion === 'th');
         const baseRate = isJpkr ? 0.03 : isTh ? 0.01 : 0.01;
@@ -4584,7 +4643,7 @@ function handleHappyExclusive(selected) {
             msg = `可再刷 ${formatAmountWithCurrency(quota.physicalRemain)}｜交通 ${formatAmountWithCurrency(quota.suicaRemain)}`;
         }
         
-        return { spent: totalSpent, reward: totalReward, progress, msg };
+        return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
     }
 
     // JCB 卡統計 (新增)
@@ -4616,7 +4675,7 @@ function handleHappyExclusive(selected) {
             msg = `加碼可再刷 ${formatAmountWithCurrency(quota.bonusRemain)}`;
         }
         
-        return { spent: totalSpent, reward: totalReward, progress, msg };
+        return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
     }
 
     function calculateStatsAllLocations(cardId) {
@@ -4749,7 +4808,12 @@ function getCardDisplayName(card) {
                 const rewardUnit = isMiles ? '哩' : '元';
                 
                 // 消費金額顯示
-                const spentDisplay = formatAmountWithCurrency(stats.spent);
+                let spentDisplay;
+                if (currentLocation !== 'TW' && stats.spentForeign > 0) {
+                    spentDisplay = `${stats.spentForeign.toLocaleString()} ${LOCATION_CONFIG[currentLocation].currency}`;
+                } else {
+                    spentDisplay = formatAmountWithCurrency(stats.spent);
+                }
                 
                let cycleHint = '';
 const settings = cardSettings[card.id] || {};

@@ -28,7 +28,7 @@
     <meta property="og:url" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/">
     <meta property="og:type" content="website">
 
-    <title>刷卡回饋管家 (V125.8 )</title>
+    <title>刷卡回饋管家 (V126.0 )</title>
         
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
@@ -579,7 +579,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V125.8 </div>
+            <div class="version-tag">V126.0 </div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -602,7 +602,7 @@
         <div class="subtitle"><span class="today-date" id="dateDisplay"></span></div>
         
         <div class="news-ticker">
-            <div class="ticker-content" id="news-text">🎉 V125.8修復：備份還原紀錄遺失、UniOpen 完整品牌清單、JCB 封頂計算！</div>
+            <div class="ticker-content" id="news-text">🎉 V126.0修復：備份還原紀錄遺失、UniOpen 完整品牌清單、JCB 封頂計算！</div>
         </div>
         
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
@@ -1351,7 +1351,7 @@
     
     <script>
     // ==========================================
-    // Part 3: 核心設定、匯率與 UI 邏輯 (V125.8)
+    // Part 3: 核心設定、匯率與 UI 邏輯 (V126.0)
     // ==========================================
     
     const LOCATION_CONFIG = {
@@ -2101,7 +2101,7 @@ let editingTxId = null; // 追蹤正在編輯的交易 ID
     }
       
     // ==========================================
-    // Part 4: 交易資料、Toggle 邏輯與運算核心 (V125.8)
+    // Part 4: 交易資料、Toggle 邏輯與運算核心 (V126.0)
     // ==========================================
 
     function getTransactionsKey(cardId) { return `transactions_${cardId}`; }
@@ -2147,7 +2147,7 @@ function getActualCycleDay(year, month, cycleDay) {
         
         return txs.filter(tx => {
             const txCycleKey = getCycleKey(cardId, tx.date);
-            return txCycleKey === currentCycleKey;125.8
+            return txCycleKey === currentCycleKey;126.0
         });
     }
 
@@ -4143,7 +4143,7 @@ function handleHappyExclusive(selected) {
                 if ((totalCycleSpent + amount) < minSpend) {
                     return { reward: Math.floor(amount * 0.005), rate: 0.005 };
                 }
-                const selectedSpent = getCardBonusSpent(cardId, t => t.isJiangSelected);
+                const selectedSpent = getCardBonusSpent(cardId, t => t.isJiangSelected && (!editingTxId || t.id !== editingTxId));
                 if (selectedSpent >= selectedLimit) {
                     return { reward: Math.floor(amount * 0.005), rate: 0.005 };
                 }
@@ -4157,7 +4157,7 @@ function handleHappyExclusive(selected) {
                 if ((totalCycleSpent + amount) < minSpend) {
                     return { reward: Math.floor(amount * 0.005), rate: 0.005 };
                 }
-                const travelSpent = getCardBonusSpent(cardId, t => t.isJiangTravel);
+                const travelSpent = getCardBonusSpent(cardId, t => t.isJiangTravel && (!editingTxId || t.id !== editingTxId));
                 if (travelSpent >= travelLimit) {
                     return { reward: Math.floor(amount * 0.005), rate: 0.005 };
                 }
@@ -4213,7 +4213,7 @@ function handleHappyExclusive(selected) {
                 if (bonusSpent < limit) {
                     const available = Math.min(amount, limit - bonusSpent);
                     const totalReward = baseReward + Math.floor(available * 0.088);
-                    return { reward: totalReward, rate: (amount > 0) ? (totalReward / amount) : 0.10 };
+            return { reward: totalReward, rate: (available >= amount) ? 0.10 : (amount > 0 ? (totalReward / amount) : 0.10) };
                 }
             }
             return { reward: baseReward, rate: 0.012 };
@@ -4971,7 +4971,7 @@ if (cycleDay && cycleDay > 0) {
     // 匯出資料 (修復：確保 cardId 欄位存在)
     function exportData() {
         const data = {
-            version: 'V125.8',
+            version: 'V126.0',
             exportTime: new Date().toISOString(),
             visibleCards: visibleCards,
             cardOrder: savedOrder,

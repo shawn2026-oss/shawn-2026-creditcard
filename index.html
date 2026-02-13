@@ -2248,6 +2248,23 @@ function getActualCycleDay(year, month, cycleDay) {
         });
     }
 
+   function getUniOpenDailyPromo() {
+        const now = new Date();
+        const day = now.getDay();
+        const date = now.getDate();
+        const dn = ['日','一','二','三','四','五','六'];
+        let p = [];
+        if (day===1) p.push('☕ 星巴克大杯以上買一送一(最多買二送二)');
+        if (day===2) { p.push('☕ 星巴克飲料+糕點組合8折'); p.push('🍦 COLD STONE 酷樂思買一送一'); }
+        if (day===3) p.push('🏬 統一時代/DREAM PLAZA 刷899送$100券');
+        if (day===5) p.push('🍦 COLD STONE 中杯以上買一送一');
+        if (day===5||day===6||day===0) p.push('🍽️ 夢時代指定餐飲 OP 8%');
+        if (day===0) { p.push('💄 康是美滿$988贈OP120點'); p.push('🌿 聖德科斯滿$688贈$50券'); }
+        if (date===1) p.push('🛒 家樂福OPEN Day 刷$799→$1加購');
+        if (p.length===0) return '';
+        return `📅 <b>今日(週${dn[day]})品牌日</b><br>` + p.join('<br>') + '<hr style="margin:6px 0;border-color:#FFC107">';
+    }
+
    function openCardModal(cardId) {
         if (cardId === 'add1') { openManageModal(); return; }
         const card = cards.find(c => c.id === cardId);
@@ -2277,7 +2294,12 @@ document.getElementById('dateInput').value = today.getFullYear() + '-' + String(
         document.getElementById('uniUpSuggestion').style.display = 'none';
         
         const parkingInfo = document.getElementById('modalParkingInfo');
-        if (card.parking) { parkingInfo.innerHTML = card.parking; parkingInfo.style.display = 'block'; }
+      if (card.parking) {
+            let parkingHtml = card.parking;
+            if (card.id === 'c10') parkingHtml = getUniOpenDailyPromo() + parkingHtml;
+            parkingInfo.innerHTML = parkingHtml;
+            parkingInfo.style.display = 'block';
+        }
         else parkingInfo.style.display = 'none';
 
         // 顯示對應卡片的選項

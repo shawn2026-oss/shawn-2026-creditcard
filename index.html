@@ -470,9 +470,9 @@
         #safari-install-bubble {
             position: fixed; 
             bottom: calc(20px + env(safe-area-inset-bottom)); 
-            right: 50%;
-            left: 50%; 
-            transform: translateX(-50%); 
+            right: 16px;
+            left: auto; 
+            transform: none;
             z-index: 10000; animation: bounce 2s infinite;
             cursor: pointer;
             width: fit-content;
@@ -485,7 +485,7 @@
         .bubble-text { font-size: 13px; line-height: 1.4; display: block; pointer-events: none; font-weight: 600; } 
         .bubble-arrow {
             position: absolute; bottom: -8px; 
-            left: 50%; transform: translateX(-50%);
+          right: 24px; left: auto; transform: none;
             width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid #007AFF;
         }
         .bubble-close {

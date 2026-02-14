@@ -1628,22 +1628,34 @@
     }
 
     function openShareModal() {
-        const totalAmount = document.getElementById('totalRewardDisplay').innerText;
-        document.getElementById('shareCardMonth').innerText = `${new Date().getMonth() + 1} 月回饋戰績`;
-        document.getElementById('shareCardAmount').innerText = totalAmount;
+       document.getElementById('shareCardMonth').innerText = `${new Date().getMonth() + 1} 月回饋戰績`;
+        let shareCash = 0, shareMiles = 0;
         let cardRewards = [];
         cards.forEach(card => {
             if(card.type === 'placeholder') return;
             const stats = calculateStatsAllLocations(card.id);
-            if(stats.reward > 0) cardRewards.push({ name: card.name, reward: stats.reward });
+            if(stats.reward > 0) {
+                if (card.type === 'miles') shareMiles += stats.reward;
+                else shareCash += stats.reward;
+                cardRewards.push({ name: card.name, reward: stats.reward, isMiles: card.type === 'miles' });
+            }
         });
+       let shareHtml = '';
+        if (shareCash > 0 && shareMiles > 0) {
+            shareHtml = `$${shareCash.toLocaleString()}<div style="font-size:50%; opacity:0.8; margin-top:4px;">✈️ ${shareMiles.toLocaleString()} 哩</div>`;
+        } else if (shareMiles > 0) {
+            shareHtml = `${shareMiles.toLocaleString()} 哩`;
+        } else {
+            shareHtml = `$${shareCash.toLocaleString()}`;
+        }
+        document.getElementById('shareCardAmount').innerHTML = shareHtml;
         cardRewards.sort((a, b) => b.reward - a.reward);
         const listContainer = document.getElementById('shareCardList');
         listContainer.innerHTML = '';
         if(cardRewards.length === 0) listContainer.innerHTML = '<div style="text-align:center; opacity:0.6; padding:10px;">本月尚無回饋紀錄</div>';
         else {
             cardRewards.forEach(c => {
-                let unit = (c.name.includes('旅人')) ? '哩' : '元';
+               let unit = c.isMiles ? '哩' : '元';
                 listContainer.innerHTML += `<div class="share-item"><span>${c.name}</span><span>+${c.reward.toLocaleString()} ${unit}</span></div>`;
             });
         }
@@ -5106,13 +5118,22 @@ if (cycleDay && cycleDay > 0) {
     }
 
     function updateTotalReward() {
-        let totalReward = 0;
+        let totalCash = 0, totalMiles = 0;
         cards.forEach(card => {
             if (card.type === 'placeholder') return;
             const stats = calculateStats(card.id);
-            totalReward += stats.reward;
+            if (card.type === 'miles') totalMiles += stats.reward;
+            else totalCash += stats.reward;
         });
-        document.getElementById('totalRewardDisplay').innerText = `$${totalReward.toLocaleString()}`;
+       let rewardHtml = '';
+        if (totalCash > 0 && totalMiles > 0) {
+            rewardHtml = `$${totalCash.toLocaleString()}<div style="font-size:60%; opacity:0.7; margin-top:2px;">✈️ ${totalMiles.toLocaleString()} 哩</div>`;
+        } else if (totalMiles > 0) {
+            rewardHtml = `${totalMiles.toLocaleString()} 哩`;
+        } else {
+            rewardHtml = `$${totalCash.toLocaleString()}`;
+        }
+        document.getElementById('totalRewardDisplay').innerHTML = rewardHtml;
         
         const breakdownEl = document.getElementById('totalRewardBreakdown');
         if (breakdownEl) breakdownEl.style.display = 'none';

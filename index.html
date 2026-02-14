@@ -1272,7 +1272,14 @@
                 </div>
             </div>
             <div class="modal-history-section">
-                <div class="modal-history-title" id="modalHistoryTitle"><span>📅 本月消費紀錄</span><span style="font-weight:normal; font-size:10px; color:#aaa;">(點擊文字修改 / ✕ 刪除)</span></div>
+               <div class="modal-history-title" id="modalHistoryTitle">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <span onclick="shiftHistoryMonth(-1)" style="cursor:pointer; font-size:16px; padding:2px 6px;">◀</span>
+                        <span id="historyMonthLabel">📅 本期消費紀錄</span>
+                        <span id="historyNextBtn" onclick="shiftHistoryMonth(1)" style="cursor:pointer; font-size:16px; padding:2px 6px; visibility:hidden;">▶</span>
+                    </div>
+                    <span style="font-weight:normal; font-size:10px; color:#aaa;">(點擊修改 / ✕ 刪除)</span>
+                </div>
                 <div id="modalHistoryList" style="max-height:40vh; overflow-y:auto;"></div>
             </div>
         </div>
@@ -1703,6 +1710,7 @@
     fetch('config.json?t=' + Date.now()).then(response => response.json()).then(data => { if(data.news) document.getElementById('news-text').innerHTML = data.news; }).catch(error => {});
     let cardSettings = JSON.parse(localStorage.getItem('cardSettings')) || {};
 let editingTxId = null; // 追蹤正在編輯的交易 ID
+let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
 
     window.addEventListener('load', () => {
         injectDetails(); fetchExchangeRates();
@@ -2312,6 +2320,7 @@ document.getElementById('dateInput').value = today.getFullYear() + '-' + String(
         // 根據地點更新國外警告
         updateOverseasWarnings(cardId);
         
+        historyMonthOffset = 0;
         renderModalHistory(cardId);
         document.getElementById('transactionModal').style.display = 'flex';
         history.pushState({ modal: true }, '');
@@ -3485,10 +3494,41 @@ function handleHappyExclusive(selected) {
         localStorage.setItem('happy_used', JSON.stringify(used));
     }
 
+    function shiftHistoryMonth(dir) {
+        const newOffset = historyMonthOffset + dir;
+        if (newOffset > 0) return;
+        historyMonthOffset = newOffset;
+        const cardId = document.getElementById('cardIdInput').value;
+        renderModalHistory(cardId);
+    }
+
+    function getOffsetCycleTransactions(cardId, offset) {
+        const txs = getTransactions(cardId);
+        const settings = cardSettings[cardId] || {};
+        const cycleDay = parseInt(settings.cycleDay) || 0;
+        const target = new Date();
+        target.setMonth(target.getMonth() + offset);
+        const targetKey = getCycleKey(cardId, target);
+        return txs.filter(tx => getCycleKey(cardId, tx.date) === targetKey);
+    }
+
     function renderModalHistory(cardId) {
         const container = document.getElementById('modalHistoryList');
-        const txs = getCurrentCycleTransactions(cardId);
-        
+        const txs = (historyMonthOffset === 0) ? getCurrentCycleTransactions(cardId) : getOffsetCycleTransactions(cardId, historyMonthOffset);
+
+        // 更新標題
+        const label = document.getElementById('historyMonthLabel');
+        const nextBtn = document.getElementById('historyNextBtn');
+        if (historyMonthOffset === 0) {
+            label.innerText = '📅 本期消費紀錄';
+            nextBtn.style.visibility = 'hidden';
+        } else {
+            const d = new Date();
+            d.setMonth(d.getMonth() + historyMonthOffset);
+            label.innerText = `📅 ${d.getFullYear()}/${d.getMonth() + 1} 消費紀錄`;
+            nextBtn.style.visibility = 'visible';
+        }
+
         if (txs.length === 0) {
             container.innerHTML = '<div style="text-align:center; color:#aaa; padding:20px; font-size:12px;">本期尚無消費紀錄</div>';
             return;

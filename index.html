@@ -2112,7 +2112,7 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
                 note: cc.cap > 0 ? `${cc.rate}% (刷$${cc.cap.toLocaleString()}封頂)` : `${cc.rate}% (無上限)`,
                 type: cc.cap > 0 ? 'ceiling' : 'ceiling',
                 limit: cc.cap > 0 ? cc.cap : 99999999,
-                tier1Rate: cc.rate / 100,
+                tier1Rate: parseFloat((cc.rate / 100).toFixed(10)),
                 tier2Rate: 0,
                 gradient: cc.gradient,
                 textColor: cc.textColor || 'white',

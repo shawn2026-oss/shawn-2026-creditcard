@@ -28,7 +28,7 @@
     <meta property="og:url" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/">
     <meta property="og:type" content="website">
 
-    <title>刷卡回饋管家 (V126.0 )</title>
+    <title>刷卡回饋管家 (V126.1 )</title>
         
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
@@ -579,7 +579,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V126.0 </div>
+            <div class="version-tag">V126.1 </div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -602,7 +602,7 @@
         <div class="subtitle"><span class="today-date" id="dateDisplay"></span></div>
         
         <div class="news-ticker">
-            <div class="ticker-content" id="news-text">🎉 V126.0修復：備份還原紀錄遺失、UniOpen 完整品牌清單、JCB 封頂計算！</div>
+            <div class="ticker-content" id="news-text">🎉 V126.1修復：備份還原紀錄遺失、UniOpen 完整品牌清單、JCB 封頂計算！</div>
         </div>
         
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
@@ -1311,6 +1311,11 @@
             
             <div id="manageCardList" class="manage-grid"></div>
             
+            <div id="customCardSection" style="margin-top:12px; border-top:2px solid #f0f0f0; padding-top:12px;">
+                <div style="font-size:12px; color:#888; margin-bottom:8px;">自建卡片 (<span id="customCardCount">0</span>/2)</div>
+                <button id="btnAddCustomCard" class="btn" style="width:100%; background:#f0f8ff; color:#007AFF; border:1px dashed #007AFF; font-size:14px;" onclick="openCustomCardModal()">＋ 自建卡片</button>
+            </div>
+
             <button class="btn btn-confirm" style="width:100%; margin-top:10px;" onclick="document.getElementById('manageModal').style.display='none'">完成</button>
         </div>
     </div>
@@ -1343,6 +1348,63 @@
         </div>
     </div>
     
+   <!-- 自建卡片 Modal -->
+    <div id="customCardModal" class="modal" onclick="if(event.target===this) document.getElementById('customCardModal').style.display='none'">
+        <div class="modal-content">
+             <h2 id="customCardTitle" style="margin: 0 0 12px 0; font-size: 18px; font-weight: 800; color:#333;">自建卡片</h2>
+             
+             <div class="input-group">
+                 <label>💳 卡片名稱 (必填)</label>
+                 <input type="text" id="customCardName" placeholder="例如：國泰 CUBE 卡" maxlength="20">
+             </div>
+             
+             <div class="input-group">
+                 <label>🏷️ 暱稱 (選填)</label>
+                 <input type="text" id="customCardNickname" placeholder="例如：繳費專用" maxlength="10">
+             </div>
+
+             <div class="input-group">
+                 <label>📊 回饋率 % (必填)</label>
+                 <input type="number" id="customCardRate" placeholder="例如：3" step="0.1" min="0" max="100" style="font-size:16px;">
+             </div>
+
+             <div class="input-group">
+                 <label>🎁 回饋單位</label>
+                 <div style="display:flex; gap:10px; margin-top:4px;">
+                     <label style="font-size:14px; display:flex; align-items:center; gap:4px;"><input type="radio" name="customCardUnit" value="cash" checked style="width:18px; height:18px;"> 現金回饋</label>
+                     <label style="font-size:14px; display:flex; align-items:center; gap:4px;"><input type="radio" name="customCardUnit" value="miles" style="width:18px; height:18px;"> 哩程</label>
+                 </div>
+             </div>
+             
+             <div class="input-group">
+                 <label>🔒 每期封頂消費金額 (選填，空=無上限)</label>
+                 <input type="number" id="customCardCap" placeholder="例如：10000" style="font-size:16px;">
+             </div>
+
+             <div class="input-group">
+                 <label>📅 結帳日 (選填)</label>
+                 <select id="customCardCycleDay" style="width:100%; padding:10px; border:2px solid #f0f0f0; background:#fff; border-radius:12px; font-size:16px; outline:none; font-weight:600; color:#333;">
+                     <option value="">預設 (按自然月)</option>
+                 </select>
+             </div>
+
+             <div class="input-group">
+                 <label>🎨 卡面顏色</label>
+                 <div id="customColorPicker" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;"></div>
+             </div>
+             
+             <input type="hidden" id="customCardEditId" value="">
+
+           <div class="btn-group">
+                 <button class="btn btn-cancel" onclick="document.getElementById('customCardModal').style.display='none'">取消</button>
+                 <button class="btn btn-confirm" onclick="saveCustomCard()">儲存</button>
+             </div>
+             <div id="customCardDeleteArea" style="display:none; margin-top:10px; text-align:center;">
+                 <button onclick="deleteCustomCard(document.getElementById('customCardEditId').value)" style="background:none; border:none; color:#FF3B30; font-size:13px; cursor:pointer; padding:8px;">🗑️ 刪除此卡片</button>
+             </div>
+        </div>
+    </div>
+
    <!-- 編輯情境 Modal -->
     <div id="sceneEditModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10001; justify-content:center; align-items:center;">
         <div style="background:#fff; border-radius:16px; width:90%; max-width:400px; max-height:85vh; overflow-y:auto; padding:20px;">
@@ -1382,7 +1444,7 @@
     
     <script>
     // ==========================================
-    // Part 3: 核心設定、匯率與 UI 邏輯 (V126.0)
+    // Part 3: 核心設定、匯率與 UI 邏輯 (V126.1)
     // ==========================================
     
     const LOCATION_CONFIG = {
@@ -1987,7 +2049,8 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
         visibleCards = getScenes()[index].cards; localStorage.setItem('visibleCards', JSON.stringify(visibleCards)); renderGrid(); openManageModal();
     }
     function clearVisibleCards() { if(confirm('清空所有卡片？')) { visibleCards = ['add1']; localStorage.setItem('visibleCards', JSON.stringify(visibleCards)); renderGrid(); openManageModal(); } }
-    function loadAndRenderApp() {
+   function loadAndRenderApp() {
+        loadCustomCards();
         let currentCards = JSON.parse(localStorage.getItem('visibleCards')) || [];
         const realCardIds = cards.map(c => c.id).filter(id => id !== 'add1');
         let realCards = currentCards.filter(id => realCardIds.includes(id));
@@ -2001,7 +2064,8 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
         document.getElementById('transactionModal').style.display = 'none'; 
         document.getElementById('manageModal').style.display = 'none'; 
         document.getElementById('sharePreviewModal').style.display = 'none'; 
-        document.getElementById('cardSettingsModal').style.display = 'none'; 
+       document.getElementById('cardSettingsModal').style.display = 'none';
+        document.getElementById('customCardModal').style.display = 'none';
         
         // ★ 重置編輯狀態
         editingTxId = null;
@@ -2032,7 +2096,181 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
         { id: 'c12', name: '永豐現金回饋 JCB', nickname: '旅日神卡', note: '國內特選/日本 +3% (月$1萬共用)', type: 'custom_jcb', limit: 10000, tier1Rate: 0.05, tier2Rate: 0.01, gradient: 'linear-gradient(135deg, #8E0E00 0%, #1F1C18 100%)', textColor: 'white', msgDanger: '特選已封頂 (變1%)', parking: `🇯🇵 <b>日本消費</b><br>最高 5% (國外2% + 加碼3%)<br>🛍️ <b>特選通路</b><br>最高 5% (國外2% + 加碼3%) 或 4% (國內1% + 加碼3%)<br>⚠️ 日本+特選共用加碼上限 $300/月 (約刷 $10,000)<br>🔥 <b>日韓泰滿額</b> (需登錄)<br>每季累積滿 2 萬送 $1,000 (共用上限)`},
         { id: 'add1', name: '新增卡片', nickname: '點擊選卡', note: '前往資料庫挑選', type: 'placeholder', gradient: 'linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%)', textColor: '#999', msgDanger: '' }
     ];
-    let visibleCards = JSON.parse(localStorage.getItem('visibleCards')), savedOrder = JSON.parse(localStorage.getItem('cardOrder')), cards = [...defaultCards], sortableInstance = null;
+  let visibleCards = JSON.parse(localStorage.getItem('visibleCards')), savedOrder = JSON.parse(localStorage.getItem('cardOrder')), cards = [...defaultCards], sortableInstance = null;
+    
+    // 載入自建卡片
+    function loadCustomCards() {
+        const customs = JSON.parse(localStorage.getItem('custom_cards') || '[]');
+        // 移除舊的自建卡（保留 defaultCards + add1）
+        cards = [...defaultCards];
+        customs.forEach(cc => {
+            const cardObj = {
+                id: cc.id,
+                name: cc.name,
+                nickname: cc.nickname || '',
+                note: cc.cap > 0 ? `${cc.rate}% (刷$${cc.cap.toLocaleString()}封頂)` : `${cc.rate}% (無上限)`,
+                type: cc.cap > 0 ? 'ceiling' : 'ceiling',
+                limit: cc.cap > 0 ? cc.cap : 99999999,
+                tier1Rate: cc.rate / 100,
+                tier2Rate: 0,
+                gradient: cc.gradient,
+                textColor: cc.textColor || 'white',
+                msgDanger: cc.cap > 0 ? '已封頂' : '',
+                parking: '',
+                isCustom: true,
+                isMiles: cc.unit === 'miles'
+            };
+            if (cc.unit === 'miles') cardObj.type = 'miles';
+          // 暱稱同步到 cardSettings
+            if (cc.nickname) {
+                if (!cardSettings[cc.id]) cardSettings[cc.id] = {};
+                cardSettings[cc.id].nickname = cc.nickname;
+            }
+            // 插入到 add1 之前
+            const addIdx = cards.findIndex(c => c.id === 'add1');
+            cards.splice(addIdx, 0, cardObj);
+        });
+    }
+    loadCustomCards();
+
+    const customColorPresets = [
+        { name: '深藍', gradient: 'linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%)', textColor: 'white' },
+        { name: '墨黑', gradient: 'linear-gradient(135deg, #232526 0%, #414345 100%)', textColor: 'white' },
+        { name: '酒紅', gradient: 'linear-gradient(135deg, #870000 0%, #190A05 100%)', textColor: 'white' },
+        { name: '森綠', gradient: 'linear-gradient(135deg, #134E5E 0%, #71B280 100%)', textColor: 'white' },
+        { name: '紫羅蘭', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', textColor: 'white' },
+        { name: '玫瑰金', gradient: 'linear-gradient(135deg, #f5af19 0%, #f12711 100%)', textColor: 'white' },
+        { name: '銀灰', gradient: 'linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%)', textColor: 'white' },
+        { name: '淺粉', gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)', textColor: '#333' }
+    ];
+    let selectedCustomColor = 0;
+
+    function openCustomCardModal(editId) {
+        const modal = document.getElementById('customCardModal');
+        const title = document.getElementById('customCardTitle');
+        document.getElementById('customCardEditId').value = editId || '';
+
+        // 渲染顏色選擇器
+        const picker = document.getElementById('customColorPicker');
+        picker.innerHTML = '';
+        customColorPresets.forEach((c, i) => {
+            const dot = document.createElement('div');
+            dot.style.cssText = `width:36px; height:36px; border-radius:10px; cursor:pointer; border:3px solid ${i === selectedCustomColor ? '#007AFF' : 'transparent'}; background:${c.gradient};`;
+            dot.onclick = () => { selectedCustomColor = i; document.querySelectorAll('#customColorPicker > div').forEach((d,j) => d.style.borderColor = j===i ? '#007AFF' : 'transparent'); };
+            picker.appendChild(dot);
+        });
+
+        // 結帳日選項
+        const sel = document.getElementById('customCardCycleDay');
+        if (sel.options.length <= 1) {
+            for (let i = 1; i <= 31; i++) sel.add(new Option(`每月 ${i} 號`, i));
+        }
+
+        if (editId) {
+            title.innerText = '編輯自建卡片';
+            const customs = JSON.parse(localStorage.getItem('custom_cards') || '[]');
+            const cc = customs.find(c => c.id === editId);
+            if (cc) {
+                document.getElementById('customCardName').value = cc.name;
+                document.getElementById('customCardNickname').value = cc.nickname || '';
+                document.getElementById('customCardRate').value = cc.rate;
+                document.querySelector(`input[name="customCardUnit"][value="${cc.unit}"]`).checked = true;
+                document.getElementById('customCardCap').value = cc.cap > 0 ? cc.cap : '';
+                document.getElementById('customCardCycleDay').value = cc.cycleDay || '';
+                const ci = customColorPresets.findIndex(p => p.gradient === cc.gradient);
+                selectedCustomColor = ci >= 0 ? ci : 0;
+                // 重新渲染顏色選中狀態
+                picker.innerHTML = '';
+                customColorPresets.forEach((c, i) => {
+                    const dot = document.createElement('div');
+                    dot.style.cssText = `width:36px; height:36px; border-radius:10px; cursor:pointer; border:3px solid ${i === selectedCustomColor ? '#007AFF' : 'transparent'}; background:${c.gradient};`;
+                    dot.onclick = () => { selectedCustomColor = i; document.querySelectorAll('#customColorPicker > div').forEach((d,j) => d.style.borderColor = j===i ? '#007AFF' : 'transparent'); };
+                    picker.appendChild(dot);
+                });
+            }
+        } else {
+            title.innerText = '自建卡片';
+           document.getElementById('customCardName').value = '';
+            document.getElementById('customCardNickname').value = '';
+            document.getElementById('customCardRate').value = '';
+            document.querySelector('input[name="customCardUnit"][value="cash"]').checked = true;
+            document.getElementById('customCardCap').value = '';
+            document.getElementById('customCardCycleDay').value = '';
+            selectedCustomColor = 0;
+        }
+
+      document.getElementById('customCardDeleteArea').style.display = editId ? 'block' : 'none';
+        modal.style.display = 'flex';
+        history.pushState({ modal: true }, '');
+    }
+
+    function saveCustomCard() {
+        const name = document.getElementById('customCardName').value.trim();
+        const rate = parseFloat(document.getElementById('customCardRate').value);
+        if (!name) { alert('請輸入卡片名稱'); return; }
+        if (isNaN(rate) || rate <= 0) { alert('請輸入有效的回饋率'); return; }
+
+       const nickname = document.getElementById('customCardNickname').value.trim();
+        const unit = document.querySelector('input[name="customCardUnit"]:checked').value;
+        const cap = parseInt(document.getElementById('customCardCap').value) || 0;
+        const cycleDay = document.getElementById('customCardCycleDay').value;
+        const color = customColorPresets[selectedCustomColor];
+        const editId = document.getElementById('customCardEditId').value;
+
+        let customs = JSON.parse(localStorage.getItem('custom_cards') || '[]');
+
+        if (editId) {
+            const idx = customs.findIndex(c => c.id === editId);
+            if (idx >= 0) {
+                customs[idx] = { ...customs[idx], name, nickname, rate, unit, cap, cycleDay, gradient: color.gradient, textColor: color.textColor };
+            }
+        } else {
+            if (customs.length >= 2) { alert('自建卡片最多 2 張'); return; }
+            const newId = 'custom_' + Date.now();
+           customs.push({ id: newId, name, nickname, rate, unit, cap, cycleDay, gradient: color.gradient, textColor: color.textColor });
+        }
+
+        localStorage.setItem('custom_cards', JSON.stringify(customs));
+        loadCustomCards();
+
+        // 新建時自動加入首頁
+        if (!editId) {
+            const newCard = customs[customs.length - 1];
+            let realCards = visibleCards.filter(id => id !== 'add1');
+            if (realCards.length < 8) {
+                realCards.push(newCard.id);
+                visibleCards = realCards.length < 8 ? [...realCards, 'add1'] : realCards;
+                localStorage.setItem('visibleCards', JSON.stringify(visibleCards));
+            }
+        }
+
+        // 自建卡結帳日存入 cardSettings
+        if (editId || customs.length > 0) {
+            const targetId = editId || customs[customs.length - 1].id;
+            if (!cardSettings[targetId]) cardSettings[targetId] = {};
+            cardSettings[targetId].cycleDay = cycleDay;
+            localStorage.setItem('cardSettings', JSON.stringify(cardSettings));
+        }
+
+        document.getElementById('customCardModal').style.display = 'none';
+        renderManageList();
+        renderGrid();
+    }
+
+    function deleteCustomCard(cardId) {
+        if (!confirm('確定刪除這張自建卡片？（消費紀錄會保留）')) return;
+        let customs = JSON.parse(localStorage.getItem('custom_cards') || '[]');
+        customs = customs.filter(c => c.id !== cardId);
+        localStorage.setItem('custom_cards', JSON.stringify(customs));
+
+        // 從首頁移除
+        visibleCards = visibleCards.filter(id => id !== cardId);
+        localStorage.setItem('visibleCards', JSON.stringify(visibleCards));
+
+        loadCustomCards();
+        renderManageList();
+        renderGrid();
+    }
     function getSortedCards() {
         if (!visibleCards) return [];
         let displayCards = cards.filter(c => visibleCards.includes(c.id));
@@ -2211,7 +2449,7 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
     }
       
     // ==========================================
-    // Part 4: 交易資料、Toggle 邏輯與運算核心 (V126.0)
+    // Part 4: 交易資料、Toggle 邏輯與運算核心 (V126.1)
     // ==========================================
 
     function getTransactionsKey(cardId) { return `transactions_${cardId}`; }
@@ -2257,7 +2495,7 @@ function getActualCycleDay(year, month, cycleDay) {
         
         return txs.filter(tx => {
             const txCycleKey = getCycleKey(cardId, tx.date);
-            return txCycleKey === currentCycleKey;126.0
+            return txCycleKey === currentCycleKey;126.1
         });
     }
 
@@ -4190,6 +4428,12 @@ function handleHappyExclusive(selected) {
             reward = Math.floor(amount * rate);
             return { reward, rate };
         }
+        // 自建卡片
+        else if (cardId.startsWith('custom_')) {
+            rate = card.tier1Rate || 0;
+            reward = Math.floor(amount * rate);
+            return { reward, rate };
+        }
        // J1 富邦J卡 (含封頂判斷)
         else if (cardId === 'j1') {
             const isJpkr = options.isJpkr || options.region === 'jpkr' || false;
@@ -5008,7 +5252,11 @@ function getCardDisplayName(card) {
             case 'j5': return '7.3%';
             case 'c12': return '5%';
             case 'dbs1': return '10%';
-            default: return '';
+          default:
+                if (card.isCustom) {
+                    return `${(card.tier1Rate * 100)}%`;
+                }
+                return '';
         }
     }
     function getCardDisplayNote(card) {
@@ -5126,7 +5374,7 @@ if (cycleDay && cycleDay > 0) {
                 }
                 
                tile.innerHTML = `
-                    <div class="tile-nickname-badge ${nickname ? '' : 'placeholder'}">${nickname || '點擊設定暱稱'}</div>
+                    <div class="tile-nickname-badge ${nickname ? '' : 'placeholder'}">${nickname || ''}</div>
                     <div class="tile-header">
                         <div class="tile-name">${getCardDisplayName(card)}</div>
                       ${getCardMaxRate(card) ? `<span class="rate-badge">${getCardMaxRate(card)}</span>` : ''}
@@ -5209,11 +5457,13 @@ if (cycleDay && cycleDay > 0) {
             btn.className = 'manage-card-btn' + (isActive ? ' active' : '');
             btn.setAttribute('data-card-id', card.id);
             
+            const settingHtml = `<div class="m-setting-btn" onclick="event.stopPropagation(); ${card.isCustom ? `openCustomCardModal('${card.id}')` : `openCardSetting('${card.id}')`}">⚙️</div>`;
+            
             btn.innerHTML = `
                 <div class="m-check-mark">✓</div>
-                <div class="m-card-name">${card.name}</div>
+                <div class="m-card-name">${card.isCustom ? '⭐ ' : ''}${card.name}</div>
                 <div class="m-card-nick">${nickname || card.nickname || ''}</div>
-                <div class="m-setting-btn" onclick="event.stopPropagation(); openCardSetting('${card.id}')">⚙️</div>
+                ${settingHtml}
             `;
             
             btn.onclick = (e) => {
@@ -5223,6 +5473,13 @@ if (cycleDay && cycleDay > 0) {
             
             container.appendChild(btn);
         });
+
+        // 更新自建卡數量
+        const customs = JSON.parse(localStorage.getItem('custom_cards') || '[]');
+        const countEl = document.getElementById('customCardCount');
+        if (countEl) countEl.innerText = customs.length;
+        const addBtn = document.getElementById('btnAddCustomCard');
+        if (addBtn) addBtn.style.display = customs.length >= 2 ? 'none' : '';
     }
 
     function toggleCardVisibility(cardId) {
@@ -5307,7 +5564,7 @@ if (cycleDay && cycleDay > 0) {
     // 匯出資料 (修復：確保 cardId 欄位存在)
     function exportData() {
         const data = {
-            version: 'V126.0',
+            version: 'V126.1',
             exportTime: new Date().toISOString(),
             visibleCards: visibleCards,
             cardOrder: savedOrder,

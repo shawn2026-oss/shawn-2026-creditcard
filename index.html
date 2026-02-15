@@ -191,7 +191,7 @@
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.01); } 100% { transform: scale(1); } }
         
         #card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; flex: 1; align-content: start;}
-        .card-tile { border-radius: 16px; padding: 12px; aspect-ratio: 8.56 / 5.4; min-height: auto; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; transition: transform 0.1s; cursor: pointer; color: white; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: pan-y; }
+        .card-tile { border-radius: 16px; padding: 12px; aspect-ratio: 8.56 / 5.4; min-height: auto;display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; transition: transform 0.1s; cursor: pointer; color: white; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: pan-y; }
         .card-tile:active { transform: scale(0.97); }
         .sortable-ghost { opacity: 0.4; transform: scale(0.95); }
         .sortable-drag { cursor: grabbing; }
@@ -207,7 +207,7 @@
         .tile-body { z-index: 2; flex:1; display:flex; flex-direction:column; justify-content:center; }
         .tile-stat-group { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; margin-bottom: 2px; }
         .tile-stat-main { font-size: 17px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; }
-        .tile-stat-sub { font-size: 11px; color: rgba(255,255,255,0.8); font-weight: 600; margin-top: 1px; letter-spacing: 0.2px; }
+        .tile-stat-sub { font-size: 9px; color: rgba(255,255,255,0.8); font-weight: 600; margin-top: 0; letter-spacing: 0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
         
         .tile-stat { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 2px;}
         
@@ -218,7 +218,7 @@
         .progress-track { background: rgba(0,0,0,0.2); height: 4px; border-radius: 2px; overflow: hidden; margin-bottom: 4px; }
         .progress-fill { height: 100%; background: rgba(255,255,255,0.95); transition: width 0.5s ease; }
         .tile-msg { font-size: 10px; font-weight: 700; opacity: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
-        .tile-cycle-hint { font-size: 9px; color: #fff; opacity: 0.95; margin-top: 3px; text-align: right; text-shadow: 0 1px 2px rgba(0,0,0,0.5); font-weight: 700; letter-spacing: 0.3px; }
+       .tile-cycle-hint { font-size: 9px; color: #fff; opacity: 0.95; text-shadow: 0 1px 2px rgba(0,0,0,0.5); font-weight: 700; letter-spacing: 0.3px; position: absolute; bottom: 26px; right: 12px;}
         .tile-cycle-hint.dark-text { color: rgba(0,0,0,0.6); text-shadow: none; }
         .tile-overseas-warning { font-size: 10px; color: #FFD700; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; margin-top: 4px; display: none; }
         

@@ -4935,6 +4935,25 @@ function handleHappyExclusive(selected) {
                  return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
              }
         }
+// 特殊處理：將將卡顯示生活/旅遊雙軌封頂狀態
+        if (cardId === 'c4') {
+            let selectedSpent = 0, travelSpent = 0;
+            txs.forEach(tx => {
+                const amount = tx.amountTWD || tx.amount || 0;
+                if (tx.isJiangSelected) selectedSpent += amount;
+                if (tx.isJiangTravel) travelSpent += amount;
+            });
+            const selectedLimit = 6666;
+            const travelLimit = 11111;
+            let parts = [];
+            if (selectedSpent >= selectedLimit) parts.push('生活⚡');
+            else parts.push(`生活$${(selectedLimit - selectedSpent).toLocaleString()}`);
+            if (travelSpent >= travelLimit) parts.push('旅遊⚡');
+            else parts.push(`旅遊$${(travelLimit - travelSpent).toLocaleString()}`);
+            msg = parts.join('/');
+            progress = Math.min(100, (totalSpent / 3000) * 100);
+            return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
+        }
         // 特殊處理：樂家卡顯示各類別封頂狀態
         if (cardId === 'c8') {
             const txs = getCurrentCycleTransactions('c8');
@@ -5018,20 +5037,25 @@ function handleHappyExclusive(selected) {
                  progress = (card.target && card.target > 0) ? Math.min(100, (totalSpent / card.target) * 100) : 0;
             }
             else if (card.type === 'custom_laidian') {
-                 // 賴點卡優先顯示偶數日額度
+                 // 賴點卡多軌倒數：偶數日 + LP + 新戶
                  const evenSpent = getCardBonusSpent(cardId, t => t.laiDianMode === 'even' && (t.amountTWD || t.amount) >= 100);
                  const evenLimit = 3000;
-                 if (evenSpent < evenLimit) {
-                     const remain = evenLimit - evenSpent;
-                     msg = `偶數日可再刷 ${formatAmountWithCurrency(remain)}`;
-                     progress = (evenSpent / evenLimit) * 100;
-                 } else {
-                     const lpSpent = getCardBonusSpent(cardId, t => t.laiDianMode === 'lp' && (t.amountTWD || t.amount) >= 100);
-                     const lpLimit = 20000;
-                     const remain = Math.max(0, lpLimit - lpSpent);
-                     msg = `LP可再刷 ${formatAmountWithCurrency(remain)}`;
-                     progress = (lpSpent / lpLimit) * 100;
+                 const lpSpent = getCardBonusSpent(cardId, t => (t.laiDianMode === 'lp' || t.laiDianMode === 'even') && (t.amountTWD || t.amount) >= 100);
+                 const lpLimit = 20000;
+                 const newSpent = getCardBonusSpent(cardId, t => (t.laiDianMode === 'lp' || t.laiDianMode === 'even') && t.isLaiDianNew && (t.amountTWD || t.amount) >= 100);
+                 const newLimit = 7500;
+                 let parts = [];
+                 if (evenSpent >= evenLimit) parts.push('偶數⚡');
+                 else parts.push(`偶數$${(evenLimit - evenSpent).toLocaleString()}`);
+                 if (lpSpent >= lpLimit) parts.push('LP⚡');
+                 else parts.push(`LP$${(lpLimit - lpSpent).toLocaleString()}`);
+                 const hasNewTx = getCardBonusSpent(cardId, t => t.isLaiDianNew) > 0;
+                 if (hasNewTx) {
+                     if (newSpent >= newLimit) parts.push('新戶⚡');
+                     else parts.push(`新戶$${(newLimit - newSpent).toLocaleString()}`);
                  }
+                 msg = parts.join('/');
+                 progress = (evenSpent / evenLimit) * 100;
             }
             else {
                 // 一般封頂計算

@@ -60,7 +60,7 @@ async function checkPromo() {
     // 精準匹配當月額滿公告
     // 格式：2026年2月【全通路不限金額消費享4%】活動贈點已於2026/2/10 12:00 pm額滿
     const pattern = new RegExp(
-      year + '年' + month + '月[^額]*額滿'
+      year + '年' + month + '月[\\s\\S]*?額滿'
     );
     
     const match = textContent.match(pattern);

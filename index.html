@@ -191,13 +191,13 @@
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.01); } 100% { transform: scale(1); } }
         
         #card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; flex: 1; align-content: start;}
-        .card-tile { border-radius: 16px; padding: 12px; min-height: 135px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; transition: transform 0.1s; cursor: pointer; color: white; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: pan-y; }
+        .card-tile { border-radius: 16px; padding: 12px; aspect-ratio: 8.56 / 5.4; min-height: auto; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; transition: transform 0.1s; cursor: pointer; color: white; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: pan-y; }
         .card-tile:active { transform: scale(0.97); }
         .sortable-ghost { opacity: 0.4; transform: scale(0.95); }
         .sortable-drag { cursor: grabbing; }
         
         .tile-header { display: flex; justify-content: space-between; align-items: flex-start; z-index: 2; margin-bottom: 2px;}
-        .tile-name { font-size: 15px; font-weight: 800; line-height: 1.2; text-shadow: 0 1px 2px rgba(0,0,0,0.15); }
+        .tile-name { font-size: 13px; font-weight: 800; line-height: 1.2; text-shadow: 0 1px 2px rgba(0,0,0,0.15); }
         .tile-nickname-badge { display: inline-block; font-size: 10px; font-weight: 800; background: rgba(0,0,0,0.2); color: #FFD700; padding: 2px 6px; border-radius: 4px; margin-bottom: 4px; z-index: 2; width: fit-content; }
         .tile-nickname-badge.placeholder { background: rgba(0,0,0,0.1); color: #aaa; }
         .tile-note { font-size: 10px; font-weight: 500; opacity: 0.9; margin-bottom: 4px; display: block; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2; letter-spacing: -0.2px; }
@@ -206,7 +206,7 @@
         
         .tile-body { z-index: 2; flex:1; display:flex; flex-direction:column; justify-content:center; }
         .tile-stat-group { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; margin-bottom: 2px; }
-        .tile-stat-main { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; }
+        .tile-stat-main { font-size: 17px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; }
         .tile-stat-sub { font-size: 11px; color: rgba(255,255,255,0.8); font-weight: 600; margin-top: 1px; letter-spacing: 0.2px; }
         
         .tile-stat { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 2px;}
@@ -214,10 +214,10 @@
         .tile-earned { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.95); display: flex; align-items: center; gap: 3px;}
         .tile-earned::before { content: '賺'; font-size: 9px; opacity: 0.8; border: 1px solid rgba(255,255,255,0.7); padding: 0 2px; border-radius: 3px;}
         
-        .tile-footer { z-index: 2; margin-top: 6px; position: relative; }
+        .tile-footer { z-index: 2; margin-top: 2px; position: relative; }
         .progress-track { background: rgba(0,0,0,0.2); height: 4px; border-radius: 2px; overflow: hidden; margin-bottom: 4px; }
         .progress-fill { height: 100%; background: rgba(255,255,255,0.95); transition: width 0.5s ease; }
-        .tile-msg { font-size: 11px; font-weight: 700; opacity: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+        .tile-msg { font-size: 10px; font-weight: 700; opacity: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
         .tile-cycle-hint { font-size: 9px; color: #fff; opacity: 0.95; margin-top: 3px; text-align: right; text-shadow: 0 1px 2px rgba(0,0,0,0.5); font-weight: 700; letter-spacing: 0.3px; }
         .tile-cycle-hint.dark-text { color: rgba(0,0,0,0.6); text-shadow: none; }
         .tile-overseas-warning { font-size: 10px; color: #FFD700; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; margin-top: 4px; display: none; }
@@ -5355,8 +5355,16 @@ function getCardDisplayName(card) {
         displayCards.forEach(card => {
             const tile = document.createElement('div');
             tile.className = 'card-tile';
-            tile.style.background = card.gradient;
-            tile.style.color = card.textColor;
+           var cardPhoto = localStorage.getItem('card_photo_' + card.id);
+            if (cardPhoto) {
+                tile.style.background = 'linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.45)), url(' + cardPhoto + ')';
+                tile.style.backgroundSize = 'cover, cover';
+                tile.style.backgroundPosition = tile.style.backgroundPosition = 'center';;
+                tile.style.color = 'white';
+            } else {
+                tile.style.background = card.gradient;
+                tile.style.color = card.textColor;
+            }
             tile.setAttribute('data-card-id', card.id);
             tile.onclick = () => openCardModal(card.id);
             
@@ -5577,9 +5585,87 @@ if (cycleDay && cycleDay > 0) {
         const cycleDay = cardSettings[cardId]?.cycleDay || '';
         document.getElementById('settingCycleDayInput').value = cycleDay;
         
+        // 動態插入卡面照片功能
+        let photoSection = document.getElementById('cardPhotoSection');
+        if (!photoSection) {
+            photoSection = document.createElement('div');
+            photoSection.id = 'cardPhotoSection';
+            photoSection.className = 'input-group';
+            photoSection.innerHTML = `
+                <label>🖼️ 卡面照片</label>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button class="btn" style="flex:1; background:#f0f8ff; color:#007AFF; border:1px dashed #007AFF; font-size:13px; padding:10px;" onclick="document.getElementById('cardPhotoFileInput').click()">📷 選擇照片</button>
+                    <button id="btnRemovePhoto" class="btn" style="background:#fff0f0; color:#FF3B30; border:1px solid #ffcdd2; font-size:13px; padding:10px; display:none;" onclick="removeCardPhoto()">移除</button>
+                </div>
+                <input type="file" id="cardPhotoFileInput" accept="image/*" style="display:none" onchange="handleCardPhoto(event)">
+                <div id="photoPreviewBox" style="margin-top:8px; display:none; width:100%; height:120px; border-radius:12px; overflow:hidden;">
+                    <img id="photoPreviewImg" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+               
+                <div style="font-size:11px; color:#888; margin-top:4px;">照片會裁切成卡片比例，覆蓋原本漸層背景。</div>
+            `;
+            const btnGroup = document.querySelector('#cardSettingsModal .btn-group');
+            btnGroup.parentNode.insertBefore(photoSection, btnGroup);
+        }
+        // 載入已存照片
+        const existingPhoto = localStorage.getItem('card_photo_' + cardId);
+        window._pendingCardPhoto = null;
+        document.getElementById('cardPhotoFileInput').value = '';
+        if (existingPhoto) {
+            document.getElementById('photoPreviewImg').src = existingPhoto;
+            document.getElementById('photoPreviewBox').style.display = 'block';
+            document.getElementById('btnRemovePhoto').style.display = 'inline-block';
+            
+        } else {
+            document.getElementById('photoPreviewBox').style.display = 'none';
+            document.getElementById('btnRemovePhoto').style.display = 'none';
+            
+        }
+        var savedAlign = localStorage.getItem('card_photo_align_' + cardId) || 'center';
+        
+        
+
         document.getElementById('cardSettingsModal').style.display = 'flex';
     }
+function handleCardPhoto(event) {
+        var file = event.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var img = new Image();
+            img.onload = function() {
+                var maxW = 400, maxH = 400;
+                var scale = Math.min(maxW / img.width, maxH / img.height, 1);
+                var canvas = document.createElement('canvas');
+                canvas.width = Math.round(img.width * scale);
+                canvas.height = Math.round(img.height * scale);
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                var dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                document.getElementById('photoPreviewImg').src = dataUrl;
+                document.getElementById('photoPreviewBox').style.display = 'block';
+                document.getElementById('btnRemovePhoto').style.display = 'inline-block';
+                window._pendingCardPhoto = dataUrl;
+                
+                
+                
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
 
+    function removeCardPhoto() {
+        var cardId = document.getElementById('settingCardId').value;
+        window._pendingCardPhoto = '__remove__';
+        
+        document.getElementById('photoPreviewBox').style.display = 'none';
+        document.getElementById('btnRemovePhoto').style.display = 'none';
+        
+        document.getElementById('cardPhotoFileInput').value = '';
+    }
+
+   
     function saveCardSetting() {
         const cardId = document.getElementById('settingCardId').value;
         const newNickname = document.getElementById('settingNicknameInput').value.trim();
@@ -5590,6 +5676,15 @@ if (cycleDay && cycleDay > 0) {
         cardSettings[cardId].nickname = newNickname;
         cardSettings[cardId].cycleDay = newCycleDay;
         
+      if (window._pendingCardPhoto === '__remove__') {
+            localStorage.removeItem('card_photo_' + cardId);
+            
+        } else if (window._pendingCardPhoto) {
+            localStorage.setItem('card_photo_' + cardId, window._pendingCardPhoto);
+        }
+        
+        window._pendingCardPhoto = null;
+       
         localStorage.setItem('cardSettings', JSON.stringify(cardSettings));
         
         document.getElementById('cardSettingsModal').style.display = 'none';

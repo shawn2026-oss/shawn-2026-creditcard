@@ -3740,8 +3740,11 @@ function handleHappyExclusive(selected) {
         document.getElementById('liveRewardCalc').style.display = 'none';
         document.getElementById('twdConversionDisplay').style.display = 'none';
         
-        if (closeAfter) {
-            document.getElementById('transactionModal').style.display = 'none';
+       if (closeAfter) {
+            // 停在記帳頁，捲到列表讓用戶確認
+            document.getElementById('amountInput').value = '';
+            document.getElementById('noteInput').value = '';
+            document.getElementById('modalHistoryList').scrollIntoView({ behavior: 'smooth' });
         } else {
             document.getElementById('amountInput').focus();
         }

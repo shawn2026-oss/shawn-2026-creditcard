@@ -1796,7 +1796,13 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
                 document.getElementById('exchangeRateInput').value = parseFloat(rateVal).toFixed(4);
             }
         }
-        
+        // 載入額滿公告
+    fetch('./promo_status.json?' + Date.now())
+      .then(r => r.json())
+      .then(status => {
+        window.promoStatus = status;
+      })
+      .catch(() => { window.promoStatus = {}; });
         if (!localStorage.getItem('user_setup_done')) {
             if (localStorage.getItem('visibleCards') !== null) { localStorage.setItem('user_setup_done', 'true'); loadAndRenderApp(); }
             else initWelcomeModal();
@@ -2516,7 +2522,30 @@ function getActualCycleDay(year, month, cycleDay) {
         if (p.length===0) return '';
         return `📅 <b>今日(週${dn[day]})品牌日</b><br>` + p.join('<br>') + '<hr style="margin:6px 0;border-color:#FFC107">';
     }
-
+function applyPromoStatus() {
+        if (!window.promoStatus) return;
+        const icashCb = document.getElementById('checkUniIcash');
+        if (!icashCb) return;
+        const icashRow = icashCb.closest('.option-row');
+        if (window.promoStatus.uniopen_icash_full) {
+            icashCb.checked = false;
+            icashCb.disabled = true;
+            if (icashRow) icashRow.style.opacity = '0.5';
+            let tag = document.getElementById('icashFullTag');
+            if (!tag) {
+                tag = document.createElement('span');
+                tag.id = 'icashFullTag';
+                tag.style.cssText = 'font-size:11px; color:#FF3B30; font-weight:700; margin-left:6px;';
+                icashRow.querySelector('label').appendChild(tag);
+            }
+            tag.innerText = '⚠️ 本月已額滿';
+        } else {
+            icashCb.disabled = false;
+            if (icashRow) icashRow.style.opacity = '1';
+            const tag = document.getElementById('icashFullTag');
+            if (tag) tag.remove();
+        }
+    }
    function openCardModal(cardId) {
         if (cardId === 'add1') { openManageModal(); return; }
         const card = cards.find(c => c.id === cardId);
@@ -2633,6 +2662,7 @@ document.getElementById('dateInput').value = today.getFullYear() + '-' + String(
         // C10 UniOpen卡
         else if (cardId === 'c10') {
             document.getElementById('uniOpenOptions').style.display = 'block';
+        applyPromoStatus();
             initUniBrandGrid();
             // 重置選項 (避免殘留)
             document.getElementById('checkUniGroup').checked = false;
@@ -4870,7 +4900,8 @@ function handleHappyExclusive(selected) {
                 if (groupSpent >= groupLimit) parts.push('集團⚡');
                 else parts.push(`集團$${(groupLimit - groupSpent).toLocaleString()}`);
                 
-                if (icashSpent >= icashLimit) parts.push('icp⚡');
+              if (window.promoStatus?.uniopen_icash_full) parts.push('icp已額滿');
+                else if (icashSpent >= icashLimit) parts.push('icp⚡');
                 else parts.push(`icp$${(icashLimit - icashSpent).toLocaleString()}`);
             }
             

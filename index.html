@@ -1263,7 +1263,7 @@
                 </div>
 
                 <div class="input-group" style="margin-top:10px;">
-                    <input type="number" id="amountInput" placeholder="$ 金額" inputmode="numeric" style="font-size:28px; text-align:center; border:none; border-bottom:2px solid #eee; border-radius:0;" oninput="updateRewardPreview()" onkeyup="updateRewardPreview()" onpaste="updateRewardPreview()">
+                    <input type="number" id="amountInput" placeholder="金額" inputmode="numeric" style="font-size:32px; text-align:center; border:2px solid #007AFF; border-radius:12px; background:#f0f8ff; padding:12px; font-weight:800;" oninput="updateRewardPreview()" onkeyup="updateRewardPreview()" onpaste="updateRewardPreview()">
                     <div id="twdConversionDisplay" style="text-align:center; font-size:14px; color:#666; margin-top:6px; display:none;">
                         ≈ TWD <span id="twdAmount">0</span>
                     </div>
@@ -1271,7 +1271,7 @@
                     <div id="liveRewardCalc"></div>
                 </div>
                 
-                <div class="input-group"><input type="text" id="noteInput" placeholder="備註 (例如: 午餐)"></div>
+               <div class="input-group"><input type="text" id="noteInput" placeholder="備註 (例如: 午餐)" style="font-size:14px; color:#666; border:1px solid #ddd;"></div>
                 <div class="btn-group">
                     <button class="btn btn-cancel" onclick="document.getElementById('transactionModal').style.display='none'">取消</button>
                     <button class="btn btn-again" onclick="addTransaction(false)">🔄 再記一筆</button>
@@ -1319,7 +1319,7 @@
             <div id="manageCardList" class="manage-grid"></div>
             
             <div id="customCardSection" style="margin-top:12px; border-top:2px solid #f0f0f0; padding-top:12px;">
-                <div style="font-size:12px; color:#888; margin-bottom:8px;">自建卡片 (<span id="customCardCount">0</span>/2)</div>
+                <div style="font-size:12px; color:#888; margin-bottom:8px;">自建卡片 (<span id="customCardCount">0</span>/5)</div>
                 <button id="btnAddCustomCard" class="btn" style="width:100%; background:#f0f8ff; color:#007AFF; border:1px dashed #007AFF; font-size:14px;" onclick="openCustomCardModal()">＋ 自建卡片</button>
             </div>
 
@@ -2238,7 +2238,7 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
                 customs[idx] = { ...customs[idx], name, nickname, rate, unit, cap, cycleDay, gradient: color.gradient, textColor: color.textColor };
             }
         } else {
-            if (customs.length >= 2) { alert('自建卡片最多 2 張'); return; }
+            if (customs.length >= 5) { alert('自建卡片最多 5 張'); return; }
             const newId = 'custom_' + Date.now();
            customs.push({ id: newId, name, nickname, rate, unit, cap, cycleDay, gradient: color.gradient, textColor: color.textColor });
         }
@@ -5572,7 +5572,7 @@ currentLocation = savedLocation;
         const countEl = document.getElementById('customCardCount');
         if (countEl) countEl.innerText = customs.length;
         const addBtn = document.getElementById('btnAddCustomCard');
-        if (addBtn) addBtn.style.display = customs.length >= 2 ? 'none' : '';
+       if (addBtn) addBtn.style.display = customs.length >= 5 ? 'none' : '';
     }
 
     function toggleCardVisibility(cardId) {

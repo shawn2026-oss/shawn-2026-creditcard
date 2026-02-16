@@ -28,7 +28,7 @@
     <meta property="og:url" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/">
     <meta property="og:type" content="website">
 
-    <title>刷卡回饋管家 (V126.1 )</title>
+    <title>刷卡回饋管家 (V126.2 )</title>
         
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
@@ -584,7 +584,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V126.1 </div>
+            <div class="version-tag">V126.2 </div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -607,7 +607,7 @@
         <div class="subtitle"><span class="today-date" id="dateDisplay"></span></div>
         
         <div class="news-ticker">
-            <div class="ticker-content" id="news-text">🎉 V126.1修復：備份還原紀錄遺失、UniOpen 完整品牌清單、JCB 封頂計算！</div>
+            <div class="ticker-content" id="news-text">🎉 V126.2修復：備份還原紀錄遺失、UniOpen 完整品牌清單、JCB 封頂計算！</div>
         </div>
         
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
@@ -1451,7 +1451,7 @@
     
     <script>
     // ==========================================
-    // Part 3: 核心設定、匯率與 UI 邏輯 (V126.1)
+    // Part 3: 核心設定、匯率與 UI 邏輯 (V126.2)
     // ==========================================
     
     const LOCATION_CONFIG = {
@@ -2473,7 +2473,7 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
     }
       
     // ==========================================
-    // Part 4: 交易資料、Toggle 邏輯與運算核心 (V126.1)
+    // Part 4: 交易資料、Toggle 邏輯與運算核心 (V126.2)
     // ==========================================
 
     function getTransactionsKey(cardId) { return `transactions_${cardId}`; }
@@ -2519,7 +2519,7 @@ function getActualCycleDay(year, month, cycleDay) {
         
         return txs.filter(tx => {
             const txCycleKey = getCycleKey(cardId, tx.date);
-            return txCycleKey === currentCycleKey;126.1
+            return txCycleKey === currentCycleKey;126.2
         });
     }
 
@@ -5744,7 +5744,7 @@ function handleCardPhoto(event) {
     // 匯出資料 (修復：確保 cardId 欄位存在)
     function exportData() {
         const data = {
-            version: 'V126.1',
+            version: 'V126.2',
             exportTime: new Date().toISOString(),
             visibleCards: visibleCards,
             cardOrder: savedOrder,

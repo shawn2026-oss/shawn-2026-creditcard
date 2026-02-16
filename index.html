@@ -65,9 +65,13 @@
             z-index: 1; 
         }
 
-        @media (max-width: 480px) { 
+       @media (max-width: 480px) { 
             body { background-color: var(--bg-color); } 
             .app-container { box-shadow: none; width: 100%; max-width: 100%; } 
+        }
+
+        @media (max-width: 380px) {
+            .card-tile { aspect-ratio: auto; min-height: 135px; }
         }
 
         .detail-progress-area {

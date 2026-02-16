@@ -934,7 +934,7 @@
                     
                     <div class="option-row" id="jiangTravelRow" style="border-top:1px dashed #ddd; padding-top:8px; margin-top:4px; flex-direction:column; align-items:flex-start;">
                           <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkJiangTravel">✈️ 旅遊加碼 +4.5% (刷$1.1萬封頂)</label>
+                            <label for="checkJiangTravel">✈️ 旅遊加碼 +4.5% (刷$1.1萬/季封頂)</label>
                             <input type="checkbox" id="checkJiangTravel" onchange="toggleJiangTravel()">
                         </div>
                         <button onclick="toggleJiangTravelDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看旅遊/航空/旅行社</button>
@@ -2095,7 +2095,7 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
         { id: 'c1', name: '星展傳說對決卡', nickname: 'Line Pay神卡', note: 'LinePay/外送/蝦皮(刷$11,363 封頂)', rule: '', type: 'custom_legend', limit: 11363, gradient: 'linear-gradient(135deg, #43cea2 0%, #185a9d 100%)', textColor: 'white', msgDanger: '加碼已封頂 (變1.2%)' },
         { id: 'c5', name: '聯邦賴點卡', nickname: 'Line Pay 10%', note: '偶數日+5% / LP+1% / 新戶+4%', rule: '⚠️ 需單筆滿 $100', type: 'custom_laidian', limit: 3000, tier1Rate: 0.06, tier2Rate: 0.01, threshold: 0, gradient: 'linear-gradient(135deg, #00B900 0%, #33CC33 100%)', textColor: 'white', msgDanger: '加碼已封頂', parking: `✅ <b>基本回饋 1%</b> (無上限)<br>📱 <b>LP 一般 2%</b> (1+1, 限刷2萬)<br>📅 <b>偶數日 6%</b> (1+5, 限刷3千)<br>👶 <b>新戶加碼 +4%</b> (限刷7500)<br>⚠️ <b>注意</b>：加碼需單筆滿 $100`},
         { id: 'c3', name: '永豐 Sport 卡', nickname: 'Apple Pay優等生', note: 'Apple Pay 5% (刷 5千封頂)', rule: '', type: 'ceiling', limit: 5000, tier1Rate: 0.05, tier2Rate: 0.02, gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)' },
-        { id: 'c4', name: '將來將將卡', nickname: '行支/餐廳/外送', note: '生活 5% (刷 6千6封頂)', rule: '', type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, gradient: 'linear-gradient(135deg, #ffe259 0%, #ffa751 100%)', textColor: '#333', msgDanger: '已封頂 (變0.5%)', parking: `🎯 <b>低消任務</b>：當月累積滿 <b>$3,000</b> 才享加碼<br><br>🛍️ <b>生活升級 5%</b> (限刷$6,666)<br>行動支付/外送/餐廳/購物<br><br>✈️ <b>旅遊加碼 5%</b> (限刷$11,111)<br>海外/航空/旅行社/高鐵`},
+        { id: 'c4', name: '將來將將卡', nickname: '行支/餐廳/外送', note: '生活 5% (刷 6千6封頂)', rule: '', type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, gradient: 'linear-gradient(135deg, #ffe259 0%, #ffa751 100%)', textColor: '#333', msgDanger: '已封頂 (變0.5%)', parking: `🎯 <b>低消任務</b>：當月累積滿 <b>$3,000</b> 才享加碼<br><br>🛍️ <b>生活升級 5%</b> (限刷$6,666)<br>行動支付/外送/餐廳/購物<br><br>✈️ <b>旅遊加碼 5%</b> (限刷$11,111/季)<br>海外/航空/旅行社/高鐵`},
         { id: 'c2', name: '聯邦綠卡', nickname: '綠色/市區停車神卡', note: '綠色 +5% (刷 3千封頂) | 停車 (刷 1.2萬達標)', rule: '', type: 'floor', target: 12000, tier1Rate: 0.02, tier2Rate: 0.02, gradient: 'linear-gradient(135deg, #20B2AA 0%, #008B8B 100%)', textColor: 'white', msgSuccess: '已達標 (下月免停)', parking: `🅿️ <b>免費停車：</b>需上月刷滿1.2萬<br>🌿 <b>綠色通路 6%</b><br>基本 1% + 加碼 5%<br>⚠️ 加碼適用月刷 $3,000 封頂 (回饋 $150)`},
         { id: 'c7', name: '玉山 UNI 卡', nickname: '行支/百貨優等生', note: 'UP 4.5% (刷 14萬封頂)', type: 'ceiling', limit: 40000, tier1Rate: 0.035, tier2Rate: 0.01, gradient: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)', parking: `🔥 <b>任意選 3.5%</b> (限刷$4萬)<br>🆙 <b>UP 選 4.5%</b> (限刷$14萬)<br>ℹ️ <b>訂閱建議</b>：<br>消費滿 $14,900 以上建議訂閱 UP 選`, getDynamicName: function() { const settings = JSON.parse(localStorage.getItem('uni_settings') || '{}'); return settings.isUp ? '玉山 UNI 卡（升級UP選）' : '玉山 UNI 卡'; }},
         { id: 'c8', name: '遠東樂家+卡', nickname: '生活/寵物神卡', note: '寵物10% / 生活安心4% ', type: 'custom_happy', limit: 5263, minSpend: 3000, tier1Rate: 0.1, tier2Rate: 0.005, gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)', textColor: 'white', msgDanger: '已封頂 (變0.5%)', parking: `🐶 <b>寵物 10%</b> (限刷$5,263)<br>🍽️ <b>安心/生活 4%</b> (限刷$5,714)<br>✈️ <b>國外 2.5%</b> (無上限)`},
@@ -3206,9 +3206,15 @@ function toggleUniOverseas() {
         if (isSelected) {
             minSpend = 3000;
             warning.innerHTML = '⚠️ 需當月累積滿 $3,000 才享加碼回饋';
-        } else if (isTravel) {
-            minSpend = 6000;
-            warning.innerHTML = '⚠️ 需當月累積滿 $6,000 才享加碼回饋';
+       } else if (isTravel) {
+            // 旅遊通路用季累積
+            const travelQuota = getJiangTravelQuotaUsed();
+            const now = new Date();
+            const qStart = Math.floor(now.getMonth() / 3) * 3 + 1;
+            const qLabel = `${qStart}~${qStart + 2}月`;
+            warning.innerHTML = `⚠️ 需本季(${qLabel})累積滿 $6,000 才享旅遊加碼 (已累積 $${travelQuota.quarterTotal.toLocaleString()})`;
+            warning.style.display = travelQuota.reachedMinSpend ? 'none' : 'block';
+            return;
         }
         
         if (minSpend > 0 && totalSpent < minSpend) {
@@ -4169,6 +4175,32 @@ function handleHappyExclusive(selected) {
             bonusRemain: Math.max(0, bonusLimit - bonusSpent)
         };
     }
+// ★★★ 將將卡旅遊通路封頂額度計算 (季制) ★★★
+    function getJiangTravelQuotaUsed() {
+        const txs = getTransactions('c4');
+        const now = new Date();
+        const qStart = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 1);
+        const qEnd = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3 + 3, 0, 23, 59, 59);
+        
+        let travelSpent = 0, quarterTotal = 0;
+        txs.forEach(tx => {
+            const txDate = parseFlexibleDate(tx.date);
+            if (!txDate || txDate < qStart || txDate > qEnd) return;
+            const amount = tx.amountTWD || tx.amount || 0;
+            quarterTotal += amount;
+            if (tx.isJiangTravel) travelSpent += amount;
+        });
+        
+        const travelLimit = 11111;
+        return {
+            travelSpent,
+            travelLimit,
+            travelRemain: Math.max(0, travelLimit - travelSpent),
+            quarterTotal,
+            quarterMinSpend: 6000,
+            reachedMinSpend: quarterTotal >= 6000
+        };
+    }
       // 單筆回饋計算
     function calculateSingleReward(cardId, amount, options) {
         let reward = 0;
@@ -4675,17 +4707,27 @@ function handleHappyExclusive(selected) {
                 const bonusReward = Math.floor(available * 0.05);
                 const baseReward = Math.floor((amount - available) * 0.005);
                 return { reward: bonusReward + baseReward, rate: (bonusReward + baseReward) / amount };
-           } else if (isTravel) {
-                const minSpend = 6000;
-                const travelLimit = 11111;
-                if ((totalCycleSpent + amount) < minSpend) {
+          } else if (isTravel) {
+                // 旅遊通路：季制封頂
+                const quota = getJiangTravelQuotaUsed();
+                // 排除正在編輯的交易
+                let adjTravelSpent = quota.travelSpent;
+                let adjQuarterTotal = quota.quarterTotal;
+                if (editingTxId) {
+                    const editTx = getTransactions(cardId).find(t => t.id === editingTxId);
+                    if (editTx) {
+                        const editAmt = editTx.amountTWD || editTx.amount || 0;
+                        adjQuarterTotal -= editAmt;
+                        if (editTx.isJiangTravel) adjTravelSpent -= editAmt;
+                    }
+                }
+                if ((adjQuarterTotal + amount) < 6000) {
                     return { reward: Math.floor(amount * 0.005), rate: 0.005 };
                 }
-                const travelSpent = getCardBonusSpent(cardId, t => t.isJiangTravel && (!editingTxId || t.id !== editingTxId));
-                if (travelSpent >= travelLimit) {
+                if (adjTravelSpent >= quota.travelLimit) {
                     return { reward: Math.floor(amount * 0.005), rate: 0.005 };
                 }
-                const available = Math.min(amount, travelLimit - travelSpent);
+                const available = Math.min(amount, quota.travelLimit - adjTravelSpent);
                 const bonusReward = Math.floor(available * 0.05);
                 const baseReward = Math.floor((amount - available) * 0.005);
                 return { reward: bonusReward + baseReward, rate: (bonusReward + baseReward) / amount };
@@ -4794,10 +4836,11 @@ function handleHappyExclusive(selected) {
                         txReward = Math.floor(available * 0.05) + Math.floor((amount - available) * 0.005);
                     }
                     jiangSelectedCumulative += amount;
-                } else if (tx.isJiangTravel) {
-                    const travelLimit = 11111;
-                    if (jiangTravelCumulative < travelLimit) {
-                        const available = Math.min(amount, travelLimit - jiangTravelCumulative);
+               } else if (tx.isJiangTravel) {
+                    // 旅遊通路季制：用 quota 判斷
+                    const travelQuota = getJiangTravelQuotaUsed();
+                    if (travelQuota.reachedMinSpend && jiangTravelCumulative < travelQuota.travelLimit) {
+                        const available = Math.min(amount, travelQuota.travelLimit - jiangTravelCumulative);
                         txReward = Math.floor(available * 0.05) + Math.floor((amount - available) * 0.005);
                     }
                     jiangTravelCumulative += amount;
@@ -4960,23 +5003,28 @@ function handleHappyExclusive(selected) {
                  return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
              }
         }
-// 特殊處理：將將卡顯示生活/旅遊雙軌封頂狀態
+// 特殊處理：將將卡顯示生活(月)/旅遊(季)封頂狀態
         if (cardId === 'c4') {
-            let selectedSpent = 0, travelSpent = 0;
-            txs.forEach(tx => {
-                const amount = tx.amountTWD || tx.amount || 0;
-                if (tx.isJiangSelected) selectedSpent += amount;
-                if (tx.isJiangTravel) travelSpent += amount;
-            });
             const selectedLimit = 6666;
-            const travelLimit = 11111;
-            let parts = [];
-            if (selectedSpent >= selectedLimit) parts.push('生活⚡');
-            else parts.push(`生活$${(selectedLimit - selectedSpent).toLocaleString()}`);
-            if (travelSpent >= travelLimit) parts.push('旅遊⚡');
-            else parts.push(`旅遊$${(travelLimit - travelSpent).toLocaleString()}`);
-            msg = parts.join('/');
-            progress = Math.min(100, (totalSpent / 3000) * 100);
+            const selectedSpent = txs.filter(t => t.isJiangSelected).reduce((sum, t) => sum + (t.amountTWD || t.amount || 0), 0);
+            const travelQuota = getJiangTravelQuotaUsed();
+            
+            let statusParts = [];
+            if (selectedSpent >= selectedLimit) {
+                statusParts.push('生活封頂');
+            } else {
+                statusParts.push(`生活$${(selectedLimit - selectedSpent).toLocaleString()}`);
+            }
+            if (travelQuota.travelSpent >= travelQuota.travelLimit) {
+                statusParts.push('旅遊封頂(季)');
+            } else {
+                statusParts.push(`旅遊$${(travelQuota.travelRemain).toLocaleString()}(季)`);
+            }
+            
+            const allCapped = (selectedSpent >= selectedLimit) && (travelQuota.travelSpent >= travelQuota.travelLimit);
+            msg = allCapped ? statusParts.join('/') : '可再刷 ' + statusParts.join('/');
+            progress = Math.min(100, (selectedSpent / selectedLimit) * 100);
+            
             return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
         }
         // 特殊處理：樂家卡顯示各類別封頂狀態

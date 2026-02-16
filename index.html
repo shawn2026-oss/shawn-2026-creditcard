@@ -5473,6 +5473,8 @@ if (cycleDay && cycleDay > 0) {
 
     function updateTotalReward() {
         let totalCash = 0, totalMiles = 0;
+        const savedLocation = currentLocation;
+        currentLocation = 'TW';
         cards.forEach(card => {
             if (card.type === 'placeholder') return;
             const stats = calculateStats(card.id);
@@ -5487,6 +5489,7 @@ if (cycleDay && cycleDay > 0) {
         } else {
             rewardHtml = `$${totalCash.toLocaleString()}`;
         }
+currentLocation = savedLocation;
         document.getElementById('totalRewardDisplay').innerHTML = rewardHtml;
         
         const breakdownEl = document.getElementById('totalRewardBreakdown');

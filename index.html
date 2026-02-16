@@ -1030,8 +1030,9 @@
                       <div class="option-row" style="border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:10px;">
                         <span style="font-weight:700; color:#333;">💳 選擇您的卡片等級 (自動記憶)：</span>
                         <div style="display:flex; gap:15px; margin-top:8px;">
-                            <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;"><input type="radio" name="hsbcTier" value="infinite" onchange="saveHsbcTier()"> 無限卡</label>
+                         <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;"><input type="radio" name="hsbcTier" value="light" onchange="saveHsbcTier()"> 輕旅卡</label>
                             <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;"><input type="radio" name="hsbcTier" value="signature" onchange="saveHsbcTier()"> 御璽卡</label>
+                            <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;"><input type="radio" name="hsbcTier" value="infinite" onchange="saveHsbcTier()"> 無限卡</label>
                         </div>
                     </div>
                     <div class="option-row"><label for="hsbcInitialMiles">🏁 已有哩程 (起始值)</label><input type="number" id="hsbcInitialMiles" onchange="saveHsbcInitial()" style="text-align:right; width: 100px; border:1px solid #ccc; border-radius:4px; padding:4px;" placeholder="0"></div>
@@ -2093,7 +2094,7 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
         { id: 'c2', name: '聯邦綠卡', nickname: '綠色/市區停車神卡', note: '綠色 +5% (刷 3千封頂) | 停車 (刷 1.2萬達標)', rule: '', type: 'floor', target: 12000, tier1Rate: 0.02, tier2Rate: 0.02, gradient: 'linear-gradient(135deg, #20B2AA 0%, #008B8B 100%)', textColor: 'white', msgSuccess: '已達標 (下月免停)', parking: `🅿️ <b>免費停車：</b>需上月刷滿1.2萬<br>🌿 <b>綠色通路 6%</b><br>基本 1% + 加碼 5%<br>⚠️ 加碼適用月刷 $3,000 封頂 (回饋 $150)`},
         { id: 'c7', name: '玉山 UNI 卡', nickname: '行支/百貨優等生', note: 'UP 4.5% (刷 14萬封頂)', type: 'ceiling', limit: 40000, tier1Rate: 0.035, tier2Rate: 0.01, gradient: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)', parking: `🔥 <b>任意選 3.5%</b> (限刷$4萬)<br>🆙 <b>UP 選 4.5%</b> (限刷$14萬)<br>ℹ️ <b>訂閱建議</b>：<br>消費滿 $14,900 以上建議訂閱 UP 選`, getDynamicName: function() { const settings = JSON.parse(localStorage.getItem('uni_settings') || '{}'); return settings.isUp ? '玉山 UNI 卡（升級UP選）' : '玉山 UNI 卡'; }},
         { id: 'c8', name: '遠東樂家+卡', nickname: '生活/寵物神卡', note: '寵物10% / 生活安心4% ', type: 'custom_happy', limit: 5263, minSpend: 3000, tier1Rate: 0.1, tier2Rate: 0.005, gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)', textColor: 'white', msgDanger: '已封頂 (變0.5%)', parking: `🐶 <b>寵物 10%</b> (限刷$5,263)<br>🍽️ <b>安心/生活 4%</b> (限刷$5,714)<br>✈️ <b>國外 2.5%</b> (無上限)`},
-        { id: 'c9', name: '滙豐旅人卡', nickname: '哩程累積', note: '無限:國內18/國外10 | 御璽:國內18/國外15', type: 'miles', gradient: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)', textColor: 'white', msgDanger: '', parking: `✈️ <b>哩程累積神卡</b>`, getDynamicName: function() { const tier = localStorage.getItem('hsbc_tier') || 'infinite'; return tier === 'infinite' ? '滙豐旅人無限卡' : '滙豐旅人御璽卡'; }},
+        { id: 'c9', name: '滙豐旅人卡', nickname: '哩程累積', note: '無限:國內18/國外10 | 御璽:國內18/國外15', type: 'miles', gradient: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)', textColor: 'white', msgDanger: '', parking: `✈️ <b>哩程累積神卡</b>`, getDynamicName: function() { const tier = localStorage.getItem('hsbc_tier') || 'infinite'; return tier === 'infinite' ? '滙豐旅人無限卡' : tier === 'light' ? '滙豐旅人輕旅卡' : '滙豐旅人御璽卡'; }},
         { id: 'c11', name: '台新 Richart 卡', nickname: '權益自由選', note: '台新Pay 3.8% (無上限)', type: 'ceiling', limit: 99999999, tier1Rate: 0.038, tier2Rate: 0.003, gradient: 'linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%)', textColor: 'white', msgDanger: '', parking: `🐶 <b>權益自由選 (無上限回饋)</b>`},
         { id: 'j1', name: '富邦 J 卡', nickname: '日韓旅遊優等生', note: '日韓泰$3.3萬/交通卡$2,857(季)',type: 'custom_j', limit: 0, gradient: 'linear-gradient(135deg, #FF7E5F 0%, #FEB47B 100%)', textColor: 'white', msgDanger: '', parking: `🇯🇵🇰🇷🇹🇭 <b>實體消費加碼</b> (共用季上限$1000回饋)<br>• 日韓實體：3%+3%=6% (刷$33,333封頂)<br>• 泰國實體：1%+5%=6% (刷$20,000封頂)<br>⚠️ 需單筆滿 $1,000<br><br>🍎 <b>日本交通卡</b> (獨立季上限$200回饋)<br>• Suica/PASMO等：3%+7%=10% (刷$2,857封頂)<br>⚠️ 需單筆滿 $2,000`},
         { id: 'j2', name: '聯邦吉鶴卡', nickname: '日本/ApplePay首選', note: '日本 AP 4% (刷 4萬封頂) | 國內日系 5%', type: 'ceiling', limit: 40000, tier1Rate: 0.04, tier2Rate: 0.025, gradient: 'linear-gradient(135deg, #DC143C 0%, #FFFFFF 150%)', textColor: 'white', msgDanger: '加碼已封頂 (變2.5%)', parking: `🍎 <b>日本 QUICPay (Apple Pay)</b><br>日本 2.5% + 加碼 1.5% = 4%<br>⚠️ 加碼上限 $600/月 (約刷$4萬)<br>🇹🇼 <b>國內日系名店 5%</b><br>國內 1% + 加碼 4% (刷$1.25萬封頂)`},
@@ -4361,10 +4362,12 @@ function handleHappyExclusive(selected) {
             return { reward, rate };
         }
         // C9 旅人卡 (哩程)
-        else if (cardId === 'c9') {
+       else if (cardId === 'c9') {
             const tier = options.tier || 'infinite';
             let milesPerDollar;
-            if (options.isForeign) {
+            if (tier === 'light') {
+                milesPerDollar = 20;
+            } else if (options.isForeign) {
                 milesPerDollar = (tier === 'infinite') ? 10 : 15;
             } else {
                 milesPerDollar = 18;
@@ -5260,7 +5263,7 @@ function handleHappyExclusive(selected) {
 function getCardDisplayName(card) {
         if (card.id === 'c9') {
             const tier = localStorage.getItem('hsbc_tier') || 'infinite';
-            return tier === 'infinite' ? '滙豐旅人無限卡' : '滙豐旅人御璽卡';
+            return tier === 'infinite' ? '滙豐旅人無限卡' : tier === 'light' ? '滙豐旅人輕旅卡' : '滙豐旅人御璽卡';
         }
         if (card.id === 'c7') {
             const settings = JSON.parse(localStorage.getItem('uni_settings') || '{}');
@@ -5329,8 +5332,10 @@ function getCardDisplayName(card) {
         // 旅人卡：根據等級顯示不同元/哩
         if (card.id === 'c9') {
             const tier = localStorage.getItem('hsbc_tier') || 'infinite';
-            if (tier === 'infinite') {
+           if (tier === 'infinite') {
                 return '國內 18元/哩 | 國外 10元/哩';
+            } else if (tier === 'light') {
+                return '國內外 20元/哩';
             } else {
                 return '國內 18元/哩 | 國外 15元/哩';
             }

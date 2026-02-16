@@ -819,7 +819,8 @@
                             <label style="font-size:13px;">📋 我的 8 項通路 <span id="uniChannelCount" style="font-size:11px; color:#999;"></span></label>
                             <button onclick="toggleUniChannelList()" style="border:none; background:#007AFF; color:white; font-size:10px; padding:4px 8px; border-radius:4px; cursor:pointer;" id="btnToggleUniChannel">展開通路 ▼</button>
                         </div>
-                        <div id="uniChannelContainer" style="width:100%; display:none;"></div>
+                       <div id="uniChannelContainer" style="width:100%; display:none;"></div>
+                        <div id="uniChannelSummary" style="margin-top:6px; font-size:11px; color:#666; line-height:1.6;"></div>
                     </div>
 
                     <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;"><label for="checkUniBonus">🔥 統一時代任務 +3% (刷$1.6萬封頂)</label><input type="checkbox" id="checkUniBonus" onchange="updateRewardPreview()"></div>
@@ -2396,6 +2397,17 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
         });
 
         document.getElementById('uniChannelCount').innerText = `(${saved.length}/8)`;
+        updateUniChannelSummary(saved);
+    }
+
+    function updateUniChannelSummary(channels) {
+        const el = document.getElementById('uniChannelSummary');
+        if (!el) return;
+        if (!channels || channels.length === 0) {
+            el.innerHTML = '<span style="color:#999;">尚未選擇通路</span>';
+        } else {
+            el.innerHTML = '已選：' + channels.map(c => `<span style="display:inline-block; background:#E3F2FD; color:#1565C0; padding:1px 6px; border-radius:4px; margin:1px 2px; font-size:10px; font-weight:600;">${c}</span>`).join('');
+        }
     }
 
     function initUniBrandGrid() {
@@ -2633,7 +2645,10 @@ document.getElementById('dateInput').value = today.getFullYear() + '-' + String(
             // UP選不需要選通路
             const uniSettings = JSON.parse(localStorage.getItem('uni_settings') || '{}');
             const channelSection = document.getElementById('uniChannelSection');
-            if (channelSection) channelSection.style.display = uniSettings.isUp ? 'none' : 'block';
+           if (channelSection) channelSection.style.display = uniSettings.isUp ? 'none' : 'block';
+            const savedChannels = JSON.parse(localStorage.getItem('uni_channels') || '[]');
+            document.getElementById('uniChannelCount').innerText = `(${savedChannels.length}/8)`;
+            updateUniChannelSummary(savedChannels);
             // 國外警告
             const overseasWarning = document.getElementById('uniOverseasWarning');
             if (currentLocation !== 'TW') {

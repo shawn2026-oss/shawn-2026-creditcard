@@ -221,7 +221,8 @@
         .tile-footer { z-index: 2; margin-top: 2px; position: relative; }
         .progress-track { background: rgba(0,0,0,0.2); height: 4px; border-radius: 2px; overflow: hidden; margin-bottom: 4px; }
         .progress-fill { height: 100%; background: rgba(255,255,255,0.95); transition: width 0.5s ease; }
-        .tile-msg { font-size: 10px; font-weight: 700; opacity: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+        .tile-msg { font-size: 10px; font-weight: 700; opacity: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
+        .tile-msg.multiline { white-space: pre-line; overflow: visible; text-overflow: unset; }
        .tile-cycle-hint { font-size: 9px; color: #fff; opacity: 0.6; text-shadow: 0 1px 2px rgba(0,0,0,0.5); font-weight: 700; letter-spacing: 0.3px; position: absolute; bottom: 26px; right: 12px;}
         .tile-cycle-hint.dark-text { color: rgba(0,0,0,0.6); text-shadow: none; }
         .tile-overseas-warning { font-size: 10px; color: #FFD700; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; margin-top: 4px; display: none; }
@@ -5326,24 +5327,39 @@ function handleHappyExclusive(selected) {
             const selectedSpent = txs.filter(t => t.isJiangSelected).reduce((sum, t) => sum + (t.amountTWD || t.amount || 0), 0);
             const travelQuota = getJiangTravelQuotaUsed();
             
-            let statusParts = [];
-            // 低消任務提醒
-            if (totalSpent < 3000) {
-                statusParts.push(`⚠️需累刷$${(3000 - totalSpent).toLocaleString()}`);
+            // 生活低消判斷 (月 $3,000)
+            const lifeReached = totalSpent >= 3000;
+            // 旅遊低消判斷 (季 $6,000)
+            const travelReached = travelQuota.reachedMinSpend;
+            
+            let lines = [];
+            
+            // === 任務倒數 (未達低消) ===
+            if (!lifeReached) {
+                lines.push(`🎯 生活：差$${(3000 - totalSpent).toLocaleString()}達標`);
             }
-            if (selectedSpent >= selectedLimit) {
-                statusParts.push('生活封頂');
-            } else {
-                statusParts.push(`生活$${(selectedLimit - selectedSpent).toLocaleString()}`);
-            }
-            if (travelQuota.travelSpent >= travelQuota.travelLimit) {
-                statusParts.push('旅遊封頂(季)');
-            } else {
-                statusParts.push(`旅遊$${(travelQuota.travelRemain).toLocaleString()}(季)`);
+            if (!travelReached) {
+                lines.push(`🎯 旅遊：差$${(travelQuota.quarterMinSpend - travelQuota.quarterTotal).toLocaleString()}達標(季)`);
             }
             
-            msg = statusParts.join('/');
-            progress = totalSpent < 3000 ? Math.min(100, (totalSpent / 3000) * 100) : Math.min(100, (selectedSpent / selectedLimit) * 100);
+            // === 封頂倒數 (已達低消後才顯示) ===
+            if (lifeReached) {
+                if (selectedSpent >= selectedLimit) {
+                    lines.push('✅ 生活已封頂');
+                } else {
+                    lines.push(`可再刷$${(selectedLimit - selectedSpent).toLocaleString()}`);
+                }
+            }
+            if (travelReached) {
+                if (travelQuota.travelSpent >= travelQuota.travelLimit) {
+                    lines.push('✅ 旅遊已封頂(季)');
+                } else {
+                    lines.push(`旅遊可再刷$${(travelQuota.travelRemain).toLocaleString()}(季)`);
+                }
+            }
+            
+            msg = lines.join('\n');
+            progress = !lifeReached ? Math.min(100, (totalSpent / 3000) * 100) : Math.min(100, (selectedSpent / selectedLimit) * 100);
             
             return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
         }
@@ -5873,7 +5889,7 @@ if (cycleDay && cycleDay > 0) {
                     </div>
                     <div class="tile-footer">
                         <div class="progress-track"><div class="progress-fill" style="width:${stats.progress}%"></div></div>
-                        <div class="tile-msg">${stats.msg}</div>
+                        <div class="tile-msg${stats.msg && stats.msg.includes('\n') ? ' multiline' : ''}">${stats.msg}</div>
                         ${overseasWarning}
                         <div class="tile-cycle-hint ${card.textColor === '#333' ? 'dark-text' : ''}">${cycleHint}</div>
                     </div>

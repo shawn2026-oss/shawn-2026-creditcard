@@ -5195,8 +5195,21 @@ function handleHappyExclusive(selected) {
                  msg = card.msgSuccess || '已達標';
                  progress = 100;
             }
-            else if (card.type === 'uniopen_special' || card.type === 'custom_mitsui') {
+            else if (card.type === 'uniopen_special') {
                  msg = `本期已刷 ${formatAmountWithCurrency(totalSpent)}`;
+                 progress = (card.target && card.target > 0) ? Math.min(100, (totalSpent / card.target) * 100) : 0;
+            }
+            else if (card.type === 'custom_mitsui') {
+                 // 三井卡：特選餐飲回饋倒數 + 季滿額進度
+                 const selectedSpent = getCardBonusSpent(cardId, t => t.isSinopacMitsuiSelected);
+                 const selectedRewardUsed = Math.floor(selectedSpent * 0.07);
+                 const selectedRewardRemain = Math.max(0, 100 - selectedRewardUsed);
+                 if (selectedRewardRemain <= 0) {
+                     msg = '特選/餐飲封頂';
+                 } else {
+                     const spendRemain = Math.ceil(selectedRewardRemain / 0.07);
+                     msg = `可再刷 特選/餐飲$${spendRemain.toLocaleString()}`;
+                 }
                  progress = (card.target && card.target > 0) ? Math.min(100, (totalSpent / card.target) * 100) : 0;
             }
             else if (card.type === 'custom_laidian') {

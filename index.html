@@ -4559,6 +4559,15 @@ function handleHappyExclusive(selected) {
         // 自建卡片
         else if (cardId.startsWith('custom_')) {
             rate = card.tier1Rate || 0;
+            if (card.limit && card.limit < 99999999) {
+                const bonusSpent = getCardBonusSpent(cardId, t => (!editingTxId || t.id !== editingTxId));
+                if (bonusSpent >= card.limit) {
+                    return { reward: 0, rate: 0 };
+                }
+                const available = Math.min(amount, card.limit - bonusSpent);
+                reward = Math.floor(available * rate);
+                return { reward, rate: amount > 0 ? reward / amount : rate };
+            }
             reward = Math.floor(amount * rate);
             return { reward, rate };
         }
@@ -4825,8 +4834,17 @@ function handleHappyExclusive(selected) {
             return { reward: baseReward, rate: 0.012 };
         }
         
-        // 預設
+        // 預設（含自建卡片封頂處理）
         rate = card.tier1Rate || 0.01;
+        if (card.isCustom && card.limit && card.limit < 99999999) {
+            const bonusSpent = getCardBonusSpent(cardId, t => (!editingTxId || t.id !== editingTxId));
+            if (bonusSpent >= card.limit) {
+                return { reward: 0, rate: 0 };
+            }
+            const available = Math.min(amount, card.limit - bonusSpent);
+            const reward = Math.floor(available * rate);
+            return { reward, rate: amount > 0 ? reward / amount : rate };
+        }
         return { reward: Math.floor(amount * rate), rate };
     }
 
@@ -4860,6 +4878,7 @@ function handleHappyExclusive(selected) {
         let uniOpenGroupCumulative = 0;
         let uniOpenIcashCumulative = 0;
         let uniOpenOverseasCumulative = 0;
+        let customCumulative = 0;
         
         txs.forEach(tx => {
             const amount = tx.amountTWD || tx.amount || 0;
@@ -4963,6 +4982,14 @@ function handleHappyExclusive(selected) {
                     if (tx.isUniIcash) uniOpenIcashCumulative += amount;
                 }
                 totalReward += txReward;
+    } else if (card.isCustom && card.limit && card.limit < 99999999) {
+        // 自建卡片封頂累計
+        const rate = card.tier1Rate || 0.01;
+        if (customCumulative < card.limit) {
+            const available = Math.min(amount, card.limit - customCumulative);
+            totalReward += Math.floor(available * rate);
+        }
+        customCumulative += amount;
     } else {
         const result = calculateTxRewardWithCap(cardId, tx);
         totalReward += result.reward;

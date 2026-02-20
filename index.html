@@ -1400,6 +1400,19 @@
                  <div id="customColorPicker" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;"></div>
              </div>
              
+             <div class="input-group">
+                 <label>🖼️ 卡面照片 (選填)</label>
+                 <div style="display:flex; gap:8px; align-items:center;">
+                     <button class="btn" style="flex:1; background:#f0f8ff; color:#007AFF; border:1px dashed #007AFF; font-size:13px; padding:10px;" onclick="document.getElementById('customCardPhotoInput').click()">📷 選擇照片</button>
+                     <button id="btnRemoveCustomPhoto" class="btn" style="background:#fff0f0; color:#FF3B30; border:1px solid #ffcdd2; font-size:13px; padding:10px; display:none;" onclick="removeCustomCardPhoto()">移除</button>
+                 </div>
+                 <input type="file" id="customCardPhotoInput" accept="image/*" style="display:none" onchange="handleCustomCardPhoto(event)">
+                 <div id="customPhotoPreviewBox" style="margin-top:8px; display:none; width:100%; height:120px; border-radius:12px; overflow:hidden;">
+                     <img id="customPhotoPreviewImg" style="width:100%; height:100%; object-fit:cover;">
+                 </div>
+                 <div style="font-size:11px; color:#888; margin-top:4px;">照片會覆蓋卡面顏色。</div>
+             </div>
+
              <input type="hidden" id="customCardEditId" value="">
 
            <div class="btn-group">
@@ -1774,7 +1787,7 @@
         });
     }
 
-    function getShareText() { return `💰 狂！本月回饋 ${document.getElementById('totalRewardDisplay').innerText}！\n快來試算 👉 https://shawn2026-oss.github.io/shawn-2026-creditcard/`; }
+    function getShareText() { return `💰 狂！本月回饋 ${document.getElementById('totalRewardDisplay').innerText}！\n快來試算 👉 https://lihi.cc/nelWa`; }
 
     fetch('config.json?t=' + Date.now()).then(response => response.json()).then(data => { if(data.news) document.getElementById('news-text').innerHTML = data.news; }).catch(error => {});
     let cardSettings = JSON.parse(localStorage.getItem('cardSettings')) || {};
@@ -2200,6 +2213,18 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
                     dot.onclick = () => { selectedCustomColor = i; document.querySelectorAll('#customColorPicker > div').forEach((d,j) => d.style.borderColor = j===i ? '#007AFF' : 'transparent'); };
                     picker.appendChild(dot);
                 });
+                // 載入已存照片
+                const existingPhoto = localStorage.getItem('card_photo_' + editId);
+                window._pendingCustomCardPhoto = null;
+                document.getElementById('customCardPhotoInput').value = '';
+                if (existingPhoto) {
+                    document.getElementById('customPhotoPreviewImg').src = existingPhoto;
+                    document.getElementById('customPhotoPreviewBox').style.display = 'block';
+                    document.getElementById('btnRemoveCustomPhoto').style.display = 'inline-block';
+                } else {
+                    document.getElementById('customPhotoPreviewBox').style.display = 'none';
+                    document.getElementById('btnRemoveCustomPhoto').style.display = 'none';
+                }
             }
         } else {
             title.innerText = '自建卡片';
@@ -2210,6 +2235,11 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
             document.getElementById('customCardCap').value = '';
             document.getElementById('customCardCycleDay').value = '';
             selectedCustomColor = 0;
+            // 重置照片
+            window._pendingCustomCardPhoto = null;
+            document.getElementById('customCardPhotoInput').value = '';
+            document.getElementById('customPhotoPreviewBox').style.display = 'none';
+            document.getElementById('btnRemoveCustomPhoto').style.display = 'none';
         }
 
       document.getElementById('customCardDeleteArea').style.display = editId ? 'block' : 'none';
@@ -2266,6 +2296,16 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
         }
 
         document.getElementById('customCardModal').style.display = 'none';
+        
+        // 儲存照片
+        const savedCardId = editId || customs[customs.length - 1].id;
+        if (window._pendingCustomCardPhoto === '__remove__') {
+            localStorage.removeItem('card_photo_' + savedCardId);
+        } else if (window._pendingCustomCardPhoto) {
+            localStorage.setItem('card_photo_' + savedCardId, window._pendingCustomCardPhoto);
+        }
+        window._pendingCustomCardPhoto = null;
+        
         renderManageList();
         renderGrid();
     }
@@ -5013,16 +5053,15 @@ function handleHappyExclusive(selected) {
             if (selectedSpent >= selectedLimit) {
                 statusParts.push('生活封頂');
             } else {
-                statusParts.push(`生活$${(selectedLimit - selectedSpent).toLocaleString()}`);
+                statusParts.push(`生活可再刷$${(selectedLimit - selectedSpent).toLocaleString()}`);
             }
             if (travelQuota.travelSpent >= travelQuota.travelLimit) {
                 statusParts.push('旅遊封頂(季)');
             } else {
-                statusParts.push(`旅遊$${(travelQuota.travelRemain).toLocaleString()}(季)`);
+                statusParts.push(`旅遊可再刷$${(travelQuota.travelRemain).toLocaleString()}(季)`);
             }
             
-            const allCapped = (selectedSpent >= selectedLimit) && (travelQuota.travelSpent >= travelQuota.travelLimit);
-            msg = allCapped ? statusParts.join('/') : '可再刷 ' + statusParts.join('/');
+            msg = statusParts.join('/');
             progress = Math.min(100, (selectedSpent / selectedLimit) * 100);
             
             return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
@@ -5737,6 +5776,38 @@ function handleCardPhoto(event) {
         document.getElementById('btnRemovePhoto').style.display = 'none';
         
         document.getElementById('cardPhotoFileInput').value = '';
+    }
+
+    function handleCustomCardPhoto(event) {
+        var file = event.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var img = new Image();
+            img.onload = function() {
+                var maxW = 400, maxH = 400;
+                var scale = Math.min(maxW / img.width, maxH / img.height, 1);
+                var canvas = document.createElement('canvas');
+                canvas.width = Math.round(img.width * scale);
+                canvas.height = Math.round(img.height * scale);
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                var dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                document.getElementById('customPhotoPreviewImg').src = dataUrl;
+                document.getElementById('customPhotoPreviewBox').style.display = 'block';
+                document.getElementById('btnRemoveCustomPhoto').style.display = 'inline-block';
+                window._pendingCustomCardPhoto = dataUrl;
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function removeCustomCardPhoto() {
+        window._pendingCustomCardPhoto = '__remove__';
+        document.getElementById('customPhotoPreviewBox').style.display = 'none';
+        document.getElementById('btnRemoveCustomPhoto').style.display = 'none';
+        document.getElementById('customCardPhotoInput').value = '';
     }
 
    

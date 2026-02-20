@@ -1371,7 +1371,7 @@
              </div>
 
              <div class="input-group">
-                 <label>📊 回饋率 % (必填)</label>
+                 <label>📊 加碼回饋率 % (必填)</label>
                  <input type="number" id="customCardRate" placeholder="例如：3" step="0.1" min="0" max="100" style="font-size:16px;">
              </div>
 
@@ -1386,6 +1386,11 @@
              <div class="input-group">
                  <label>🔒 每期封頂消費金額 (選填，空=無上限)</label>
                  <input type="number" id="customCardCap" placeholder="例如：10000" style="font-size:16px;">
+             </div>
+
+             <div class="input-group">
+                 <label>📉 封頂後回饋率 % (選填，預設 0)</label>
+                 <input type="number" id="customCardTier2Rate" placeholder="例如：1" step="0.1" min="0" max="100" style="font-size:16px;">
              </div>
 
              <div class="input-group">
@@ -2130,18 +2135,25 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
         // 移除舊的自建卡（保留 defaultCards + add1）
         cards = [...defaultCards];
         customs.forEach(cc => {
+            const t2 = cc.tier2Rate || 0;
+            let note = '';
+            if (cc.cap > 0) {
+                note = t2 > 0 ? `${cc.rate}% (刷$${cc.cap.toLocaleString()}封頂→${t2}%)` : `${cc.rate}% (刷$${cc.cap.toLocaleString()}封頂)`;
+            } else {
+                note = `${cc.rate}% (無上限)`;
+            }
             const cardObj = {
                 id: cc.id,
                 name: cc.name,
                 nickname: cc.nickname || '',
-                note: cc.cap > 0 ? `${cc.rate}% (刷$${cc.cap.toLocaleString()}封頂)` : `${cc.rate}% (無上限)`,
+                note: note,
                 type: cc.cap > 0 ? 'ceiling' : 'ceiling',
                 limit: cc.cap > 0 ? cc.cap : 99999999,
                 tier1Rate: cc.rate / 100,
-                tier2Rate: 0,
+                tier2Rate: t2 / 100,
                 gradient: cc.gradient,
                 textColor: cc.textColor || 'white',
-                msgDanger: cc.cap > 0 ? '已封頂' : '',
+                msgDanger: cc.cap > 0 ? (t2 > 0 ? `已封頂 (變${t2}%)` : '已封頂') : '',
                 parking: '',
                 isCustom: true,
                 isMiles: cc.unit === 'miles'
@@ -2202,6 +2214,7 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
                 document.getElementById('customCardRate').value = cc.rate;
                 document.querySelector(`input[name="customCardUnit"][value="${cc.unit}"]`).checked = true;
                 document.getElementById('customCardCap').value = cc.cap > 0 ? cc.cap : '';
+                document.getElementById('customCardTier2Rate').value = cc.tier2Rate > 0 ? cc.tier2Rate : '';
                 document.getElementById('customCardCycleDay').value = cc.cycleDay || '';
                 const ci = customColorPresets.findIndex(p => p.gradient === cc.gradient);
                 selectedCustomColor = ci >= 0 ? ci : 0;
@@ -2233,6 +2246,7 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
             document.getElementById('customCardRate').value = '';
             document.querySelector('input[name="customCardUnit"][value="cash"]').checked = true;
             document.getElementById('customCardCap').value = '';
+            document.getElementById('customCardTier2Rate').value = '';
             document.getElementById('customCardCycleDay').value = '';
             selectedCustomColor = 0;
             // 重置照片
@@ -2256,6 +2270,7 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
        const nickname = document.getElementById('customCardNickname').value.trim();
         const unit = document.querySelector('input[name="customCardUnit"]:checked').value;
         const cap = parseInt(document.getElementById('customCardCap').value) || 0;
+        const tier2Rate = parseFloat(document.getElementById('customCardTier2Rate').value) || 0;
         const cycleDay = document.getElementById('customCardCycleDay').value;
         const color = customColorPresets[selectedCustomColor];
         const editId = document.getElementById('customCardEditId').value;
@@ -2265,12 +2280,12 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
         if (editId) {
             const idx = customs.findIndex(c => c.id === editId);
             if (idx >= 0) {
-                customs[idx] = { ...customs[idx], name, nickname, rate, unit, cap, cycleDay, gradient: color.gradient, textColor: color.textColor };
+                customs[idx] = { ...customs[idx], name, nickname, rate, unit, cap, tier2Rate, cycleDay, gradient: color.gradient, textColor: color.textColor };
             }
         } else {
             if (customs.length >= 5) { alert('自建卡片最多 5 張'); return; }
             const newId = 'custom_' + Date.now();
-           customs.push({ id: newId, name, nickname, rate, unit, cap, cycleDay, gradient: color.gradient, textColor: color.textColor });
+           customs.push({ id: newId, name, nickname, rate, unit, cap, tier2Rate, cycleDay, gradient: color.gradient, textColor: color.textColor });
         }
 
         localStorage.setItem('custom_cards', JSON.stringify(customs));
@@ -4559,13 +4574,16 @@ function handleHappyExclusive(selected) {
         // 自建卡片
         else if (cardId.startsWith('custom_')) {
             rate = card.tier1Rate || 0;
+            const t2Rate = card.tier2Rate || 0;
             if (card.limit && card.limit < 99999999) {
                 const bonusSpent = getCardBonusSpent(cardId, t => (!editingTxId || t.id !== editingTxId));
                 if (bonusSpent >= card.limit) {
-                    return { reward: 0, rate: 0 };
+                    reward = Math.floor(amount * t2Rate);
+                    return { reward, rate: t2Rate };
                 }
                 const available = Math.min(amount, card.limit - bonusSpent);
-                reward = Math.floor(available * rate);
+                const overCap = amount - available;
+                reward = Math.floor(available * rate) + Math.floor(overCap * t2Rate);
                 return { reward, rate: amount > 0 ? reward / amount : rate };
             }
             reward = Math.floor(amount * rate);
@@ -4837,12 +4855,14 @@ function handleHappyExclusive(selected) {
         // 預設（含自建卡片封頂處理）
         rate = card.tier1Rate || 0.01;
         if (card.isCustom && card.limit && card.limit < 99999999) {
+            const t2Rate = card.tier2Rate || 0;
             const bonusSpent = getCardBonusSpent(cardId, t => (!editingTxId || t.id !== editingTxId));
             if (bonusSpent >= card.limit) {
-                return { reward: 0, rate: 0 };
+                return { reward: Math.floor(amount * t2Rate), rate: t2Rate };
             }
             const available = Math.min(amount, card.limit - bonusSpent);
-            const reward = Math.floor(available * rate);
+            const overCap = amount - available;
+            const reward = Math.floor(available * rate) + Math.floor(overCap * t2Rate);
             return { reward, rate: amount > 0 ? reward / amount : rate };
         }
         return { reward: Math.floor(amount * rate), rate };
@@ -4984,10 +5004,14 @@ function handleHappyExclusive(selected) {
                 totalReward += txReward;
     } else if (card.isCustom && card.limit && card.limit < 99999999) {
         // 自建卡片封頂累計
-        const rate = card.tier1Rate || 0.01;
+        const cRate = card.tier1Rate || 0.01;
+        const cT2Rate = card.tier2Rate || 0;
         if (customCumulative < card.limit) {
             const available = Math.min(amount, card.limit - customCumulative);
-            totalReward += Math.floor(available * rate);
+            const overCap = amount - available;
+            totalReward += Math.floor(available * cRate) + Math.floor(overCap * cT2Rate);
+        } else {
+            totalReward += Math.floor(amount * cT2Rate);
         }
         customCumulative += amount;
     } else {

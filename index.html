@@ -710,11 +710,11 @@
                 </div>
 
                 <div id="cubeOptions">
-                    <div style="display:flex; gap:8px; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:10px;">
+                    <div style="display:flex; flex-wrap:wrap; gap:6px 12px; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:10px; align-items:center;">
                         <span style="font-weight:700; color:#333; font-size:12px;">💳 等級</span>
-                        <label style="display:flex; align-items:center; font-weight:normal; font-size:12px;"><input type="radio" name="cubeLevel" value="lv1" onchange="saveCubeSettings()"> LV1 2%</label>
-                        <label style="display:flex; align-items:center; font-weight:normal; font-size:12px;"><input type="radio" name="cubeLevel" value="lv2" onchange="saveCubeSettings()"> LV2 3%</label>
-                        <label style="display:flex; align-items:center; font-weight:normal; font-size:12px;"><input type="radio" name="cubeLevel" value="lv3" onchange="saveCubeSettings()"> LV3 3.3%</label>
+                        <label style="display:flex; align-items:center; gap:3px; font-weight:normal; font-size:12px;"><input type="radio" name="cubeLevel" value="lv1" onchange="saveCubeSettings()"> LV1 2%</label>
+                        <label style="display:flex; align-items:center; gap:3px; font-weight:normal; font-size:12px;"><input type="radio" name="cubeLevel" value="lv2" onchange="saveCubeSettings()"> LV2 3%</label>
+                        <label style="display:flex; align-items:center; gap:3px; font-weight:normal; font-size:12px;"><input type="radio" name="cubeLevel" value="lv3" onchange="saveCubeSettings()"> LV3 3.3%</label>
                     </div>
                     <div class="option-row"><label for="rbCubeGeneral">🔰 一般消費 (0.3%)</label><input type="radio" name="cubeMode" id="rbCubeGeneral" value="general" checked onchange="updateRewardPreview()"></div>
 
@@ -781,23 +781,23 @@
 
                     <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0; border-top:1px dashed #ddd; padding-top:6px; margin-top:4px;">
                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="rbCubeBirthdayDining">🎂 慶生月 10% (限當月壽星)</label>
-                            <input type="radio" name="cubeMode" id="rbCubeBirthdayDining" value="birthday_dining" onchange="updateRewardPreview()">
+                            <label for="rbCubeBdayHigh">🎂 慶生月 10% (限當月壽星)</label>
+                            <input type="radio" name="cubeMode" id="rbCubeBdayHigh" value="birthday_high" onchange="updateRewardPreview()">
                         </div>
-                        <button onclick="toggleCubeDetails('cubeBdayDiningDetails')" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 4px 0;">▸ 查看 10% 通路</button>
-                        <div id="cubeBdayDiningDetails" class="details-content">
-                            <b>宜花東美食 10%：</b>礁溪庄櫻桃谷、富美海鮮火鍋、上乘三家涮涮鍋、燒肉吉室、茶宴、挪亞方舟美食旗艦店、湯蒸火鍋、樹懶餐廳、九號咖啡、肉肉餐桌、歐鄉牛排館、老時光燒肉酒肴、火車頭烤肉屋、小和山谷、屋賀爺燒肉<br>
-                            <b>微醺餐食甜點 10%：</b>BeApe法國傳統餐酒館｜Gras French、TUTTO BELLO、THE 春、香色、Galerie Bistro、FUGU GASTROPUB、creammm.t、Miss V Bakery、紅葉蛋糕指定網站、七見櫻堂<br>
-                            <b>在地食材餐廳 10%：</b>Plants、里海咖啡、日光私廚法式餐廳、方正谷眷村味、FIRNS、漁采時令料理<br>
-                            <b>連鎖餐飲 10%：</b>UNCLE SHAWN 燒肉餐酒館、二本松涮涮屋｜橋山壽喜燒、Pastaio｜Pastaio noodle cafe、詹記麻辣火鍋、無老鍋、鼎王麻辣鍋、小方舟串燒酒場、毛丼丼飯專門店、毛房蔥柚鍋、毛蔬亞洲蔬食、森川丼丼、將軍府燒烤日本料理、好夥伴咖啡<br>
-                            <b>日本樂園+遊戲娛樂 10%：</b>東京迪士尼樂園、大阪環球影城 (USJ)、PlayStation、Nintendo、巴哈姆特動畫瘋<br>
-                            <b>KTV 10%：</b>錢櫃、好樂迪、星聚點、享溫馨
+                        <button onclick="toggleCubeDetails('cubeBdayHighDetails')" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 4px 0;">▸ 查看 10% 通路</button>
+                        <div id="cubeBdayHighDetails" class="details-content">
+                            <b>宜花東美食：</b>礁溪庄櫻桃谷、富美海鮮火鍋、上乘三家涮涮鍋、燒肉吉室、茶宴、挪亞方舟美食旗艦店、湯蒸火鍋、樹懶餐廳、九號咖啡、肉肉餐桌、歐鄉牛排館、老時光燒肉酒肴、火車頭烤肉屋、小和山谷、屋賀爺燒肉<br>
+                            <b>微醺餐食甜點：</b>BeApe法國傳統餐酒館｜Gras French、TUTTO BELLO、THE 春、香色、Galerie Bistro、FUGU GASTROPUB、creammm.t、Miss V Bakery、紅葉蛋糕指定網站、七見櫻堂<br>
+                            <b>在地食材餐廳：</b>Plants、里海咖啡、日光私廚法式餐廳、方正谷眷村味、FIRNS、漁采時令料理<br>
+                            <b>連鎖餐飲：</b>UNCLE SHAWN 燒肉餐酒館、二本松涮涮屋｜橋山壽喜燒、Pastaio｜Pastaio noodle cafe、詹記麻辣火鍋、無老鍋、鼎王麻辣鍋、小方舟串燒酒場、毛丼丼飯專門店、毛房蔥柚鍋、毛蔬亞洲蔬食、森川丼丼、將軍府燒烤日本料理、好夥伴咖啡<br>
+                            <b>日本樂園+遊戲娛樂：</b>東京迪士尼樂園、大阪環球影城 (USJ)、PlayStation、Nintendo、巴哈姆特動畫瘋<br>
+                            <b>KTV：</b>錢櫃、好樂迪、星聚點、享溫馨
                         </div>
                     </div>
                     <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0;">
                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="rbCubeBirthdayOther">🎂 慶生月 3.5% (限當月壽星)</label>
-                            <input type="radio" name="cubeMode" id="rbCubeBirthdayOther" value="birthday_other" onchange="updateRewardPreview()">
+                            <label for="rbCubeBdayLow">🎂 慶生月 3.5% (限當月壽星)</label>
+                            <input type="radio" name="cubeMode" id="rbCubeBdayLow" value="birthday_low" onchange="updateRewardPreview()">
                         </div>
                         <div style="font-size:10px; color:#555; padding:2px 0 4px 0;">新光三越 (不含SKM Park Outlets高雄草衙)、Uber Eats</div>
                     </div>
@@ -5007,9 +5007,9 @@ function handleHappyExclusive(selected) {
                 mainRate = levelRate;
             } else if (cubeMode === 'select') {
                 mainRate = 0.02;
-            } else if (cubeMode === 'birthday_dining') {
+            } else if (cubeMode === 'birthday_high') {
                 mainRate = 0.10;
-            } else if (cubeMode === 'birthday_other') {
+            } else if (cubeMode === 'birthday_low') {
                 mainRate = 0.035;
             }
             
@@ -5191,8 +5191,8 @@ function handleHappyExclusive(selected) {
         let mainRate = 0.003;
         if (cubeMode === 'digital' || cubeMode === 'dining' || cubeMode === 'travel') mainRate = levelRate;
         else if (cubeMode === 'select') mainRate = 0.02;
-        else if (cubeMode === 'birthday_dining') mainRate = 0.10;
-        else if (cubeMode === 'birthday_other') mainRate = 0.035;
+        else if (cubeMode === 'birthday_high') mainRate = 0.10;
+        else if (cubeMode === 'birthday_low') mainRate = 0.035;
         
         let txReward = Math.floor(amount * mainRate);
         

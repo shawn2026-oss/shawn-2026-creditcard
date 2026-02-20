@@ -28,7 +28,7 @@
     <meta property="og:url" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/">
     <meta property="og:type" content="website">
 
-    <title>刷卡回饋管家 (V126.3 )</title>
+    <title>刷卡回饋管家 (V126.4 )</title>
         
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
@@ -304,7 +304,7 @@
         .btn-delete-single { background: none; border: none; color: #ccc; font-size: 14px; padding: 0 5px; cursor: pointer; margin-left: 8px;}
         .btn-delete-single:hover { color: #FF3B30; }
         
-        #pigRichOptions, #greenCardOptions, #uniOptions, #happyOptions, #hsbcOptions, #uniOpenOptions, #richartOptions, #fubonJOptions, #jiheOptions, #kumamonOptions, #sinopacCurrencyOptions, #sinopacMitsuiOptions, #jiangOptions, #dbsEcoOptions, #sinopacJcbOptions, #laiDianOptions, #legendOptions { display: none; background: #f9f9f9; padding: 10px; border-radius: 10px; margin-top: 10px; border: 1px dashed #ddd; }
+        #pigRichOptions, #greenCardOptions, #uniOptions, #happyOptions, #hsbcOptions, #uniOpenOptions, #richartOptions, #fubonJOptions, #jiheOptions, #kumamonOptions, #sinopacCurrencyOptions, #sinopacMitsuiOptions, #jiangOptions, #dbsEcoOptions, #sinopacJcbOptions, #laiDianOptions, #legendOptions, #cubeOptions { display: none; background: #f9f9f9; padding: 10px; border-radius: 10px; margin-top: 10px; border: 1px dashed #ddd; }
         .option-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #555; }
         .option-row input[type="checkbox"], .option-row input[type="radio"], .option-row input[type="number"] { margin: 0; }
         .option-row input[type="checkbox"], .option-row input[type="radio"] { width: 20px; height: 20px; }
@@ -584,7 +584,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V126.3 </div>
+            <div class="version-tag">V126.4 </div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -607,7 +607,7 @@
         <div class="subtitle"><span class="today-date" id="dateDisplay"></span></div>
         
         <div class="news-ticker">
-            <div class="ticker-content" id="news-text">🎉 V126.3修復：備份還原紀錄遺失、UniOpen 完整品牌清單、JCB 封頂計算！</div>
+            <div class="ticker-content" id="news-text">🎉 V126.2修復：備份還原紀錄遺失、UniOpen 完整品牌清單、JCB 封頂計算！</div>
         </div>
         
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
@@ -706,6 +706,44 @@
                             <b>(3) 生活補給通路：</b><br>
                             LINE Pay, UberEats, foodpanda, 麥當勞, 肯德基, 摩斯漢堡, 21世紀, 美墨炸雞, 拿坡里, Pizzahut, 蝦皮...
                         </div>
+                    </div>
+                </div>
+
+                <div id="cubeOptions">
+                    <div class="option-row" style="border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:10px;">
+                        <span style="font-weight:700; color:#333;">💳 等級 (自動記憶)：</span>
+                        <div style="display:flex; gap:12px; margin-top:8px;">
+                            <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;"><input type="radio" name="cubeLevel" value="lv1" onchange="saveCubeSettings()"> LV1 2%</label>
+                            <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;"><input type="radio" name="cubeLevel" value="lv2" onchange="saveCubeSettings()"> LV2 3%</label>
+                            <label style="display:flex; align-items:center; font-weight:normal; font-size:13px;"><input type="radio" name="cubeLevel" value="lv3" onchange="saveCubeSettings()"> LV3 3.3%</label>
+                        </div>
+                    </div>
+                    <div class="option-row" style="border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:10px;">
+                        <span style="font-weight:700; color:#333;">🎂 生日月 (自動記憶)：</span>
+                        <select id="selCubeBirthday" onchange="saveCubeSettings()" style="padding:4px 8px; border-radius:6px; border:1px solid #ccc; font-size:13px; margin-left:8px;">
+                            <option value="">未設定</option>
+                            <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
+                            <option value="4">4月</option><option value="5">5月</option><option value="6">6月</option>
+                            <option value="7">7月</option><option value="8">8月</option><option value="9">9月</option>
+                            <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+                        </select>
+                    </div>
+                    <div class="option-row"><label for="rbCubeGeneral">🔰 一般消費 (0.3%)</label><input type="radio" name="cubeMode" id="rbCubeGeneral" value="general" checked onchange="updateRewardPreview()"></div>
+                    <div class="option-row"><label for="rbCubeDigital">🖥️ 玩數位</label><input type="radio" name="cubeMode" id="rbCubeDigital" value="digital" onchange="updateRewardPreview()"></div>
+                    <div class="option-row"><label for="rbCubeDining">🍽️ 樂饗購</label><input type="radio" name="cubeMode" id="rbCubeDining" value="dining" onchange="updateRewardPreview()"></div>
+                    <div class="option-row"><label for="rbCubeTravel">✈️ 趣旅行</label><input type="radio" name="cubeMode" id="rbCubeTravel" value="travel" onchange="updateRewardPreview()"></div>
+                    <div class="option-row"><label for="rbCubeSelect">🛒 集精選 (固定 2%)</label><input type="radio" name="cubeMode" id="rbCubeSelect" value="select" onchange="updateRewardPreview()"></div>
+                    <div id="cubeBirthdayRows" style="display:none;">
+                        <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px; margin-top:4px;"><label for="rbCubeBirthdayDining">🎂 慶生月 餐廳/遊樂園/KTV (10%)</label><input type="radio" name="cubeMode" id="rbCubeBirthdayDining" value="birthday_dining" onchange="updateRewardPreview()"></div>
+                        <div class="option-row"><label for="rbCubeBirthdayOther">🎂 慶生月 百貨/外送/購票 (3.5%)</label><input type="radio" name="cubeMode" id="rbCubeBirthdayOther" value="birthday_other" onchange="updateRewardPreview()"></div>
+                    </div>
+                    <div id="cubeBirthdayHint" style="display:none; font-size:10px; color:#e65100; margin-top:4px;">⚠️ 請先設定生日月份</div>
+                    <div class="option-row" style="border-top:1px dashed #ddd; padding-top:8px; margin-top:6px;">
+                        <label for="checkCubeLinePay">🟢 LINE Pay 領券 +1.7% (月上限100點)</label>
+                        <input type="checkbox" id="checkCubeLinePay" onchange="updateRewardPreview()">
+                    </div>
+                    <div style="font-size:10px; color:#555; margin-top:4px; opacity:0.8;">
+                        💡 需至 CUBE App 領券，當月 LINE Pay 消費滿 8 筆才享加碼
                     </div>
                 </div>
                 
@@ -1469,7 +1507,7 @@
     
     <script>
     // ==========================================
-    // Part 3: 核心設定、匯率與 UI 邏輯 (V126.3)
+    // Part 3: 核心設定、匯率與 UI 邏輯 (V126.2)
     // ==========================================
     
     const LOCATION_CONFIG = {
@@ -2125,6 +2163,7 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
         { id: 'j4', name: '永豐幣倍卡 (大大/大戶)', nickname: '海外雙幣神卡', note: '海外精選 6% (刷 2萬封頂)', type: 'ceiling', limit: 80000, tier1Rate: 0.06, tier2Rate: 0.02, gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: 'white', msgDanger: '加碼已封頂', parking: `💰 <b>幣倍卡 2026</b><br><b>Level 1 (大大)</b><br>條件：自動扣繳+電子帳單<br>限刷：$7,500<br><br><b>Level 2 (大戶)</b><br>條件：往來資產≥10萬<br>限刷：$20,000`},
         { id: 'j5', name: '永豐三井聯名卡', nickname: '餐飲優等生/日韓泰附加', note: '餐飲 7.3% (底0.3%+7%)', type: 'custom_mitsui', target: 30000, tier1Rate: 0.073, tier2Rate: 0.003, gradient: 'linear-gradient(135deg, #00C9FF 0%, #92FE9D 100%)', textColor: '#333', msgSuccess: '已達標 (領$2000)', parking: `🍽️ <b>特選餐飲 7.3%</b> (0.3+7)<br>通路：館外餐飲(MCC 58xx) / 全盈+PAY<br>⚠️ 加碼上限僅 100 元 (約刷 $1,428)<br><br>🇯🇵 <b>日韓泰滿額禮 (需登錄)</b><br>每季累積滿 30,000 送 2,000 (回饋約6.9%)`},
         { id: 'c12', name: '永豐現金回饋 JCB', nickname: '旅日神卡', note: '國內特選/日本 +3% (月$1萬共用)', type: 'custom_jcb', limit: 10000, tier1Rate: 0.05, tier2Rate: 0.01, gradient: 'linear-gradient(135deg, #8E0E00 0%, #1F1C18 100%)', textColor: 'white', msgDanger: '特選已封頂 (變1%)', parking: `🇯🇵 <b>日本消費</b><br>最高 5% (國外2% + 加碼3%)<br>🛍️ <b>特選通路</b><br>最高 5% (國外2% + 加碼3%) 或 4% (國內1% + 加碼3%)<br>⚠️ 日本+特選共用加碼上限 $300/月 (約刷 $10,000)<br>🔥 <b>日韓泰滿額</b> (需登錄)<br>每季累積滿 2 萬送 $1,000 (共用上限)`},
+        { id: 'cube1', name: '國泰 CUBE 卡', nickname: '切換達人', note: '指定通路 3% 無上限 (LV2)', type: 'custom_cube', gradient: 'linear-gradient(135deg, #1B365D 0%, #4A90D9 100%)', textColor: 'white', msgDanger: '', parking: `🖥️ <b>玩數位</b> 依等級 2%/3%/3.3%<br>蝦皮/momo/PChome/Netflix/ChatGPT/Claude 等<br><br>🍽️ <b>樂饗購</b> 依等級 2%/3%/3.3%<br>指定百貨/星巴克/麥當勞/鼎泰豐 等<br><br>✈️ <b>趣旅行</b> 依等級 2%/3%/3.3%<br>Booking/Agoda/Klook/KKday/航空/高鐵 等<br><br>🛒 <b>集精選</b> 固定 2%<br>7-11/全家/全聯/家樂福/充電停車 等<br><br>🎂 <b>慶生月</b> (限當月壽星)<br>餐廳/遊樂園/KTV 10% | 百貨/外送/購票 3.5%<br><br>🟢 <b>LINE Pay 領券</b> +1.7% (月上限100點，約刷$5,882)<br>⚠️ 需至 CUBE App 領券，當月滿 8 筆`},
         { id: 'add1', name: '新增卡片', nickname: '點擊選卡', note: '前往資料庫挑選', type: 'placeholder', gradient: 'linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%)', textColor: '#999', msgDanger: '' }
     ];
   let visibleCards = JSON.parse(localStorage.getItem('visibleCards')), savedOrder = JSON.parse(localStorage.getItem('cardOrder')), cards = [...defaultCards], sortableInstance = null;
@@ -2528,7 +2567,7 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
     }
       
     // ==========================================
-    // Part 4: 交易資料、Toggle 邏輯與運算核心 (V126.3)
+    // Part 4: 交易資料、Toggle 邏輯與運算核心 (V126.2)
     // ==========================================
 
     function getTransactionsKey(cardId) { return `transactions_${cardId}`; }
@@ -2574,7 +2613,7 @@ function getActualCycleDay(year, month, cycleDay) {
         
         return txs.filter(tx => {
             const txCycleKey = getCycleKey(cardId, tx.date);
-            return txCycleKey === currentCycleKey;126.3
+            return txCycleKey === currentCycleKey;126.2
         });
     }
 
@@ -2638,7 +2677,7 @@ document.getElementById('dateInput').value = today.getFullYear() + '-' + String(
         document.getElementById('twdConversionDisplay').style.display = 'none';
         
         // 隱藏所有卡片專屬選項
-        const allOptions = ['pigRichOptions', 'greenCardOptions', 'uniOptions', 'happyOptions', 'hsbcOptions', 'uniOpenOptions', 'richartOptions', 'fubonJOptions', 'jiheOptions', 'kumamonOptions', 'sinopacCurrencyOptions', 'sinopacMitsuiOptions', 'jiangOptions', 'dbsEcoOptions', 'sinopacJcbOptions', 'laiDianOptions', 'legendOptions'];
+        const allOptions = ['pigRichOptions', 'greenCardOptions', 'uniOptions', 'happyOptions', 'hsbcOptions', 'uniOpenOptions', 'richartOptions', 'fubonJOptions', 'jiheOptions', 'kumamonOptions', 'sinopacCurrencyOptions', 'sinopacMitsuiOptions', 'jiangOptions', 'dbsEcoOptions', 'sinopacJcbOptions', 'laiDianOptions', 'legendOptions', 'cubeOptions'];
         allOptions.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
         
         // 隱藏警告
@@ -2814,6 +2853,11 @@ document.getElementById('dateInput').value = today.getFullYear() + '-' + String(
         // C1 傳說對決卡
         else if (cardId === 'c1') {
             document.getElementById('legendOptions').style.display = 'block';
+        }
+        // CUBE1 國泰CUBE卡
+        else if (cardId === 'cube1') {
+            document.getElementById('cubeOptions').style.display = 'block';
+            loadCubeSettings();
         }
     }
 
@@ -3510,6 +3554,47 @@ function handleHappyExclusive(selected) {
         updateRewardPreview();
     }
 
+    function loadCubeSettings() {
+        const level = localStorage.getItem('cube_level') || 'lv2';
+        const bday = localStorage.getItem('cube_birthday') || '';
+        document.querySelector(`input[name="cubeLevel"][value="${level}"]`).checked = true;
+        document.getElementById('selCubeBirthday').value = bday;
+        // 根據生日月顯示慶生月選項
+        updateCubeBirthdayRows();
+    }
+    function saveCubeSettings() {
+        const level = document.querySelector('input[name="cubeLevel"]:checked')?.value || 'lv2';
+        localStorage.setItem('cube_level', level);
+        const bday = document.getElementById('selCubeBirthday').value;
+        localStorage.setItem('cube_birthday', bday);
+        updateCubeBirthdayRows();
+        updateRewardPreview();
+        renderGrid();
+    }
+    function updateCubeBirthdayRows() {
+        const bday = localStorage.getItem('cube_birthday') || '';
+        const bdayRows = document.getElementById('cubeBirthdayRows');
+        const bdayHint = document.getElementById('cubeBirthdayHint');
+        if (!bday) {
+            bdayRows.style.display = 'none';
+            bdayHint.style.display = 'block';
+            return;
+        }
+        bdayHint.style.display = 'none';
+        const now = new Date();
+        const currentMonth = now.getMonth() + 1;
+        if (parseInt(bday) === currentMonth) {
+            bdayRows.style.display = 'block';
+        } else {
+            bdayRows.style.display = 'none';
+            // 如果已選慶生月選項，重置為一般
+            const selected = document.querySelector('input[name="cubeMode"]:checked')?.value;
+            if (selected === 'birthday_dining' || selected === 'birthday_other') {
+                document.getElementById('rbCubeGeneral').checked = true;
+            }
+        }
+    }
+
     // 取得交易選項
     function getTransactionOptions(cardId) {
         const options = {};
@@ -3592,6 +3677,11 @@ function handleHappyExclusive(selected) {
         }
         else if (cardId === 'c1') {
             options.isBonus = document.getElementById('checkLegendBonus')?.checked || false;
+        }
+        else if (cardId === 'cube1') {
+            options.cubeMode = document.querySelector('input[name="cubeMode"]:checked')?.value || 'general';
+            options.isCubeLinePay = document.getElementById('checkCubeLinePay')?.checked || false;
+            options.cubeLevel = document.querySelector('input[name="cubeLevel"]:checked')?.value || 'lv2';
         }
         
         return options;
@@ -3794,7 +3884,10 @@ function handleHappyExclusive(selected) {
             isDbsLinePay: document.getElementById('checkDbsLinePay')?.checked || false,
             isDbsGreen: document.getElementById('checkDbsGreen')?.checked || false,
             isDbsForeign: document.getElementById('checkDbsForeign')?.checked || false,
-            isLegendBonus: document.getElementById('checkLegendBonus')?.checked || false
+            isLegendBonus: document.getElementById('checkLegendBonus')?.checked || false,
+            cubeMode: document.querySelector('input[name="cubeMode"]:checked')?.value || 'general',
+            isCubeLinePay: document.getElementById('checkCubeLinePay')?.checked || false,
+            cubeLevel: document.querySelector('input[name="cubeLevel"]:checked')?.value || 'lv2'
         };
         
         let txs = getTransactions(cardId);
@@ -4085,6 +4178,16 @@ function handleHappyExclusive(selected) {
         }
         else if (cardId === 'c1') {
             document.getElementById('checkLegendBonus').checked = tx.isLegendBonus || false;
+        }
+        else if (cardId === 'cube1') {
+            const mode = tx.cubeMode || 'general';
+            const modeRadio = document.querySelector(`input[name="cubeMode"][value="${mode}"]`);
+            if (modeRadio) modeRadio.checked = true;
+            document.getElementById('checkCubeLinePay').checked = tx.isCubeLinePay || false;
+            if (tx.cubeLevel) {
+                const lvRadio = document.querySelector(`input[name="cubeLevel"][value="${tx.cubeLevel}"]`);
+                if (lvRadio) lvRadio.checked = true;
+            }
         }
         
         // 更新確認按鈕文字
@@ -4852,6 +4955,45 @@ function handleHappyExclusive(selected) {
             return { reward: baseReward, rate: 0.012 };
         }
         
+        // CUBE1 國泰CUBE卡
+        else if (cardId === 'cube1') {
+            const cubeMode = options.cubeMode || options.mode || 'general';
+            const cubeLevel = options.cubeLevel || localStorage.getItem('cube_level') || 'lv2';
+            const isCubeLP = options.isCubeLinePay || false;
+            
+            // 依等級決定三大方案回饋率
+            let levelRate = 0.03; // LV2 default
+            if (cubeLevel === 'lv1') levelRate = 0.02;
+            else if (cubeLevel === 'lv3') levelRate = 0.033;
+            
+            // 依 mode 決定回饋率
+            let mainRate = 0.003; // 一般消費
+            if (cubeMode === 'digital' || cubeMode === 'dining' || cubeMode === 'travel') {
+                mainRate = levelRate;
+            } else if (cubeMode === 'select') {
+                mainRate = 0.02;
+            } else if (cubeMode === 'birthday_dining') {
+                mainRate = 0.10;
+            } else if (cubeMode === 'birthday_other') {
+                mainRate = 0.035;
+            }
+            
+            reward = Math.floor(amount * mainRate);
+            rate = mainRate;
+            
+            // LINE Pay 領券加碼 +1.7% (月上限 100 點)
+            if (isCubeLP) {
+                const lpSpent = getCardBonusSpent(cardId, t => t.isCubeLinePay && (!editingTxId || t.id !== editingTxId));
+                const lpRewardUsed = Math.floor(lpSpent * 0.017);
+                const lpRemain = Math.max(0, 100 - lpRewardUsed);
+                const thisLpReward = Math.min(Math.floor(amount * 0.017), lpRemain);
+                reward += thisLpReward;
+                rate = amount > 0 ? reward / amount : rate;
+            }
+            
+            return { reward, rate };
+        }
+        
         // 預設（含自建卡片封頂處理）
         rate = card.tier1Rate || 0.01;
         if (card.isCustom && card.limit && card.limit < 99999999) {
@@ -4899,6 +5041,7 @@ function handleHappyExclusive(selected) {
         let uniOpenIcashCumulative = 0;
         let uniOpenOverseasCumulative = 0;
         let customCumulative = 0;
+        let cubeLpCumulative = 0;
         
         txs.forEach(tx => {
             const amount = tx.amountTWD || tx.amount || 0;
@@ -5002,6 +5145,31 @@ function handleHappyExclusive(selected) {
                     if (tx.isUniIcash) uniOpenIcashCumulative += amount;
                 }
                 totalReward += txReward;
+    } else if (cardId === 'cube1') {
+        // CUBE卡：主回饋無上限，LINE Pay有上限
+        const cubeMode = tx.cubeMode || 'general';
+        const cubeLevel = tx.cubeLevel || localStorage.getItem('cube_level') || 'lv2';
+        let levelRate = 0.03;
+        if (cubeLevel === 'lv1') levelRate = 0.02;
+        else if (cubeLevel === 'lv3') levelRate = 0.033;
+        
+        let mainRate = 0.003;
+        if (cubeMode === 'digital' || cubeMode === 'dining' || cubeMode === 'travel') mainRate = levelRate;
+        else if (cubeMode === 'select') mainRate = 0.02;
+        else if (cubeMode === 'birthday_dining') mainRate = 0.10;
+        else if (cubeMode === 'birthday_other') mainRate = 0.035;
+        
+        let txReward = Math.floor(amount * mainRate);
+        
+        // LINE Pay 領券 +1.7% 月上限 100 點
+        if (tx.isCubeLinePay) {
+            const lpRewardUsed = Math.floor(cubeLpCumulative * 0.017);
+            const lpRemain = Math.max(0, 100 - lpRewardUsed);
+            const thisLpReward = Math.min(Math.floor(amount * 0.017), lpRemain);
+            txReward += thisLpReward;
+            cubeLpCumulative += amount;
+        }
+        totalReward += txReward;
     } else if (card.isCustom && card.limit && card.limit < 99999999) {
         // 自建卡片封頂累計
         const cRate = card.tier1Rate || 0.01;
@@ -5037,6 +5205,27 @@ function handleHappyExclusive(selected) {
             const plan = getRichartPlanDisplay(rm, rp);
             msg = `${plan.name} ${plan.rate}`;
             progress = 0;
+            return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
+        }
+
+        // 特殊處理：CUBE卡
+        if (cardId === 'cube1') {
+            const cubeLevel = localStorage.getItem('cube_level') || 'lv2';
+            const lvLabel = cubeLevel === 'lv1' ? 'LV1 2%' : cubeLevel === 'lv3' ? 'LV3 3.3%' : 'LV2 3%';
+            const lpSpent = getCardBonusSpent(cardId, t => t.isCubeLinePay);
+            const lpRewardUsed = Math.floor(lpSpent * 0.017);
+            const lpRemain = Math.max(0, 100 - lpRewardUsed);
+            if (lpSpent > 0) {
+                if (lpRemain <= 0) {
+                    msg = `${lvLabel} | LP封頂`;
+                } else {
+                    const lpSpendRemain = Math.ceil(lpRemain / 0.017);
+                    msg = `${lvLabel} | LP$${lpSpendRemain.toLocaleString()}`;
+                }
+            } else {
+                msg = `${lvLabel} 指定通路無上限`;
+            }
+            progress = lpSpent > 0 ? Math.min(100, (lpRewardUsed / 100) * 100) : 0;
             return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
         }
 
@@ -5101,19 +5290,23 @@ function handleHappyExclusive(selected) {
             const travelQuota = getJiangTravelQuotaUsed();
             
             let statusParts = [];
+            // 低消任務提醒
+            if (totalSpent < 3000) {
+                statusParts.push(`⚠️需累刷$${(3000 - totalSpent).toLocaleString()}`);
+            }
             if (selectedSpent >= selectedLimit) {
                 statusParts.push('生活封頂');
             } else {
-                statusParts.push(`生活可再刷$${(selectedLimit - selectedSpent).toLocaleString()}`);
+                statusParts.push(`生活$${(selectedLimit - selectedSpent).toLocaleString()}`);
             }
             if (travelQuota.travelSpent >= travelQuota.travelLimit) {
                 statusParts.push('旅遊封頂(季)');
             } else {
-                statusParts.push(`旅遊可再刷$${(travelQuota.travelRemain).toLocaleString()}(季)`);
+                statusParts.push(`旅遊$${(travelQuota.travelRemain).toLocaleString()}(季)`);
             }
             
             msg = statusParts.join('/');
-            progress = Math.min(100, (selectedSpent / selectedLimit) * 100);
+            progress = totalSpent < 3000 ? Math.min(100, (totalSpent / 3000) * 100) : Math.min(100, (selectedSpent / selectedLimit) * 100);
             
             return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
         }
@@ -5134,6 +5327,10 @@ function handleHappyExclusive(selected) {
             const peaceLimit = 5714;
             
             let statusParts = [];
+            // 低消任務提醒
+            if (totalSpent < 3000) {
+                statusParts.push(`⚠️需累刷$${(3000 - totalSpent).toLocaleString()}`);
+            }
             if (petSpent >= petLimit) {
                 statusParts.push('寵物封頂');
             } else {
@@ -5151,7 +5348,7 @@ function handleHappyExclusive(selected) {
             }
             
             msg = statusParts.join('/');
-            progress = Math.min(100, (totalSpent / 26000) * 100);
+            progress = totalSpent < 3000 ? Math.min(100, (totalSpent / 3000) * 100) : Math.min(100, (totalSpent / 26000) * 100);
             
             return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
         }
@@ -5396,7 +5593,7 @@ function handleHappyExclusive(selected) {
     function calculateTxRewardWithCap(cardId, tx) {
         const options = {
             ...tx,
-           mode: tx.jiangMode || tx.laiDianMode || tx.richartMode || 'general',
+           mode: [tx.cubeMode, tx.laiDianMode, tx.richartMode].find(m => m && m !== 'general') || 'general',
             tier: tx.hsbcTier,
             brandCount: tx.uniBrandCount,
             region: tx.fubonJRegion,
@@ -5418,6 +5615,8 @@ function handleHappyExclusive(selected) {
             isForeign: tx.isForeign || tx.isHappyForeign || tx.isHsbcForeign || tx.isSinopacJcbForeign || tx.isDbsForeign,
             isGreen: tx.isGreenChannel || tx.isDbsGreen,
             isLinePay: tx.isDbsLinePay,
+            isCubeLinePay: tx.isCubeLinePay,
+            cubeLevel: tx.cubeLevel,
             isGroup: tx.isUniGroup,
             isIcash: tx.isUniIcash,
             isOverseas: tx.isUniOverseas,
@@ -5518,6 +5717,13 @@ function getCardDisplayName(card) {
             } else {
                 return '任意選 3.5% (刷$4萬封頂)';
             }
+        }
+        // CUBE卡：根據等級顯示不同回饋率
+        if (card.id === 'cube1') {
+            const level = localStorage.getItem('cube_level') || 'lv2';
+            if (level === 'lv1') return '指定通路 2% 無上限 (LV1)';
+            if (level === 'lv3') return '指定通路 3.3% 無上限 (LV3)';
+            return '指定通路 3% 無上限 (LV2)';
         }
         return card.note || '';
     }
@@ -5927,7 +6133,7 @@ function handleCardPhoto(event) {
     // 匯出資料 (修復：確保 cardId 欄位存在)
     function exportData() {
         const data = {
-            version: 'V126.3',
+            version: 'V126.4',
             exportTime: new Date().toISOString(),
             visibleCards: visibleCards,
             cardOrder: savedOrder,

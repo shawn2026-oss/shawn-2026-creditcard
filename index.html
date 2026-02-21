@@ -28,7 +28,7 @@
     <meta property="og:url" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/">
     <meta property="og:type" content="website">
 
-    <title>刷卡回饋管家 (V126.4 )</title>
+    <title>刷卡回饋管家 (V126.5 )</title>
         
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
@@ -181,6 +181,8 @@
         
         .total-reward-card { background: #2c3e50; color: white; border-radius: 16px; padding: 16px 20px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(44, 62, 80, 0.2); }
         .total-reward-card::after { content: ''; position: absolute; top: -50%; right: -50%; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%; pointer-events: none; }
+        .reward-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,0.35); cursor:pointer; transition:all 0.2s; }
+        .reward-dot.active { width:8px; height:8px; background:rgba(255,255,255,0.9); }
         .total-info { display: flex; flex-direction: column; gap: 2px; }
         .total-reward-label { font-size: 13px; font-weight: 600; opacity: 0.9; }
         .total-reward-amount { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; }
@@ -585,7 +587,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V126.4 </div>
+            <div class="version-tag">V126.5 </div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -608,18 +610,47 @@
         <div class="subtitle"><span class="today-date" id="dateDisplay"></span></div>
         
         <div class="news-ticker">
-            <div class="ticker-content" id="news-text">🎉 V126.2修復：備份還原紀錄遺失、UniOpen 完整品牌清單、JCB 封頂計算！</div>
+            <div class="ticker-content" id="news-text">🎉 V126.5修復：備份還原紀錄遺失、UniOpen 完整品牌清單、JCB 封頂計算！</div>
         </div>
         
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
         
-        <div class="total-reward-card">
-            <div class="total-info">
-                <span class="total-reward-label">當期累積回饋預估</span>
-                <span class="total-reward-amount" id="totalRewardDisplay">$0</span>
-                <span class="total-reward-breakdown" id="totalRewardBreakdown"></span>
+        <div id="rewardCarouselWrap" style="position:relative; overflow:hidden; touch-action:pan-y; margin-bottom:16px;">
+            <div id="rewardCarouselTrack" style="display:flex; transition:transform 0.3s ease; width:300%; transform:translateX(-33.333%);">
+                <!-- 左：歷史月份 -->
+                <div class="total-reward-card" style="flex:0 0 33.333%; box-sizing:border-box; min-width:0; margin-bottom:0;">
+                    <div class="total-info">
+                        <select id="historyMonthSel" onchange="onMonthSelChange()" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:8px; padding:4px 8px; font-size:13px; font-weight:600; margin-bottom:4px; cursor:pointer;"></select>
+                        <span class="total-reward-amount" id="monthRewardDisplay">$0</span>
+                    </div>
+                    <span style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:20px; opacity:0.4; cursor:pointer;" onclick="goRewardPage(1)">▶</span>
+                </div>
+                <!-- 中：當期 -->
+                <div class="total-reward-card" style="flex:0 0 33.333%; box-sizing:border-box; min-width:0; margin-bottom:0;">
+                    <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:20px; opacity:0.4; cursor:pointer;" onclick="goRewardPage(0)">◀</span>
+                    <div class="total-info">
+                        <span class="total-reward-label">當期累積回饋預估</span>
+                        <span class="total-reward-amount" id="totalRewardDisplay">$0</span>
+                        <span class="total-reward-breakdown" id="totalRewardBreakdown"></span>
+                    </div>
+                    <button class="btn-share-result" onclick="openShareModal()">📩 曬戰績</button>
+                    <span style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:20px; opacity:0.4; cursor:pointer;" onclick="goRewardPage(2)">▶</span>
+                </div>
+                <!-- 右：年度總回饋 -->
+                <div class="total-reward-card" style="flex:0 0 33.333%; box-sizing:border-box; min-width:0; margin-bottom:0;">
+                    <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:20px; opacity:0.4; cursor:pointer;" onclick="goRewardPage(1)">◀</span>
+                    <div class="total-info">
+                        <select id="historyYearSel" onchange="onYearSelChange()" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:8px; padding:4px 8px; font-size:13px; font-weight:600; margin-bottom:4px; cursor:pointer;"></select>
+                        <span class="total-reward-amount" id="yearRewardDisplay">$0</span>
+                    </div>
+                </div>
             </div>
-             <button class="btn-share-result" onclick="openShareModal()">📩 曬戰績</button>
+            <!-- 全局圓點 -->
+            <div id="rewardDots" style="position:absolute; bottom:6px; left:0; right:0; display:flex; justify-content:center; gap:6px; z-index:3; pointer-events:none;">
+                <span class="reward-dot" onclick="goRewardPage(0)" style="pointer-events:auto;"></span>
+                <span class="reward-dot active" onclick="goRewardPage(1)" style="pointer-events:auto;"></span>
+                <span class="reward-dot" onclick="goRewardPage(2)" style="pointer-events:auto;"></span>
+            </div>
         </div>
         
         <div id="card-grid"></div>
@@ -1595,7 +1626,7 @@
     
     <script>
     // ==========================================
-    // Part 3: 核心設定、匯率與 UI 邏輯 (V126.2)
+    // Part 3: 核心設定、匯率與 UI 邏輯 (V126.5)
     // ==========================================
     
     const LOCATION_CONFIG = {
@@ -1924,6 +1955,7 @@
     fetch('config.json?t=' + Date.now()).then(response => response.json()).then(data => { if(data.news) document.getElementById('news-text').innerHTML = data.news; }).catch(error => {});
     let cardSettings = JSON.parse(localStorage.getItem('cardSettings')) || {};
 let editingTxId = null; // 追蹤正在編輯的交易 ID
+let historyMonth = null; // null = 當期, {year, month} = 歷史月份
 let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
 
     window.addEventListener('load', () => {
@@ -2215,7 +2247,7 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
         if (realCards.length > 8) realCards = realCards.slice(0, 8);
         if (realCards.length < 8 && !currentCards.includes('add1')) realCards.push('add1');
         localStorage.setItem('visibleCards', JSON.stringify(realCards));
-        visibleCards = realCards; renderGrid();
+        visibleCards = realCards; renderGrid(); buildHistoryOptions();
     }
 
     function closeModal() { 
@@ -2656,12 +2688,12 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
     }
       
     // ==========================================
-    // Part 4: 交易資料、Toggle 邏輯與運算核心 (V126.2)
+    // Part 4: 交易資料、Toggle 邏輯與運算核心 (V126.5)
     // ==========================================
 
     function getTransactionsKey(cardId) { return `transactions_${cardId}`; }
     function getTransactions(cardId) { return JSON.parse(localStorage.getItem(getTransactionsKey(cardId)) || '[]'); }
-    function saveTransactions(cardId, txs) { localStorage.setItem(getTransactionsKey(cardId), JSON.stringify(txs)); }
+    function saveTransactions(cardId, txs) { localStorage.setItem(getTransactionsKey(cardId), JSON.stringify(txs)); try { buildHistoryOptions(); } catch(e){} }
 // 取得該月的實際結帳日（處理大小月）
 function getActualCycleDay(year, month, cycleDay) {
     const lastDay = new Date(year, month + 1, 0).getDate();
@@ -2702,7 +2734,7 @@ function getActualCycleDay(year, month, cycleDay) {
         
         return txs.filter(tx => {
             const txCycleKey = getCycleKey(cardId, tx.date);
-            return txCycleKey === currentCycleKey;126.2
+            return txCycleKey === currentCycleKey;126.5
         });
     }
 
@@ -5942,7 +5974,327 @@ if (cycleDay && cycleDay > 0) {
         checkUrgentAlerts();
     }
 
+    // ===== 歷史月份回饋計算 =====
+    function replayCyclePerTx(cardId, txs) {
+        const card = cards.find(c => c.id === cardId);
+        if (!card || card.type === 'placeholder' || txs.length === 0) return [];
+        
+        const perTx = [];
+        let totalReward = 0;
+        const totalSpent = txs.reduce((s, t) => s + (t.amountTWD || t.amount || 0), 0);
+        
+        // Cumulative state
+        let jiangSelCum = 0, jiangTrvCum = 0;
+        let legendCum = 0, uniBonusCum = 0, uniTimeCum = 0;
+        let uoGroupCum = 0, uoIcashCum = 0, uoOverseasCum = 0;
+        let cubeLpCum = 0, customCum = 0;
+        let fubonPhysCum = 0, fubonSuicaCum = 0;
+        let kumaDesigCum = 0, kumaPPCum = 0;
+        let jcbBonusCum = 0;
+        
+        const jiangReachedMin = (cardId === 'c4') ? (totalSpent >= 3000) : true;
+        const happyReachedMin = (cardId === 'c8') ? (totalSpent >= 3000) : true;
+        
+        txs.forEach(tx => {
+            const prev = totalReward;
+            const amount = tx.amountTWD || tx.amount || 0;
+            
+            if (cardId === 'c4') {
+                if (!jiangReachedMin) {
+                    totalReward += Math.floor(amount * 0.005);
+                } else {
+                    let r = Math.floor(amount * 0.005);
+                    if (tx.isJiangSelected) {
+                        const lim = 6666;
+                        if (jiangSelCum < lim) { const av = Math.min(amount, lim - jiangSelCum); r = Math.floor(av * 0.05) + Math.floor((amount - av) * 0.005); }
+                        jiangSelCum += amount;
+                    } else if (tx.isJiangTravel) {
+                        const tq = getJiangTravelQuotaUsed();
+                        if (tq.reachedMinSpend && jiangTrvCum < tq.travelLimit) { const av = Math.min(amount, tq.travelLimit - jiangTrvCum); r = Math.floor(av * 0.05) + Math.floor((amount - av) * 0.005); }
+                        jiangTrvCum += amount;
+                    }
+                    totalReward += r;
+                }
+            } else if (cardId === 'c8') {
+                if (!happyReachedMin) { totalReward += Math.floor(amount * 0.005); }
+                else { totalReward += calculateTxRewardWithCap(cardId, tx).reward; }
+            } else if (cardId === 'c1') {
+                const base = Math.floor(amount * 0.012);
+                if (tx.isLegendBonus && (tx.location || 'TW') === 'TW') {
+                    const lim = 11363;
+                    if (legendCum < lim) { const av = Math.min(amount, lim - legendCum); totalReward += base + Math.floor(av * 0.088); }
+                    else { totalReward += base; }
+                    legendCum += amount;
+                } else { totalReward += base; }
+            } else if (cardId === 'c7') {
+                const uniS = JSON.parse(localStorage.getItem('uni_settings') || '{}');
+                const isUp = tx.isUniUp || uniS.isUp;
+                const bRate = isUp ? 0.035 : 0.025;
+                const bLim = isUp ? 140000 : 40000;
+                let r = Math.floor(amount * 0.01);
+                if (uniBonusCum < bLim) { const av = Math.min(amount, bLim - uniBonusCum); r += Math.floor(av * bRate); }
+                uniBonusCum += amount;
+                if (tx.isUniBonus) {
+                    const tLim = 16000;
+                    if (uniTimeCum < tLim) { const av = Math.min(amount, tLim - uniTimeCum); r += Math.floor(av * 0.03); }
+                    uniTimeCum += amount;
+                }
+                totalReward += r;
+            } else if (cardId === 'c10') {
+                let r = Math.floor(amount * 0.01);
+                if (tx.isUniOverseas) {
+                    const lim = 6250;
+                    if (uoOverseasCum < lim) { const av = Math.min(amount, lim - uoOverseasCum); r = Math.floor(av * 0.11) + Math.floor((amount - av) * 0.01); }
+                    uoOverseasCum += amount;
+                } else {
+                    let br = 0;
+                    if (tx.isUniGroup) { if (uoGroupCum < 25000) br += 0.02; }
+                    if (tx.isUniIcash) { if (uoIcashCum < 3750) br += 0.04; }
+                    if (tx.isUniGroup && (tx.uniBrandCount || 0) >= 2) {
+                        const bc = tx.uniBrandCount;
+                        br += bc >= 5 ? 0.04 : bc >= 4 ? 0.03 : bc >= 3 ? 0.02 : 0.01;
+                    }
+                    r = Math.floor(amount * (0.01 + br));
+                    if (tx.isUniGroup) uoGroupCum += amount;
+                    if (tx.isUniIcash) uoIcashCum += amount;
+                }
+                totalReward += r;
+            } else if (cardId === 'cube1') {
+                const cm = tx.cubeMode || 'general';
+                const cl = tx.cubeLevel || localStorage.getItem('cube_level') || 'lv2';
+                let lr = cl === 'lv1' ? 0.02 : cl === 'lv3' ? 0.033 : 0.03;
+                let mr = 0.003;
+                if (['digital','dining','travel'].includes(cm)) mr = lr;
+                else if (cm === 'select') mr = 0.02;
+                else if (cm === 'birthday_high' || cm === 'megaport_high') mr = 0.10;
+                else if (cm === 'birthday_low' || cm === 'megaport_low') mr = 0.035;
+                let r = Math.floor(amount * mr);
+                if (tx.isCubeLinePay) {
+                    const lpUsed = Math.floor(cubeLpCum * 0.017);
+                    const lpRem = Math.max(0, 100 - lpUsed);
+                    r += Math.min(Math.floor(amount * 0.017), lpRem);
+                    cubeLpCum += amount;
+                }
+                totalReward += r;
+            } else if (cardId === 'j1') {
+                const isJpkr = tx.isFubonJJpkr || (tx.fubonJRegion === 'jpkr');
+                const isTh = tx.isFubonJTh || (tx.fubonJRegion === 'th');
+                const baseRate = isJpkr ? 0.03 : isTh ? 0.01 : 0.01;
+                totalReward += Math.floor(amount * baseRate);
+                const bonus = tx.fubonJBonus || 'none';
+                const physJpkr = tx.isFubonJJpkrBonus || (bonus === 'jpkr_physical');
+                const physTh = tx.isFubonJThBonus || (bonus === 'th_physical');
+                const isSuica = tx.isFubonJSuica || (bonus === 'suica');
+                const physLim = 33333, suicaLim = 2857;
+                if (physJpkr && amount >= 1000) {
+                    if (fubonPhysCum < physLim) totalReward += Math.floor(Math.min(amount, physLim - fubonPhysCum) * 0.03);
+                    fubonPhysCum += amount;
+                } else if (physTh && amount >= 1000) {
+                    if (fubonPhysCum < physLim) totalReward += Math.floor(Math.min(amount, physLim - fubonPhysCum) * 0.05);
+                    fubonPhysCum += amount;
+                } else if (isSuica && amount >= 2000) {
+                    if (fubonSuicaCum < suicaLim) totalReward += Math.floor(Math.min(amount, suicaLim - fubonSuicaCum) * 0.07);
+                    fubonSuicaCum += amount;
+                }
+            } else if (cardId === 'j3') {
+                if (tx.isKumamonPayPay) {
+                    const lim = 2857;
+                    if (kumaPPCum < lim) totalReward += Math.floor(Math.min(amount, lim - kumaPPCum) * 0.05);
+                    kumaPPCum += amount;
+                } else if (tx.isKumamonJapan) {
+                    let r = Math.floor(amount * 0.025);
+                    if (tx.isKumamonDesignated) {
+                        const lim = 8333;
+                        if (kumaDesigCum < lim) r += Math.floor(Math.min(amount, lim - kumaDesigCum) * 0.06);
+                        kumaDesigCum += amount;
+                    }
+                    totalReward += r;
+                } else { totalReward += Math.floor(amount * 0.005); }
+            } else if (cardId === 'c12') {
+                const baseRate = tx.isSinopacJcbForeign ? 0.02 : 0.01;
+                totalReward += Math.floor(amount * baseRate);
+                if (tx.isSinopacJcbBonus) {
+                    const lim = 10000;
+                    if (jcbBonusCum < lim) {
+                        const av = Math.min(amount, lim - jcbBonusCum);
+                        totalReward += Math.min(Math.floor(av * 0.03), 300 - Math.floor(jcbBonusCum * 0.03));
+                    }
+                    jcbBonusCum += amount;
+                }
+            } else if (card.isCustom && card.limit && card.limit < 99999999) {
+                const cRate = card.tier1Rate || 0.01;
+                const cT2 = card.tier2Rate || 0;
+                if (customCum < card.limit) {
+                    const av = Math.min(amount, card.limit - customCum);
+                    totalReward += Math.floor(av * cRate) + Math.floor((amount - av) * cT2);
+                } else { totalReward += Math.floor(amount * cT2); }
+                customCum += amount;
+            } else {
+                totalReward += calculateTxRewardWithCap(cardId, tx).reward;
+            }
+            
+            perTx.push({ id: tx.id, date: tx.date, reward: totalReward - prev });
+        });
+        
+        return perTx;
+    }
+    
+    function getMonthlyTotalReward(year, month) {
+        let totalCash = 0, totalMiles = 0;
+        
+        cards.forEach(card => {
+            if (card.type === 'placeholder') return;
+            
+            const allTxs = getTransactions(card.id);
+            if (allTxs.length === 0) return;
+            
+            // 找出落在目標月份的交易 ID
+            const targetIds = new Set();
+            allTxs.forEach(tx => {
+                const d = parseFlexibleDate(tx.date);
+                if (d && d.getFullYear() === year && d.getMonth() === (month - 1)) targetIds.add(tx.id);
+            });
+            if (targetIds.size === 0) return;
+            
+            // 按帳單週期分組
+            const groups = {};
+            allTxs.forEach(tx => {
+                const key = getCycleKey(card.id, tx.date);
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(tx);
+            });
+            
+            // 只重播含有目標月份交易的週期
+            Object.values(groups).forEach(cycleTxs => {
+                if (!cycleTxs.some(tx => targetIds.has(tx.id))) return;
+                // 按日期排序確保累計順序正確
+                cycleTxs.sort((a, b) => new Date(a.date) - new Date(b.date));
+                const perTx = replayCyclePerTx(card.id, cycleTxs);
+                perTx.forEach(r => {
+                    if (targetIds.has(r.id)) {
+                        if (card.type === 'miles') totalMiles += r.reward;
+                        else totalCash += r.reward;
+                    }
+                });
+            });
+        });
+        
+        return { totalCash, totalMiles };
+    }
+    
+    // ===== 三頁回饋切換 =====
+    let rewardPage = 1; // 0=月份, 1=當期, 2=年度
+    
+    function goRewardPage(idx) {
+        rewardPage = idx;
+        const track = document.getElementById('rewardCarouselTrack');
+        track.style.transform = `translateX(-${idx * 100 / 3}%)`;
+        updateRewardDots();
+    }
+    
+    function updateRewardDots() {
+        document.querySelectorAll('#rewardDots .reward-dot, .total-reward-card .reward-dot').forEach((d, i) => {
+            // 每組3個dots，找出對應的page index
+            const pageIdx = i % 3;
+            d.classList.toggle('active', pageIdx === rewardPage);
+        });
+    }
+    
+    function buildHistoryOptions() {
+        // 找最早交易月份
+        let earliest = new Date();
+        cards.forEach(card => {
+            if (card.type === 'placeholder') return;
+            getTransactions(card.id).forEach(tx => {
+                const d = parseFlexibleDate(tx.date);
+                if (d && d < earliest) earliest = d;
+            });
+        });
+        
+        const now = new Date();
+        const curYear = now.getFullYear();
+        const curMonth = now.getMonth() + 1;
+        
+        // 月份下拉
+        const mSel = document.getElementById('historyMonthSel');
+        const prevM = mSel.value;
+        mSel.innerHTML = '';
+        let y = curYear, m = curMonth;
+        const eY = earliest.getFullYear(), eM = earliest.getMonth() + 1;
+        while (y > eY || (y === eY && m >= eM)) {
+            mSel.appendChild(new Option(`${y}年${m}月`, `${y}_${m}`));
+            m--;
+            if (m < 1) { m = 12; y--; }
+        }
+        if ([...mSel.options].some(o => o.value === prevM)) mSel.value = prevM;
+        
+        // 年度下拉
+        const ySel = document.getElementById('historyYearSel');
+        const prevY = ySel.value;
+        ySel.innerHTML = '';
+        for (let yr = curYear; yr >= earliest.getFullYear(); yr--) {
+            ySel.appendChild(new Option(`🏆 ${yr}年 累計回饋`, String(yr)));
+        }
+        if ([...ySel.options].some(o => o.value === prevY)) ySel.value = prevY;
+        
+        // 初始計算
+        onMonthSelChange();
+        onYearSelChange();
+        
+        // 預設停在當期（中間）
+        goRewardPage(1);
+    }
+    
+    function formatRewardHtml(result) {
+        if (result.totalCash > 0 && result.totalMiles > 0) {
+            return `$${result.totalCash.toLocaleString()}<div style="font-size:60%; opacity:0.7; margin-top:2px;">✈️ ${result.totalMiles.toLocaleString()} 哩</div>`;
+        } else if (result.totalMiles > 0) {
+            return `${result.totalMiles.toLocaleString()} 哩`;
+        }
+        return `$${result.totalCash.toLocaleString()}`;
+    }
+    
+    function onMonthSelChange() {
+        const val = document.getElementById('historyMonthSel').value;
+        if (!val) return;
+        const [y, m] = val.split('_').map(Number);
+        const result = getMonthlyTotalReward(y, m);
+        document.getElementById('monthRewardDisplay').innerHTML = formatRewardHtml(result);
+    }
+    
+    function onYearSelChange() {
+        const year = parseInt(document.getElementById('historyYearSel').value);
+        if (!year) return;
+        const now = new Date();
+        const maxMonth = (year === now.getFullYear()) ? now.getMonth() + 1 : 12;
+        let totalCash = 0, totalMiles = 0;
+        for (let m = 1; m <= maxMonth; m++) {
+            const r = getMonthlyTotalReward(year, m);
+            totalCash += r.totalCash;
+            totalMiles += r.totalMiles;
+        }
+        document.getElementById('yearRewardDisplay').innerHTML = formatRewardHtml({ totalCash, totalMiles });
+    }
+    
+    // 觸控滑動
+    (function() {
+        let startX = 0, swiping = false;
+        const el = document.getElementById('rewardCarouselWrap');
+        if (!el) return;
+        el.addEventListener('touchstart', e => { startX = e.touches[0].clientX; swiping = true; }, { passive: true });
+        el.addEventListener('touchend', e => {
+            if (!swiping) return;
+            swiping = false;
+            const dx = e.changedTouches[0].clientX - startX;
+            if (Math.abs(dx) > 40) {
+                const newPage = rewardPage + (dx < 0 ? 1 : -1);
+                if (newPage >= 0 && newPage <= 2) goRewardPage(newPage);
+            }
+        }, { passive: true });
+    })();
+
     function updateTotalReward() {
+        
         let totalCash = 0, totalMiles = 0;
         const savedLocation = currentLocation;
         currentLocation = 'TW';
@@ -6223,7 +6575,7 @@ function handleCardPhoto(event) {
     // 匯出資料 (修復：確保 cardId 欄位存在)
     function exportData() {
         const data = {
-            version: 'V126.4',
+            version: 'V126.5',
             exportTime: new Date().toISOString(),
             visibleCards: visibleCards,
             cardOrder: savedOrder,

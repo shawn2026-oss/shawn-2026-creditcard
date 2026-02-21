@@ -28,7 +28,7 @@
     <meta property="og:url" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/">
     <meta property="og:type" content="website">
 
-    <title>刷卡回饋管家 (V126.5 )</title>
+    <title>刷卡回饋管家 (V126.4 )</title>
         
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
@@ -587,7 +587,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V126.5 </div>
+            <div class="version-tag">V126.4 </div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -610,7 +610,7 @@
         <div class="subtitle"><span class="today-date" id="dateDisplay"></span></div>
         
         <div class="news-ticker">
-            <div class="ticker-content" id="news-text">🎉 V126.5修復：備份還原紀錄遺失、UniOpen 完整品牌清單、JCB 封頂計算！</div>
+            <div class="ticker-content" id="news-text">🎉 V126.2修復：備份還原紀錄遺失、UniOpen 完整品牌清單、JCB 封頂計算！</div>
         </div>
         
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
@@ -618,10 +618,11 @@
         <div id="rewardCarouselWrap" style="position:relative; overflow:hidden; touch-action:pan-y; margin-bottom:16px;">
             <div id="rewardCarouselTrack" style="display:flex; transition:transform 0.3s ease; width:300%; transform:translateX(-33.333%);">
                 <!-- 左：歷史月份 -->
-                <div class="total-reward-card" style="flex:0 0 33.333%; box-sizing:border-box; min-width:0; margin-bottom:0;">
-                    <div class="total-info">
-                        <select id="historyMonthSel" onchange="onMonthSelChange()" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:8px; padding:4px 8px; font-size:13px; font-weight:600; margin-bottom:4px; cursor:pointer;"></select>
+                <div class="total-reward-card" style="flex:0 0 33.333%; box-sizing:border-box; min-width:0; margin-bottom:0; justify-content:center;">
+                    <div class="total-info" style="align-items:center;">
+                        <select id="historyMonthSel" onchange="onMonthSelChange()" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:8px; padding:4px 10px; font-size:14px; font-weight:600; margin-bottom:2px; cursor:pointer; text-align:center;"></select>
                         <span class="total-reward-amount" id="monthRewardDisplay">$0</span>
+                        <span id="monthRewardMiles" style="font-size:14px; opacity:0.7;"></span>
                     </div>
                     <span style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:20px; opacity:0.4; cursor:pointer;" onclick="goRewardPage(1)">▶</span>
                 </div>
@@ -637,11 +638,12 @@
                     <span style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:20px; opacity:0.4; cursor:pointer;" onclick="goRewardPage(2)">▶</span>
                 </div>
                 <!-- 右：年度總回饋 -->
-                <div class="total-reward-card" style="flex:0 0 33.333%; box-sizing:border-box; min-width:0; margin-bottom:0;">
+                <div class="total-reward-card" style="flex:0 0 33.333%; box-sizing:border-box; min-width:0; margin-bottom:0; justify-content:center;">
                     <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:20px; opacity:0.4; cursor:pointer;" onclick="goRewardPage(1)">◀</span>
-                    <div class="total-info">
-                        <select id="historyYearSel" onchange="onYearSelChange()" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:8px; padding:4px 8px; font-size:13px; font-weight:600; margin-bottom:4px; cursor:pointer;"></select>
+                    <div class="total-info" style="align-items:center;">
+                        <select id="historyYearSel" onchange="onYearSelChange()" style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:8px; padding:4px 10px; font-size:14px; font-weight:600; margin-bottom:2px; cursor:pointer; text-align:center;"></select>
                         <span class="total-reward-amount" id="yearRewardDisplay">$0</span>
+                        <span id="yearRewardMiles" style="font-size:14px; opacity:0.7;"></span>
                     </div>
                 </div>
             </div>
@@ -1626,7 +1628,7 @@
     
     <script>
     // ==========================================
-    // Part 3: 核心設定、匯率與 UI 邏輯 (V126.5)
+    // Part 3: 核心設定、匯率與 UI 邏輯 (V126.2)
     // ==========================================
     
     const LOCATION_CONFIG = {
@@ -2688,7 +2690,7 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
     }
       
     // ==========================================
-    // Part 4: 交易資料、Toggle 邏輯與運算核心 (V126.5)
+    // Part 4: 交易資料、Toggle 邏輯與運算核心 (V126.2)
     // ==========================================
 
     function getTransactionsKey(cardId) { return `transactions_${cardId}`; }
@@ -2734,7 +2736,7 @@ function getActualCycleDay(year, month, cycleDay) {
         
         return txs.filter(tx => {
             const txCycleKey = getCycleKey(cardId, tx.date);
-            return txCycleKey === currentCycleKey;126.5
+            return txCycleKey === currentCycleKey;126.2
         });
     }
 
@@ -6245,13 +6247,11 @@ if (cycleDay && cycleDay > 0) {
         goRewardPage(1);
     }
     
-    function formatRewardHtml(result) {
-        if (result.totalCash > 0 && result.totalMiles > 0) {
-            return `$${result.totalCash.toLocaleString()}<div style="font-size:60%; opacity:0.7; margin-top:2px;">✈️ ${result.totalMiles.toLocaleString()} 哩</div>`;
-        } else if (result.totalMiles > 0) {
-            return `${result.totalMiles.toLocaleString()} 哩`;
+    function displayReward(amountEl, milesEl, result) {
+        amountEl.innerText = `$${result.totalCash.toLocaleString()}`;
+        if (milesEl) {
+            milesEl.innerText = result.totalMiles > 0 ? `✈️ ${result.totalMiles.toLocaleString()} 哩` : '';
         }
-        return `$${result.totalCash.toLocaleString()}`;
     }
     
     function onMonthSelChange() {
@@ -6259,7 +6259,11 @@ if (cycleDay && cycleDay > 0) {
         if (!val) return;
         const [y, m] = val.split('_').map(Number);
         const result = getMonthlyTotalReward(y, m);
-        document.getElementById('monthRewardDisplay').innerHTML = formatRewardHtml(result);
+        displayReward(
+            document.getElementById('monthRewardDisplay'),
+            document.getElementById('monthRewardMiles'),
+            result
+        );
     }
     
     function onYearSelChange() {
@@ -6273,7 +6277,11 @@ if (cycleDay && cycleDay > 0) {
             totalCash += r.totalCash;
             totalMiles += r.totalMiles;
         }
-        document.getElementById('yearRewardDisplay').innerHTML = formatRewardHtml({ totalCash, totalMiles });
+        displayReward(
+            document.getElementById('yearRewardDisplay'),
+            document.getElementById('yearRewardMiles'),
+            { totalCash, totalMiles }
+        );
     }
     
     // 觸控滑動
@@ -6575,7 +6583,7 @@ function handleCardPhoto(event) {
     // 匯出資料 (修復：確保 cardId 欄位存在)
     function exportData() {
         const data = {
-            version: 'V126.5',
+            version: 'V126.4',
             exportTime: new Date().toISOString(),
             visibleCards: visibleCards,
             cardOrder: savedOrder,

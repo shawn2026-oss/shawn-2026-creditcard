@@ -805,6 +805,27 @@
                         <div style="font-size:10px; color:#555; padding:2px 0 4px 0;">新光三越 (不含SKM Park Outlets高雄草衙)、Uber Eats</div>
                     </div>
 
+                    <div id="cubeMegaHighRow" class="option-row" style="flex-direction:column; align-items:flex-start; gap:0; border-top:1px dashed #ddd; padding-top:6px; margin-top:4px;">
+                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                            <label for="rbCubeMegaHigh">🎸 瘋大港 10% (3/21-3/22限定)</label>
+                            <input type="radio" name="cubeMode" id="rbCubeMegaHigh" value="megaport_high" onchange="updateRewardPreview()">
+                        </div>
+                        <div style="font-size:10px; color:#555; padding:2px 0 4px 0;">大港開唱現場周邊商品、指定星巴克、大港倉、棧二庫、左腳右腳按摩會館、ChargeSPOT</div>
+                    </div>
+                    <div id="cubeMegaLowRow" class="option-row" style="flex-direction:column; align-items:flex-start; gap:0;">
+                        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                            <label for="rbCubeMegaLow">🎸 瘋大港 3.5% (~3/23)</label>
+                            <input type="radio" name="cubeMode" id="rbCubeMegaLow" value="megaport_low" onchange="updateRewardPreview()">
+                        </div>
+                        <button onclick="toggleCubeDetails('cubeMegaDetails')" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 4px 0;">▸ 查看 3.5% 通路</button>
+                        <div id="cubeMegaDetails" class="details-content">
+                            <b>指定高雄住宿：</b>城市商旅 (真愛館、駁二館)、麗尊酒店、帕可麗酒店、和逸飯店高雄中山館、旅居文旅 (一心館、七賢館、亞灣館)、秝芯旅店 (駁二館、六合館)、鈞怡大飯店、夏優旅居駁二館、華園大飯店草衙館、捷絲旅高雄中正館<br>
+                            <b>旅遊平台：</b>Klook<br>
+                            <b>指定交通 (2/21起)：</b>台灣高鐵、台灣鐵路局<br>
+                            <b>周邊商品預購：</b>大港開唱官方通路
+                        </div>
+                    </div>
+
                     <div class="option-row" style="border-top:1px dashed #ddd; padding-top:8px; margin-top:6px;">
                         <label for="checkCubeLinePay">🟢 LINE Pay 領券 +1.7% (月上限100點)</label>
                         <input type="checkbox" id="checkCubeLinePay" onchange="updateRewardPreview()">
@@ -2231,7 +2252,7 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
         { id: 'j4', name: '永豐幣倍卡 (大大/大戶)', nickname: '海外雙幣神卡', note: '海外精選 6% (刷 2萬封頂)', type: 'ceiling', limit: 80000, tier1Rate: 0.06, tier2Rate: 0.02, gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: 'white', msgDanger: '加碼已封頂', parking: `💰 <b>幣倍卡 2026</b><br><b>Level 1 (大大)</b><br>條件：自動扣繳+電子帳單<br>限刷：$7,500<br><br><b>Level 2 (大戶)</b><br>條件：往來資產≥10萬<br>限刷：$20,000`},
         { id: 'j5', name: '永豐三井聯名卡', nickname: '餐飲優等生/日韓泰附加', note: '餐飲 7.3% (底0.3%+7%)', type: 'custom_mitsui', target: 30000, tier1Rate: 0.073, tier2Rate: 0.003, gradient: 'linear-gradient(135deg, #00C9FF 0%, #92FE9D 100%)', textColor: '#333', msgSuccess: '已達標 (領$2000)', parking: `🍽️ <b>特選餐飲 7.3%</b> (0.3+7)<br>通路：館外餐飲(MCC 58xx) / 全盈+PAY<br>⚠️ 加碼上限僅 100 元 (約刷 $1,428)<br><br>🇯🇵 <b>日韓泰滿額禮 (需登錄)</b><br>每季累積滿 30,000 送 2,000 (回饋約6.9%)`},
         { id: 'c12', name: '永豐現金回饋 JCB', nickname: '旅日神卡', note: '國內特選/日本 +3% (月$1萬共用)', type: 'custom_jcb', limit: 10000, tier1Rate: 0.05, tier2Rate: 0.01, gradient: 'linear-gradient(135deg, #8E0E00 0%, #1F1C18 100%)', textColor: 'white', msgDanger: '特選已封頂 (變1%)', parking: `🇯🇵 <b>日本消費</b><br>最高 5% (國外2% + 加碼3%)<br>🛍️ <b>特選通路</b><br>最高 5% (國外2% + 加碼3%) 或 4% (國內1% + 加碼3%)<br>⚠️ 日本+特選共用加碼上限 $300/月 (約刷 $10,000)<br>🔥 <b>日韓泰滿額</b> (需登錄)<br>每季累積滿 2 萬送 $1,000 (共用上限)`},
-        { id: 'cube1', name: '國泰 CUBE 卡', nickname: '指定通路無上限', note: '玩數位/樂饗購/趣旅行 3% 無上限', type: 'custom_cube', gradient: 'linear-gradient(135deg, #1B365D 0%, #4A90D9 100%)', textColor: 'white', msgDanger: '', parking: `🖥️ <b>玩數位</b> 依等級 2%/3%/3.3%<br>蝦皮/momo/PChome/Netflix/ChatGPT/Claude/Max<br><br>🍽️ <b>樂饗購</b> 依等級 2%/3%/3.3%<br>34家國內百貨/國內餐飲+麥當勞/外送/藥妝<br><br>✈️ <b>趣旅行</b> 依等級 2%/3%/3.3%<br>海外實體/20家航空/高鐵/6訂房平台/13旅行社/國內飯店<br><br>🛒 <b>集精選</b> 固定 2%<br>7-11/全家/全聯/家樂福/IKEA/中油/充電停車<br><br>🎂 <b>慶生月</b> (限當月壽星)<br>7類指定餐廳/樂園/KTV 10% | 新光三越/Uber Eats 3.5%<br><br>🟢 <b>LINE Pay 領券</b> +1.7% (月上限100點)<br>⚠️ 需至 CUBE App 領券，當月滿 8 筆`},
+        { id: 'cube1', name: '國泰 CUBE 卡', nickname: '指定通路無上限', note: '玩數位/樂饗購/趣旅行 3% 無上限', type: 'custom_cube', gradient: 'linear-gradient(135deg, #1B365D 0%, #4A90D9 100%)', textColor: 'white', msgDanger: '', parking: `🖥️ <b>玩數位</b> 依等級 2%/3%/3.3%<br>蝦皮/momo/PChome/Netflix/ChatGPT/Claude/Max<br><br>🍽️ <b>樂饗購</b> 依等級 2%/3%/3.3%<br>34家國內百貨/國內餐飲+麥當勞/外送/藥妝<br><br>✈️ <b>趣旅行</b> 依等級 2%/3%/3.3%<br>海外實體/20家航空/高鐵/6訂房平台/13旅行社/國內飯店<br><br>🛒 <b>集精選</b> 固定 2%<br>7-11/全家/全聯/家樂福/IKEA/中油/充電停車<br><br>🎂 <b>慶生月</b> (限當月壽星)<br>7類指定餐廳/樂園/KTV 10% | 新光三越/Uber Eats 3.5%<br><br>🎸 <b>瘋大港</b> (限時~3/23)<br>現場消費10% | 高雄住宿/Klook/高鐵 3.5%<br><br>🟢 <b>LINE Pay 領券</b> +1.7% (月上限100點)<br>⚠️ 需至 CUBE App 領券，當月滿 8 筆`},
         { id: 'add1', name: '新增卡片', nickname: '點擊選卡', note: '前往資料庫挑選', type: 'placeholder', gradient: 'linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%)', textColor: '#999', msgDanger: '' }
     ];
   let visibleCards = JSON.parse(localStorage.getItem('visibleCards')), savedOrder = JSON.parse(localStorage.getItem('cardOrder')), cards = [...defaultCards], sortableInstance = null;
@@ -2926,6 +2947,16 @@ document.getElementById('dateInput').value = today.getFullYear() + '-' + String(
         else if (cardId === 'cube1') {
             document.getElementById('cubeOptions').style.display = 'block';
             loadCubeSettings();
+            // 瘋大港到期隱藏 (3/31後)
+            const now = new Date();
+            if (now > new Date('2026-03-23')) {
+                document.getElementById('cubeMegaHighRow').style.display = 'none';
+                document.getElementById('cubeMegaLowRow').style.display = 'none';
+                const curMode = document.querySelector('input[name="cubeMode"]:checked')?.value || '';
+                if (curMode.startsWith('megaport')) {
+                    document.getElementById('rbCubeGeneral').checked = true;
+                }
+            }
         }
     }
 
@@ -5014,6 +5045,10 @@ function handleHappyExclusive(selected) {
                 mainRate = 0.10;
             } else if (cubeMode === 'birthday_low') {
                 mainRate = 0.035;
+            } else if (cubeMode === 'megaport_high') {
+                mainRate = 0.10;
+            } else if (cubeMode === 'megaport_low') {
+                mainRate = 0.035;
             }
             
             reward = Math.floor(amount * mainRate);
@@ -5196,6 +5231,8 @@ function handleHappyExclusive(selected) {
         else if (cubeMode === 'select') mainRate = 0.02;
         else if (cubeMode === 'birthday_high') mainRate = 0.10;
         else if (cubeMode === 'birthday_low') mainRate = 0.035;
+        else if (cubeMode === 'megaport_high') mainRate = 0.10;
+        else if (cubeMode === 'megaport_low') mainRate = 0.035;
         
         let txReward = Math.floor(amount * mainRate);
         

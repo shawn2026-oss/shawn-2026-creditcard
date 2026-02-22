@@ -868,6 +868,12 @@
                     </div>
                 </div>
                 
+                <div id="customMilesOptions" style="display:none; background:#f9f9f9; padding:10px; border-radius:10px; margin-top:10px; border:1px dashed #ddd;">
+                    <div style="font-size:13px; font-weight:700; color:#333; margin-bottom:8px;">✈️ 消費地區</div>
+                    <div class="option-row"><label for="rbCustomMilesDomestic">🇹🇼 國內消費</label><input type="radio" name="customMilesLocation" id="rbCustomMilesDomestic" value="domestic" checked onchange="updateRewardPreview()"></div>
+                    <div class="option-row"><label for="rbCustomMilesForeign">✈️ 國外消費</label><input type="radio" name="customMilesLocation" id="rbCustomMilesForeign" value="foreign" onchange="updateRewardPreview()"></div>
+                </div>
+
                 <div id="pigRichOptions">
                     <div class="option-row read-only"><label id="labelBaseRate">🔰 基本回饋 1% (無上限)</label><input type="checkbox" checked disabled></div>
                     <div class="option-row" style="flex-direction:column; align-items:flex-start; gap:0;">
@@ -1530,16 +1536,23 @@
              </div>
 
              <div class="input-group">
+                 <label>🎁 回饋單位</label>
+                 <div style="display:flex; gap:10px; margin-top:4px;">
+                     <label style="font-size:14px; display:flex; align-items:center; gap:4px;"><input type="radio" name="customCardUnit" value="cash" checked style="width:18px; height:18px;" onchange="toggleCustomMilesFields()"> 現金回饋</label>
+                     <label style="font-size:14px; display:flex; align-items:center; gap:4px;"><input type="radio" name="customCardUnit" value="miles" style="width:18px; height:18px;" onchange="toggleCustomMilesFields()"> 哩程</label>
+                 </div>
+             </div>
+
+             <div id="customCashRateGroup" class="input-group">
                  <label>📊 加碼回饋率 % (必填)</label>
                  <input type="number" id="customCardRate" placeholder="例如：3" step="0.1" min="0" max="100" style="font-size:16px;">
              </div>
 
-             <div class="input-group">
-                 <label>🎁 回饋單位</label>
-                 <div style="display:flex; gap:10px; margin-top:4px;">
-                     <label style="font-size:14px; display:flex; align-items:center; gap:4px;"><input type="radio" name="customCardUnit" value="cash" checked style="width:18px; height:18px;"> 現金回饋</label>
-                     <label style="font-size:14px; display:flex; align-items:center; gap:4px;"><input type="radio" name="customCardUnit" value="miles" style="width:18px; height:18px;"> 哩程</label>
-                 </div>
+             <div id="customMilesRateGroup" class="input-group" style="display:none;">
+                 <label>✈️ 國內消費 X元 = 1哩 (必填)</label>
+                 <input type="number" id="customMilesDomestic" placeholder="例如：18" step="1" min="1" style="font-size:16px;">
+                 <label style="margin-top:8px;">✈️ 國外消費 X元 = 1哩 (必填)</label>
+                 <input type="number" id="customMilesForeign" placeholder="例如：10" step="1" min="1" style="font-size:16px;">
              </div>
              
              <div class="input-group">
@@ -2299,7 +2312,9 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
         customs.forEach(cc => {
             const t2 = cc.tier2Rate || 0;
             let note = '';
-            if (cc.cap > 0) {
+            if (cc.unit === 'miles' && cc.domesticMPD) {
+                note = `國內${cc.domesticMPD}元/哩 | 國外${cc.foreignMPD || cc.domesticMPD}元/哩`;
+            } else if (cc.cap > 0) {
                 note = t2 > 0 ? `${cc.rate}% (刷$${cc.cap.toLocaleString()}封頂→${t2}%)` : `${cc.rate}% (刷$${cc.cap.toLocaleString()}封頂)`;
             } else {
                 note = `${cc.rate}% (無上限)`;
@@ -2311,8 +2326,11 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
                 note: note,
                 type: cc.cap > 0 ? 'ceiling' : 'ceiling',
                 limit: cc.cap > 0 ? cc.cap : 99999999,
-                tier1Rate: cc.rate / 100,
+                tier1Rate: (cc.unit === 'miles' && cc.domesticMPD) ? (1 / cc.domesticMPD) : (cc.rate / 100),
                 tier2Rate: t2 / 100,
+                foreignRate: (cc.unit === 'miles' && cc.foreignMPD) ? (1 / cc.foreignMPD) : 0,
+                domesticMPD: cc.domesticMPD || 0,
+                foreignMPD: cc.foreignMPD || 0,
                 gradient: cc.gradient,
                 textColor: cc.textColor || 'white',
                 msgDanger: cc.cap > 0 ? (t2 > 0 ? `已封頂 (變${t2}%)` : '已封頂') : '',
@@ -2345,6 +2363,12 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
     ];
     let selectedCustomColor = 0;
 
+    function toggleCustomMilesFields() {
+        const isMiles = document.querySelector('input[name="customCardUnit"]:checked').value === 'miles';
+        document.getElementById('customCashRateGroup').style.display = isMiles ? 'none' : '';
+        document.getElementById('customMilesRateGroup').style.display = isMiles ? '' : 'none';
+    }
+
     function openCustomCardModal(editId) {
         const modal = document.getElementById('customCardModal');
         const title = document.getElementById('customCardTitle');
@@ -2375,6 +2399,11 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
                 document.getElementById('customCardNickname').value = cc.nickname || '';
                 document.getElementById('customCardRate').value = cc.rate;
                 document.querySelector(`input[name="customCardUnit"][value="${cc.unit}"]`).checked = true;
+                if (cc.unit === 'miles' && cc.domesticMPD) {
+                    document.getElementById('customMilesDomestic').value = cc.domesticMPD;
+                    document.getElementById('customMilesForeign').value = cc.foreignMPD || cc.domesticMPD;
+                }
+                toggleCustomMilesFields();
                 document.getElementById('customCardCap').value = cc.cap > 0 ? cc.cap : '';
                 document.getElementById('customCardTier2Rate').value = cc.tier2Rate > 0 ? cc.tier2Rate : '';
                 document.getElementById('customCardCycleDay').value = cc.cycleDay || '';
@@ -2407,6 +2436,9 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
             document.getElementById('customCardNickname').value = '';
             document.getElementById('customCardRate').value = '';
             document.querySelector('input[name="customCardUnit"][value="cash"]').checked = true;
+            document.getElementById('customMilesDomestic').value = '';
+            document.getElementById('customMilesForeign').value = '';
+            toggleCustomMilesFields();
             document.getElementById('customCardCap').value = '';
             document.getElementById('customCardTier2Rate').value = '';
             document.getElementById('customCardCycleDay').value = '';
@@ -2427,10 +2459,16 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
         const name = document.getElementById('customCardName').value.trim();
         const rate = parseFloat(document.getElementById('customCardRate').value);
         if (!name) { alert('請輸入卡片名稱'); return; }
-        if (isNaN(rate) || rate <= 0) { alert('請輸入有效的回饋率'); return; }
 
        const nickname = document.getElementById('customCardNickname').value.trim();
         const unit = document.querySelector('input[name="customCardUnit"]:checked').value;
+        const domesticMPD = parseInt(document.getElementById('customMilesDomestic').value) || 0;
+        const foreignMPD = parseInt(document.getElementById('customMilesForeign').value) || 0;
+        if (unit === 'miles') {
+            if (domesticMPD <= 0 || foreignMPD <= 0) { alert('請輸入國內和國外的元/哩'); return; }
+        } else {
+            if (isNaN(rate) || rate <= 0) { alert('請輸入有效的回饋率'); return; }
+        }
         const cap = parseInt(document.getElementById('customCardCap').value) || 0;
         const tier2Rate = parseFloat(document.getElementById('customCardTier2Rate').value) || 0;
         const cycleDay = document.getElementById('customCardCycleDay').value;
@@ -2442,12 +2480,12 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
         if (editId) {
             const idx = customs.findIndex(c => c.id === editId);
             if (idx >= 0) {
-                customs[idx] = { ...customs[idx], name, nickname, rate, unit, cap, tier2Rate, cycleDay, gradient: color.gradient, textColor: color.textColor };
+                customs[idx] = { ...customs[idx], name, nickname, rate, unit, cap, tier2Rate, domesticMPD, foreignMPD, cycleDay, gradient: color.gradient, textColor: color.textColor };
             }
         } else {
             if (customs.length >= 5) { alert('自建卡片最多 5 張'); return; }
             const newId = 'custom_' + Date.now();
-           customs.push({ id: newId, name, nickname, rate, unit, cap, tier2Rate, cycleDay, gradient: color.gradient, textColor: color.textColor });
+           customs.push({ id: newId, name, nickname, rate, unit, cap, tier2Rate, domesticMPD, foreignMPD, cycleDay, gradient: color.gradient, textColor: color.textColor });
         }
 
         localStorage.setItem('custom_cards', JSON.stringify(customs));
@@ -2800,7 +2838,7 @@ document.getElementById('dateInput').value = today.getFullYear() + '-' + String(
         document.getElementById('twdConversionDisplay').style.display = 'none';
         
         // 隱藏所有卡片專屬選項
-        const allOptions = ['pigRichOptions', 'greenCardOptions', 'uniOptions', 'happyOptions', 'hsbcOptions', 'uniOpenOptions', 'richartOptions', 'fubonJOptions', 'jiheOptions', 'kumamonOptions', 'sinopacCurrencyOptions', 'sinopacMitsuiOptions', 'jiangOptions', 'dbsEcoOptions', 'sinopacJcbOptions', 'laiDianOptions', 'legendOptions', 'cubeOptions'];
+        const allOptions = ['pigRichOptions', 'greenCardOptions', 'uniOptions', 'happyOptions', 'hsbcOptions', 'uniOpenOptions', 'richartOptions', 'fubonJOptions', 'jiheOptions', 'kumamonOptions', 'sinopacCurrencyOptions', 'sinopacMitsuiOptions', 'jiangOptions', 'dbsEcoOptions', 'sinopacJcbOptions', 'laiDianOptions', 'legendOptions', 'cubeOptions', 'customMilesOptions'];
         allOptions.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
         
         // 隱藏警告
@@ -2990,6 +3028,13 @@ document.getElementById('dateInput').value = today.getFullYear() + '-' + String(
                 if (curMode.startsWith('megaport')) {
                     document.getElementById('rbCubeGeneral').checked = true;
                 }
+            }
+        }
+        // 自建哩程卡 (國內/國外切換)
+        else if (cardId.startsWith('custom_')) {
+            const card = cards.find(c => c.id === cardId);
+            if (card && card.isMiles && card.domesticMPD) {
+                document.getElementById('customMilesOptions').style.display = 'block';
             }
         }
     }
@@ -3787,6 +3832,10 @@ function handleHappyExclusive(selected) {
             options.cubeLevel = document.querySelector('input[name="cubeLevel"]:checked')?.value || 'lv2';
         }
         
+        if (cardId.startsWith('custom_')) {
+            options.isCustomForeign = document.querySelector('input[name="customMilesLocation"]:checked')?.value === 'foreign';
+        }
+        
         return options;
     }
 
@@ -3899,6 +3948,13 @@ function handleHappyExclusive(selected) {
         
         if (cardId === 'c9') {
             liveCalc.innerHTML = `預估獲得 <b>${result.reward}</b> 哩`;
+        } else if (cardId.startsWith('custom_')) {
+            const card = cards.find(c => c.id === cardId);
+            if (card && card.isMiles) {
+                liveCalc.innerHTML = `預估獲得 <b>${result.reward}</b> 哩`;
+            } else {
+                liveCalc.innerHTML = `預估獲得 <b>$${result.reward}</b> 回饋 (${(result.rate * 100).toFixed(1)}%)`;
+            }
         } else {
             liveCalc.innerHTML = `預估獲得 <b>$${result.reward}</b> 回饋 (${(result.rate * 100).toFixed(1)}%)`;
         }
@@ -3990,7 +4046,8 @@ function handleHappyExclusive(selected) {
             isLegendBonus: document.getElementById('checkLegendBonus')?.checked || false,
             cubeMode: document.querySelector('input[name="cubeMode"]:checked')?.value || 'general',
             isCubeLinePay: document.getElementById('checkCubeLinePay')?.checked || false,
-            cubeLevel: document.querySelector('input[name="cubeLevel"]:checked')?.value || 'lv2'
+            cubeLevel: document.querySelector('input[name="cubeLevel"]:checked')?.value || 'lv2',
+            isCustomForeign: document.querySelector('input[name="customMilesLocation"]:checked')?.value === 'foreign'
         };
         
         let txs = getTransactions(cardId);
@@ -4291,6 +4348,12 @@ function handleHappyExclusive(selected) {
                 const lvRadio = document.querySelector(`input[name="cubeLevel"][value="${tx.cubeLevel}"]`);
                 if (lvRadio) lvRadio.checked = true;
             }
+        }
+        // 自建哩程卡：還原國內/國外
+        if (cardId.startsWith('custom_') && tx.isCustomForeign !== undefined) {
+            const val = tx.isCustomForeign ? 'foreign' : 'domestic';
+            const radio = document.querySelector(`input[name="customMilesLocation"][value="${val}"]`);
+            if (radio) radio.checked = true;
         }
         
         // 更新確認按鈕文字
@@ -4779,6 +4842,13 @@ function handleHappyExclusive(selected) {
         }
         // 自建卡片
         else if (cardId.startsWith('custom_')) {
+            // 自建哩程卡：根據國內/國外使用不同元/哩
+            if (card.isMiles && card.domesticMPD) {
+                const mpd = options.isCustomForeign ? (card.foreignMPD || card.domesticMPD) : card.domesticMPD;
+                reward = Math.floor(amount / mpd);
+                rate = 1 / mpd;
+                return { reward, rate };
+            }
             rate = card.tier1Rate || 0;
             const t2Rate = card.tier2Rate || 0;
             if (card.limit && card.limit < 99999999) {
@@ -5565,8 +5635,8 @@ function handleHappyExclusive(selected) {
                 }
             }
         } else if (card.type === 'miles') {
-            // Fallback for generic miles if not c9
-            msg = '累積中';
+            // 自建哩程卡：顯示已累積哩數
+            msg = `已累積 ${totalReward.toLocaleString()} 哩`;
             progress = 50;
         }
         
@@ -5747,7 +5817,8 @@ function handleHappyExclusive(selected) {
             isUp: tx.isUniUp,
             isBonus10: tx.isBonus10,
             isBonus25: tx.isBonus25,
-            isBill: tx.isBill
+            isBill: tx.isBill,
+            isCustomForeign: tx.isCustomForeign
         };
         
         const result = calculateSingleReward(cardId, tx.amountTWD || tx.amount || 0, options);

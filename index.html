@@ -28,7 +28,7 @@
     <meta property="og:url" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/">
     <meta property="og:type" content="website">
 
-    <title>刷卡回饋管家 (V126.6 )</title>
+    <title>刷卡回饋管家 (V126.7 )</title>
         
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
@@ -587,7 +587,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V126.6 </div>
+            <div class="version-tag">V126.7 </div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -2309,7 +2309,7 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
         { id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', note: '新戶 10% (刷 8千封頂) | 精選 2.5% (刷 40萬封頂)', rule: '', type: 'ceiling', limit: 8000, tier1Rate: 0.135, tier2Rate: 0.035, gradient: 'linear-gradient(135deg, #e60012 0%, #FFD700 100%)', textColor: 'white', msgDanger: '新戶10%已封頂', parking: `🐷 <b>新戶限定神卡</b><br>新戶 +10% (限刷$8,000)<br>🌟 <b>精選通路 +2.5%</b><br>上限 $40 萬`},
         { id: 'c1', name: '星展傳說對決卡', nickname: 'Line Pay神卡', note: 'LinePay/外送/蝦皮(刷$11,363 封頂)', rule: '', type: 'custom_legend', limit: 11363, gradient: 'linear-gradient(135deg, #43cea2 0%, #185a9d 100%)', textColor: 'white', msgDanger: '加碼已封頂 (變1.2%)' },
         { id: 'c5', name: '聯邦賴點卡', nickname: 'Line Pay 10%', note: '偶數日+5% / LP+1% / 新戶+4%', rule: '⚠️ 需單筆滿 $100', type: 'custom_laidian', limit: 3000, tier1Rate: 0.06, tier2Rate: 0.01, threshold: 0, gradient: 'linear-gradient(135deg, #00B900 0%, #33CC33 100%)', textColor: 'white', msgDanger: '加碼已封頂', parking: `✅ <b>基本回饋 1%</b> (無上限)<br>📱 <b>LP 一般 2%</b> (1+1, 限刷2萬)<br>📅 <b>偶數日 6%</b> (1+5, 限刷3千)<br>👶 <b>新戶加碼 +4%</b> (限刷7500)<br>⚠️ <b>注意</b>：加碼需單筆滿 $100`},
-        { id: 'c3', name: '永豐 Sport 卡', nickname: 'Apple Pay優等生', note: 'Apple Pay 5% (刷 5千封頂)', rule: '', type: 'ceiling', limit: 5000, tier1Rate: 0.05, tier2Rate: 0.02, gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)' },
+        { id: 'c3', name: '永豐 Sport 卡', nickname: 'Apple Pay優等生', note: '指定 5% | 運動封頂→4% | 全封→1%', rule: '', type: 'custom_sport', limit: 10000, tier1Rate: 0.05, tier2Rate: 0.01, gradient: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)', parking: `🍎 <b>綁定 APP (Apple Pay)</b><br>1% 豐點 (無上限)<br>🏃 <b>運動獎勵</b><br>+1% (上限 50點/月，約刷$5,000)<br>🛍️ <b>指定通路</b><br>+3% (上限 300點/月，約刷$10,000)<br>⚠️ 需配合APP達運動條件+永豐帳戶自扣` },
         { id: 'c4', name: '將來將將卡', nickname: '行支/餐廳/外送', note: '生活 5% (刷 6千6封頂)', rule: '', type: 'mixed', limit: 6666, minSpend: 3000, tier1Rate: 0.05, tier2Rate: 0.005, gradient: 'linear-gradient(135deg, #ffe259 0%, #ffa751 100%)', textColor: '#333', msgDanger: '已封頂 (變0.5%)', parking: `🎯 <b>低消任務</b>：當月累積滿 <b>$3,000</b> 才享加碼<br><br>🛍️ <b>生活升級 5%</b> (限刷$6,666)<br>行動支付/外送/餐廳/購物<br><br>✈️ <b>旅遊加碼 5%</b> (限刷$11,111/季)<br>海外/航空/旅行社/高鐵`},
         { id: 'c2', name: '聯邦綠卡', nickname: '綠色/市區停車神卡', note: '綠色 +5% (刷 3千封頂) | 停車 (刷 1.2萬達標)', rule: '', type: 'floor', target: 12000, tier1Rate: 0.02, tier2Rate: 0.02, gradient: 'linear-gradient(135deg, #20B2AA 0%, #008B8B 100%)', textColor: 'white', msgSuccess: '已達標 (下月免停)', parking: `🅿️ <b>免費停車：</b>需上月刷滿1.2萬<br>🌿 <b>綠色通路 6%</b><br>基本 1% + 加碼 5%<br>⚠️ 加碼適用月刷 $3,000 封頂 (回饋 $150)`},
         { id: 'c7', name: '玉山 UNI 卡', nickname: '行支/百貨優等生', note: 'UP 4.5% (刷 14萬封頂)', type: 'ceiling', limit: 40000, tier1Rate: 0.035, tier2Rate: 0.01, gradient: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)', textColor: 'white', msgDanger: '已封頂 (變1%)', parking: `🔥 <b>任意選 3.5%</b> (限刷$4萬)<br>🆙 <b>UP 選 4.5%</b> (限刷$14萬)<br>ℹ️ <b>訂閱建議</b>：<br>消費滿 $14,900 以上建議訂閱 UP 選`, getDynamicName: function() { const settings = JSON.parse(localStorage.getItem('uni_settings') || '{}'); return settings.isUp ? '玉山 UNI 卡（升級UP選）' : '玉山 UNI 卡'; }},
@@ -5244,9 +5244,30 @@ function handleHappyExclusive(selected) {
             return { reward, rate };
         }
         
-        // 預設（含自建卡片封頂處理）
+        // C3 永豐Sport卡：三段式 5%→4%→1%
+        else if (cardId === 'c3') {
+            const baseReward = rf(amount * 0.01); // 綁定APP 1% 無上限
+            let exerciseReward = 0, channelReward = 0;
+            // 運動獎勵 +1%，上限50點/月
+            const exerciseSpent = getCardBonusSpent(cardId, t => (!editingTxId || t.id !== editingTxId));
+            const exerciseUsed = rf(exerciseSpent * 0.01);
+            const exerciseRemain = Math.max(0, 50 - exerciseUsed);
+            if (exerciseRemain > 0) {
+                exerciseReward = Math.min(rf(amount * 0.01), exerciseRemain);
+            }
+            // 指定通路 +3%，上限300點/月
+            const channelUsed = rf(exerciseSpent * 0.03);
+            const channelRemain = Math.max(0, 300 - channelUsed);
+            if (channelRemain > 0) {
+                channelReward = Math.min(rf(amount * 0.03), channelRemain);
+            }
+            const totalReward = baseReward + exerciseReward + channelReward;
+            return { reward: totalReward, rate: amount > 0 ? totalReward / amount : 0.05 };
+        }
+        
+        // 預設（含封頂處理）
         rate = card.tier1Rate || 0.01;
-        if (card.isCustom && card.limit && card.limit < 99999999) {
+        if (card.limit && card.limit < 99999999) {
             const t2Rate = card.tier2Rate || 0;
             const bonusSpent = getCardBonusSpent(cardId, t => (!editingTxId || t.id !== editingTxId));
             if (bonusSpent >= card.limit) {
@@ -5291,6 +5312,8 @@ function handleHappyExclusive(selected) {
         let dbsLpCumReward = 0;
         let dbsGreenCumReward = 0;
         let dbsForeignCumulative = 0;
+        let sportExerciseCumR = 0;
+        let sportChannelCumR = 0;
         let uniOpenGroupCumulative = 0;
         let uniOpenIcashCumulative = 0;
         let uniOpenOverseasCumulative = 0;
@@ -5453,8 +5476,19 @@ function handleHappyExclusive(selected) {
             cubeLpCumulative += amount;
         }
         totalReward += txReward;
-    } else if (card.isCustom && card.limit && card.limit < 99999999) {
-        // 自建卡片封頂累計
+    } else if (cardId === 'c3') {
+        // Sport卡三段式：APP 1%(無上限) + 運動 1%(50點) + 指定 3%(300點)
+        const base = rf(amount * 0.01);
+        let exercise = 0, channel = 0;
+        const exRemain = Math.max(0, 50 - sportExerciseCumR);
+        if (exRemain > 0) exercise = Math.min(rf(amount * 0.01), exRemain);
+        sportExerciseCumR += rf(amount * 0.01);
+        const chRemain = Math.max(0, 300 - sportChannelCumR);
+        if (chRemain > 0) channel = Math.min(rf(amount * 0.03), chRemain);
+        sportChannelCumR += rf(amount * 0.03);
+        totalReward += base + exercise + channel;
+    } else if (card.limit && card.limit < 99999999) {
+        // 封頂累計（含自建卡與無專屬handler的內建卡如c3 Sport）
         const cRate = card.tier1Rate || 0.01;
         const cT2Rate = card.tier2Rate || 0;
         if (customCumulative < card.limit) {
@@ -5512,6 +5546,20 @@ function handleHappyExclusive(selected) {
             return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
         }
 
+        // 特殊處理：Sport 卡 (c3) 雙軌倒數
+        if (cardId === 'c3') {
+            let parts = [];
+            const exRemain = Math.max(0, 50 - sportExerciseCumR);
+            const chRemain = Math.max(0, 300 - sportChannelCumR);
+            if (exRemain <= 0) parts.push('運動已封頂');
+            else parts.push(`運動$${Math.ceil(exRemain / 0.01).toLocaleString()}`);
+            if (chRemain <= 0) parts.push('指定已封頂');
+            else parts.push(`指定$${Math.ceil(chRemain / 0.03).toLocaleString()}`);
+            msg = parts.join('/');
+            progress = Math.min(100, (sportChannelCumR / 300) * 100);
+            return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
+        }
+
         // 特殊處理：UniOpen 卡 (c10)
         if (cardId === 'c10') {
             let groupSpent = 0, icashSpent = 0, overseasSpent = 0;
@@ -5528,11 +5576,11 @@ function handleHappyExclusive(selected) {
                 if (overseasSpent >= overseasLimit) parts.push('海外已封頂');
                 else parts.push(`海外可再刷 ${formatAmountWithCurrency(overseasLimit - overseasSpent)}`);
             } else {
-                if (groupSpent >= groupLimit) parts.push('集團⚡');
+                if (groupSpent >= groupLimit) parts.push('集團已封頂');
                 else parts.push(`集團$${(groupLimit - groupSpent).toLocaleString()}`);
                 
               if (window.promoStatus?.uniopen_icash_full) parts.push('icp已額滿');
-                else if (icashSpent >= icashLimit) parts.push('icp⚡');
+                else if (icashSpent >= icashLimit) parts.push('icp已封頂');
                 else parts.push(`icp$${(icashLimit - icashSpent).toLocaleString()}`);
             }
             
@@ -5716,9 +5764,9 @@ function handleHappyExclusive(selected) {
                  const newSpent = getCardBonusSpent(cardId, t => (t.laiDianMode === 'lp' || t.laiDianMode === 'even') && t.isLaiDianNew && (t.amountTWD || t.amount) >= 100 && (!editingTxId || t.id !== editingTxId));
                  const newLimit = 7500;
                  let parts = [];
-                 if (evenSpent >= evenLimit) parts.push('偶數⚡');
+                 if (evenSpent >= evenLimit) parts.push('偶數已封頂');
                  else parts.push(`偶數$${(evenLimit - evenSpent).toLocaleString()}`);
-                 if (lpSpent >= lpLimit) parts.push('LP⚡');
+                 if (lpSpent >= lpLimit) parts.push('LP已封頂');
                  else parts.push(`LP$${(lpLimit - lpSpent).toLocaleString()}`);
                  const hasNewTx = getCardBonusSpent(cardId, t => t.isLaiDianNew) > 0;
                  if (hasNewTx) {
@@ -5748,7 +5796,7 @@ function handleHappyExclusive(selected) {
         if (cardId === 'c7' && uniTimeCumulative > 0) {
             const timeLimit = 16666;
             if (uniTimeCumulative >= timeLimit) {
-                msg += ' | 統一⚡';
+                msg += ' | 統一已封頂';
             } else {
                 msg += ` | 統一$${(timeLimit - uniTimeCumulative).toLocaleString()}`;
             }
@@ -5793,10 +5841,10 @@ function handleHappyExclusive(selected) {
         
         let parts = [];
         if (currentLocation === 'JP') {
-            if (designatedCumulative >= designatedLimit) parts.push('指定⚡');
+            if (designatedCumulative >= designatedLimit) parts.push('指定已封頂');
             else parts.push(`指定${formatAmountWithCurrency(designatedLimit - designatedCumulative)}`);
             
-            if (paypayCumulative >= paypayLimit) parts.push('PP⚡');
+            if (paypayCumulative >= paypayLimit) parts.push('PP已封頂');
             else parts.push(`PP${formatAmountWithCurrency(paypayLimit - paypayCumulative)}`);
        } else {
             if (totalSpent > 0) parts.push(`國內 0.5%`);
@@ -6177,6 +6225,7 @@ if (cycleDay && cycleDay > 0) {
         let uoGroupCum = 0, uoIcashCum = 0, uoOverseasCum = 0;
         let cubeLpCum = 0, customCum = 0;
         let dbsLpCumR = 0, dbsGreenCumR = 0, dbsForeignCum = 0;
+        let sportExCumR = 0, sportChCumR = 0;
         let fubonPhysCum = 0, fubonSuicaCum = 0;
         let kumaDesigCum = 0, kumaPPCum = 0;
         let jcbBonusCum = 0;
@@ -6326,7 +6375,17 @@ if (cycleDay && cycleDay > 0) {
                     }
                     jcbBonusCum += amount;
                 }
-            } else if (card.isCustom && card.limit && card.limit < 99999999) {
+            } else if (cardId === 'c3') {
+                const base = rf(amount * 0.01);
+                let ex = 0, ch = 0;
+                const exRem = Math.max(0, 50 - sportExCumR);
+                if (exRem > 0) ex = Math.min(rf(amount * 0.01), exRem);
+                sportExCumR += rf(amount * 0.01);
+                const chRem = Math.max(0, 300 - sportChCumR);
+                if (chRem > 0) ch = Math.min(rf(amount * 0.03), chRem);
+                sportChCumR += rf(amount * 0.03);
+                totalReward += base + ex + ch;
+            } else if (card.limit && card.limit < 99999999) {
                 const cRate = card.tier1Rate || 0.01;
                 const cT2 = card.tier2Rate || 0;
                 if (customCum < card.limit) {
@@ -6786,7 +6845,7 @@ function handleCardPhoto(event) {
     // 匯出資料 (修復：確保 cardId 欄位存在)
     function exportData() {
         const data = {
-            version: 'V126.6',
+            version: 'V126.7',
             exportTime: new Date().toISOString(),
             visibleCards: visibleCards,
             cardOrder: savedOrder,

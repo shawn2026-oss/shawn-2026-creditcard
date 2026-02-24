@@ -5704,6 +5704,16 @@ function handleHappyExclusive(selected) {
             progress = 50;
         }
         
+        // c7 UNI卡：附加統一時代任務倒數
+        if (cardId === 'c7' && uniTimeCumulative > 0) {
+            const timeLimit = 16666;
+            if (uniTimeCumulative >= timeLimit) {
+                msg += ' | 統一⚡';
+            } else {
+                msg += ` | 統一$${(timeLimit - uniTimeCumulative).toLocaleString()}`;
+            }
+        }
+
         return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
     }
 

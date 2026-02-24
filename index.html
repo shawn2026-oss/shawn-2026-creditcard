@@ -4659,7 +4659,7 @@ function handleHappyExclusive(selected) {
                 // 只要模式是 'lp' 或 'even' (偶數日必為LP)，都符合此條件
                 if (options.mode === 'lp' || options.mode === 'even') {
                     // 計算已使用的 LP 額度 (包含 lp 和 even 的交易)
-                    const lpSpent = getCardBonusSpent(cardId, t => (t.laiDianMode === 'lp' || t.laiDianMode === 'even') && (t.amountTWD || t.amount) >= 100);
+                    const lpSpent = getCardBonusSpent(cardId, t => (t.laiDianMode === 'lp' || t.laiDianMode === 'even') && (t.amountTWD || t.amount) >= 100 && (!editingTxId || t.id !== editingTxId));
                     
                     // LP +1% (限刷2萬)
                     if (lpSpent < 20000) {
@@ -4668,7 +4668,7 @@ function handleHappyExclusive(selected) {
                     
                     // 新戶 +4% (限刷7500，需綁定 LP)
                     if (options.isNew) {
-                        const newSpent = getCardBonusSpent(cardId, t => (t.laiDianMode === 'lp' || t.laiDianMode === 'even') && t.isLaiDianNew && (t.amountTWD || t.amount) >= 100);
+                        const newSpent = getCardBonusSpent(cardId, t => (t.laiDianMode === 'lp' || t.laiDianMode === 'even') && t.isLaiDianNew && (t.amountTWD || t.amount) >= 100 && (!editingTxId || t.id !== editingTxId));
                         if (newSpent < 7500) {
                             totalReward += rf(Math.min(amount, 7500 - newSpent) * 0.04);
                         }
@@ -4677,7 +4677,7 @@ function handleHappyExclusive(selected) {
 
                 // 2. 偶數日加碼 (+5%)
                 if (options.mode === 'even') {
-                    const evenSpent = getCardBonusSpent(cardId, t => t.laiDianMode === 'even' && (t.amountTWD || t.amount) >= 100);
+                    const evenSpent = getCardBonusSpent(cardId, t => t.laiDianMode === 'even' && (t.amountTWD || t.amount) >= 100 && (!editingTxId || t.id !== editingTxId));
                     // 偶數日 +5% (限刷3000)
                     if (evenSpent < 3000) {
                         totalReward += rf(Math.min(amount, 3000 - evenSpent) * 0.05);
@@ -4694,7 +4694,7 @@ function handleHappyExclusive(selected) {
                 rate = 0.02;
                 reward = rf(amount * rate);
             } else if (options.isGreen) {
-                const greenSpent = getCardBonusSpent(cardId, t => t.isGreenChannel);
+                const greenSpent = getCardBonusSpent(cardId, t => t.isGreenChannel && (!editingTxId || t.id !== editingTxId));
                 const greenLimit = 3000;
                 const baseReward = rf(amount * 0.01);
                 
@@ -4775,21 +4775,21 @@ function handleHappyExclusive(selected) {
             
             if (options.isPet) {
                 // 寵物 +9.5%，回饋上限 $500
-                const petUsed = getCardBonusSpent(cardId, t => t.isHappyPet || t.happyMode === 'pet');
+                const petUsed = getCardBonusSpent(cardId, t => (t.isHappyPet || t.happyMode === 'pet') && (!editingTxId || t.id !== editingTxId));
                 const petRewardUsed = rf(petUsed * 0.095);
                 const petRewardRemain = Math.max(0, 500 - petRewardUsed);
                 const thisPetReward = Math.min(rf(amount * 0.095), petRewardRemain);
                 reward += thisPetReward;
             } else if (options.isLife) {
                 // 生活 +3.5%，回饋上限 $200
-                const lifeUsed = getCardBonusSpent(cardId, t => t.isHappyLife || t.happyMode === 'life');
+                const lifeUsed = getCardBonusSpent(cardId, t => (t.isHappyLife || t.happyMode === 'life') && (!editingTxId || t.id !== editingTxId));
                 const lifeRewardUsed = rf(lifeUsed * 0.035);
                 const lifeRewardRemain = Math.max(0, 200 - lifeRewardUsed);
                 const thisLifeReward = Math.min(rf(amount * 0.035), lifeRewardRemain);
                 reward += thisLifeReward;
             } else if (options.isPeace) {
                 // 安心 +3.5%，回饋上限 $200
-                const peaceUsed = getCardBonusSpent(cardId, t => t.isHappyPeace || t.happyMode === 'peace');
+                const peaceUsed = getCardBonusSpent(cardId, t => (t.isHappyPeace || t.happyMode === 'peace') && (!editingTxId || t.id !== editingTxId));
                 const peaceRewardUsed = rf(peaceUsed * 0.035);
                 const peaceRewardRemain = Math.max(0, 200 - peaceRewardUsed);
                 const thisPeaceReward = Math.min(rf(amount * 0.035), peaceRewardRemain);
@@ -4979,7 +4979,7 @@ function handleHappyExclusive(selected) {
                 let totalRate = 0.025;
                 // Apple Pay 低消門檻：等值台幣 $100
                 if (options.isApple && amount >= 100) {
-                    const appleSpent = getCardBonusSpent(cardId, t => t.isJiheJapan && t.isJiheApple);
+                    const appleSpent = getCardBonusSpent(cardId, t => t.isJiheJapan && t.isJiheApple && (!editingTxId || t.id !== editingTxId));
                     if (appleSpent < 40000) {
                         totalReward += rf(Math.min(amount, 40000 - appleSpent) * 0.015);
                         totalRate = 0.04; // 2.5% + 1.5% = 4%
@@ -4991,7 +4991,7 @@ function handleHappyExclusive(selected) {
                 let totalRate = 0.01;
                 // 國內日系名店（無低消門檻）
                 if (options.isDomesticJapanese) {
-                    const djSpent = getCardBonusSpent(cardId, t => t.isJiheDomesticJapanese);
+                    const djSpent = getCardBonusSpent(cardId, t => t.isJiheDomesticJapanese && (!editingTxId || t.id !== editingTxId));
                     if (djSpent < 12500) {
                         totalReward += rf(Math.min(amount, 12500 - djSpent) * 0.04);
                         totalRate = 0.05; // 1% + 4% = 5%
@@ -5005,7 +5005,7 @@ function handleHappyExclusive(selected) {
             // PayPay 獨立計算（不與其他回饋疊加）
             if (options.isPayPay) {
                 const paypayLimit = 2857;
-                const paypaySpent = getCardBonusSpent(cardId, t => t.isKumamonPayPay);
+                const paypaySpent = getCardBonusSpent(cardId, t => t.isKumamonPayPay && (!editingTxId || t.id !== editingTxId));
                 
                 if (paypaySpent >= paypayLimit) {
                     // 已封頂，回饋 0%
@@ -5023,7 +5023,7 @@ function handleHappyExclusive(selected) {
             if (options.isJapan) {
                 let totalReward = rf(amount * 0.025);
                 if (options.isDesignated) {
-                    const designatedSpent = getCardBonusSpent(cardId, t => t.isKumamonJapan && t.isKumamonDesignated);
+                    const designatedSpent = getCardBonusSpent(cardId, t => t.isKumamonJapan && t.isKumamonDesignated && (!editingTxId || t.id !== editingTxId));
                     if (designatedSpent < 8333) totalReward += rf(Math.min(amount, 8333 - designatedSpent) * 0.06);
                 }
                 return { reward: totalReward, rate: totalReward / amount };
@@ -5039,7 +5039,7 @@ function handleHappyExclusive(selected) {
             if (options.isSelected) {
                 const level = options.level || localStorage.getItem('currency_level') || 'low';
                 const bonusLimit = (level === 'high') ? 20000 : 7500;
-                const bonusSpent = getCardBonusSpent(cardId, t => t.isCurrencySelected);
+                const bonusSpent = getCardBonusSpent(cardId, t => t.isCurrencySelected && (!editingTxId || t.id !== editingTxId));
                 
                 if (bonusSpent < bonusLimit) {
                     const available = bonusLimit - bonusSpent;
@@ -5058,7 +5058,7 @@ function handleHappyExclusive(selected) {
             
             if (options.isSelected) {
                 // 特選餐飲 +7%，回饋上限 $100
-                const selectedSpent = getCardBonusSpent(cardId, t => t.isSinopacMitsuiSelected);
+                const selectedSpent = getCardBonusSpent(cardId, t => t.isSinopacMitsuiSelected && (!editingTxId || t.id !== editingTxId));
                 const selectedRewardUsed = rf(selectedSpent * 0.07);
                 const selectedRewardRemain = Math.max(0, 100 - selectedRewardUsed);
                 const thisSelectedReward = Math.min(rf(amount * 0.07), selectedRewardRemain);
@@ -5148,7 +5148,7 @@ function handleHappyExclusive(selected) {
             
             if (options.isLinePay) {
                 // 新戶 LINE Pay +9%（加碼上限 1000 點）
-                const lpSpent = getCardBonusSpent(cardId, t => t.isDbsLinePay);
+                const lpSpent = getCardBonusSpent(cardId, t => t.isDbsLinePay && (!editingTxId || t.id !== editingTxId));
                 const lpBonusUsed = rf(lpSpent * 0.09); // 已用掉的加碼點數
                 const lpBonusRemain = Math.max(0, 1000 - lpBonusUsed); // 剩餘可用加碼點數
                 if (lpBonusRemain > 0) {
@@ -5156,7 +5156,7 @@ function handleHappyExclusive(selected) {
                 }
             } else if (options.isGreen) {
                 // 綠色/特斯拉 +9%（加碼上限 300 點）
-                const greenSpent = getCardBonusSpent(cardId, t => t.isDbsGreen);
+                const greenSpent = getCardBonusSpent(cardId, t => t.isDbsGreen && (!editingTxId || t.id !== editingTxId));
                 const greenBonusUsed = rf(greenSpent * 0.09);
                 const greenBonusRemain = Math.max(0, 300 - greenBonusUsed);
                 if (greenBonusRemain > 0) {
@@ -5164,7 +5164,7 @@ function handleHappyExclusive(selected) {
                 }
             } else if (options.isForeign) {
                 // 國外實體 +4%（月刷 $15,000 封頂）
-                const foreignSpent = getCardBonusSpent(cardId, t => t.isDbsForeign);
+                const foreignSpent = getCardBonusSpent(cardId, t => t.isDbsForeign && (!editingTxId || t.id !== editingTxId));
                 const foreignRemain = Math.max(0, 15000 - foreignSpent);
                 if (foreignRemain > 0) {
                     const validAmount = Math.min(amount, foreignRemain);
@@ -5669,11 +5669,11 @@ function handleHappyExclusive(selected) {
             }
             else if (card.type === 'custom_laidian') {
                  // 賴點卡多軌倒數：偶數日 + LP + 新戶
-                 const evenSpent = getCardBonusSpent(cardId, t => t.laiDianMode === 'even' && (t.amountTWD || t.amount) >= 100);
+                 const evenSpent = getCardBonusSpent(cardId, t => t.laiDianMode === 'even' && (t.amountTWD || t.amount) >= 100 && (!editingTxId || t.id !== editingTxId));
                  const evenLimit = 3000;
-                 const lpSpent = getCardBonusSpent(cardId, t => (t.laiDianMode === 'lp' || t.laiDianMode === 'even') && (t.amountTWD || t.amount) >= 100);
+                 const lpSpent = getCardBonusSpent(cardId, t => (t.laiDianMode === 'lp' || t.laiDianMode === 'even') && (t.amountTWD || t.amount) >= 100 && (!editingTxId || t.id !== editingTxId));
                  const lpLimit = 20000;
-                 const newSpent = getCardBonusSpent(cardId, t => (t.laiDianMode === 'lp' || t.laiDianMode === 'even') && t.isLaiDianNew && (t.amountTWD || t.amount) >= 100);
+                 const newSpent = getCardBonusSpent(cardId, t => (t.laiDianMode === 'lp' || t.laiDianMode === 'even') && t.isLaiDianNew && (t.amountTWD || t.amount) >= 100 && (!editingTxId || t.id !== editingTxId));
                  const newLimit = 7500;
                  let parts = [];
                  if (evenSpent >= evenLimit) parts.push('偶數⚡');

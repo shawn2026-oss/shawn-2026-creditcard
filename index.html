@@ -28,7 +28,7 @@
     <meta property="og:url" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/">
     <meta property="og:type" content="website">
 
-    <title>刷卡回饋管家 (V126.4 )</title>
+    <title>刷卡回饋管家 (V126.5 )</title>
         
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
@@ -587,7 +587,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V126.4 </div>
+            <div class="version-tag">V126.5 </div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -1992,6 +1992,7 @@
     fetch('config.json?t=' + Date.now()).then(response => response.json()).then(data => { if(data.news) document.getElementById('news-text').innerHTML = data.news; }).catch(error => {});
     let cardSettings = JSON.parse(localStorage.getItem('cardSettings')) || {};
 let editingTxId = null; // 追蹤正在編輯的交易 ID
+let previewCycleDate = null; // 預覽時用的週期參考日期（跨月補記用）
 let historyMonth = null; // null = 當期, {year, month} = 歷史月份
 let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
 
@@ -2798,7 +2799,7 @@ function getActualCycleDay(year, month, cycleDay) {
     }
     function getCurrentCycleTransactions(cardId) {
         const txs = getTransactions(cardId);
-        const currentCycleKey = getCycleKey(cardId);
+        const currentCycleKey = previewCycleDate ? getCycleKey(cardId, previewCycleDate) : getCycleKey(cardId);
         
         return txs.filter(tx => {
             const txCycleKey = getCycleKey(cardId, tx.date);
@@ -3889,6 +3890,9 @@ function handleHappyExclusive(selected) {
         const amountTWD = Math.round(amount * rate);
         const rf = getRoundFn(cardId);
         
+        // 跨月補記：用輸入的日期判斷週期，而非今天
+        previewCycleDate = document.getElementById('dateInput').value || null;
+        
         if (cardId === 'j1') checkFubonJMinSpend();
         if (cardId === 'c5') checkLaiDianMinSpend();
         
@@ -3917,6 +3921,7 @@ function handleHappyExclusive(selected) {
                     liveCalc.style.display = 'block';
                     liveCalc.innerHTML = `預估獲得 <b>$${baseReward}</b> 回饋 (0.5%) <span style="color:#e65100; font-size:11px;"><br>⚠️ 需累積滿$${minSpend.toLocaleString()}才享加碼</span>`;
                     updateTWDPreview();
+                    previewCycleDate = null;
                     return;
                 }
             }
@@ -3942,6 +3947,7 @@ function handleHappyExclusive(selected) {
                         liveCalc.style.display = 'block';
                         liveCalc.innerHTML = `預估獲得 <b>$${baseReward}</b> 回饋 (0.5%) <span style="color:#e65100; font-size:11px;"><br>⚠️ 需累積滿$3,000才享加碼</span>`;
                         updateTWDPreview();
+                        previewCycleDate = null;
                         return;
                     }
                 } else {
@@ -3964,6 +3970,7 @@ function handleHappyExclusive(selected) {
                 liveCalc.style.display = 'block';
                 liveCalc.innerHTML = `預估獲得 <b>$${baseReward}</b> 回饋 (2.5%) <span style="color:#e65100; font-size:11px;"><br>⚠️ 未達低消 $100，無法享有 Apple Pay +1.5%</span>`;
                 updateTWDPreview();
+                previewCycleDate = null;
                 return;
             }
         }
@@ -3989,6 +3996,7 @@ function handleHappyExclusive(selected) {
         }
         
         updateTWDPreview();
+        previewCycleDate = null;
     }
 
     // 新增交易 (修復：加入 cardId 欄位)
@@ -5278,6 +5286,9 @@ function handleHappyExclusive(selected) {
         let uniTimeCumulative = 0;
         let jiangSelectedCumulative = 0;
         let jiangTravelCumulative = 0;
+        let dbsLpCumReward = 0;
+        let dbsGreenCumReward = 0;
+        let dbsForeignCumulative = 0;
         let uniOpenGroupCumulative = 0;
         let uniOpenIcashCumulative = 0;
         let uniOpenOverseasCumulative = 0;
@@ -5331,6 +5342,33 @@ function handleHappyExclusive(selected) {
                 } else {
                     totalReward += baseReward;
                 }
+            } else if (cardId === 'dbs1') {
+                // DBS eco: 基本1% + 各模式累計封頂
+                const baseReward = rf(amount * 0.01);
+                let bonusReward = 0;
+                if (tx.isDbsLinePay) {
+                    // 新戶 LP +9%，加碼上限1000點
+                    const lpBonusRemain = Math.max(0, 1000 - dbsLpCumReward);
+                    if (lpBonusRemain > 0) {
+                        bonusReward = Math.min(rf(amount * 0.09), lpBonusRemain);
+                    }
+                    dbsLpCumReward += rf(amount * 0.09);
+                } else if (tx.isDbsGreen) {
+                    // 綠色/特斯拉 +9%，加碼上限300點
+                    const greenBonusRemain = Math.max(0, 300 - dbsGreenCumReward);
+                    if (greenBonusRemain > 0) {
+                        bonusReward = Math.min(rf(amount * 0.09), greenBonusRemain);
+                    }
+                    dbsGreenCumReward += rf(amount * 0.09);
+                } else if (tx.isDbsForeign) {
+                    // 國外實體 +4%，月刷$15,000封頂
+                    if (dbsForeignCumulative < 15000) {
+                        const available = Math.min(amount, 15000 - dbsForeignCumulative);
+                        bonusReward = rf(available * 0.04);
+                    }
+                    dbsForeignCumulative += amount;
+                }
+                totalReward += baseReward + bonusReward;
             } else if (cardId === 'c7') {
         if (currentLocation !== 'TW') {
             totalReward += rf(amount * 0.01);
@@ -6136,6 +6174,7 @@ if (cycleDay && cycleDay > 0) {
         let legendCum = 0, uniBonusCum = 0, uniTimeCum = 0;
         let uoGroupCum = 0, uoIcashCum = 0, uoOverseasCum = 0;
         let cubeLpCum = 0, customCum = 0;
+        let dbsLpCumR = 0, dbsGreenCumR = 0, dbsForeignCum = 0;
         let fubonPhysCum = 0, fubonSuicaCum = 0;
         let kumaDesigCum = 0, kumaPPCum = 0;
         let jcbBonusCum = 0;
@@ -6174,6 +6213,22 @@ if (cycleDay && cycleDay > 0) {
                     else { totalReward += base; }
                     legendCum += amount;
                 } else { totalReward += base; }
+            } else if (cardId === 'dbs1') {
+                const base = rf(amount * 0.01);
+                let bonus = 0;
+                if (tx.isDbsLinePay) {
+                    const rem = Math.max(0, 1000 - dbsLpCumR);
+                    if (rem > 0) bonus = Math.min(rf(amount * 0.09), rem);
+                    dbsLpCumR += rf(amount * 0.09);
+                } else if (tx.isDbsGreen) {
+                    const rem = Math.max(0, 300 - dbsGreenCumR);
+                    if (rem > 0) bonus = Math.min(rf(amount * 0.09), rem);
+                    dbsGreenCumR += rf(amount * 0.09);
+                } else if (tx.isDbsForeign) {
+                    if (dbsForeignCum < 15000) { const av = Math.min(amount, 15000 - dbsForeignCum); bonus = rf(av * 0.04); }
+                    dbsForeignCum += amount;
+                }
+                totalReward += base + bonus;
             } else if (cardId === 'c7') {
                 const uniS = JSON.parse(localStorage.getItem('uni_settings') || '{}');
                 const isUp = tx.isUniUp || uniS.isUp;
@@ -6729,7 +6784,7 @@ function handleCardPhoto(event) {
     // 匯出資料 (修復：確保 cardId 欄位存在)
     function exportData() {
         const data = {
-            version: 'V126.4',
+            version: 'V126.5',
             exportTime: new Date().toISOString(),
             visibleCards: visibleCards,
             cardOrder: savedOrder,

@@ -224,7 +224,7 @@
         .progress-track { background: rgba(0,0,0,0.2); height: 4px; border-radius: 2px; overflow: hidden; margin-bottom: 4px; }
         .progress-fill { height: 100%; background: rgba(255,255,255,0.95); transition: width 0.5s ease; }
         .tile-msg { font-size: 10px; font-weight: 700; opacity: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
-        .tile-msg.multiline { white-space: pre-line; overflow: visible; text-overflow: unset; font-size: 9px; line-height: 1.2; }
+        .tile-msg.multiline { white-space: pre-line; overflow: visible; text-overflow: unset; }
        .tile-cycle-hint { font-size: 9px; color: #fff; opacity: 0.6; text-shadow: 0 1px 2px rgba(0,0,0,0.5); font-weight: 700; letter-spacing: 0.3px; position: absolute; bottom: 26px; right: 12px;}
         .tile-cycle-hint.dark-text { color: rgba(0,0,0,0.6); text-shadow: none; }
         .tile-overseas-warning { font-size: 10px; color: #FFD700; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; margin-top: 4px; display: none; }
@@ -988,7 +988,7 @@
                         <div id="uniChannelSummary" style="margin-top:6px; font-size:11px; color:#666; line-height:1.6;"></div>
                     </div>
 
-                    <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;"><label for="checkUniBonus">🔥 統一時代任務 +3% (刷$1.6萬封頂)</label><input type="checkbox" id="checkUniBonus" onchange="updateRewardPreview()"></div>
+                    <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; margin-bottom:0;"><label for="checkUniBonus">🔥 統一時代任務 +3% (刷$16,666封頂)</label><input type="checkbox" id="checkUniBonus" onchange="updateRewardPreview()"></div>
                     <div style="margin-top:4px; padding-left:4px;">
                         <div style="font-size:11px; color:#888;">活動期間：~2026/6/30</div>
                         <details style="margin-top:4px;">
@@ -4736,7 +4736,7 @@ function handleHappyExclusive(selected) {
                 
                // 統一時代任務 +3%
                 if (options.isBonus) {
-                    const timeLimit = 16000;
+                    const timeLimit = 16666;
                     const timeSpent = getCardBonusSpent(cardId, t => t.isUniBonus && (!editingTxId || t.id < editingTxId));
                     if (timeSpent < timeLimit) {
                         const available = timeLimit - timeSpent;
@@ -5346,7 +5346,7 @@ function handleHappyExclusive(selected) {
             }
             uniBonusCumulative += amount;
             if (tx.isUniBonus) {
-                const timeLimit = 16000;
+                const timeLimit = 16666;
                 if (uniTimeCumulative < timeLimit) {
                     const available = Math.min(amount, timeLimit - uniTimeCumulative);
                     txReward += rf(available * 0.03);
@@ -6173,7 +6173,7 @@ if (cycleDay && cycleDay > 0) {
                 if (uniBonusCum < bLim) { const av = Math.min(amount, bLim - uniBonusCum); r += rf(av * bRate); }
                 uniBonusCum += amount;
                 if (tx.isUniBonus) {
-                    const tLim = 16000;
+                    const tLim = 16666;
                     if (uniTimeCum < tLim) { const av = Math.min(amount, tLim - uniTimeCum); r += rf(av * 0.03); }
                     uniTimeCum += amount;
                 }

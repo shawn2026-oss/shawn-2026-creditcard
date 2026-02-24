@@ -4726,7 +4726,7 @@ function handleHappyExclusive(selected) {
                 const isUp = options.isUp;
                 const bonusRate = isUp ? 0.035 : 0.025; // UP選+3.5%, 任意選+2.5%
                 const bonusLimit = isUp ? 140000 : 40000;
-               const bonusSpent = getCardBonusSpent(cardId, t => !editingTxId || t.id < editingTxId);
+               const bonusSpent = getCardBonusSpent(cardId, t => !editingTxId || t.id !== editingTxId);
                 
                 if (bonusSpent < bonusLimit) {
                     const available = bonusLimit - bonusSpent;
@@ -4737,7 +4737,7 @@ function handleHappyExclusive(selected) {
                // 統一時代任務 +3%
                 if (options.isBonus) {
                     const timeLimit = 16666;
-                    const timeSpent = getCardBonusSpent(cardId, t => t.isUniBonus && (!editingTxId || t.id < editingTxId));
+                    const timeSpent = getCardBonusSpent(cardId, t => t.isUniBonus && (!editingTxId || t.id !== editingTxId));
                     if (timeSpent < timeLimit) {
                         const available = timeLimit - timeSpent;
                         const validForTime = Math.min(amount, available);
@@ -5180,7 +5180,7 @@ function handleHappyExclusive(selected) {
         else if (cardId === 'c1') {
             const baseReward = rf(amount * 0.012);
             if (options.isBonus && currentLocation === 'TW') {
-               const bonusSpent = getCardBonusSpent(cardId, t => t.isLegendBonus && (t.location || 'TW') === 'TW' && (!editingTxId || t.id < editingTxId));
+               const bonusSpent = getCardBonusSpent(cardId, t => t.isLegendBonus && (t.location || 'TW') === 'TW' && (!editingTxId || t.id !== editingTxId));
                 const limit = 11363;
                 if (bonusSpent < limit) {
                     const available = Math.min(amount, limit - bonusSpent);

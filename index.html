@@ -28,7 +28,7 @@
     <meta property="og:url" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/">
     <meta property="og:type" content="website">
 
-    <title>刷卡回饋管家 (V126.7 )</title>
+    <title>刷卡回饋管家 (V126.8 )</title>
         
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
@@ -587,7 +587,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V126.7 </div>
+            <div class="version-tag">V126.8 </div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -4432,8 +4432,11 @@ function handleHappyExclusive(selected) {
         const txs = getCurrentCycleTransactions(cardId);
         let total = 0;
         txs.forEach(tx => {
-            // 預覽模式：只算日期 ≤ 當前輸入日期的交易（模擬銀行順序）
-            if (previewCycleDate && tx.date && tx.date > previewCycleDate) return;
+            // 預覽模式：模擬銀行順序，只算在這筆之前的交易
+            if (previewCycleDate && tx.date) {
+                if (tx.date > previewCycleDate) return;  // 晚於此日 → 排除
+                if (tx.date === previewCycleDate && editingTxId && tx.id > editingTxId) return; // 同日但更晚建立 → 排除
+            }
             if (filterFn(tx)) {
                 total += (tx.amountTWD || tx.amount || 0);
             }
@@ -6845,7 +6848,7 @@ function handleCardPhoto(event) {
     // 匯出資料 (修復：確保 cardId 欄位存在)
     function exportData() {
         const data = {
-            version: 'V126.7',
+            version: 'V126.8',
             exportTime: new Date().toISOString(),
             visibleCards: visibleCards,
             cardOrder: savedOrder,

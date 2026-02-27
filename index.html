@@ -28,7 +28,7 @@
     <meta property="og:url" content="https://shawn2026-oss.github.io/shawn-2026-creditcard/">
     <meta property="og:type" content="website">
 
-    <title>刷卡回饋管家 (V126.8 )</title>
+    <title>刷卡回饋管家 (V126.7 )</title>
         
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
@@ -587,7 +587,7 @@
     <div class="app-container">
         <div class="header-top-row">
             <div class="author-top">Designed by Pocket Lab</div>
-            <div class="version-tag">V126.8 </div>
+            <div class="version-tag">V126.7 </div>
         </div>
         <div class="header-section">
             <h1>刷卡回饋管家</h1>
@@ -5268,9 +5268,9 @@ function handleHappyExclusive(selected) {
             return { reward: totalReward, rate: amount > 0 ? totalReward / amount : 0.05 };
         }
         
-        // 預設（含封頂處理）
+        // 預設（含自建卡片封頂處理）
         rate = card.tier1Rate || 0.01;
-        if (card.limit && card.limit < 99999999) {
+        if (card.isCustom && card.limit && card.limit < 99999999) {
             const t2Rate = card.tier2Rate || 0;
             const bonusSpent = getCardBonusSpent(cardId, t => (!editingTxId || t.id !== editingTxId));
             if (bonusSpent >= card.limit) {
@@ -5322,6 +5322,20 @@ function handleHappyExclusive(selected) {
         let uniOpenOverseasCumulative = 0;
         let customCumulative = 0;
         let cubeLpCumulative = 0;
+        // c6 豬富
+        let pigBonus10Cum = 0, pigBonus25Cum = 0;
+        // c5 賴點
+        let laiLpCum = 0, laiNewCum = 0, laiEvenCum = 0;
+        // c2 綠卡
+        let greenCum = 0;
+        // c8 樂家
+        let happyPetCumR = 0, happyLifeCumR = 0, happyPeaceCumR = 0;
+        // j2 吉鶴
+        let jiheAppleCum = 0, jiheDjCum = 0;
+        // j4 幣倍
+        let currencySelCum = 0;
+        // j5 三井
+        let mitsuiSelCumR = 0;
         
         txs.forEach(tx => {
             const amount = tx.amountTWD || tx.amount || 0;
@@ -5353,8 +5367,23 @@ function handleHappyExclusive(selected) {
                 if (!happyReachedMin) {
                     totalReward += rf(amount * 0.005);
                 } else {
-                    const result = calculateTxRewardWithCap(cardId, tx);
-                    totalReward += result.reward;
+                    let txR = rf(amount * 0.005);
+                    if (tx.isForeign || tx.isHappyForeign) {
+                        txR += rf(amount * 0.02);
+                    } else if (tx.isHappyPet || tx.happyMode === 'pet') {
+                        const rem = Math.max(0, 500 - happyPetCumR);
+                        txR += Math.min(rf(amount * 0.095), rem);
+                        happyPetCumR += rf(amount * 0.095);
+                    } else if (tx.isHappyLife || tx.happyMode === 'life') {
+                        const rem = Math.max(0, 200 - happyLifeCumR);
+                        txR += Math.min(rf(amount * 0.035), rem);
+                        happyLifeCumR += rf(amount * 0.035);
+                    } else if (tx.isHappyPeace || tx.happyMode === 'peace') {
+                        const rem = Math.max(0, 200 - happyPeaceCumR);
+                        txR += Math.min(rf(amount * 0.035), rem);
+                        happyPeaceCumR += rf(amount * 0.035);
+                    }
+                    totalReward += txR;
                 }
             } else if (cardId === 'c1') {
                 const baseReward = rf(amount * 0.012);
@@ -5490,8 +5519,124 @@ function handleHappyExclusive(selected) {
         if (chRemain > 0) channel = Math.min(rf(amount * 0.03), chRemain);
         sportChannelCumR += rf(amount * 0.03);
         totalReward += base + exercise + channel;
-    } else if (card.limit && card.limit < 99999999) {
-        // 封頂累計（含自建卡與無專屬handler的內建卡如c3 Sport）
+    } else if (cardId === 'c6') {
+        // 豬富卡：繳費0.15% / 一般1% + 新戶10%封頂$8000 + 精選2.5%封頂$40萬
+        if (tx.isBill) {
+            let txR = rf(amount * 0.0015);
+            if (tx.isBonus10) {
+                if (pigBonus10Cum < 8000) {
+                    const av = Math.min(amount, 8000 - pigBonus10Cum);
+                    txR += rf(av * 0.10);
+                }
+                pigBonus10Cum += amount;
+            }
+            totalReward += txR;
+        } else {
+            let txR = rf(amount * 0.01);
+            if (tx.isBonus10) {
+                if (pigBonus10Cum < 8000) {
+                    const av = Math.min(amount, 8000 - pigBonus10Cum);
+                    txR += rf(av * 0.10);
+                }
+                pigBonus10Cum += amount;
+            }
+            if (tx.isBonus25) {
+                if (pigBonus25Cum < 400000) {
+                    const av = Math.min(amount, 400000 - pigBonus25Cum);
+                    const bRate = (tx.location === 'JP') ? 0.01 : 0.025;
+                    txR += rf(av * bRate);
+                }
+                pigBonus25Cum += amount;
+            }
+            totalReward += txR;
+        }
+    } else if (cardId === 'c5') {
+        // 賴點卡：基本1% + LP+1%(月刷$2萬) + 新戶+4%($7500) + 偶數+5%($3000)
+        let txR = rf(amount * 0.01);
+        if ((tx.location || 'TW') === 'TW' && amount >= 100) {
+            const mode = tx.laiDianMode || 'general';
+            if (mode === 'lp' || mode === 'even') {
+                // LP +1%
+                if (laiLpCum < 20000) {
+                    txR += rf(Math.min(amount, 20000 - laiLpCum) * 0.01);
+                }
+                laiLpCum += amount;
+                // 新戶 +4%
+                if (tx.isLaiDianNew) {
+                    if (laiNewCum < 7500) {
+                        txR += rf(Math.min(amount, 7500 - laiNewCum) * 0.04);
+                    }
+                    laiNewCum += amount;
+                }
+            }
+            if (mode === 'even') {
+                // 偶數日 +5%
+                if (laiEvenCum < 3000) {
+                    txR += rf(Math.min(amount, 3000 - laiEvenCum) * 0.05);
+                }
+                laiEvenCum += amount;
+            }
+        }
+        totalReward += txR;
+    } else if (cardId === 'c2') {
+        // 綠卡：基本1% / 國外2% / 綠色通路+5%(月刷$3000)
+        if (tx.isForeign) {
+            totalReward += rf(amount * 0.02);
+        } else if (tx.isGreenChannel) {
+            let txR = rf(amount * 0.01);
+            if (greenCum < 3000) {
+                txR += rf(Math.min(amount, 3000 - greenCum) * 0.05);
+            }
+            greenCum += amount;
+            totalReward += txR;
+        } else {
+            totalReward += rf(amount * 0.01);
+        }
+    } else if (cardId === 'j2') {
+        // 吉鶴卡：日本2.5% + AP+1.5%($4萬) / 國內1% + 日系+4%($12500)
+        if (tx.isJiheJapan) {
+            let txR = rf(amount * 0.025);
+            if (tx.isJiheApple && amount >= 100) {
+                if (jiheAppleCum < 40000) {
+                    txR += rf(Math.min(amount, 40000 - jiheAppleCum) * 0.015);
+                }
+                jiheAppleCum += amount;
+            }
+            totalReward += txR;
+        } else {
+            let txR = rf(amount * 0.01);
+            if (tx.isJiheDomesticJapanese) {
+                if (jiheDjCum < 12500) {
+                    txR += rf(Math.min(amount, 12500 - jiheDjCum) * 0.04);
+                }
+                jiheDjCum += amount;
+            }
+            totalReward += txR;
+        }
+    } else if (cardId === 'j4') {
+        // 幣倍卡：基本1% + 精選+5%(依等級$7500/$20000)
+        let txR = rf(amount * 0.01);
+        if (tx.isCurrencySelected) {
+            const level = tx.currencyLevel || localStorage.getItem('currency_level') || 'low';
+            const bonusLimit = (level === 'high') ? 20000 : 7500;
+            if (currencySelCum < bonusLimit) {
+                txR += rf(Math.min(amount, bonusLimit - currencySelCum) * 0.05);
+            }
+            currencySelCum += amount;
+        }
+        totalReward += txR;
+    } else if (cardId === 'j5') {
+        // 三井卡：基本0.3% + 特選餐飲+7%(回饋上限$100)
+        let txR = rf(amount * 0.003);
+        if (tx.isSinopacMitsuiSelected) {
+            const rem = Math.max(0, 100 - mitsuiSelCumR);
+            const thisR = Math.min(rf(amount * 0.07), rem);
+            txR += thisR;
+            mitsuiSelCumR += rf(amount * 0.07);
+        }
+        totalReward += txR;
+    } else if (card.isCustom && card.limit && card.limit < 99999999) {
+        // 自建卡片封頂累計
         const cRate = card.tier1Rate || 0.01;
         const cT2Rate = card.tier2Rate || 0;
         if (customCumulative < card.limit) {
@@ -6232,6 +6377,20 @@ if (cycleDay && cycleDay > 0) {
         let fubonPhysCum = 0, fubonSuicaCum = 0;
         let kumaDesigCum = 0, kumaPPCum = 0;
         let jcbBonusCum = 0;
+        // c6 豬富
+        let rPigB10Cum = 0, rPigB25Cum = 0;
+        // c5 賴點
+        let rLaiLpCum = 0, rLaiNewCum = 0, rLaiEvenCum = 0;
+        // c2 綠卡
+        let rGreenCum = 0;
+        // c8 樂家
+        let rHappyPetCumR = 0, rHappyLifeCumR = 0, rHappyPeaceCumR = 0;
+        // j2 吉鶴
+        let rJiheAppleCum = 0, rJiheDjCum = 0;
+        // j4 幣倍
+        let rCurrencySelCum = 0;
+        // j5 三井
+        let rMitsuiSelCumR = 0;
         
         const jiangReachedMin = (cardId === 'c4') ? (totalSpent >= 3000) : true;
         const happyReachedMin = (cardId === 'c8') ? (totalSpent >= 3000) : true;
@@ -6258,7 +6417,25 @@ if (cycleDay && cycleDay > 0) {
                 }
             } else if (cardId === 'c8') {
                 if (!happyReachedMin) { totalReward += rf(amount * 0.005); }
-                else { totalReward += calculateTxRewardWithCap(cardId, tx).reward; }
+                else {
+                    let r = rf(amount * 0.005);
+                    if (tx.isForeign || tx.isHappyForeign) {
+                        r += rf(amount * 0.02);
+                    } else if (tx.isHappyPet || tx.happyMode === 'pet') {
+                        const rem = Math.max(0, 500 - rHappyPetCumR);
+                        r += Math.min(rf(amount * 0.095), rem);
+                        rHappyPetCumR += rf(amount * 0.095);
+                    } else if (tx.isHappyLife || tx.happyMode === 'life') {
+                        const rem = Math.max(0, 200 - rHappyLifeCumR);
+                        r += Math.min(rf(amount * 0.035), rem);
+                        rHappyLifeCumR += rf(amount * 0.035);
+                    } else if (tx.isHappyPeace || tx.happyMode === 'peace') {
+                        const rem = Math.max(0, 200 - rHappyPeaceCumR);
+                        r += Math.min(rf(amount * 0.035), rem);
+                        rHappyPeaceCumR += rf(amount * 0.035);
+                    }
+                    totalReward += r;
+                }
             } else if (cardId === 'c1') {
                 const base = rf(amount * 0.012);
                 if (tx.isLegendBonus && (tx.location || 'TW') === 'TW') {
@@ -6388,7 +6565,89 @@ if (cycleDay && cycleDay > 0) {
                 if (chRem > 0) ch = Math.min(rf(amount * 0.03), chRem);
                 sportChCumR += rf(amount * 0.03);
                 totalReward += base + ex + ch;
-            } else if (card.limit && card.limit < 99999999) {
+            } else if (cardId === 'c6') {
+                if (tx.isBill) {
+                    let r = rf(amount * 0.0015);
+                    if (tx.isBonus10) {
+                        if (rPigB10Cum < 8000) r += rf(Math.min(amount, 8000 - rPigB10Cum) * 0.10);
+                        rPigB10Cum += amount;
+                    }
+                    totalReward += r;
+                } else {
+                    let r = rf(amount * 0.01);
+                    if (tx.isBonus10) {
+                        if (rPigB10Cum < 8000) r += rf(Math.min(amount, 8000 - rPigB10Cum) * 0.10);
+                        rPigB10Cum += amount;
+                    }
+                    if (tx.isBonus25) {
+                        if (rPigB25Cum < 400000) {
+                            const av = Math.min(amount, 400000 - rPigB25Cum);
+                            r += rf(av * ((tx.location === 'JP') ? 0.01 : 0.025));
+                        }
+                        rPigB25Cum += amount;
+                    }
+                    totalReward += r;
+                }
+            } else if (cardId === 'c5') {
+                let r = rf(amount * 0.01);
+                if ((tx.location || 'TW') === 'TW' && amount >= 100) {
+                    const mode = tx.laiDianMode || 'general';
+                    if (mode === 'lp' || mode === 'even') {
+                        if (rLaiLpCum < 20000) r += rf(Math.min(amount, 20000 - rLaiLpCum) * 0.01);
+                        rLaiLpCum += amount;
+                        if (tx.isLaiDianNew) {
+                            if (rLaiNewCum < 7500) r += rf(Math.min(amount, 7500 - rLaiNewCum) * 0.04);
+                            rLaiNewCum += amount;
+                        }
+                    }
+                    if (mode === 'even') {
+                        if (rLaiEvenCum < 3000) r += rf(Math.min(amount, 3000 - rLaiEvenCum) * 0.05);
+                        rLaiEvenCum += amount;
+                    }
+                }
+                totalReward += r;
+            } else if (cardId === 'c2') {
+                if (tx.isForeign) { totalReward += rf(amount * 0.02); }
+                else if (tx.isGreenChannel) {
+                    let r = rf(amount * 0.01);
+                    if (rGreenCum < 3000) r += rf(Math.min(amount, 3000 - rGreenCum) * 0.05);
+                    rGreenCum += amount;
+                    totalReward += r;
+                } else { totalReward += rf(amount * 0.01); }
+            } else if (cardId === 'j2') {
+                if (tx.isJiheJapan) {
+                    let r = rf(amount * 0.025);
+                    if (tx.isJiheApple && amount >= 100) {
+                        if (rJiheAppleCum < 40000) r += rf(Math.min(amount, 40000 - rJiheAppleCum) * 0.015);
+                        rJiheAppleCum += amount;
+                    }
+                    totalReward += r;
+                } else {
+                    let r = rf(amount * 0.01);
+                    if (tx.isJiheDomesticJapanese) {
+                        if (rJiheDjCum < 12500) r += rf(Math.min(amount, 12500 - rJiheDjCum) * 0.04);
+                        rJiheDjCum += amount;
+                    }
+                    totalReward += r;
+                }
+            } else if (cardId === 'j4') {
+                let r = rf(amount * 0.01);
+                if (tx.isCurrencySelected) {
+                    const lv = tx.currencyLevel || localStorage.getItem('currency_level') || 'low';
+                    const lim = (lv === 'high') ? 20000 : 7500;
+                    if (rCurrencySelCum < lim) r += rf(Math.min(amount, lim - rCurrencySelCum) * 0.05);
+                    rCurrencySelCum += amount;
+                }
+                totalReward += r;
+            } else if (cardId === 'j5') {
+                let r = rf(amount * 0.003);
+                if (tx.isSinopacMitsuiSelected) {
+                    const rem = Math.max(0, 100 - rMitsuiSelCumR);
+                    r += Math.min(rf(amount * 0.07), rem);
+                    rMitsuiSelCumR += rf(amount * 0.07);
+                }
+                totalReward += r;
+            } else if (card.isCustom && card.limit && card.limit < 99999999) {
                 const cRate = card.tier1Rate || 0.01;
                 const cT2 = card.tier2Rate || 0;
                 if (customCum < card.limit) {
@@ -6848,7 +7107,7 @@ function handleCardPhoto(event) {
     // 匯出資料 (修復：確保 cardId 欄位存在)
     function exportData() {
         const data = {
-            version: 'V126.8',
+            version: 'V126.7',
             exportTime: new Date().toISOString(),
             visibleCards: visibleCards,
             cardOrder: savedOrder,

@@ -7207,6 +7207,9 @@ function handleCardPhoto(event) {
             }
         });
         
+        // 匯出自建卡片定義
+        data.customCards = JSON.parse(localStorage.getItem('custom_cards') || '[]');
+
         // 匯出 UniOpen 各週期的踩點記錄
         data.uniBrandsByPeriod = {};
         for (let i = 0; i < localStorage.length; i++) {
@@ -7350,6 +7353,11 @@ function handleCardPhoto(event) {
                         localStorage.setItem(cycleKey, JSON.stringify(data.uniOpenState.brands));
                     }
                 }
+                // 匯入自建卡片定義
+                if (data.customCards) {
+                    localStorage.setItem('custom_cards', JSON.stringify(data.customCards));
+                }
+
                 alert('匯入成功！頁面將重新載入。');
                 location.reload();
                 

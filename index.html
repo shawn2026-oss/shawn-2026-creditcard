@@ -7175,75 +7175,99 @@ function handleCardPhoto(event) {
 
   // 匯出資料 (2026/03/05 終極相容版：解決巢狀字串與欄位缺失)
     function exportData() {
-        // 🌟 核心修復函數：確保資料是「物件」而非「字串」，避免 iOS 解析崩潰
-        const parseStorage = (key, defaultVal) => {
-            const val = localStorage.getItem(key);
-            if (!val) return defaultVal;
-            try { 
-                const parsed = JSON.parse(val);
-                // 針對 uni_brands 這種可能被雙重 stringify 的情況再做一次檢查
-                return (typeof parsed === 'string') ? JSON.parse(parsed) : parsed;
-            } catch(e) { return val; }
-        };
-
         const data = {
             version: 'V126.7',
             exportTime: new Date().toISOString(),
             visibleCards: visibleCards,
-            cardOrder: savedOrder || [],
-            cardSettings: cardSettings || {},
+            cardOrder: savedOrder,
+            cardSettings: cardSettings,
             transactions: {},
             settings: {
                 current_location: currentLocation,
                 exchange_rates: exchangeRates,
-                // 🌟 這些欄位必須是「物件」，iOS 才能讀懂
-                uni_settings: parseStorage('uni_settings', {isUp: false}),
-                happy_used: parseStorage('happy_used', {}),
-                hsbc_tier: localStorage.getItem('hsbc_tier') || 'infinite',
-                hsbc_initial: Number(localStorage.getItem('hsbc_initial')) || 0,
-                hsbc_redeemed: Number(localStorage.getItem('hsbc_redeemed')) || 0,
-                currency_level: localStorage.getItem('currency_level') || 'low',
-                scene_snapshots: parseStorage('scene_snapshots', [])
+                uni_settings: localStorage.getItem('uni_settings'),
+                happy_used: localStorage.getItem('happy_used'),
+                hsbc_tier: localStorage.getItem('hsbc_tier'),
+                hsbc_initial: localStorage.getItem('hsbc_initial'),
+                hsbc_redeemed: localStorage.getItem('hsbc_redeemed'),
+                currency_level: localStorage.getItem('currency_level'),
+                scene_snapshots: localStorage.getItem('scene_snapshots')
             }
         };
 
-        // 1. 處理交易紀錄
+        // 匯出所有卡片的交易紀錄
         cards.forEach(card => {
             const txs = getTransactions(card.id);
             if (txs.length > 0) {
-                data.transactions[card.id] = txs.map(tx => ({ ...tx, cardId: card.id }));
+                data.transactions[card.id] = txs.map(tx => ({
+                    ...tx,
+                    cardId: card.id
+                }));
             }
         });
 
-        // 2. 🌟 補齊自建卡欄位 (對齊 iOS CustomCardSheet 定義)
-        let rawCustomCards = JSON.parse(localStorage.getItem('custom_cards') || '[]');
+        // 匯出自建卡片定義（轉換為 iOS Card.swift 格式）
+        const rawCustomCards = JSON.parse(localStorage.getItem('custom_cards') || '[]');
         data.customCards = rawCustomCards.map(card => {
-            const colorIndex = customColorPresets.findIndex(p => p.gradient === card.gradient);
+            const rate = Number(card.rate) || 0;
+            const rate2 = Number(card.tier2Rate) || 0;
+            const cap = Number(card.cap) || 0;
+            const unit = card.unit || 'cash';
+            const dMPD = Number(card.domesticMPD) || 0;
+            const fMPD = Number(card.foreignMPD) || 0;
+            const rm = card.roundingMethod || 'floor';
+            const roundLabel = rm === 'round' ? '四捨五入' : '無條件捨去';
+
+            // 產生 note（對齊 iOS makeCustomCard 邏輯）
+            let noteText;
+            if (unit === 'miles' && dMPD > 0) {
+                noteText = `國內${Math.floor(dMPD)}元/哩 | 國外${Math.floor(fMPD || dMPD)}元/哩 (${roundLabel})`;
+            } else {
+                noteText = `${rate}%`;
+                if (cap > 0) {
+                    noteText += ` (刷$${cap.toLocaleString()}封頂`;
+                    if (rate2 > 0) noteText += `→${rate2}%`;
+                    noteText += ')';
+                } else {
+                    noteText += ' (無上限)';
+                }
+                noteText += ` ${roundLabel}`;
+            }
+
+            // 從 CSS gradient 提取 hex 色碼陣列
+            const hexMatches = (card.gradient || '').match(/#[0-9a-fA-F]{3,6}/g) || ['#232526', '#414345'];
+
             return {
-                ...card,
-                selectedColorIndex: colorIndex >= 0 ? colorIndex : 0, 
-                roundingMethod: card.roundingMethod || "floor",
-                cardRounding: card.roundingMethod || "floor", 
-                cycleDay: card.cycleDay ? String(card.cycleDay) : "",
-                nickname: card.nickname || "",
-                tier2Rate: Number(card.tier2Rate) || 0,
-                cap: Number(card.cap) || 0,
-                rate: Number(card.rate) || 0,
-                domesticMPD: Number(card.domesticMPD) || 0,
-                foreignMPD: Number(card.foreignMPD) || 0,
-                unit: card.unit || "cash",
-                name: card.name || "",
-                gradient: card.gradient || "linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%)",
-                textColor: card.textColor || "white"
+                id: card.id,
+                name: card.name || '',
+                nickname: card.nickname || '',
+                note: noteText,
+                type: (unit === 'miles' && dMPD > 0) ? 'miles' : 'custom',
+                gradientHex: hexMatches,
+                textColor: card.textColor || 'white',
+                msgDanger: '',
+                parking: '',
+                limit: cap > 0 ? cap : null,
+                tier1Rate: (unit === 'miles' && dMPD > 0) ? (1.0 / dMPD) : (rate / 100.0),
+                tier2Rate: rate2 / 100.0,
+                threshold: null,
+                minSpend: null,
+                target: null,
+                isCustom: true,
+                baseRate: rate,
+                baseRate2: rate2,
+                roundingMethod: rm,
+                domesticMPD: dMPD,
+                foreignMPD: fMPD
             };
         });
 
-        // 3. 🌟 關鍵修復：踩點紀錄轉回「陣列物件」
+        // 匯出 UniOpen 各週期的踩點記錄
         data.uniBrandsByPeriod = {};
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
             if (key && key.startsWith('uni_brands_')) {
-                data.uniBrandsByPeriod[key] = parseStorage(key, []);
+                data.uniBrandsByPeriod[key] = localStorage.getItem(key);
             }
         }
 
@@ -7452,8 +7476,3 @@ function handleCardPhoto(event) {
 </script>
 </body>
 </html>
-
-
-
-
-

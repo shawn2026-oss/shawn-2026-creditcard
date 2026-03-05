@@ -7270,6 +7270,13 @@ function handleCardPhoto(event) {
                 data.uniBrandsByPeriod[key] = localStorage.getItem(key);
             }
         }
+        // 確保當前週期一定存在（即使 0 家，iOS 才會清除舊資料）
+        const currentBrandKey = getUniBrandCycleKey();
+        if (!data.uniBrandsByPeriod[currentBrandKey]) {
+            data.uniBrandsByPeriod[currentBrandKey] = '[]';
+        }
+        // iOS 也會讀根層級的 uni_brands（陣列格式）
+        data.uni_brands = JSON.parse(localStorage.getItem(currentBrandKey) || '[]');
 
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);

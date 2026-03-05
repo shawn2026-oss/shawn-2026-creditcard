@@ -7173,13 +7173,17 @@ function handleCardPhoto(event) {
         filterManageCards();
     }
 
-  // 匯出資料 (2026/03/05 最終修正：iOS 完美相容版)
+  // 匯出資料 (2026/03/05 終極相容版：解決巢狀字串與欄位缺失)
     function exportData() {
-        // 安全解析 localStorage 函數 (防範字串化的 JSON 導致 iOS 崩潰)
-        const safeParse = (key, defaultVal) => {
+        // 🌟 核心修復函數：確保資料是「物件」而非「字串」，避免 iOS 解析崩潰
+        const parseStorage = (key, defaultVal) => {
             const val = localStorage.getItem(key);
             if (!val) return defaultVal;
-            try { return JSON.parse(val); } catch(e) { return val; }
+            try { 
+                const parsed = JSON.parse(val);
+                // 針對 uni_brands 這種可能被雙重 stringify 的情況再做一次檢查
+                return (typeof parsed === 'string') ? JSON.parse(parsed) : parsed;
+            } catch(e) { return val; }
         };
 
         const data = {
@@ -7192,18 +7196,18 @@ function handleCardPhoto(event) {
             settings: {
                 current_location: currentLocation,
                 exchange_rates: exchangeRates,
-                // 🌟 這裡必須解開 JSON 字串，iOS 才能直接用物件讀取
-                uni_settings: safeParse('uni_settings', {isUp: false}),
-                happy_used: safeParse('happy_used', {}),
+                // 🌟 這些欄位必須是「物件」，iOS 才能讀懂
+                uni_settings: parseStorage('uni_settings', {isUp: false}),
+                happy_used: parseStorage('happy_used', {}),
                 hsbc_tier: localStorage.getItem('hsbc_tier') || 'infinite',
                 hsbc_initial: Number(localStorage.getItem('hsbc_initial')) || 0,
                 hsbc_redeemed: Number(localStorage.getItem('hsbc_redeemed')) || 0,
                 currency_level: localStorage.getItem('currency_level') || 'low',
-                scene_snapshots: safeParse('scene_snapshots', [])
+                scene_snapshots: parseStorage('scene_snapshots', [])
             }
         };
 
-        // 1. 搬運交易紀錄
+        // 1. 處理交易紀錄
         cards.forEach(card => {
             const txs = getTransactions(card.id);
             if (txs.length > 0) {
@@ -7211,10 +7215,9 @@ function handleCardPhoto(event) {
             }
         });
 
-        // 2. 🌟 修復自建卡 (補齊 iOS 遺漏的所有必填欄位)
+        // 2. 🌟 補齊自建卡欄位 (對齊 iOS CustomCardSheet 定義)
         let rawCustomCards = JSON.parse(localStorage.getItem('custom_cards') || '[]');
         data.customCards = rawCustomCards.map(card => {
-            // 自動對應顏色索引 (iOS UI 需要 selectedColorIndex)
             const colorIndex = customColorPresets.findIndex(p => p.gradient === card.gradient);
             return {
                 ...card,
@@ -7235,18 +7238,12 @@ function handleCardPhoto(event) {
             };
         });
 
-        // 3. 🌟 關鍵修正：UniOpen 踩點紀錄 (iOS 預期是 [String: [String]] 字典陣列)
+        // 3. 🌟 關鍵修復：踩點紀錄轉回「陣列物件」
         data.uniBrandsByPeriod = {};
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
             if (key && key.startsWith('uni_brands_')) {
-                const val = localStorage.getItem(key);
-                try {
-                    // 核心：將 "[\"7-11\"]" 轉回真正的陣列 ["7-11"]
-                    data.uniBrandsByPeriod[key] = JSON.parse(val);
-                } catch(e) {
-                    data.uniBrandsByPeriod[key] = [];
-                }
+                data.uniBrandsByPeriod[key] = parseStorage(key, []);
             }
         }
 
@@ -7455,6 +7452,7 @@ function handleCardPhoto(event) {
 </script>
 </body>
 </html>
+
 
 
 

@@ -7173,70 +7173,71 @@ function handleCardPhoto(event) {
         filterManageCards();
     }
 
-   // 匯出資料 (加入 iOS 終極防當機清洗機)
+  // 匯出資料 (iOS 終極相容版：同時修復自建卡與踩點紀錄)
     function exportData() {
         const data = {
             version: 'V126.7',
             exportTime: new Date().toISOString(),
             visibleCards: visibleCards,
-            cardOrder: savedOrder,
-            cardSettings: cardSettings,
+            cardOrder: savedOrder || [],
+            cardSettings: cardSettings || {},
             transactions: {},
             settings: {
                 current_location: currentLocation,
                 exchange_rates: exchangeRates,
-                uni_settings: localStorage.getItem('uni_settings'),
-                happy_used: localStorage.getItem('happy_used'),
-                hsbc_tier: localStorage.getItem('hsbc_tier'),
-                hsbc_initial: localStorage.getItem('hsbc_initial'),
-                hsbc_redeemed: localStorage.getItem('hsbc_redeemed'),
-                currency_level: localStorage.getItem('currency_level'),
-                scene_snapshots: localStorage.getItem('scene_snapshots')
+                uni_settings: localStorage.getItem('uni_settings') || '{"isUp":false}',
+                happy_used: localStorage.getItem('happy_used') || '{}',
+                hsbc_tier: localStorage.getItem('hsbc_tier') || 'infinite',
+                hsbc_initial: localStorage.getItem('hsbc_initial') || '0',
+                hsbc_redeemed: localStorage.getItem('hsbc_redeemed') || '0',
+                currency_level: localStorage.getItem('currency_level') || 'low',
+                scene_snapshots: localStorage.getItem('scene_snapshots') || '[]'
             }
         };
 
-        // 匯出所有卡片的交易紀錄
+        // 1. 搬運交易紀錄 (確保 cardId 存在)
         cards.forEach(card => {
             const txs = getTransactions(card.id);
             if (txs.length > 0) {
-                data.transactions[card.id] = txs.map(tx => ({
-                    ...tx,
-                    cardId: card.id
-                }));
+                data.transactions[card.id] = txs.map(tx => ({ ...tx, cardId: card.id }));
             }
         });
 
-        // 🌟 核心修復：匯出自建卡片並補齊 iOS 必填欄位
+        // 2. 🌟 修復自建卡 (補齊 iOS 所有可能需要的欄位)
         let rawCustomCards = JSON.parse(localStorage.getItem('custom_cards') || '[]');
         data.customCards = rawCustomCards.map(card => {
-            // 找出顏色索引，若找不到預設為 0
             const colorIndex = customColorPresets.findIndex(p => p.gradient === card.gradient);
-            
             return {
                 ...card,
-                // --- 強制對齊 iOS Swift Codable 結構 ---
-                selectedColorIndex: colorIndex >= 0 ? colorIndex : 0, 
+                selectedColorIndex: colorIndex >= 0 ? colorIndex : 0,
                 roundingMethod: card.roundingMethod || "floor",
-                cycleDay: card.cycleDay || "",
+                cardRounding: card.roundingMethod || "floor", // 預防 iOS 變數名不同
+                cycleDay: card.cycleDay ? String(card.cycleDay) : "",
                 nickname: card.nickname || "",
-                tier2Rate: card.tier2Rate !== undefined ? Number(card.tier2Rate) : 0,
-                cap: card.cap !== undefined ? Number(card.cap) : 0,
-                rate: card.rate !== undefined ? Number(card.rate) : 0,
-                domesticMPD: card.domesticMPD !== undefined ? Number(card.domesticMPD) : 0,
-                foreignMPD: card.foreignMPD !== undefined ? Number(card.foreignMPD) : 0,
+                tier2Rate: Number(card.tier2Rate) || 0,
+                cap: Number(card.cap) || 0,
+                rate: Number(card.rate) || 0,
+                domesticMPD: Number(card.domesticMPD) || 0,
+                foreignMPD: Number(card.foreignMPD) || 0,
                 unit: card.unit || "cash",
                 name: card.name || "",
-                gradient: card.gradient || "linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%)",
+                gradient: card.gradient || "",
                 textColor: card.textColor || "white"
             };
         });
 
-        // 匯出 UniOpen 各週期的踩點記錄
+        // 3. 🌟 修復 UniOpen 踩點紀錄 (關鍵：解析字串為真實物件，確保 iOS 能讀)
         data.uniBrandsByPeriod = {};
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
             if (key && key.startsWith('uni_brands_')) {
-                data.uniBrandsByPeriod[key] = localStorage.getItem(key);
+                const val = localStorage.getItem(key);
+                try {
+                    // 如果 PWA 存的是字串 "[\"7-11\"]"，我們把它轉成真的陣列 ["7-11"]
+                    data.uniBrandsByPeriod[key] = JSON.parse(val);
+                } catch(e) {
+                    data.uniBrandsByPeriod[key] = val; // 失敗就維持原樣
+                }
             }
         }
 
@@ -7445,5 +7446,6 @@ function handleCardPhoto(event) {
 </script>
 </body>
 </html>
+
 
 

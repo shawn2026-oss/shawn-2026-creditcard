@@ -7207,9 +7207,26 @@ function handleCardPhoto(event) {
             }
         });
         
-        // 匯出自建卡片定義
-        data.customCards = JSON.parse(localStorage.getItem('custom_cards') || '[]');
-
+       // 🌟 匯出自建卡片定義 (加入 iOS Codable 防當機清洗邏輯)
+        let rawCustomCards = JSON.parse(localStorage.getItem('custom_cards') || '[]');
+        data.customCards = rawCustomCards.map(card => {
+            return {
+                ...card,
+                // 補齊舊卡片缺少的欄位，強制對齊 iOS Swift 最新結構
+                domesticMPD: card.domesticMPD !== undefined ? Number(card.domesticMPD) : 0,
+                foreignMPD: card.foreignMPD !== undefined ? Number(card.foreignMPD) : 0,
+                roundingMethod: card.roundingMethod || "floor",
+                cycleDay: card.cycleDay || "",
+                nickname: card.nickname || "",
+                tier2Rate: card.tier2Rate !== undefined ? Number(card.tier2Rate) : 0,
+                cap: card.cap !== undefined ? Number(card.cap) : 0,
+                rate: card.rate !== undefined ? Number(card.rate) : 0,
+                unit: card.unit || "cash",
+                name: card.name || "",
+                gradient: card.gradient || "linear-gradient(135deg, #134E5E 0%, #71B280 100%)",
+                textColor: card.textColor || "white"
+            };
+        });
         // 匯出 UniOpen 各週期的踩點記錄
         data.uniBrandsByPeriod = {};
         for (let i = 0; i < localStorage.length; i++) {
@@ -7424,3 +7441,4 @@ function handleCardPhoto(event) {
 </script>
 </body>
 </html>
+

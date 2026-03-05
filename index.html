@@ -7173,8 +7173,15 @@ function handleCardPhoto(event) {
         filterManageCards();
     }
 
-  // 匯出資料 (iOS 終極相容版：同時修復自建卡與踩點紀錄)
+  // 匯出資料 (2026/03/05 最終修正：iOS 完美相容版)
     function exportData() {
+        // 安全解析 localStorage 函數 (防範字串化的 JSON 導致 iOS 崩潰)
+        const safeParse = (key, defaultVal) => {
+            const val = localStorage.getItem(key);
+            if (!val) return defaultVal;
+            try { return JSON.parse(val); } catch(e) { return val; }
+        };
+
         const data = {
             version: 'V126.7',
             exportTime: new Date().toISOString(),
@@ -7185,17 +7192,18 @@ function handleCardPhoto(event) {
             settings: {
                 current_location: currentLocation,
                 exchange_rates: exchangeRates,
-                uni_settings: localStorage.getItem('uni_settings') || '{"isUp":false}',
-                happy_used: localStorage.getItem('happy_used') || '{}',
+                // 🌟 這裡必須解開 JSON 字串，iOS 才能直接用物件讀取
+                uni_settings: safeParse('uni_settings', {isUp: false}),
+                happy_used: safeParse('happy_used', {}),
                 hsbc_tier: localStorage.getItem('hsbc_tier') || 'infinite',
-                hsbc_initial: localStorage.getItem('hsbc_initial') || '0',
-                hsbc_redeemed: localStorage.getItem('hsbc_redeemed') || '0',
+                hsbc_initial: Number(localStorage.getItem('hsbc_initial')) || 0,
+                hsbc_redeemed: Number(localStorage.getItem('hsbc_redeemed')) || 0,
                 currency_level: localStorage.getItem('currency_level') || 'low',
-                scene_snapshots: localStorage.getItem('scene_snapshots') || '[]'
+                scene_snapshots: safeParse('scene_snapshots', [])
             }
         };
 
-        // 1. 搬運交易紀錄 (確保 cardId 存在)
+        // 1. 搬運交易紀錄
         cards.forEach(card => {
             const txs = getTransactions(card.id);
             if (txs.length > 0) {
@@ -7203,15 +7211,16 @@ function handleCardPhoto(event) {
             }
         });
 
-        // 2. 🌟 修復自建卡 (補齊 iOS 所有可能需要的欄位)
+        // 2. 🌟 修復自建卡 (補齊 iOS 遺漏的所有必填欄位)
         let rawCustomCards = JSON.parse(localStorage.getItem('custom_cards') || '[]');
         data.customCards = rawCustomCards.map(card => {
+            // 自動對應顏色索引 (iOS UI 需要 selectedColorIndex)
             const colorIndex = customColorPresets.findIndex(p => p.gradient === card.gradient);
             return {
                 ...card,
-                selectedColorIndex: colorIndex >= 0 ? colorIndex : 0,
+                selectedColorIndex: colorIndex >= 0 ? colorIndex : 0, 
                 roundingMethod: card.roundingMethod || "floor",
-                cardRounding: card.roundingMethod || "floor", // 預防 iOS 變數名不同
+                cardRounding: card.roundingMethod || "floor", 
                 cycleDay: card.cycleDay ? String(card.cycleDay) : "",
                 nickname: card.nickname || "",
                 tier2Rate: Number(card.tier2Rate) || 0,
@@ -7221,22 +7230,22 @@ function handleCardPhoto(event) {
                 foreignMPD: Number(card.foreignMPD) || 0,
                 unit: card.unit || "cash",
                 name: card.name || "",
-                gradient: card.gradient || "",
+                gradient: card.gradient || "linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%)",
                 textColor: card.textColor || "white"
             };
         });
 
-        // 3. 🌟 修復 UniOpen 踩點紀錄 (關鍵：解析字串為真實物件，確保 iOS 能讀)
+        // 3. 🌟 關鍵修正：UniOpen 踩點紀錄 (iOS 預期是 [String: [String]] 字典陣列)
         data.uniBrandsByPeriod = {};
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
             if (key && key.startsWith('uni_brands_')) {
                 const val = localStorage.getItem(key);
                 try {
-                    // 如果 PWA 存的是字串 "[\"7-11\"]"，我們把它轉成真的陣列 ["7-11"]
+                    // 核心：將 "[\"7-11\"]" 轉回真正的陣列 ["7-11"]
                     data.uniBrandsByPeriod[key] = JSON.parse(val);
                 } catch(e) {
-                    data.uniBrandsByPeriod[key] = val; // 失敗就維持原樣
+                    data.uniBrandsByPeriod[key] = [];
                 }
             }
         }
@@ -7446,6 +7455,7 @@ function handleCardPhoto(event) {
 </script>
 </body>
 </html>
+
 
 
 

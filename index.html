@@ -7173,7 +7173,7 @@ function handleCardPhoto(event) {
         filterManageCards();
     }
 
-    // 匯出資料 (修復：確保 cardId 欄位存在)
+   // 匯出資料 (加入 iOS 終極防當機清洗機)
     function exportData() {
         const data = {
             version: 'V126.7',
@@ -7194,39 +7194,43 @@ function handleCardPhoto(event) {
                 scene_snapshots: localStorage.getItem('scene_snapshots')
             }
         };
-        
+
         // 匯出所有卡片的交易紀錄
         cards.forEach(card => {
             const txs = getTransactions(card.id);
             if (txs.length > 0) {
-                // 確保每筆交易都有 cardId 欄位
                 data.transactions[card.id] = txs.map(tx => ({
                     ...tx,
                     cardId: card.id
                 }));
             }
         });
-        
-       // 🌟 匯出自建卡片定義 (加入 iOS Codable 防當機清洗邏輯)
+
+        // 🌟 核心修復：匯出自建卡片並補齊 iOS 必填欄位
         let rawCustomCards = JSON.parse(localStorage.getItem('custom_cards') || '[]');
         data.customCards = rawCustomCards.map(card => {
+            // 找出顏色索引，若找不到預設為 0
+            const colorIndex = customColorPresets.findIndex(p => p.gradient === card.gradient);
+            
             return {
                 ...card,
-                // 補齊舊卡片缺少的欄位，強制對齊 iOS Swift 最新結構
-                domesticMPD: card.domesticMPD !== undefined ? Number(card.domesticMPD) : 0,
-                foreignMPD: card.foreignMPD !== undefined ? Number(card.foreignMPD) : 0,
+                // --- 強制對齊 iOS Swift Codable 結構 ---
+                selectedColorIndex: colorIndex >= 0 ? colorIndex : 0, 
                 roundingMethod: card.roundingMethod || "floor",
                 cycleDay: card.cycleDay || "",
                 nickname: card.nickname || "",
                 tier2Rate: card.tier2Rate !== undefined ? Number(card.tier2Rate) : 0,
                 cap: card.cap !== undefined ? Number(card.cap) : 0,
                 rate: card.rate !== undefined ? Number(card.rate) : 0,
+                domesticMPD: card.domesticMPD !== undefined ? Number(card.domesticMPD) : 0,
+                foreignMPD: card.foreignMPD !== undefined ? Number(card.foreignMPD) : 0,
                 unit: card.unit || "cash",
                 name: card.name || "",
-                gradient: card.gradient || "linear-gradient(135deg, #134E5E 0%, #71B280 100%)",
+                gradient: card.gradient || "linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%)",
                 textColor: card.textColor || "white"
             };
         });
+
         // 匯出 UniOpen 各週期的踩點記錄
         data.uniBrandsByPeriod = {};
         for (let i = 0; i < localStorage.length; i++) {
@@ -7235,12 +7239,12 @@ function handleCardPhoto(event) {
                 data.uniBrandsByPeriod[key] = localStorage.getItem(key);
             }
         }
-        
+
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-       const now = new Date();
+        const now = new Date();
         const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
         a.download = `刷卡回饋管家_備份_${dateStr}.json`;
         a.click();
@@ -7441,4 +7445,5 @@ function handleCardPhoto(event) {
 </script>
 </body>
 </html>
+
 

@@ -610,8 +610,28 @@
         <div class="subtitle"><span class="today-date" id="dateDisplay"></span></div>
         
         <div class="news-ticker">
-            <div class="ticker-content" id="news-text">🎉 V126.2修復：備份還原紀錄遺失、UniOpen 完整品牌清單、JCB 封頂計算！</div>
+            <div class="ticker-content" id="news-text">🎉 iOS 專屬 App 上線！網頁版已停止更新規則，將於 3/22 停止支援 iOS（Android 不受影響）。iOS 用戶請點擊下方按鈕，或前往連結下載 👉 https://apple.co/4u8dHzj</div>
         </div>
+
+        <div id="ios-download-section" style="display: none; background-color: #FFF9E6; padding: 16px; text-align: center; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <div style="font-size: 14px; color: #333; margin-bottom: 12px; font-weight: bold; line-height: 1.4;">
+                備份好資料了嗎？<br>請盡速轉移，立即體驗原生 App 的流暢感 👇
+            </div>
+            <a href="https://apps.apple.com/tw/app/id6759591355" target="_blank" rel="noopener noreferrer">
+                <img src="badge.svg" alt="在 App Store 下載" style="height: 40px; width: auto; display: inline-block;">
+            </a>
+        </div>
+
+        <script>
+            (function() {
+                // 精準判斷是否為 iPhone / iPad
+                var isIOSDevice = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase()) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+                if (isIOSDevice) {
+                    // 如果是 iOS，就把下載區塊顯示出來
+                    document.getElementById('ios-download-section').style.display = 'block';
+                }
+            })();
+        </script>
         
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
         

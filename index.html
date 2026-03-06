@@ -622,13 +622,44 @@
             </a>
         </div>
 
-        <script>
+      <script>
             (function() {
-                // 精準判斷是否為 iPhone / iPad
-                var isIOSDevice = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase()) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-                if (isIOSDevice) {
-                    // 如果是 iOS，就把下載區塊顯示出來
-                    document.getElementById('ios-download-section').style.display = 'block';
+                // 精準判斷是否為 iOS 裝置 (iPhone/iPad/iPod)
+                var isIOS = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase()) || 
+                            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+                
+                // 設定 3/22 為網頁版日落轉移日
+                var deadline = new Date('2026-03-22T00:00:00');
+                var now = new Date();
+
+                if (isIOS) {
+                    if (now >= deadline) {
+                        // 【3/22 之後】：顯示強調價值的「新家邀請」畫面
+                        document.body.innerHTML = `
+                            <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:#FFFFFF; z-index:999999; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px; text-align:center; font-family:-apple-system, BlinkMacSystemFont, sans-serif;">
+                                <div style="font-size:60px; margin-bottom:24px;">🚀</div>
+                                <h2 style="color:#1C1C1E; font-size:22px; font-weight:800; margin-bottom:12px;">iOS 專屬 App 體驗全面進化</h2>
+                                <p style="color:#8E8E93; font-size:15px; line-height:1.6; margin-bottom:32px;">
+                                    網頁版已完成階段性任務。為了提供給您：<br>
+                                    <b>更流暢的操作感、更即時的 2026 規則更新</b><br>
+                                    以及未來更多元的 iOS 專屬功能，<br>
+                                    請移駕至原生 App 開啟您的回饋管家！
+                                </p>
+                                <a href="https://apps.apple.com/tw/app/id6759591355" target="_blank" rel="noopener noreferrer">
+                                    <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/zh-tw?size=250x83" style="height:54px; width:auto; border-radius:10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                </a>
+                                <p style="margin-top:40px; font-size:13px; color:#007AFF; font-weight:600;">
+                                    💡 提醒：若有舊紀錄，請先備份再轉移
+                                </p>
+                            </div>
+                        `;
+                    } else {
+                        // 【3/22 之前】：顯示您已調好的黃色引導區塊
+                        var downloadSection = document.getElementById('ios-download-section');
+                        if (downloadSection) {
+                            downloadSection.style.display = 'block';
+                        }
+                    }
                 }
             })();
         </script>

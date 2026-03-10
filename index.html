@@ -610,59 +610,8 @@
         <div class="subtitle"><span class="today-date" id="dateDisplay"></span></div>
         
         <div class="news-ticker">
-            <div class="ticker-content" id="news-text">🎉 iOS 專屬 App 上線！網頁版已停止更新卡片，將於 3/22 停止支援 iOS（Android 暫時不受影響）。</div>
+            <div class="ticker-content" id="news-text">🎉 V126.2修復：備份還原紀錄遺失、UniOpen 完整品牌清單、JCB 封頂計算！</div>
         </div>
-
-       <div id="ios-download-section" style="display: none; background-color: #FFF9E6; padding: 16px; text-align: center; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-            <div style="font-size: 14px; color: #333; margin-bottom: 12px; font-weight: bold; line-height: 1.4;">
-                備份好資料了嗎？<br>網頁版即將於 3/22 關閉，請盡速轉移 👇
-            </div>
-            <a href="https://apps.apple.com/tw/app/id6759591355" target="_blank" rel="noopener noreferrer">
-                <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/zh-tw?size=250x83&releaseDate=1276560000" alt="在 App Store 下載" style="height: 40px; width: auto; display: inline-block; border-radius: 8px;">
-            </a>
-        </div>
-
-      <script>
-            (function() {
-                // 精準判斷是否為 iOS 裝置 (iPhone/iPad/iPod)
-                var isIOS = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase()) || 
-                            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-                
-                // 設定 3/22 為網頁版日落轉移日
-                var deadline = new Date('2026-03-22T00:00:00');
-                var now = new Date();
-
-                if (isIOS) {
-                    if (now >= deadline) {
-                        // 【3/22 之後】：顯示強調價值的「新家邀請」畫面
-                        document.body.innerHTML = `
-                            <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:#FFFFFF; z-index:999999; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px; text-align:center; font-family:-apple-system, BlinkMacSystemFont, sans-serif;">
-                                <div style="font-size:60px; margin-bottom:24px;">🚀</div>
-                                <h2 style="color:#1C1C1E; font-size:22px; font-weight:800; margin-bottom:12px;">iOS 專屬 App 體驗全面進化</h2>
-                                <p style="color:#8E8E93; font-size:15px; line-height:1.6; margin-bottom:32px;">
-                                    網頁版已完成階段性任務。為了提供給您：<br>
-                                    <b>更流暢的操作感、更即時的 2026 規則更新</b><br>
-                                    以及未來更多元的 iOS 專屬功能，<br>
-                                    請移駕至原生 App 開啟您的回饋管家！
-                                </p>
-                                <a href="https://apps.apple.com/tw/app/id6759591355" target="_blank" rel="noopener noreferrer">
-                                    <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/zh-tw?size=250x83" style="height:54px; width:auto; border-radius:10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                                </a>
-                                <p style="margin-top:40px; font-size:13px; color:#007AFF; font-weight:600;">
-                                    💡 提醒：若有舊紀錄，請先備份再轉移
-                                </p>
-                            </div>
-                        `;
-                    } else {
-                        // 【3/22 之前】：顯示您已調好的黃色引導區塊
-                        var downloadSection = document.getElementById('ios-download-section');
-                        if (downloadSection) {
-                            downloadSection.style.display = 'block';
-                        }
-                    }
-                }
-            })();
-        </script>
         
         <div id="urgent-alert-area"><div class="urgent-card"><div class="urgent-title">🚨 任務到期警報</div><div id="urgent-list"></div></div></div>
         
@@ -1447,10 +1396,10 @@
                     <div class="option-row" style="background:#eee; padding:8px; border-radius:6px; margin-bottom:8px; flex-direction:column; align-items:flex-start;">
                           <label style="margin-bottom:4px; color:#555;">💰 選擇資格等級 (自動記憶)</label>
                           <div style="display:flex; gap:10px; width:100%;">
-                              <label style="font-weight:normal; font-size:12px; display:flex; align-items:center;"><input type="radio" name="currencyLevel" value="low" onchange="saveCurrencyLevel()" checked> 大大等級 (Level 1)</label>
-                              <label style="font-weight:normal; font-size:12px; display:flex; align-items:center;"><input type="radio" name="currencyLevel" value="high" onchange="saveCurrencyLevel()"> 大戶等級 (Level 2)</label>
+                              <label style="font-weight:normal; font-size:12px; display:flex; align-items:center;"><input type="radio" name="currencyLevel" value="low" onchange="saveCurrencyLevel()" checked> Level 1 (自扣+e化)</label>
+                              <label style="font-weight:normal; font-size:12px; display:flex; align-items:center;"><input type="radio" name="currencyLevel" value="high" onchange="saveCurrencyLevel()"> Level 2 (L1+大戶或資產≥10萬)</label>
                           </div>
-                          <div style="font-size:10px; color:#999; margin-top:2px;">大大: 自動扣繳+電子帳單 | 大戶: 往來資產≥10萬</div>
+                          <div style="font-size:10px; color:#999; margin-top:2px;">L1: 刷$7,500封頂 | L2: 刷$2萬封頂</div>
                     </div>
                     
                     <div class="option-row read-only"><label id="labelCurrencyBase">🔰 國內一般 1%</label><input type="checkbox" checked disabled></div>
@@ -2409,7 +2358,7 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
         { id: 'j1', name: '富邦 J 卡', nickname: '日韓旅遊優等生', note: '日韓泰$3.3萬/交通卡$2,857(季)',type: 'custom_j', limit: 0, gradient: 'linear-gradient(135deg, #FF7E5F 0%, #FEB47B 100%)', textColor: 'white', msgDanger: '', parking: `🇯🇵🇰🇷🇹🇭 <b>實體消費加碼</b> (共用季上限$1000回饋)<br>• 日韓實體：3%+3%=6% (刷$33,333封頂)<br>• 泰國實體：1%+5%=6% (刷$20,000封頂)<br>⚠️ 需單筆滿 $1,000<br><br>🍎 <b>日本交通卡</b> (獨立季上限$200回饋)<br>• Suica/PASMO等：3%+7%=10% (刷$2,857封頂)<br>⚠️ 需單筆滿 $2,000`},
         { id: 'j2', name: '聯邦吉鶴卡', nickname: '日本/ApplePay首選', note: '日本 AP 4% (刷 4萬封頂) | 國內日系 5%', type: 'ceiling', limit: 40000, tier1Rate: 0.04, tier2Rate: 0.025, gradient: 'linear-gradient(135deg, #DC143C 0%, #FFFFFF 150%)', textColor: 'white', msgDanger: '加碼已封頂 (變2.5%)', parking: `🍎 <b>日本 QUICPay (Apple Pay)</b><br>日本 2.5% + 加碼 1.5% = 4%<br>⚠️ 加碼上限 $600/月 (約刷$4萬)<br>🇹🇼 <b>國內日系名店 5%</b><br>國內 1% + 加碼 4% (刷$1.25萬封頂)`},
         { id: 'j3', name: '玉山熊本熊卡', nickname: '日本優等生', note: 'PayPay 5% (季) | 指定 8.5%', type: 'ceiling', limit: 8333, tier1Rate: 0.085, tier2Rate: 0.025, gradient: 'linear-gradient(135deg, #BDC3C7 0%, #2C3E50 100%)', textColor: 'white', msgDanger: '加碼已封頂', parking: `🐻 <b>指定通路 8.5%</b><br>(基本2.5% + 加碼6%)<br>⚠️ 加碼上限 $500/期 (約刷$8,333)<br>📱 <b>PayPay 5%</b> (3.5%+1.5%免手續費)<br>⚠️ 3.5%加碼上限 $100/季 (約刷$2,857)<br>🔰 <b>國內一般 0.5%</b> (無上限)`},
-        { id: 'j4', name: '永豐幣倍卡 (大大/大戶)', nickname: '海外雙幣神卡', note: '海外精選 6% (刷 2萬封頂)', type: 'ceiling', limit: 80000, tier1Rate: 0.06, tier2Rate: 0.02, gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: 'white', msgDanger: '加碼已封頂', parking: `💰 <b>幣倍卡 2026</b><br><b>Level 1 (大大)</b><br>條件：自動扣繳+電子帳單<br>限刷：$7,500<br><br><b>Level 2 (大戶)</b><br>條件：往來資產≥10萬<br>限刷：$20,000`},
+        { id: 'j4', name: '永豐幣倍卡 (大大/大戶)', nickname: '海外雙幣神卡', note: '精選+4% (L1刷$7,500/L2刷$2萬)', type: 'ceiling', limit: 20000, tier1Rate: 0.06, tier2Rate: 0.02, gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: 'white', msgDanger: '加碼已封頂', parking: `💰 <b>幣倍卡 2026</b><br><b>Level 1</b>：自扣+e化 (加碼上限$300/月，約刷$7,500)<br><b>Level 2</b>：L1+大戶等級或資產≥10萬 (加碼上限$800/月，約刷$2萬)<br><br><b>精選通路</b>：國外實體/指定網購/旅遊通路`},
         { id: 'j5', name: '永豐三井聯名卡', nickname: '餐飲優等生/日韓泰附加', note: '餐飲 7.3% (底0.3%+7%)', type: 'custom_mitsui', target: 30000, tier1Rate: 0.073, tier2Rate: 0.003, gradient: 'linear-gradient(135deg, #00C9FF 0%, #92FE9D 100%)', textColor: '#333', msgSuccess: '已達標 (領$2000)', parking: `🍽️ <b>特選餐飲 7.3%</b> (0.3+7)<br>通路：館外餐飲(MCC 58xx) / 全盈+PAY<br>⚠️ 加碼上限僅 100 元 (約刷 $1,428)<br><br>🇯🇵 <b>日韓泰滿額禮 (需登錄)</b><br>每季累積滿 30,000 送 2,000 (回饋約6.9%)`},
         { id: 'c12', name: '永豐現金回饋 JCB', nickname: '旅日神卡', note: '國內特選/日本 +3% (月$1萬共用)', type: 'custom_jcb', limit: 10000, tier1Rate: 0.05, tier2Rate: 0.01, gradient: 'linear-gradient(135deg, #8E0E00 0%, #1F1C18 100%)', textColor: 'white', msgDanger: '特選已封頂 (變1%)', parking: `🇯🇵 <b>日本消費</b><br>最高 5% (國外2% + 加碼3%)<br>🛍️ <b>特選通路</b><br>最高 5% (國外2% + 加碼3%) 或 4% (國內1% + 加碼3%)<br>⚠️ 日本+特選共用加碼上限 $300/月 (約刷 $10,000)<br>🔥 <b>日韓泰滿額</b> (需登錄)<br>每季累積滿 2 萬送 $1,000 (共用上限)`},
         { id: 'cube1', name: '國泰 CUBE 卡', nickname: '指定通路無上限', note: '玩數位/樂饗購/趣旅行 3% 無上限', type: 'custom_cube', gradient: 'linear-gradient(135deg, #1B365D 0%, #4A90D9 100%)', textColor: 'white', msgDanger: '', parking: `🖥️ <b>玩數位</b> 依等級 2%/3%/3.3%<br>蝦皮/momo/PChome/Netflix/ChatGPT/Claude/Max<br><br>🍽️ <b>樂饗購</b> 依等級 2%/3%/3.3%<br>34家國內百貨/國內餐飲+麥當勞/外送/藥妝<br><br>✈️ <b>趣旅行</b> 依等級 2%/3%/3.3%<br>海外實體/20家航空/高鐵/6訂房平台/13旅行社/國內飯店<br><br>🛒 <b>集精選</b> 固定 2%<br>7-11/全家/全聯/家樂福/IKEA/中油/充電停車<br><br>🎂 <b>慶生月</b> (限當月壽星)<br>7類指定餐廳/樂園/KTV 10% | 新光三越/Uber Eats 3.5%<br><br>🇯🇵 <b>日本賞</b> (限時3/1~4/30)<br>日本實體3.5%/日系餐飲最高8%/購物最高5%/訂房最高6%<br><br>🎸 <b>瘋大港</b> (限時~3/23)<br>現場消費10% | 高雄住宿/Klook/高鐵 3.5%<br><br>🟢 <b>LINE Pay 領券</b> +1.7% (月上限100點)<br>⚠️ 需至 CUBE App 領券，當月滿 8 筆`},
@@ -5163,7 +5112,7 @@ function handleHappyExclusive(selected) {
                 if (bonusSpent < bonusLimit) {
                     const available = bonusLimit - bonusSpent;
                     const validForBonus = Math.min(amount, available);
-                    reward += rf(validForBonus * 0.05);
+                    reward += rf(validForBonus * 0.04);
                 }
             }
             
@@ -5735,7 +5684,7 @@ function handleHappyExclusive(selected) {
             const level = tx.currencyLevel || localStorage.getItem('currency_level') || 'low';
             const bonusLimit = (level === 'high') ? 20000 : 7500;
             if (currencySelCum < bonusLimit) {
-                txR += rf(Math.min(amount, bonusLimit - currencySelCum) * 0.05);
+                txR += rf(Math.min(amount, bonusLimit - currencySelCum) * 0.04);
             }
             currencySelCum += amount;
         }
@@ -6755,7 +6704,7 @@ if (cycleDay && cycleDay > 0) {
                 if (tx.isCurrencySelected) {
                     const lv = tx.currencyLevel || localStorage.getItem('currency_level') || 'low';
                     const lim = (lv === 'high') ? 20000 : 7500;
-                    if (rCurrencySelCum < lim) r += rf(Math.min(amount, lim - rCurrencySelCum) * 0.05);
+                    if (rCurrencySelCum < lim) r += rf(Math.min(amount, lim - rCurrencySelCum) * 0.04);
                     rCurrencySelCum += amount;
                 }
                 totalReward += r;
@@ -7226,108 +7175,77 @@ function handleCardPhoto(event) {
 
   // 匯出資料 (2026/03/05 終極相容版：解決巢狀字串與欄位缺失)
     function exportData() {
+        // 🌟 核心修復函數：確保資料是「物件」而非「字串」，避免 iOS 解析崩潰
+        const parseStorage = (key, defaultVal) => {
+            const val = localStorage.getItem(key);
+            if (!val) return defaultVal;
+            try { 
+                const parsed = JSON.parse(val);
+                // 針對 uni_brands 這種可能被雙重 stringify 的情況再做一次檢查
+                return (typeof parsed === 'string') ? JSON.parse(parsed) : parsed;
+            } catch(e) { return val; }
+        };
+
         const data = {
             version: 'V126.7',
             exportTime: new Date().toISOString(),
             visibleCards: visibleCards,
-            cardOrder: savedOrder,
-            cardSettings: cardSettings,
+            cardOrder: savedOrder || [],
+            cardSettings: cardSettings || {},
             transactions: {},
             settings: {
                 current_location: currentLocation,
                 exchange_rates: exchangeRates,
-                uni_settings: localStorage.getItem('uni_settings'),
-                happy_used: localStorage.getItem('happy_used'),
-                hsbc_tier: localStorage.getItem('hsbc_tier'),
-                hsbc_initial: localStorage.getItem('hsbc_initial'),
-                hsbc_redeemed: localStorage.getItem('hsbc_redeemed'),
-                currency_level: localStorage.getItem('currency_level'),
-                scene_snapshots: localStorage.getItem('scene_snapshots')
+                // 🌟 這些欄位必須是「物件」，iOS 才能讀懂
+                uni_settings: parseStorage('uni_settings', {isUp: false}),
+                happy_used: parseStorage('happy_used', {}),
+                hsbc_tier: localStorage.getItem('hsbc_tier') || 'infinite',
+                hsbc_initial: Number(localStorage.getItem('hsbc_initial')) || 0,
+                hsbc_redeemed: Number(localStorage.getItem('hsbc_redeemed')) || 0,
+                currency_level: localStorage.getItem('currency_level') || 'low',
+                scene_snapshots: parseStorage('scene_snapshots', [])
             }
         };
 
-        // 匯出所有卡片的交易紀錄
+        // 1. 處理交易紀錄
         cards.forEach(card => {
             const txs = getTransactions(card.id);
             if (txs.length > 0) {
-                data.transactions[card.id] = txs.map(tx => ({
-                    ...tx,
-                    cardId: card.id
-                }));
+                data.transactions[card.id] = txs.map(tx => ({ ...tx, cardId: card.id }));
             }
         });
 
-        // 匯出自建卡片定義（轉換為 iOS Card.swift 格式）
-        const rawCustomCards = JSON.parse(localStorage.getItem('custom_cards') || '[]');
+        // 2. 🌟 補齊自建卡欄位 (對齊 iOS CustomCardSheet 定義)
+        let rawCustomCards = JSON.parse(localStorage.getItem('custom_cards') || '[]');
         data.customCards = rawCustomCards.map(card => {
-            const rate = Number(card.rate) || 0;
-            const rate2 = Number(card.tier2Rate) || 0;
-            const cap = Number(card.cap) || 0;
-            const unit = card.unit || 'cash';
-            const dMPD = Number(card.domesticMPD) || 0;
-            const fMPD = Number(card.foreignMPD) || 0;
-            const rm = card.roundingMethod || 'floor';
-            const roundLabel = rm === 'round' ? '四捨五入' : '無條件捨去';
-
-            // 產生 note（對齊 iOS makeCustomCard 邏輯）
-            let noteText;
-            if (unit === 'miles' && dMPD > 0) {
-                noteText = `國內${Math.floor(dMPD)}元/哩 | 國外${Math.floor(fMPD || dMPD)}元/哩 (${roundLabel})`;
-            } else {
-                noteText = `${rate}%`;
-                if (cap > 0) {
-                    noteText += ` (刷$${cap.toLocaleString()}封頂`;
-                    if (rate2 > 0) noteText += `→${rate2}%`;
-                    noteText += ')';
-                } else {
-                    noteText += ' (無上限)';
-                }
-                noteText += ` ${roundLabel}`;
-            }
-
-            // 從 CSS gradient 提取 hex 色碼陣列
-            const hexMatches = (card.gradient || '').match(/#[0-9a-fA-F]{3,6}/g) || ['#232526', '#414345'];
-
+            const colorIndex = customColorPresets.findIndex(p => p.gradient === card.gradient);
             return {
-                id: card.id,
-                name: card.name || '',
-                nickname: card.nickname || '',
-                note: noteText,
-                type: (unit === 'miles' && dMPD > 0) ? 'miles' : 'custom',
-                gradientHex: hexMatches,
-                textColor: card.textColor || 'white',
-                msgDanger: '',
-                parking: '',
-                limit: cap > 0 ? cap : null,
-                tier1Rate: (unit === 'miles' && dMPD > 0) ? (1.0 / dMPD) : (rate / 100.0),
-                tier2Rate: rate2 / 100.0,
-                threshold: null,
-                minSpend: null,
-                target: null,
-                isCustom: true,
-                baseRate: rate,
-                baseRate2: rate2,
-                roundingMethod: rm,
-                domesticMPD: dMPD,
-                foreignMPD: fMPD
+                ...card,
+                selectedColorIndex: colorIndex >= 0 ? colorIndex : 0, 
+                roundingMethod: card.roundingMethod || "floor",
+                cardRounding: card.roundingMethod || "floor", 
+                cycleDay: card.cycleDay ? String(card.cycleDay) : "",
+                nickname: card.nickname || "",
+                tier2Rate: Number(card.tier2Rate) || 0,
+                cap: Number(card.cap) || 0,
+                rate: Number(card.rate) || 0,
+                domesticMPD: Number(card.domesticMPD) || 0,
+                foreignMPD: Number(card.foreignMPD) || 0,
+                unit: card.unit || "cash",
+                name: card.name || "",
+                gradient: card.gradient || "linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%)",
+                textColor: card.textColor || "white"
             };
         });
 
-        // 匯出 UniOpen 各週期的踩點記錄
+        // 3. 🌟 關鍵修復：踩點紀錄轉回「陣列物件」
         data.uniBrandsByPeriod = {};
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
             if (key && key.startsWith('uni_brands_')) {
-                data.uniBrandsByPeriod[key] = localStorage.getItem(key);
+                data.uniBrandsByPeriod[key] = parseStorage(key, []);
             }
         }
-        // 確保當前週期一定存在（即使 0 家，iOS 才會清除舊資料）
-        const currentBrandKey = getUniBrandCycleKey();
-        if (!data.uniBrandsByPeriod[currentBrandKey]) {
-            data.uniBrandsByPeriod[currentBrandKey] = '[]';
-        }
-        // iOS 也會讀根層級的 uni_brands（陣列格式）
-        data.uni_brands = JSON.parse(localStorage.getItem(currentBrandKey) || '[]');
 
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);

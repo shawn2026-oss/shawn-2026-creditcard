@@ -1172,18 +1172,21 @@
                       
                       <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; flex-direction:column; align-items:flex-start;">
                           <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="checkDbsGreen">🌿 綠色/特斯拉 +9% (刷$3,333封頂)</label>
+                            <label for="checkDbsGreen">🌿 eco消費 +9% (刷$3,333封頂)</label>
                             <input type="checkbox" id="checkDbsGreen" onchange="toggleDbsLogic('green')">
                         </div>
-                        <button onclick="toggleDbsDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看加碼詳情</button>
+                        <button onclick="toggleDbsDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:2px 0 6px 0;">🔽 點擊查看eco通路</button>
                         <div id="dbsDetails" class="details-content">
-                            <b>綠色消費 (含特斯拉/Gogoro)：</b><br>加碼 9% (上限 300 點)。<br>通路：Tesla充電/配件、Gogoro電池資費、星巴克(隨行卡儲值不適用)、鮮乳坊、茶籽堂、台灣大車隊、iRent、WeMo、GoShare<br>
+                            <b>eco消費：</b><br>Tesla充電資費、Gogoro(含PBGN)電池資費<br><b>社會企業：</b><br>鮮乳坊、茶籽堂、nextdoorfresh、直接跟農夫買、玩轉學校、甘樂文創、禾乃川、馳綠、艾瑪絲、覺亞、EVOPURE+優織隆、綠藤、藍鵲茶、銀色大門、多扶假期、淨毒五郎<br>
                         </div>
                       </div>
 
-                      <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px;">
-                          <label for="checkDbsForeign">✈️ 國外實體 +4% (刷$1.5萬封頂)</label>
-                          <input type="checkbox" id="checkDbsForeign" onchange="toggleDbsLogic('foreign')">
+                      <div class="option-row" style="margin-top:6px; border-top:1px dashed #ddd; padding-top:6px; flex-direction:column; align-items:flex-start;">
+                          <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                              <label for="checkDbsForeign">✈️ 指定地區實體 +4% (刷$1.5萬封頂)</label>
+                              <input type="checkbox" id="checkDbsForeign" onchange="toggleDbsLogic('foreign')">
+                          </div>
+                          <div style="font-size:10px; color:#888; margin-top:2px;">適用：日本/韓國/泰國/新加坡/美洲/歐洲</div>
                       </div>
                 </div>
                 
@@ -2343,7 +2346,7 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
     // Cards DB
     const defaultCards = [
         { id: 'c10', name: '中信 UniOpen 卡', nickname: '2026 統一集團神卡', note: 'icashPay/海外 11% ($3,750/$6,250 封頂)', type: 'uniopen_special', gradient: 'linear-gradient(135deg, #FF512F 0%, #F09819 100%)', textColor: 'white', msgDanger: '', parking: `🏪 <b>統一集團 2026 新權益</b><br>1. <b>基本回饋</b>：1% (無上限)<br>2. <b>集團加碼</b>：+2% (限刷$2.5萬)<br>3. <b>踩點任務</b>：滿 5 家 +4% (限刷$1.25萬)<br>4. <b>icash Pay</b>：加碼 +4% (限刷$3,750)`},
-        { id: 'dbs1', name: '星展 eco 永續卡', nickname: '綠能/新戶lp神卡', note: '國外實體 +4% (刷$1.5萬封頂)', type: 'ceiling', limit: 15000, tier1Rate: 0.05, tier2Rate: 0.01, gradient: 'linear-gradient(135deg, #FF0000 0%, #000000 100%)', textColor: 'white', msgDanger: '加碼已封頂 (變1%)', parking: `🌿 <b>綠色/特斯拉 +9%</b><br>基本 1% + 加碼 9% (上限300點)<br>⚠️ 約刷 $3,333 封頂<br>⚡ <b>新戶 Line Pay 10%</b><br>基本 1% + 加碼 9%<br>⚠️ 加碼上限 1000 點 (約刷 $11,111)<br>✈️ <b>國外實體 +4%</b><br>基本 1% + 加碼 4% (共5%)<br>⚠️ 加碼適用月刷 $15,000 封頂`},
+        { id: 'dbs1', name: '星展 eco 永續卡', nickname: '綠能/新戶lp神卡', note: '指定地區+4%(刷$1.5萬) | eco+9%(刷$3,333)', type: 'ceiling', limit: 15000, tier1Rate: 0.05, tier2Rate: 0.01, gradient: 'linear-gradient(135deg, #FF0000 0%, #000000 100%)', textColor: 'white', msgDanger: '加碼已封頂 (變1%)', parking: `🌿 <b>eco消費 +9%</b> (刷$3,333封頂)<br>Tesla充電資費/Gogoro(含PBGN)電池資費/社會企業<br>⚡ <b>新戶 LINE Pay +9%</b> (刷$11,111封頂)<br>✈️ <b>指定地區實體 +4%</b> (刷$1.5萬封頂)<br>適用：日本/韓國/泰國/新加坡/美洲/歐洲`},
         { id: 'c6', name: '台新街口豬富卡', nickname: '行支/繳費神卡', note: '新戶 10% (刷 8千封頂) | 精選 2.5% (刷 40萬封頂)', rule: '', type: 'ceiling', limit: 8000, tier1Rate: 0.135, tier2Rate: 0.035, gradient: 'linear-gradient(135deg, #e60012 0%, #FFD700 100%)', textColor: 'white', msgDanger: '新戶10%已封頂', parking: `🐷 <b>新戶限定神卡</b><br>新戶 +10% (限刷$8,000)<br>🌟 <b>精選通路 +2.5%</b><br>上限 $40 萬`},
         { id: 'c1', name: '星展傳說對決卡', nickname: 'Line Pay神卡', note: 'LinePay/外送/蝦皮(刷$11,363 封頂)', rule: '', type: 'custom_legend', limit: 11363, gradient: 'linear-gradient(135deg, #43cea2 0%, #185a9d 100%)', textColor: 'white', msgDanger: '加碼已封頂 (變1.2%)' },
         { id: 'c5', name: '聯邦賴點卡', nickname: 'Line Pay 10%', note: '偶數日+5% / LP+1% / 新戶+4%', rule: '⚠️ 需單筆滿 $100', type: 'custom_laidian', limit: 3000, tier1Rate: 0.06, tier2Rate: 0.01, threshold: 0, gradient: 'linear-gradient(135deg, #00B900 0%, #33CC33 100%)', textColor: 'white', msgDanger: '加碼已封頂', parking: `✅ <b>基本回饋 1%</b> (無上限)<br>📱 <b>LP 一般 2%</b> (1+1, 限刷2萬)<br>📅 <b>偶數日 6%</b> (1+5, 限刷3千)<br>👶 <b>新戶加碼 +4%</b> (限刷7500)<br>⚠️ <b>注意</b>：加碼需單筆滿 $100`},
@@ -5226,7 +5229,7 @@ function handleHappyExclusive(selected) {
                     bonusReward = Math.min(rf(amount * 0.09), lpBonusRemain);
                 }
             } else if (options.isGreen) {
-                // 綠色/特斯拉 +9%（加碼上限 300 點）
+                // eco消費 +9%（加碼上限 300 點）
                 const greenSpent = getCardBonusSpent(cardId, t => t.isDbsGreen && (!editingTxId || t.id !== editingTxId));
                 const greenBonusUsed = rf(greenSpent * 0.09);
                 const greenBonusRemain = Math.max(0, 300 - greenBonusUsed);
@@ -5234,7 +5237,7 @@ function handleHappyExclusive(selected) {
                     bonusReward = Math.min(rf(amount * 0.09), greenBonusRemain);
                 }
             } else if (options.isForeign) {
-                // 國外實體 +4%（月刷 $15,000 封頂）
+                // 指定地區實體 +4%（月刷 $15,000 封頂）
                 const foreignSpent = getCardBonusSpent(cardId, t => t.isDbsForeign && (!editingTxId || t.id !== editingTxId));
                 const foreignRemain = Math.max(0, 15000 - foreignSpent);
                 if (foreignRemain > 0) {
@@ -5473,14 +5476,14 @@ function handleHappyExclusive(selected) {
                     }
                     dbsLpCumReward += rf(amount * 0.09);
                 } else if (tx.isDbsGreen) {
-                    // 綠色/特斯拉 +9%，加碼上限300點
+                    // eco消費 +9%，加碼上限300點
                     const greenBonusRemain = Math.max(0, 300 - dbsGreenCumReward);
                     if (greenBonusRemain > 0) {
                         bonusReward = Math.min(rf(amount * 0.09), greenBonusRemain);
                     }
                     dbsGreenCumReward += rf(amount * 0.09);
                 } else if (tx.isDbsForeign) {
-                    // 國外實體 +4%，月刷$15,000封頂
+                    // 指定地區實體 +4%，月刷$15,000封頂
                     if (dbsForeignCumulative < 15000) {
                         const available = Math.min(amount, 15000 - dbsForeignCumulative);
                         bonusReward = rf(available * 0.04);

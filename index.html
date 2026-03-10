@@ -1402,21 +1402,20 @@
                           <div style="font-size:10px; color:#999; margin-top:2px;">L1: 刷$7,500封頂 | L2: 刷$2萬封頂</div>
                     </div>
                     
-                    <div class="option-row read-only"><label id="labelCurrencyBase">🔰 國內一般 1%</label><input type="checkbox" checked disabled></div>
-
-                    <div class="option-row"><label>🇹🇼 國內消費</label><input type="radio" name="currencyType" value="domestic" checked onchange="toggleCurrencyLogic()"></div>
+                    <div class="option-row"><label>🇹🇼 國內消費 (基本1%)</label><input type="radio" name="currencyLocation" value="domestic" checked onchange="updateRewardPreview()"></div>
+                    <div class="option-row"><label>✈️ 國外消費 (基本2%)</label><input type="radio" name="currencyLocation" value="foreign" onchange="updateRewardPreview()"></div>
 
                     <div class="option-row" style="border-top:1px dashed #ddd; padding-top:6px; flex-direction:column; align-items:flex-start;">
                         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                            <label for="rbCurrencySelected">✈️ 海外/精選 +4% (見等級封頂)</label>
-                            <input type="radio" name="currencyType" id="rbCurrencySelected" value="selected" onchange="toggleCurrencyLogic()">
+                            <label for="checkCurrencySelected">🔥 精選通路 +4% (見等級封頂)</label>
+                            <input type="checkbox" id="checkCurrencySelected" onchange="updateRewardPreview()">
                         </div>
 
                         <button onclick="toggleCurrencyDetails()" style="border:none; background:none; color:#007AFF; font-size:11px; cursor:pointer; padding:0 0 6px 0;">🔽 點擊查看精選通路</button>
                         <div id="currencyDetails" class="details-content">
                             <b>(1) 國外實體：</b><br>非台灣地區且非台幣之一般交易<br>
-                            <b>(2) 網購消費：</b><br>Suica/PASMO/ICOCA儲值、Amazon、Rakuten、淘寶、eBay、Gmarket、iHerb、Selfridge、Mercari、大國藥妝、Sugi藥妝、Olive Young<br>
-                            <b>(3) 旅遊通路：</b><br>航空公司、旅行社、Booking.com、Agoda、Hotels.com、Expedia、Trip.com、Airbnb、Klook、KKday、Trivago、AsiaYo、歐特儀松山機場停車<br>
+                            <b>(2) 指定網購：</b><br>Suica/PASMO/ICOCA儲值、大國藥妝、Sugi藥妝、Rakuten、Mercari、Amazon、iHerb、Selfridge、eBay、淘寶、Gmarket、Olive Young<br>
+                            <b>(3) 旅遊通路：</b><br>航空公司、旅行社、Booking.com、Agoda、Hotels.com、Expedia、Trip.com、Airbnb、Klook、KKday、Trivago、AsiaYo<br>
                         </div>
                     </div>
                 </div>
@@ -2358,7 +2357,7 @@ let historyMonthOffset = 0; // 歷史月份偏移 (0=本期, -1=上期...)
         { id: 'j1', name: '富邦 J 卡', nickname: '日韓旅遊優等生', note: '日韓泰$3.3萬/交通卡$2,857(季)',type: 'custom_j', limit: 0, gradient: 'linear-gradient(135deg, #FF7E5F 0%, #FEB47B 100%)', textColor: 'white', msgDanger: '', parking: `🇯🇵🇰🇷🇹🇭 <b>實體消費加碼</b> (共用季上限$1000回饋)<br>• 日韓實體：3%+3%=6% (刷$33,333封頂)<br>• 泰國實體：1%+5%=6% (刷$20,000封頂)<br>⚠️ 需單筆滿 $1,000<br><br>🍎 <b>日本交通卡</b> (獨立季上限$200回饋)<br>• Suica/PASMO等：3%+7%=10% (刷$2,857封頂)<br>⚠️ 需單筆滿 $2,000`},
         { id: 'j2', name: '聯邦吉鶴卡', nickname: '日本/ApplePay首選', note: '日本 AP 4% (刷 4萬封頂) | 國內日系 5%', type: 'ceiling', limit: 40000, tier1Rate: 0.04, tier2Rate: 0.025, gradient: 'linear-gradient(135deg, #DC143C 0%, #FFFFFF 150%)', textColor: 'white', msgDanger: '加碼已封頂 (變2.5%)', parking: `🍎 <b>日本 QUICPay (Apple Pay)</b><br>日本 2.5% + 加碼 1.5% = 4%<br>⚠️ 加碼上限 $600/月 (約刷$4萬)<br>🇹🇼 <b>國內日系名店 5%</b><br>國內 1% + 加碼 4% (刷$1.25萬封頂)`},
         { id: 'j3', name: '玉山熊本熊卡', nickname: '日本優等生', note: 'PayPay 5% (季) | 指定 8.5%', type: 'ceiling', limit: 8333, tier1Rate: 0.085, tier2Rate: 0.025, gradient: 'linear-gradient(135deg, #BDC3C7 0%, #2C3E50 100%)', textColor: 'white', msgDanger: '加碼已封頂', parking: `🐻 <b>指定通路 8.5%</b><br>(基本2.5% + 加碼6%)<br>⚠️ 加碼上限 $500/期 (約刷$8,333)<br>📱 <b>PayPay 5%</b> (3.5%+1.5%免手續費)<br>⚠️ 3.5%加碼上限 $100/季 (約刷$2,857)<br>🔰 <b>國內一般 0.5%</b> (無上限)`},
-        { id: 'j4', name: '永豐幣倍卡 (大大/大戶)', nickname: '海外雙幣神卡', note: '精選+4% (L1刷$7,500/L2刷$2萬)', type: 'ceiling', limit: 20000, tier1Rate: 0.06, tier2Rate: 0.02, gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: 'white', msgDanger: '加碼已封頂', parking: `💰 <b>幣倍卡 2026</b><br><b>Level 1</b>：自扣+e化 (加碼上限$300/月，約刷$7,500)<br><b>Level 2</b>：L1+大戶等級或資產≥10萬 (加碼上限$800/月，約刷$2萬)<br><br><b>精選通路</b>：國外實體/指定網購/旅遊通路`},
+        { id: 'j4', name: '永豐幣倍卡', nickname: '海外雙幣神卡', note: '精選+4% (L2刷$2萬封頂)', type: 'ceiling', limit: 20000, tier1Rate: 0.06, tier2Rate: 0.02, gradient: 'linear-gradient(135deg, #FDC830 0%, #F37335 100%)', textColor: 'white', msgDanger: '加碼已封頂', parking: `💰 <b>幣倍卡 2026</b><br><b>Level 1</b>：自扣+e化 (加碼上限$300/月，約刷$7,500)<br><b>Level 2</b>：L1+大戶等級或資產≥10萬 (加碼上限$800/月，約刷$2萬)<br><br><b>精選通路</b>：國外實體/指定網購/旅遊通路`},
         { id: 'j5', name: '永豐三井聯名卡', nickname: '餐飲優等生/日韓泰附加', note: '餐飲 7.3% (底0.3%+7%)', type: 'custom_mitsui', target: 30000, tier1Rate: 0.073, tier2Rate: 0.003, gradient: 'linear-gradient(135deg, #00C9FF 0%, #92FE9D 100%)', textColor: '#333', msgSuccess: '已達標 (領$2000)', parking: `🍽️ <b>特選餐飲 7.3%</b> (0.3+7)<br>通路：館外餐飲(MCC 58xx) / 全盈+PAY<br>⚠️ 加碼上限僅 100 元 (約刷 $1,428)<br><br>🇯🇵 <b>日韓泰滿額禮 (需登錄)</b><br>每季累積滿 30,000 送 2,000 (回饋約6.9%)`},
         { id: 'c12', name: '永豐現金回饋 JCB', nickname: '旅日神卡', note: '國內特選/日本 +3% (月$1萬共用)', type: 'custom_jcb', limit: 10000, tier1Rate: 0.05, tier2Rate: 0.01, gradient: 'linear-gradient(135deg, #8E0E00 0%, #1F1C18 100%)', textColor: 'white', msgDanger: '特選已封頂 (變1%)', parking: `🇯🇵 <b>日本消費</b><br>最高 5% (國外2% + 加碼3%)<br>🛍️ <b>特選通路</b><br>最高 5% (國外2% + 加碼3%) 或 4% (國內1% + 加碼3%)<br>⚠️ 日本+特選共用加碼上限 $300/月 (約刷 $10,000)<br>🔥 <b>日韓泰滿額</b> (需登錄)<br>每季累積滿 2 萬送 $1,000 (共用上限)`},
         { id: 'cube1', name: '國泰 CUBE 卡', nickname: '指定通路無上限', note: '玩數位/樂饗購/趣旅行 3% 無上限', type: 'custom_cube', gradient: 'linear-gradient(135deg, #1B365D 0%, #4A90D9 100%)', textColor: 'white', msgDanger: '', parking: `🖥️ <b>玩數位</b> 依等級 2%/3%/3.3%<br>蝦皮/momo/PChome/Netflix/ChatGPT/Claude/Max<br><br>🍽️ <b>樂饗購</b> 依等級 2%/3%/3.3%<br>34家國內百貨/國內餐飲+麥當勞/外送/藥妝<br><br>✈️ <b>趣旅行</b> 依等級 2%/3%/3.3%<br>海外實體/20家航空/高鐵/6訂房平台/13旅行社/國內飯店<br><br>🛒 <b>集精選</b> 固定 2%<br>7-11/全家/全聯/家樂福/IKEA/中油/充電停車<br><br>🎂 <b>慶生月</b> (限當月壽星)<br>7類指定餐廳/樂園/KTV 10% | 新光三越/Uber Eats 3.5%<br><br>🇯🇵 <b>日本賞</b> (限時3/1~4/30)<br>日本實體3.5%/日系餐飲最高8%/購物最高5%/訂房最高6%<br><br>🎸 <b>瘋大港</b> (限時~3/23)<br>現場消費10% | 高雄住宿/Klook/高鐵 3.5%<br><br>🟢 <b>LINE Pay 領券</b> +1.7% (月上限100點)<br>⚠️ 需至 CUBE App 領券，當月滿 8 筆`},
@@ -3879,7 +3878,8 @@ function handleHappyExclusive(selected) {
         }
         else if (cardId === 'j4') {
             options.level = document.querySelector('input[name="currencyLevel"]:checked')?.value || 'low';
-            options.isSelected = document.querySelector('input[name="currencyType"]:checked')?.value === 'selected';
+            options.isCurrencyForeign = document.querySelector('input[name="currencyLocation"]:checked')?.value === 'foreign';
+            options.isSelected = document.getElementById('checkCurrencySelected')?.checked || false;
         }
         else if (cardId === 'j5') {
             options.isSelected = document.getElementById('checkSinopacMitsuiSelected')?.checked || false;
@@ -4118,7 +4118,8 @@ function handleHappyExclusive(selected) {
             isKumamonDesignated: document.getElementById('checkKumamonDesignated')?.checked || false,
             isKumamonPayPay: document.getElementById('checkKumamonPayPay')?.checked || false,
             currencyLevel: document.querySelector('input[name="currencyLevel"]:checked')?.value || 'low',
-            isCurrencySelected: document.querySelector('input[name="currencyType"]:checked')?.value === 'selected',
+            isCurrencyForeign: document.querySelector('input[name="currencyLocation"]:checked')?.value === 'foreign',
+            isCurrencySelected: document.getElementById('checkCurrencySelected')?.checked || false,
             isSinopacMitsuiSelected: document.getElementById('checkSinopacMitsuiSelected')?.checked || false,
             isSinopacMitsuiTarget: document.getElementById('checkSinopacMitsuiTarget')?.checked || false,
             isSinopacJcbForeign: document.getElementById('checkSinopacJcbForeign')?.checked || false,
@@ -4401,8 +4402,9 @@ function handleHappyExclusive(selected) {
             const level = tx.currencyLevel || 'low';
             const levelRadio = document.querySelector(`input[name="currencyLevel"][value="${level}"]`);
             if (levelRadio) levelRadio.checked = true;
-            const isSelected = tx.isCurrencySelected || false;
-            document.querySelector(`input[name="currencyType"][value="${isSelected ? 'selected' : 'domestic'}"]`).checked = true;
+            const isForeign = tx.isCurrencyForeign || false;
+            document.querySelector(`input[name="currencyLocation"][value="${isForeign ? 'foreign' : 'domestic'}"]`).checked = true;
+            document.getElementById('checkCurrencySelected').checked = tx.isCurrencySelected || false;
         }
         else if (cardId === 'j5') {
             document.getElementById('checkSinopacMitsuiSelected').checked = tx.isSinopacMitsuiSelected || false;
@@ -5101,7 +5103,8 @@ function handleHappyExclusive(selected) {
         }
         // J4 幣倍卡 (修復：加入封頂計算)
         else if (cardId === 'j4') {
-            const baseReward = rf(amount * 0.01);
+            const baseRate = options.isCurrencyForeign ? 0.02 : 0.01;
+            const baseReward = rf(amount * baseRate);
             reward = baseReward;
             
             if (options.isSelected) {
@@ -5116,7 +5119,7 @@ function handleHappyExclusive(selected) {
                 }
             }
             
-            rate = (amount > 0) ? (reward / amount) : 0.01;
+            rate = (amount > 0) ? (reward / amount) : baseRate;
             return { reward, rate };
         }
         // J5 三井卡 (修復：特選餐飲回饋上限)
@@ -5678,8 +5681,9 @@ function handleHappyExclusive(selected) {
             totalReward += txR;
         }
     } else if (cardId === 'j4') {
-        // 幣倍卡：基本1% + 精選+5%(依等級$7500/$20000)
-        let txR = rf(amount * 0.01);
+        // 幣倍卡：基本1%/2% + 精選+4%(依等級$7500/$20000)
+        const baseRate = tx.isCurrencyForeign ? 0.02 : 0.01;
+        let txR = rf(amount * baseRate);
         if (tx.isCurrencySelected) {
             const level = tx.currencyLevel || localStorage.getItem('currency_level') || 'low';
             const bonusLimit = (level === 'high') ? 20000 : 7500;
@@ -5825,6 +5829,16 @@ function handleHappyExclusive(selected) {
                  progress = Math.min(100, (qualSpent / currencyLimit) * 100);
                  return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
              }
+        }
+        // 特殊處理：幣倍卡 (j4) 只追蹤精選通路消費
+        if (cardId === 'j4') {
+            const level = localStorage.getItem('currency_level') || 'low';
+            const spendLimit = (level === 'high') ? 20000 : 7500;
+            const qualSpent = txs.filter(t => t.isCurrencySelected).reduce((s, t) => s + (t.amountTWD || t.amount || 0), 0);
+            const remain = Math.max(0, spendLimit - qualSpent);
+            progress = Math.min(100, (qualSpent / spendLimit) * 100);
+            msg = (qualSpent >= spendLimit) ? '加碼已封頂' : `可再刷 ${formatAmountWithCurrency(remain)}`;
+            return { spent: totalSpent, spentForeign: totalSpentForeign, reward: totalReward, progress, msg };
         }
 // 特殊處理：將將卡顯示生活(月)/旅遊(季)封頂狀態
         if (cardId === 'c4') {
@@ -6700,7 +6714,8 @@ if (cycleDay && cycleDay > 0) {
                     totalReward += r;
                 }
             } else if (cardId === 'j4') {
-                let r = rf(amount * 0.01);
+                const baseRate = tx.isCurrencyForeign ? 0.02 : 0.01;
+                let r = rf(amount * baseRate);
                 if (tx.isCurrencySelected) {
                     const lv = tx.currencyLevel || localStorage.getItem('currency_level') || 'low';
                     const lim = (lv === 'high') ? 20000 : 7500;

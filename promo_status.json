@@ -1,13 +1,59 @@
 {
-  "uniopen_icash_full": false,
-  "uniopen_icash_msg": "",
+  "uniopen_icash_full": true,
+  "uniopen_icash_msg": "2026年3月 icash Pay 4% 加碼已額滿",
   "transport_10": {
-    "台新": { "full": false, "msg": "" },
-    "兆豐": { "full": false, "msg": "" },
-    "一銀": { "full": false, "msg": "" },
-    "華南": { "full": false, "msg": "" },
-    "元大": { "full": false, "msg": "" }
+    "台新": {
+      "full": true,
+      "msg": "台新03月份贈點已於2026/03/04&nbsp;18:41&nbsp;p.m.額滿"
+    },
+    "兆豐": {
+      "full": true,
+      "msg": "兆豐03月份贈點已於2026/03/17&nbsp;17:02&nbsp;p.m.額滿"
+    },
+    "一銀": {
+      "full": true,
+      "msg": "一銀03月份贈點已於2026/03/08&nbsp;08:27&nbsp;a.m.額滿"
+    },
+    "華南": {
+      "full": true,
+      "msg": "華南03月份贈點已於2026/03/19&nbsp;10:26 a.m.額滿"
+    },
+    "元大": {
+      "full": true,
+      "msg": "元大03月份贈點已於2026/03/08 22:28&nbsp;p.m.額滿"
+    }
   },
-  "promos": [],
+  "promos": [
+    {
+      "id": "transport_台新",
+      "full": true,
+      "title": "交通10%額滿(台新)",
+      "body": "icash Pay 交通運輸10% 台新本月名額已滿"
+    },
+    {
+      "id": "transport_兆豐",
+      "full": true,
+      "title": "交通10%額滿(兆豐)",
+      "body": "icash Pay 交通運輸10% 兆豐本月名額已滿"
+    },
+    {
+      "id": "transport_一銀",
+      "full": true,
+      "title": "交通10%額滿(一銀)",
+      "body": "icash Pay 交通運輸10% 一銀本月名額已滿"
+    },
+    {
+      "id": "transport_華南",
+      "full": true,
+      "title": "交通10%額滿(華南)",
+      "body": "icash Pay 交通運輸10% 華南本月名額已滿"
+    },
+    {
+      "id": "transport_元大",
+      "full": true,
+      "title": "交通10%額滿(元大)",
+      "body": "icash Pay 交通運輸10% 元大本月名額已滿"
+    }
+  ],
   "updated": "2026-03-22"
 }

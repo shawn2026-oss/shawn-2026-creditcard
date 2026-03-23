@@ -1,4 +1,4 @@
-name: 檢查 icash Pay 額滿狀態
+name: 檢查活動額滿狀態
 
 on:
   schedule:

@@ -123,7 +123,8 @@ async function checkPromo() {
   if (needReset) { autoloadFull = false; autoloadMsg = ''; }
   
   try {
-    const page12654 = await fetchPage('https://www.icash.com.tw/Home/NewsDetail/?ID=12654');
+   const page12654raw = await fetchPage('https://www.icash.com.tw/Home/NewsDetail/?ID=12654');
+    const page12654 = page12654raw.replace(/<[^>]+>/g, '');
     const regexAutoload = new RegExp(year + '年' + monthNum + '月[\\s\\S]*?自動加值[\\s\\S]*?額滿');
     const matchAutoload = page12654.match(regexAutoload);
     if (matchAutoload) {

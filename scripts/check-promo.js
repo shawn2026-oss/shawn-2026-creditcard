@@ -1,22 +1,33 @@
 /**
- * 自動檢查活動額滿狀態
+ * 自動檢查活動額滿狀態（puppeteer 版）
  * GitHub Actions 每天台灣時間 10/14/18/22 點執行
  *
- * A. icash Pay (icashpay.com.tw): 4%全通路+星巴克5%, 交通10%, 週日7%
- * B. icash2.0 (icash.com.tw): uniopen自動加值10%
- * C. 悠遊付 (easycard.com.tw): 週五元大/乘車碼/日常美食/早餐速食/週末聚餐/月級挑戰/7-ELEVEN/全家/新會員
+ * A. icash Pay (icashpay.com.tw) — fetchPage
+ * B. icash2.0 (icash.com.tw) — fetchPageWithCookie
+ * C. 悠遊付 (easycard.com.tw + easywallet) — puppeteer 掃列表 + fetchPage 掃內頁
  */
 
 const https = require('https');
 const http = require('http');
 const fs = require('fs');
+const puppeteer = require('puppeteer');
 
 const STATUS_FILE = 'promo_status.json';
 
-function fetchPage(url) {
+// ===== 基礎工具 =====
+
+function fetchPage(url, timeout = 15000) {
   return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => { resolve(''); }, 15000);
-    https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' } }, (res) => {
+    const timer = setTimeout(() => resolve(''), timeout);
+    const mod = url.startsWith('https') ? https : http;
+    mod.get(url, { headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' } }, (res) => {
+      // Follow redirects
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        clearTimeout(timer);
+        const next = res.headers.location.startsWith('http') ? res.headers.location : new URL(res.headers.location, url).href;
+        res.resume();
+        return fetchPage(next, timeout).then(resolve).catch(reject);
+      }
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => { clearTimeout(timer); resolve(data); });
@@ -26,9 +37,8 @@ function fetchPage(url) {
 
 function fetchPageWithCookie(url) {
   return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => { console.log('[fetchPageWithCookie] 超時 10 秒'); resolve(''); }, 10000);
-    let redirectCount = 0;
-    let allCookies = '';
+    const timer = setTimeout(() => { resolve(''); }, 10000);
+    let redirectCount = 0, allCookies = '';
     function doGet(targetUrl) {
       if (redirectCount++ > 5) { clearTimeout(timer); resolve(''); return; }
       const headers = { 'User-Agent': 'Mozilla/5.0' };
@@ -57,6 +67,29 @@ function getMonthStr() {
   return { year, month, monthNum: String(now.getMonth() + 1), todayStr: `${year}-${month}-${String(now.getDate()).padStart(2, '0')}` };
 }
 
+// ===== 額滿偵測（通用） =====
+
+function detectFull(text, year, monthNum, month) {
+  // 多種額滿格式
+  const patterns = [
+    new RegExp(monthNum + '月[\\s\\S]{0,200}?額滿'),
+    new RegExp('已於\\s*' + year + '/' + monthNum + '/[\\s\\S]{0,50}?額滿'),
+    new RegExp('已於\\s*' + year + '/' + month + '/[\\s\\S]{0,50}?額滿'),
+  ];
+  for (const p of patterns) {
+    if (text.match(p)) return true;
+  }
+  return false;
+}
+
+function extractTitle(html) {
+  const m = html.match(/<title[^>]*>(.*?)<\/title>/i);
+  if (!m) return '';
+  return m[1].replace(/-悠遊卡股份有限公司/, '').replace(/悠遊付｜.*/, '').trim();
+}
+
+// ===== 主程式 =====
+
 async function checkPromo() {
   const { year, month, monthNum, todayStr } = getMonthStr();
   let currentStatus = {};
@@ -65,10 +98,11 @@ async function checkPromo() {
   const lastMonth = (currentStatus.updated || '').substring(0, 7);
   const thisMonth = todayStr.substring(0, 7);
   const needReset = thisMonth !== lastMonth && new Date().getDate() <= 3;
-
   function prev(key) { return needReset ? false : (currentStatus[key] || false); }
 
-  // ===== A. icash Pay =====
+  const promos = [];
+
+  // ========== A. icash Pay ==========
 
   // 1. id/2019 — 4%全通路 + 星巴克5%
   let icashFull = prev('uniopen_icash_full'), icashMsg = needReset ? '' : (currentStatus.uniopen_icash_msg || '');
@@ -77,12 +111,17 @@ async function checkPromo() {
     const p = await fetchPage('https://www.icashpay.com.tw/advertMessage/view/id/2019');
     const ms = p.match(new RegExp(year + '年' + monthNum + '月[\\s\\S]*?額滿', 'g'));
     if (ms) for (const m of ms) {
-      if (m.includes('筆筆回饋5%') || m.includes('筆筆饋5%')) { starbucksFull = true; starbucksMsg = `${year}年${monthNum}月 星巴克筆筆5%已額滿`; console.log(`[id/2019] 星巴克5%額滿`); }
-      else if (m.includes('全通路') || m.includes('不限金額')) { icashFull = true; icashMsg = `${year}年${monthNum}月 icash Pay 4%已額滿`; console.log(`[id/2019] icash Pay 4%額滿`); }
+      if (m.includes('筆筆回饋5%') || m.includes('筆筆饋5%')) { starbucksFull = true; starbucksMsg = `${year}年${monthNum}月 星巴克筆筆5%已額滿`; console.log('[id/2019] 星巴克5%額滿'); }
+      else if (m.includes('全通路') || m.includes('不限金額')) { icashFull = true; icashMsg = `${year}年${monthNum}月 icash Pay 4%已額滿`; console.log('[id/2019] icash Pay 4%額滿'); }
     }
     if (!icashFull) console.log('[id/2019] icash Pay 4% 未額滿');
     if (!starbucksFull) console.log('[id/2019] 星巴克5% 未額滿');
   } catch (e) { console.error('[id/2019] 失敗:', e.message); }
+
+  if (icashFull) promos.push({ id: 'icash_4', full: true, title: 'icash Pay 4%已額滿', body: `icash Pay 全通路4% ${monthNum}月名額已滿`, category: 'icash Pay' });
+  else promos.push({ id: 'icash_4', full: false, title: 'icash Pay 4%全通路', body: '', category: 'icash Pay' });
+  if (starbucksFull) promos.push({ id: 'starbucks_5', full: true, title: '星巴克5%已額滿', body: `icash Pay 星巴克5% ${monthNum}月名額已滿`, category: 'icash Pay' });
+  else promos.push({ id: 'starbucks_5', full: false, title: '星巴克5%', body: '', category: 'icash Pay' });
 
   // 2. id/2037 — 交通10%
   const banks = ['台新', '兆豐', '一銀', '華南', '元大'];
@@ -97,6 +136,10 @@ async function checkPromo() {
       else console.log(`[id/2037] ${b} 未額滿`);
     }
   } catch (e) { console.error('[id/2037] 失敗:', e.message); }
+  for (const b of banks) {
+    if (transport[b].full) promos.push({ id: `transport_${b}`, full: true, title: `交通10%額滿(${b})`, body: `icash Pay 交通10% ${b} ${monthNum}月名額已滿`, category: 'icash Pay' });
+    else promos.push({ id: `transport_${b}`, full: false, title: `交通10% ${b}`, body: '', category: 'icash Pay' });
+  }
 
   // 3. id/1954 — 週日7%
   let sundayFull = prev('sunday_7_full'), sundayMsg = needReset ? '' : (currentStatus.sunday_7_msg || '');
@@ -105,10 +148,11 @@ async function checkPromo() {
     if (p.match(new RegExp(year + '年' + monthNum + '月[\\s\\S]*?週日[\\s\\S]*?額滿'))) { sundayFull = true; sundayMsg = `${year}年${monthNum}月 週日7%已額滿`; console.log('[id/1954] 週日7%額滿'); }
     else console.log('[id/1954] 週日7% 未額滿');
   } catch (e) { console.error('[id/1954] 失敗:', e.message); }
+  if (sundayFull) promos.push({ id: 'sunday_7', full: true, title: '週日7%已額滿', body: `icash Pay 週日7% ${monthNum}月名額已滿`, category: 'icash Pay' });
+  else promos.push({ id: 'sunday_7', full: false, title: '週日全通路7%', body: '', category: 'icash Pay' });
 
-  // ===== B. icash2.0 =====
+  // ========== B. icash2.0 ==========
 
-  // 4. ID=12654 — uniopen自動加值10%
   let autoloadFull = prev('uniopen_autoload_full'), autoloadMsg = needReset ? '' : (currentStatus.uniopen_autoload_msg || '');
   try {
     const raw = await fetchPageWithCookie('https://www.icash.com.tw/Home/NewsDetail?ID=12654');
@@ -117,93 +161,136 @@ async function checkPromo() {
       autoloadFull = true; autoloadMsg = `${year}年${monthNum}月 uniopen自動加值10%已額滿`; console.log('[ID=12654] 額滿');
     } else console.log('[ID=12654] 未額滿或頁面過短');
   } catch (e) { console.error('[ID=12654] 失敗:', e.message); }
+  if (autoloadFull) promos.push({ id: 'uniopen_autoload', full: true, title: '自動加值10%已額滿', body: `uniopen自動加值10% ${monthNum}月名額已滿`, category: 'icash2.0' });
+  else promos.push({ id: 'uniopen_autoload', full: false, title: 'uniopen自動加值10%', body: '', category: 'icash2.0' });
 
-  // ===== C. 悠遊付 (easycard.com.tw) =====
+  // ========== C. 悠遊付（動態掃描）==========
 
-  const ecActs = [
-    { id: 'easycard_yuanta', label: '週五元大加碼', url: 'https://www.easycard.com.tw/offer?cls=1506473490%2C1506473503%2C1508721809%2C1508721884%2C&id=1747884970',
-      rx: () => new RegExp('元大銀行每週五' + monthNum + '月份加碼已於[\\s\\S]*?額滿'),
-      title: '悠遊付元大加碼已額滿', body: `悠遊付週五會員日 元大${monthNum}月份加碼名額已滿` },
-    { id: 'easycard_ride', label: '乘車碼10%', url: 'https://www.easycard.com.tw/offer?cls=1508721884%2C1506473490%2C1506473503%2C&id=1771988018',
-      rx: () => new RegExp('已於' + year + '/' + monthNum + '/[\\s\\S]*?額滿'),
-      title: '悠遊付乘車碼10%已額滿', body: `悠遊付乘車碼10%回饋 ${monthNum}月名額已滿` },
-    { id: 'easycard_food', label: '日常美食2%', url: 'https://www.easycard.com.tw/offer?cls=1506473503%2C1508721809%2C1506473490%2C&id=1765765539',
-      rx: () => new RegExp('※\\s*' + monthNum + '月於[\\s\\S]*?額滿'),
-      title: '悠遊付日常美食2%已額滿', body: `悠遊付日常美食2% ${monthNum}月名額已滿` },
-    { id: 'easycard_breakfast', label: '早餐速食2%', url: 'https://www.easycard.com.tw/offer?cls=1506473503%2C1508721809%2C1506473490%2C&id=1765791389',
-      rx: () => new RegExp('※\\s*' + monthNum + '月於[\\s\\S]*?額滿'),
-      title: '悠遊付早餐速食2%已額滿', body: `悠遊付早餐速食2% ${monthNum}月名額已滿` },
-    { id: 'easycard_weekend', label: '週末聚餐2%', url: 'https://www.easycard.com.tw/offer?cls=1506473503%2C1508721809%2C1506473490%2C&id=1765871049',
-      rx: () => new RegExp('※\\s*' + monthNum + '月於[\\s\\S]*?額滿'),
-      title: '悠遊付週末聚餐2%已額滿', body: `悠遊付週末聚餐2% ${monthNum}月名額已滿` },
-    { id: 'easycard_seven', label: '7-ELEVEN贈券', url: 'https://www.easycard.com.tw/offer?cls=1506473490%2C1506473503%2C1508721809%2C&id=1766844961',
-      rx: () => new RegExp(monthNum + '月份累計消費[\\s\\S]*?已額滿'),
-      title: '悠遊付7-ELEVEN贈券已額滿', body: `悠遊付7-ELEVEN滿額贈券 ${monthNum}月名額已滿` },
-    { id: 'easycard_family', label: '全家回饋', url: 'https://www.easycard.com.tw/offer?cls=1506473490%2C1506473503%2C1508721809%2C&id=1766475778',
-      rx: () => new RegExp('※\\s*' + monthNum + '月[\\s\\S]*?額滿'),
-      title: '悠遊付全家回饋已額滿', body: `悠遊付全家回饋 ${monthNum}月名額已滿` },
-    { id: 'easycard_newmember', label: '新會員3%', url: 'https://www.easycard.com.tw/offer?cls=1506473490%2C1506473503%2C&id=1766377676',
-      rx: () => new RegExp(monthNum + '月[\\s\\S]*?額滿'),
-      title: '悠遊付新會員3%已額滿', body: `悠遊付新會員3% ${monthNum}月名額已滿` },
-  ];
+  console.log('\n===== 悠遊付動態掃描 =====');
 
-  let ecResults = {};
-  for (const a of ecActs) ecResults[a.id] = prev(a.id + '_full');
-  ecResults['easycard_challenge_silver'] = prev('easycard_challenge_silver_full');
-  ecResults['easycard_challenge_gold'] = prev('easycard_challenge_gold_full');
-  ecResults['easycard_challenge_platinum'] = prev('easycard_challenge_platinum_full');
+  // C1: 用 puppeteer 從列表頁取得所有活動 URL
+  let offerUrls = [];
+  try {
+    const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'] });
+    const page = await browser.newPage();
+    await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36');
 
-  for (const a of ecActs) {
-    try {
-      const html = await fetchPage(a.url);
-      const text = html.replace(/<[^>]+>/g, ' ');
-      if (text.match(a.rx())) { ecResults[a.id] = true; console.log(`[easycard] ${a.label} 額滿`); }
-      else console.log(`[easycard] ${a.label} 未額滿`);
-    } catch (e) { console.error(`[easycard] ${a.label} 失敗:`, e.message); }
+    // 載入好康特區（全分類）
+    const listUrl = 'https://www.easycard.com.tw/offers?cls=1506473490,1506473503,1508721809,1508721884,1506473519';
+    console.log('[puppeteer] 載入列表頁...');
+    await page.goto(listUrl, { waitUntil: 'networkidle2', timeout: 30000 });
+
+    // 捲動觸發 lazy load
+    await page.evaluate(async () => {
+      for (let i = 0; i < 5; i++) {
+        window.scrollBy(0, 800);
+        await new Promise(r => setTimeout(r, 500));
+      }
+    });
+    await new Promise(r => setTimeout(r, 2000));
+
+    // 提取所有活動連結（/offer? 包含 id=）
+    const links = await page.$$eval('a[href*="offer"]', as =>
+      as.map(a => a.href).filter(h => h.includes('id=') && h.includes('easycard.com.tw'))
+    );
+
+    // 去重（以 id 為 key）
+    const seen = new Set();
+    for (const link of links) {
+      const idMatch = link.match(/id=(\d+)/);
+      if (idMatch && !seen.has(idMatch[1])) {
+        seen.add(idMatch[1]);
+        offerUrls.push({ id: idMatch[1], url: link });
+      }
+    }
+
+    console.log(`[puppeteer] 找到 ${offerUrls.length} 個活動頁面`);
+    await browser.close();
+  } catch (e) {
+    console.error('[puppeteer] 列表頁抓取失敗:', e.message);
+    console.log('[puppeteer] 跳過動態掃描');
   }
 
-  // 月級挑戰（銀/金/白金同一頁）— 格式：3月銀級回饋已於3/08 14:49:26額滿
-  try {
-    const html = await fetchPage('https://easywallet.easycard.com.tw/benefit/content?id=1766109563');
-    const text = html.replace(/<[^>]+>/g, ' ');
-    if (text.match(new RegExp(monthNum + '月銀級回饋已於[\\s\\S]*?額滿'))) { ecResults['easycard_challenge_silver'] = true; console.log('[easycard] 月級挑戰銀級額滿'); }
-    else console.log('[easycard] 月級挑戰銀級 未額滿');
-    if (text.match(new RegExp(monthNum + '月金級回饋已於[\\s\\S]*?額滿'))) { ecResults['easycard_challenge_gold'] = true; console.log('[easycard] 月級挑戰金級額滿'); }
-    else console.log('[easycard] 月級挑戰金級 未額滿');
-    if (text.match(new RegExp(monthNum + '月白金回饋已於[\\s\\S]*?額滿'))) { ecResults['easycard_challenge_platinum'] = true; console.log('[easycard] 月級挑戰白金級額滿'); }
-    else console.log('[easycard] 月級挑戰白金級 未額滿');
-  } catch (e) { console.error('[easycard] 月級挑戰失敗:', e.message); }
+  // C2: 加入 easywallet 月級挑戰（不在 easycard.com.tw 列表裡）
+  const extraUrls = [
+    { id: 'challenge_1766109563', url: 'https://easywallet.easycard.com.tw/benefit/content?id=1766109563', label: '月級挑戰' },
+  ];
 
-  // ===== 組合 promos =====
-  const promos = [];
-  if (icashFull) promos.push({ id: 'icash_4', full: true, title: 'icash Pay 4%已額滿', body: `icash Pay 全通路4% ${monthNum}月名額已滿` });
-  if (starbucksFull) promos.push({ id: 'starbucks_5', full: true, title: '星巴克5%已額滿', body: `icash Pay 星巴克5% ${monthNum}月名額已滿` });
-  for (const b of banks) { if (transport[b].full) promos.push({ id: `transport_${b}`, full: true, title: `交通10%額滿(${b})`, body: `icash Pay 交通10% ${b} ${monthNum}月名額已滿` }); }
-  if (sundayFull) promos.push({ id: 'sunday_7', full: true, title: '週日7%已額滿', body: `icash Pay 週日7% ${monthNum}月名額已滿` });
-  if (autoloadFull) promos.push({ id: 'uniopen_autoload', full: true, title: '自動加值10%已額滿', body: `uniopen自動加值10% ${monthNum}月名額已滿` });
-  for (const a of ecActs) { if (ecResults[a.id]) promos.push({ id: a.id, full: true, title: a.title, body: a.body }); }
-  if (ecResults['easycard_challenge_silver']) promos.push({ id: 'easycard_challenge_silver', full: true, title: '月級挑戰銀級已額滿', body: `悠遊付月級挑戰銀級 ${monthNum}月名額已滿` });
-  if (ecResults['easycard_challenge_gold']) promos.push({ id: 'easycard_challenge_gold', full: true, title: '月級挑戰金級已額滿', body: `悠遊付月級挑戰金級 ${monthNum}月名額已滿` });
-  if (ecResults['easycard_challenge_platinum']) promos.push({ id: 'easycard_challenge_platinum', full: true, title: '月級挑戰白金級已額滿', body: `悠遊付月級挑戰白金級 ${monthNum}月名額已滿` });
+  // C3: 逐頁掃描額滿
+  const ecardResults = {}; // id → { full, title }
 
-  // ===== 寫入 =====
+  // 掃 easycard.com.tw 活動頁（server-rendered，用 fetchPage）
+  for (const item of offerUrls) {
+    try {
+      const html = await fetchPage(item.url);
+      const text = html.replace(/<[^>]+>/g, ' ');
+      const title = extractTitle(html);
+      const full = detectFull(text, year, monthNum, month);
+      ecardResults[item.id] = { full, title };
+      console.log(`[easycard id=${item.id}] ${title.substring(0, 30)} → ${full ? '額滿' : '未額滿'}`);
+    } catch (e) {
+      console.error(`[easycard id=${item.id}] 失敗:`, e.message);
+    }
+  }
+
+  // 掃 easywallet 額外頁面
+  for (const item of extraUrls) {
+    try {
+      const html = await fetchPage(item.url);
+      const text = html.replace(/<[^>]+>/g, ' ');
+
+      // 月級挑戰特殊處理：三個等級
+      if (item.label === '月級挑戰') {
+        const levels = [
+          { suffix: 'silver', label: '銀級', rx: new RegExp(monthNum + '月銀級回饋已於[\\s\\S]*?額滿') },
+          { suffix: 'gold', label: '金級', rx: new RegExp(monthNum + '月金級回饋已於[\\s\\S]*?額滿') },
+          { suffix: 'platinum', label: '白金級', rx: new RegExp(monthNum + '月白金回饋已於[\\s\\S]*?額滿') },
+        ];
+        for (const lv of levels) {
+          const full = !!text.match(lv.rx);
+          ecardResults[`challenge_${lv.suffix}`] = { full, title: `月級挑戰 ${lv.label}` };
+          console.log(`[easywallet] 月級挑戰${lv.label} → ${full ? '額滿' : '未額滿'}`);
+        }
+      } else {
+        const title = extractTitle(html) || item.label;
+        const full = detectFull(text, year, monthNum, month);
+        ecardResults[item.id] = { full, title };
+        console.log(`[easywallet] ${title.substring(0, 30)} → ${full ? '額滿' : '未額滿'}`);
+      }
+    } catch (e) {
+      console.error(`[easywallet ${item.label}] 失敗:`, e.message);
+    }
+  }
+
+  // 把所有悠遊付活動加入 promos（含未額滿）
+  for (const [id, result] of Object.entries(ecardResults)) {
+    promos.push({
+      id: `easycard_${id}`,
+      full: result.full,
+      title: result.full ? `${result.title}已額滿` : result.title,
+      body: result.full ? `${result.title} ${monthNum}月名額已滿` : '',
+      category: '悠遊付'
+    });
+  }
+
+  // ========== 寫入狀態 ==========
+
   const newStatus = {
     uniopen_icash_full: icashFull, uniopen_icash_msg: icashMsg,
     starbucks_5_full: starbucksFull, starbucks_5_msg: starbucksMsg,
     sunday_7_full: sundayFull, sunday_7_msg: sundayMsg,
     uniopen_autoload_full: autoloadFull, uniopen_autoload_msg: autoloadMsg,
     transport_10: transport,
+    easycard_results: ecardResults,
+    promos: promos,
+    updated: todayStr
   };
-  for (const a of ecActs) newStatus[a.id + '_full'] = ecResults[a.id];
-  newStatus['easycard_challenge_silver_full'] = ecResults['easycard_challenge_silver'];
-  newStatus['easycard_challenge_gold_full'] = ecResults['easycard_challenge_gold'];
-  newStatus['easycard_challenge_platinum_full'] = ecResults['easycard_challenge_platinum'];
-  newStatus.promos = promos;
-  newStatus.updated = todayStr;
 
   const changed = JSON.stringify(currentStatus, null, 2) !== JSON.stringify(newStatus, null, 2);
   fs.writeFileSync(STATUS_FILE, JSON.stringify(newStatus, null, 2) + '\n');
-  console.log(`\n狀態已更新`);
+
+  console.log(`\n總活動: ${promos.length} 項，額滿: ${promos.filter(p => p.full).length} 項`);
+  for (const p of promos.filter(p => p.full)) console.log(`  [${p.category}] ${p.title}`);
   console.log(changed ? 'STATUS_CHANGED=true' : 'STATUS_CHANGED=false');
 }
 

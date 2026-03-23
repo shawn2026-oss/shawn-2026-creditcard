@@ -151,6 +151,7 @@ async function checkPromo() {
   for (const a of ecActs) ecResults[a.id] = prev(a.id + '_full');
   ecResults['easycard_challenge_silver'] = prev('easycard_challenge_silver_full');
   ecResults['easycard_challenge_gold'] = prev('easycard_challenge_gold_full');
+  ecResults['easycard_challenge_platinum'] = prev('easycard_challenge_platinum_full');
 
   for (const a of ecActs) {
     try {
@@ -161,14 +162,16 @@ async function checkPromo() {
     } catch (e) { console.error(`[easycard] ${a.label} 失敗:`, e.message); }
   }
 
-  // 月級挑戰（銀/金同一頁）
+  // 月級挑戰（銀/金/白金同一頁）— 格式：3月銀級回饋已於3/08 14:49:26額滿
   try {
-    const html = await fetchPage('https://www.easycard.com.tw/offer?cls=1506473519%2C1506473490%2C1506473503%2C&id=1744612351');
+    const html = await fetchPage('https://easywallet.easycard.com.tw/benefit/content?id=1766109563');
     const text = html.replace(/<[^>]+>/g, ' ');
     if (text.match(new RegExp(monthNum + '月銀級回饋已於[\\s\\S]*?額滿'))) { ecResults['easycard_challenge_silver'] = true; console.log('[easycard] 月級挑戰銀級額滿'); }
     else console.log('[easycard] 月級挑戰銀級 未額滿');
     if (text.match(new RegExp(monthNum + '月金級回饋已於[\\s\\S]*?額滿'))) { ecResults['easycard_challenge_gold'] = true; console.log('[easycard] 月級挑戰金級額滿'); }
     else console.log('[easycard] 月級挑戰金級 未額滿');
+    if (text.match(new RegExp(monthNum + '月白金回饋已於[\\s\\S]*?額滿'))) { ecResults['easycard_challenge_platinum'] = true; console.log('[easycard] 月級挑戰白金級額滿'); }
+    else console.log('[easycard] 月級挑戰白金級 未額滿');
   } catch (e) { console.error('[easycard] 月級挑戰失敗:', e.message); }
 
   // ===== 組合 promos =====
@@ -181,6 +184,7 @@ async function checkPromo() {
   for (const a of ecActs) { if (ecResults[a.id]) promos.push({ id: a.id, full: true, title: a.title, body: a.body }); }
   if (ecResults['easycard_challenge_silver']) promos.push({ id: 'easycard_challenge_silver', full: true, title: '月級挑戰銀級已額滿', body: `悠遊付月級挑戰銀級 ${monthNum}月名額已滿` });
   if (ecResults['easycard_challenge_gold']) promos.push({ id: 'easycard_challenge_gold', full: true, title: '月級挑戰金級已額滿', body: `悠遊付月級挑戰金級 ${monthNum}月名額已滿` });
+  if (ecResults['easycard_challenge_platinum']) promos.push({ id: 'easycard_challenge_platinum', full: true, title: '月級挑戰白金級已額滿', body: `悠遊付月級挑戰白金級 ${monthNum}月名額已滿` });
 
   // ===== 寫入 =====
   const newStatus = {
@@ -193,6 +197,7 @@ async function checkPromo() {
   for (const a of ecActs) newStatus[a.id + '_full'] = ecResults[a.id];
   newStatus['easycard_challenge_silver_full'] = ecResults['easycard_challenge_silver'];
   newStatus['easycard_challenge_gold_full'] = ecResults['easycard_challenge_gold'];
+  newStatus['easycard_challenge_platinum_full'] = ecResults['easycard_challenge_platinum'];
   newStatus.promos = promos;
   newStatus.updated = todayStr;
 

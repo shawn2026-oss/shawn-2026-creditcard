@@ -125,6 +125,13 @@ async function checkPromo() {
   try {
    const page12654raw = await fetchPage('https://www.icash.com.tw/Home/NewsDetail/?ID=12654');
     const page12654 = page12654raw.replace(/<[^>]+>/g, '');
+    // debug: 找頁面中有沒有額滿字樣
+    const idxFull = page12654.indexOf('額滿');
+    if (idxFull >= 0) {
+      console.log('[ID=12654] DEBUG 額滿附近: ' + page12654.substring(Math.max(0, idxFull - 80), idxFull + 20).replace(/\n/g, ' '));
+    } else {
+      console.log('[ID=12654] DEBUG 頁面中找不到「額滿」');
+    }
     const regexAutoload = new RegExp(monthNum + '月[\\s\\S]*?自動加值[\\s\\S]*?額滿');
     const matchAutoload = page12654.match(regexAutoload);
     if (matchAutoload) {

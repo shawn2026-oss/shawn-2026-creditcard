@@ -1,4 +1,5 @@
 const https = require('https');
+const http = require('http');
 const fs = require('fs');
 
 const STATUS_FILE = 'promo_status.json';
@@ -6,16 +7,57 @@ const STATUS_FILE = 'promo_status.json';
 function fetchPage(url) {
   return new Promise((resolve, reject) => {
     https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
-     if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-        if ((fetchPage._depth || 0) >= 3) { resolve(''); return; }
-        fetchPage._depth = (fetchPage._depth || 0) + 1;
-        const redirectUrl = res.headers.location.startsWith('http') ? res.headers.location : new URL(res.headers.location, url).href;
-        return fetchPage(redirectUrl).then(resolve).catch(reject);
-      }
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => resolve(data));
     }).on('error', reject);
+  });
+}
+
+// icash.com.tw 需要帶 cookie 才拿到內容
+function fetchPageWithCookie(url, maxRedirects) {
+  maxRedirects = maxRedirects || 5;
+  return new Promise((resolve, reject) => {
+    let redirectCount = 0;
+    let allCookies = '';
+    
+    function doGet(targetUrl) {
+      const headers = { 'User-Agent': 'Mozilla/5.0' };
+      if (allCookies) headers['Cookie'] = allCookies;
+      
+      const mod = targetUrl.startsWith('https') ? https : http;
+      const req = mod.get(targetUrl, { headers, timeout: 10000 }, (res) => {
+        // 收集 cookie
+        const setCookies = res.headers['set-cookie'];
+        if (setCookies) {
+          const newCookies = setCookies.map(c => c.split(';')[0]).join('; ');
+          allCookies = allCookies ? allCookies + '; ' + newCookies : newCookies;
+        }
+        
+        // 重導
+        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+          redirectCount++;
+          if (redirectCount > maxRedirects) {
+            resolve('');
+            return;
+          }
+          const redirectUrl = res.headers.location.startsWith('http')
+            ? res.headers.location
+            : new URL(res.headers.location, targetUrl).href;
+          res.resume();
+          doGet(redirectUrl);
+          return;
+        }
+        
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => resolve(data));
+      });
+      req.on('error', (e) => { resolve(''); });
+      req.on('timeout', () => { req.destroy(); resolve(''); });
+    }
+    
+    doGet(url);
   });
 }
 
@@ -129,14 +171,24 @@ async function checkPromo() {
   if (needReset) { autoloadFull = false; autoloadMsg = ''; }
   
   try {
-    const page12654raw = await fetchPage('https://www.icash.com.tw/Home/NewsDetail/?ID=12654');
+    console.log('[ID=12654] 開始抓取...');
+    const page12654raw = await fetchPageWithCookie('https://www.icash.com.tw/Home/NewsDetail/?ID=12654');
     const page12654 = page12654raw.replace(/<[^>]+>/g, '');
-    const regexAutoload = new RegExp(monthNum + '月[\\s\\S]*?自動加值[\\s\\S]*?額滿');
+    console.log(`[ID=12654] 頁面長度: ${page12654.length}`);
+    
+    if (page12654.length > 0) {
+      const idxFull = page12654.indexOf('額滿');
+      if (idxFull >= 0) {
+        console.log('[ID=12654] 找到額滿: ' + page12654.substring(Math.max(0, idxFull - 40), idxFull + 10).replace(/\n/g, ' '));
+      }
+    }
+    
+    const regexAutoload = new RegExp(monthNum + '月[\\s\\S]*?加值[\\s\\S]*?額滿');
     const matchAutoload = page12654.match(regexAutoload);
     if (matchAutoload) {
       autoloadFull = true;
       autoloadMsg = `${year}年${monthNum}月 uniopen自動加值10%已額滿`;
-      console.log(`[ID=12654] 自動加值10%額滿: ${matchAutoload[0].substring(0, 60)}`);
+      console.log(`[ID=12654] 額滿: ${matchAutoload[0].substring(0, 60)}`);
     } else {
       console.log('[ID=12654] 自動加值10% 本月尚未額滿');
     }

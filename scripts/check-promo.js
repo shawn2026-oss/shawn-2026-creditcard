@@ -6,7 +6,9 @@ const STATUS_FILE = 'promo_status.json';
 function fetchPage(url) {
   return new Promise((resolve, reject) => {
     https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
-      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+     if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        if ((fetchPage._depth || 0) >= 3) { resolve(''); return; }
+        fetchPage._depth = (fetchPage._depth || 0) + 1;
         const redirectUrl = res.headers.location.startsWith('http') ? res.headers.location : new URL(res.headers.location, url).href;
         return fetchPage(redirectUrl).then(resolve).catch(reject);
       }

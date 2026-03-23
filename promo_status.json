@@ -29,42 +29,66 @@
       "msg": "元大03月份贈點已於2026/03/08 22:28 p.m.額滿"
     }
   },
+  "easycard_yuanta_full": true,
+  "easycard_yuanta_msg": "悠遊付週五會員日 元大3月份加碼已額滿",
+  "easycard_ride_full": true,
+  "easycard_ride_msg": "悠遊付乘車碼10% 3月已額滿",
+  "easycard_food_full": false,
+  "easycard_food_msg": "",
   "promos": [
+    {
+      "id": "icash_4",
+      "full": true,
+      "title": "icash Pay 4%已額滿",
+      "body": "icash Pay 全通路4%加碼3月名額已滿"
+    },
     {
       "id": "transport_台新",
       "full": true,
       "title": "交通10%額滿(台新)",
-      "body": "icash Pay 交通運輸10% 台新本月名額已滿"
+      "body": "icash Pay 交通運輸10% 台新3月名額已滿"
     },
     {
       "id": "transport_兆豐",
       "full": true,
       "title": "交通10%額滿(兆豐)",
-      "body": "icash Pay 交通運輸10% 兆豐本月名額已滿"
+      "body": "icash Pay 交通運輸10% 兆豐3月名額已滿"
     },
     {
       "id": "transport_一銀",
       "full": true,
       "title": "交通10%額滿(一銀)",
-      "body": "icash Pay 交通運輸10% 一銀本月名額已滿"
+      "body": "icash Pay 交通運輸10% 一銀3月名額已滿"
     },
     {
       "id": "transport_華南",
       "full": true,
       "title": "交通10%額滿(華南)",
-      "body": "icash Pay 交通運輸10% 華南本月名額已滿"
+      "body": "icash Pay 交通運輸10% 華南3月名額已滿"
     },
     {
       "id": "transport_元大",
       "full": true,
       "title": "交通10%額滿(元大)",
-      "body": "icash Pay 交通運輸10% 元大本月名額已滿"
+      "body": "icash Pay 交通運輸10% 元大3月名額已滿"
     },
     {
       "id": "uniopen_autoload",
       "full": true,
       "title": "自動加值10%已額滿",
-      "body": "uniopen聯名卡icash2.0自動加值10%本月名額已滿"
+      "body": "uniopen聯名卡icash2.0自動加值10% 3月名額已滿"
+    },
+    {
+      "id": "easycard_yuanta",
+      "full": true,
+      "title": "悠遊付元大加碼已額滿",
+      "body": "悠遊付週五會員日 元大銀行3月份加碼名額已滿"
+    },
+    {
+      "id": "easycard_ride",
+      "full": true,
+      "title": "悠遊付乘車碼10%已額滿",
+      "body": "悠遊付乘車碼筆筆10%回饋 3月名額已滿"
     }
   ],
   "updated": "2026-03-23"

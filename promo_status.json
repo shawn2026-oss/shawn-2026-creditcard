@@ -29,95 +29,170 @@
       "msg": "元大03月份贈點已於2026/03/08 22:28 p.m.額滿"
     }
   },
-  "easycard_yuanta_full": true,
-  "easycard_ride_full": true,
-  "easycard_food_full": false,
-  "easycard_breakfast_full": false,
-  "easycard_weekend_full": false,
-  "easycard_seven_full": true,
-  "easycard_family_full": false,
-  "easycard_newmember_full": false,
-  "easycard_challenge_silver_full": true,
-  "easycard_challenge_gold_full": true,
-  "easycard_challenge_platinum_full": true,
+  "easycard_results": {
+    "1766109563": {
+      "full": true,
+      "title": "月級挑戰-筆筆最高3%回饋"
+    },
+    "1768462278": {
+      "full": true,
+      "title": "悠遊付繳學雜費最高回饋10% 首繳贈50%回饋券 加碼再抽iPad mini"
+    },
+    "1768547222": {
+      "full": false,
+      "title": "「樂天悠遊付」新戶雙享 好禮 Easy Get !"
+    },
+    "1768875546": {
+      "full": false,
+      "title": "悠遊開學季 雙周最高享20%回饋"
+    },
+    "1769673733": {
+      "full": false,
+      "title": "悠遊付繳牌照稅最高回饋9% 再享抽千元加油券 !"
+    },
+    "1772008437": {
+      "full": false,
+      "title": "悠遊付6週年慶 領券最高賺$666 再抽6倍回饋金"
+    },
+    "challenge_silver": {
+      "full": true,
+      "title": "月級挑戰 銀級"
+    },
+    "challenge_gold": {
+      "full": true,
+      "title": "月級挑戰 金級"
+    },
+    "challenge_platinum": {
+      "full": true,
+      "title": "月級挑戰 白金級"
+    }
+  },
   "promos": [
     {
       "id": "icash_4",
       "full": true,
       "title": "icash Pay 4%已額滿",
-      "body": "icash Pay 全通路4% 3月名額已滿"
+      "body": "icash Pay 全通路4% 3月名額已滿",
+      "category": "icash Pay"
+    },
+    {
+      "id": "starbucks_5",
+      "full": false,
+      "title": "星巴克5%",
+      "body": "",
+      "category": "icash Pay"
     },
     {
       "id": "transport_台新",
       "full": true,
       "title": "交通10%額滿(台新)",
-      "body": "icash Pay 交通10% 台新 3月名額已滿"
+      "body": "icash Pay 交通10% 台新 3月名額已滿",
+      "category": "icash Pay"
     },
     {
       "id": "transport_兆豐",
       "full": true,
       "title": "交通10%額滿(兆豐)",
-      "body": "icash Pay 交通10% 兆豐 3月名額已滿"
+      "body": "icash Pay 交通10% 兆豐 3月名額已滿",
+      "category": "icash Pay"
     },
     {
       "id": "transport_一銀",
       "full": true,
       "title": "交通10%額滿(一銀)",
-      "body": "icash Pay 交通10% 一銀 3月名額已滿"
+      "body": "icash Pay 交通10% 一銀 3月名額已滿",
+      "category": "icash Pay"
     },
     {
       "id": "transport_華南",
       "full": true,
       "title": "交通10%額滿(華南)",
-      "body": "icash Pay 交通10% 華南 3月名額已滿"
+      "body": "icash Pay 交通10% 華南 3月名額已滿",
+      "category": "icash Pay"
     },
     {
       "id": "transport_元大",
       "full": true,
       "title": "交通10%額滿(元大)",
-      "body": "icash Pay 交通10% 元大 3月名額已滿"
+      "body": "icash Pay 交通10% 元大 3月名額已滿",
+      "category": "icash Pay"
+    },
+    {
+      "id": "sunday_7",
+      "full": false,
+      "title": "週日全通路7%",
+      "body": "",
+      "category": "icash Pay"
     },
     {
       "id": "uniopen_autoload",
       "full": true,
       "title": "自動加值10%已額滿",
-      "body": "uniopen自動加值10% 3月名額已滿"
+      "body": "uniopen自動加值10% 3月名額已滿",
+      "category": "icash2.0"
     },
     {
-      "id": "easycard_yuanta",
+      "id": "easycard_1766109563",
       "full": true,
-      "title": "悠遊付元大加碼已額滿",
-      "body": "悠遊付週五會員日 元大3月份加碼名額已滿"
+      "title": "月級挑戰-筆筆最高3%回饋已額滿",
+      "body": "月級挑戰-筆筆最高3%回饋 3月名額已滿",
+      "category": "悠遊付"
     },
     {
-      "id": "easycard_ride",
+      "id": "easycard_1768462278",
       "full": true,
-      "title": "悠遊付乘車碼10%已額滿",
-      "body": "悠遊付乘車碼10%回饋 3月名額已滿"
+      "title": "悠遊付繳學雜費最高回饋10% 首繳贈50%回饋券 加碼再抽iPad mini已額滿",
+      "body": "悠遊付繳學雜費最高回饋10% 首繳贈50%回饋券 加碼再抽iPad mini 3月名額已滿",
+      "category": "悠遊付"
     },
     {
-      "id": "easycard_seven",
-      "full": true,
-      "title": "悠遊付7-ELEVEN贈券已額滿",
-      "body": "悠遊付7-ELEVEN滿額贈券 3月名額已滿"
+      "id": "easycard_1768547222",
+      "full": false,
+      "title": "「樂天悠遊付」新戶雙享 好禮 Easy Get !",
+      "body": "",
+      "category": "悠遊付"
+    },
+    {
+      "id": "easycard_1768875546",
+      "full": false,
+      "title": "悠遊開學季 雙周最高享20%回饋",
+      "body": "",
+      "category": "悠遊付"
+    },
+    {
+      "id": "easycard_1769673733",
+      "full": false,
+      "title": "悠遊付繳牌照稅最高回饋9% 再享抽千元加油券 !",
+      "body": "",
+      "category": "悠遊付"
+    },
+    {
+      "id": "easycard_1772008437",
+      "full": false,
+      "title": "悠遊付6週年慶 領券最高賺$666 再抽6倍回饋金",
+      "body": "",
+      "category": "悠遊付"
     },
     {
       "id": "easycard_challenge_silver",
       "full": true,
-      "title": "月級挑戰銀級已額滿",
-      "body": "悠遊付月級挑戰銀級 3月名額已滿"
+      "title": "月級挑戰 銀級已額滿",
+      "body": "月級挑戰 銀級 3月名額已滿",
+      "category": "悠遊付"
     },
     {
       "id": "easycard_challenge_gold",
       "full": true,
-      "title": "月級挑戰金級已額滿",
-      "body": "悠遊付月級挑戰金級 3月名額已滿"
+      "title": "月級挑戰 金級已額滿",
+      "body": "月級挑戰 金級 3月名額已滿",
+      "category": "悠遊付"
     },
     {
       "id": "easycard_challenge_platinum",
       "full": true,
-      "title": "月級挑戰白金級已額滿",
-      "body": "悠遊付月級挑戰白金級 3月名額已滿"
+      "title": "月級挑戰 白金級已額滿",
+      "body": "月級挑戰 白金級 3月名額已滿",
+      "category": "悠遊付"
     }
   ],
   "updated": "2026-03-23"

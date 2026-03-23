@@ -37,8 +37,9 @@
   "easycard_seven_full": true,
   "easycard_family_full": false,
   "easycard_newmember_full": false,
-  "easycard_challenge_silver_full": false,
-  "easycard_challenge_gold_full": false,
+  "easycard_challenge_silver_full": true,
+  "easycard_challenge_gold_full": true,
+  "easycard_challenge_platinum_full": true,
   "promos": [
     {
       "id": "icash_4",
@@ -99,6 +100,24 @@
       "full": true,
       "title": "悠遊付7-ELEVEN贈券已額滿",
       "body": "悠遊付7-ELEVEN滿額贈券 3月名額已滿"
+    },
+    {
+      "id": "easycard_challenge_silver",
+      "full": true,
+      "title": "月級挑戰銀級已額滿",
+      "body": "悠遊付月級挑戰銀級 3月名額已滿"
+    },
+    {
+      "id": "easycard_challenge_gold",
+      "full": true,
+      "title": "月級挑戰金級已額滿",
+      "body": "悠遊付月級挑戰金級 3月名額已滿"
+    },
+    {
+      "id": "easycard_challenge_platinum",
+      "full": true,
+      "title": "月級挑戰白金級已額滿",
+      "body": "悠遊付月級挑戰白金級 3月名額已滿"
     }
   ],
   "updated": "2026-03-23"

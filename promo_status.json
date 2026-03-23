@@ -1,26 +1,30 @@
 {
   "uniopen_icash_full": true,
   "uniopen_icash_msg": "2026年3月 icash Pay 4% 加碼已額滿",
+  "starbucks_5_full": false,
+  "starbucks_5_msg": "",
+  "sunday_7_full": false,
+  "sunday_7_msg": "",
   "transport_10": {
     "台新": {
       "full": true,
-      "msg": "台新03月份贈點已於2026/03/04&nbsp;18:41&nbsp;p.m.額滿"
+      "msg": "台新03月份贈點已於2026/03/04 18:41 p.m.額滿"
     },
     "兆豐": {
       "full": true,
-      "msg": "兆豐03月份贈點已於2026/03/17&nbsp;17:02&nbsp;p.m.額滿"
+      "msg": "兆豐03月份贈點已於2026/03/17 17:02 p.m.額滿"
     },
     "一銀": {
       "full": true,
-      "msg": "一銀03月份贈點已於2026/03/08&nbsp;08:27&nbsp;a.m.額滿"
+      "msg": "一銀03月份贈點已於2026/03/08 08:27 a.m.額滿"
     },
     "華南": {
       "full": true,
-      "msg": "華南03月份贈點已於2026/03/19&nbsp;10:26 a.m.額滿"
+      "msg": "華南03月份贈點已於2026/03/19 10:26 a.m.額滿"
     },
     "元大": {
       "full": true,
-      "msg": "元大03月份贈點已於2026/03/08 22:28&nbsp;p.m.額滿"
+      "msg": "元大03月份贈點已於2026/03/08 22:28 p.m.額滿"
     }
   },
   "promos": [
@@ -55,5 +59,5 @@
       "body": "icash Pay 交通運輸10% 元大本月名額已滿"
     }
   ],
-  "updated": "2026-03-22"
+  "updated": "2026-03-23"
 }

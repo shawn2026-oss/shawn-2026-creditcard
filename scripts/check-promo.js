@@ -202,8 +202,8 @@ async function collectEasycardOfferUrls(browser) {
         console.log(`[C1] 無下一頁，共 ${pageNum} 頁`);
         break;
       }
-      await new Promise(r => setTimeout(r, 3000));
-      await page.waitForNetworkIdle({ timeout: 10000 }).catch(() => {});
+      await new Promise(r => setTimeout(r, 2000));
+      await page.waitForNetworkIdle({ timeout: 8000 }).catch(() => {});
     }
     await page.close();
   } catch (e) {
@@ -279,12 +279,13 @@ async function collectEasycardOfferUrls(browser) {
 
 // ===== 用 puppeteer 取 SPA 頁面標題和內文 =====
 
-async function fetchSpaPage(browser, url, timeout = 15000) {
+async function fetchSpaPage(browser, url, timeout = 12000) {
   const page = await browser.newPage();
   await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36');
   try {
-    await page.goto(url, { waitUntil: 'networkidle2', timeout });
-    await new Promise(r => setTimeout(r, 1000));
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout });
+    // 等 SPA 渲染，但不要等太久
+    await page.waitForNetworkIdle({ idleTime: 500, timeout: 5000 }).catch(() => {});
     const title = await page.title().catch(() => '');
     const text = await page.evaluate(() => document.body?.innerText || '').catch(() => '');
     await page.close();
@@ -387,35 +388,38 @@ async function checkPromo() {
     console.error('[悠遊付] URL 收集失敗:', e.message);
   }
 
-  // --- C4: 逐頁掃描額滿 ---
+  // --- C4: 逐頁掃描額滿（並行，最多 5 個同時）---
   console.log('\n===== 悠遊付逐頁掃描額滿 =====');
   const ecardResults = {};
+  const CONCURRENCY = 5;
 
-  for (const item of offerUrls) {
+  // 分成 SPA 和 server-rendered 兩組
+  const spaItems = offerUrls.filter(i => i.url.includes('easywallet.easycard.com.tw'));
+  const ssrItems = offerUrls.filter(i => !i.url.includes('easywallet.easycard.com.tw'));
+
+  // SSR: 全部用 fetchPage 並行（不佔 puppeteer）
+  async function scanSsr(item) {
     try {
-      const isEasywallet = item.url.includes('easywallet.easycard.com.tw');
+      const html = await fetchPage(item.url);
+      const text = html.replace(/<[^>]+>/g, ' ');
+      const pageTitle = extractTitle(html);
+      const title = item.label || pageTitle || `悠遊付活動 ${item.id}`;
+      const full = detectFull(text, year, monthNum, month);
+      ecardResults[item.id] = { full, title: title.substring(0, 50) };
+      console.log(`[${item.source}] ${title.substring(0, 40)} → ${full ? '額滿' : '未額滿'}`);
+    } catch (e) {
+      console.error(`[${item.id}] SSR失敗:`, e.message);
+    }
+  }
 
-      let text, pageTitle;
-
-      if (isEasywallet) {
-        // SPA 頁面：用 puppeteer 渲染
-        const spa = await fetchSpaPage(browser, item.url);
-        text = spa.text;
-        pageTitle = spa.title
-          .replace(/-悠遊卡股份有限公司/, '')
-          .replace(/悠遊付｜.*/, '')
-          .trim();
-      } else {
-        // server-rendered：用 fetchPage
-        const html = await fetchPage(item.url);
-        text = html.replace(/<[^>]+>/g, ' ');
-        pageTitle = extractTitle(html);
-      }
-
-      // 標題優先順序：列表頁抓的 label > 頁面 title > fallback
+  // SPA: 用 puppeteer 並行池
+  async function scanSpa(item) {
+    try {
+      const spa = await fetchSpaPage(browser, item.url);
+      const text = spa.text;
+      const pageTitle = spa.title.replace(/-悠遊卡股份有限公司/, '').replace(/悠遊付｜.*/, '').trim();
       const title = item.label || pageTitle || `悠遊付活動 ${item.id}`;
 
-      // 月級挑戰特殊處理
       if (item.special === 'challenge') {
         const levels = [
           { suffix: 'silver', label: '銀級', rx: new RegExp(monthNum + '月銀級回饋已於[\\s\\S]*?額滿') },
@@ -427,16 +431,34 @@ async function checkPromo() {
           ecardResults[`challenge_${lv.suffix}`] = { full, title: `月級挑戰 ${lv.label}` };
           console.log(`[月級挑戰] ${lv.label} → ${full ? '額滿' : '未額滿'}`);
         }
-        continue;
+        return;
       }
 
       const full = detectFull(text, year, monthNum, month);
       ecardResults[item.id] = { full, title: title.substring(0, 50) };
       console.log(`[${item.source}] ${title.substring(0, 40)} → ${full ? '額滿' : '未額滿'}`);
     } catch (e) {
-      console.error(`[${item.id}] 失敗:`, e.message);
+      console.error(`[${item.id}] SPA失敗:`, e.message);
     }
   }
+
+  // 並行池
+  async function runPool(items, fn, concurrency) {
+    let idx = 0;
+    const workers = Array.from({ length: Math.min(concurrency, items.length) }, async () => {
+      while (idx < items.length) {
+        const i = idx++;
+        await fn(items[i]);
+      }
+    });
+    await Promise.all(workers);
+  }
+
+  // SSR 全部並行（fetchPage 輕量，不需要限制）+ SPA 5 並行
+  await Promise.all([
+    runPool(ssrItems, scanSsr, 10),
+    runPool(spaItems, scanSpa, CONCURRENCY),
+  ]);
 
   await browser.close();
 

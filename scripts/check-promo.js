@@ -46,7 +46,6 @@ async function checkPromo() {
   
   try {
     const page2019 = await fetchPage('https://www.icashpay.com.tw/advertMessage/view/id/2019');
-    
     const regexAll = new RegExp(year + '年' + monthNum + '月[\\s\\S]*?額滿', 'g');
     const matches = page2019.match(regexAll);
     if (matches) {
@@ -117,6 +116,27 @@ async function checkPromo() {
     console.error('[id/1954] 抓取失敗:', e.message);
   }
 
+  // ===== 活動 4: ID=12654 — uniopen icash2.0 自動加值 10% =====
+  let autoloadFull = currentStatus.uniopen_autoload_full || false;
+  let autoloadMsg = currentStatus.uniopen_autoload_msg || '';
+  
+  if (needReset) { autoloadFull = false; autoloadMsg = ''; }
+  
+  try {
+    const page12654 = await fetchPage('https://www.icash.com.tw/Home/NewsDetail/?ID=12654');
+    const regexAutoload = new RegExp(year + '年' + monthNum + '月[\\s\\S]*?自動加值[\\s\\S]*?額滿');
+    const matchAutoload = page12654.match(regexAutoload);
+    if (matchAutoload) {
+      autoloadFull = true;
+      autoloadMsg = `${year}年${monthNum}月 uniopen自動加值10%已額滿`;
+      console.log(`[ID=12654] 自動加值10%額滿: ${matchAutoload[0].substring(0, 60)}`);
+    } else {
+      console.log('[ID=12654] 自動加值10% 本月尚未額滿');
+    }
+  } catch (e) {
+    console.error('[ID=12654] 抓取失敗:', e.message);
+  }
+
   // 組合 promos 陣列
   const promos = [];
   for (const bank of banks) {
@@ -130,6 +150,9 @@ async function checkPromo() {
   if (sundayFull) {
     promos.push({ id: 'sunday_7', full: true, title: '週日7%已額滿', body: 'icash Pay 週日全通路7%本月名額已滿' });
   }
+  if (autoloadFull) {
+    promos.push({ id: 'uniopen_autoload', full: true, title: '自動加值10%已額滿', body: 'uniopen聯名卡icash2.0自動加值10%本月名額已滿' });
+  }
 
   // 寫入狀態
   const newStatus = {
@@ -139,6 +162,8 @@ async function checkPromo() {
     starbucks_5_msg: starbucksMsg,
     sunday_7_full: sundayFull,
     sunday_7_msg: sundayMsg,
+    uniopen_autoload_full: autoloadFull,
+    uniopen_autoload_msg: autoloadMsg,
     transport_10: transport,
     promos: promos,
     updated: todayStr

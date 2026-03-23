@@ -5,8 +5,8 @@
   "starbucks_5_msg": "",
   "sunday_7_full": false,
   "sunday_7_msg": "",
-  "uniopen_autoload_full": false,
-  "uniopen_autoload_msg": "",
+  "uniopen_autoload_full": true,
+  "uniopen_autoload_msg": "2026年3月 uniopen自動加值10%已額滿",
   "transport_10": {
     "台新": {
       "full": true,
@@ -59,6 +59,12 @@
       "full": true,
       "title": "交通10%額滿(元大)",
       "body": "icash Pay 交通運輸10% 元大本月名額已滿"
+    },
+    {
+      "id": "uniopen_autoload",
+      "full": true,
+      "title": "自動加值10%已額滿",
+      "body": "uniopen聯名卡icash2.0自動加值10%本月名額已滿"
     }
   ],
   "updated": "2026-03-23"

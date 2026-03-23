@@ -5,10 +5,10 @@
  * A. icash Pay (icashpay.com.tw) — fetchPage
  * B. icash2.0 (icash.com.tw) — fetchPageWithCookie
  * C. 悠遊付 — 三層掃描：
- *    C1. easycard.com.tw/offers 列表頁（puppeteer 翻頁掃全頁）
- *    C2. easywallet.easycard.com.tw/benefit 列表頁（puppeteer）
- *    C3. hardcoded 保底清單（不在列表頁但已知重要的活動）
- *    C4. 逐頁 fetchPage 偵測額滿
+ *    C1. easycard.com.tw/offers 列表頁（puppeteer 翻頁 + 抓連結文字）
+ *    C2. easywallet.easycard.com.tw/benefit 列表頁（puppeteer + 抓連結文字）
+ *    C3. hardcoded 保底清單（已知重要活動）
+ *    C4. 逐頁偵測額滿（easycard 用 fetchPage，easywallet 用 puppeteer）
  */
 
 const https = require('https');
@@ -78,7 +78,6 @@ function detectFull(text, year, monthNum, month) {
     new RegExp('已於\\s*' + year + '/' + monthNum + '/[\\s\\S]{0,50}?額滿'),
     new RegExp('已於\\s*' + year + '/' + month + '/[\\s\\S]{0,50}?額滿'),
     new RegExp('已於\\s*' + year + '年' + monthNum + '月[\\s\\S]{0,50}?額滿'),
-    // 「本活動一 已於2026/3/13 17:31:32 額滿」格式
     new RegExp('已於\\s*' + year + '/' + month + '/\\d+[\\s\\S]{0,30}?額滿'),
   ];
   for (const p of patterns) {
@@ -88,41 +87,65 @@ function detectFull(text, year, monthNum, month) {
 }
 
 function extractTitle(html) {
-  const m = html.match(/<title[^>]*>(.*?)<\/title>/i);
-  if (!m) return '';
-  return m[1]
-    .replace(/-悠遊卡股份有限公司/, '')
-    .replace(/悠遊付｜.*/, '')
-    .replace(/\s+/g, ' ')
-    .trim();
+  // 嘗試多種方式提取標題
+  // 1. <title> tag
+  let m = html.match(/<title[^>]*>(.*?)<\/title>/i);
+  if (m && m[1]) {
+    const t = m[1].replace(/-悠遊卡股份有限公司/, '').replace(/悠遊付｜.*/, '').replace(/\s+/g, ' ').trim();
+    if (t.length > 2 && t.length < 80) return t;
+  }
+  // 2. og:title
+  m = html.match(/<meta\s+(?:property|name)=["']og:title["']\s+content=["'](.*?)["']/i);
+  if (m && m[1]) {
+    const t = m[1].replace(/-悠遊卡股份有限公司/, '').replace(/\s+/g, ' ').trim();
+    if (t.length > 2 && t.length < 80) return t;
+  }
+  // 3. 第一個 h1 或 h2
+  m = html.match(/<h[12][^>]*>(.*?)<\/h[12]>/i);
+  if (m && m[1]) {
+    const t = m[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+    if (t.length > 2 && t.length < 80) return t;
+  }
+  return '';
 }
 
-// ===== 悠遊付：三層掃描收集 URL =====
+// ===== 清理標題 =====
+function cleanLabel(text) {
+  return text
+    .replace(/<[^>]+>/g, '')
+    .replace(/\s+/g, ' ')
+    .replace(/悠遊卡股份有限公司/g, '')
+    .trim()
+    .substring(0, 50);
+}
+
+// ===== 悠遊付：三層掃描收集 URL + 標題 =====
 
 async function collectEasycardOfferUrls(browser) {
   const seen = new Set();
-  const results = []; // { id, url, source }
+  const results = []; // { id, url, source, label, special? }
 
-  function addUrl(id, url, source) {
+  function addUrl(id, url, source, label, special) {
     if (!seen.has(id)) {
       seen.add(id);
-      results.push({ id, url, source });
+      results.push({ id, url, source, label: label || '', special });
+    } else if (label) {
+      // 已存在但之前沒標題，補上
+      const existing = results.find(r => r.id === id);
+      if (existing && !existing.label) existing.label = label;
     }
   }
 
-  // --- C1: easycard.com.tw/offers 列表頁（含翻頁）---
+  // --- C1: easycard.com.tw/offers 列表頁（含翻頁 + 抓連結文字）---
   try {
     const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36');
 
-    // 不帶分類參數，抓全部活動
     const listUrl = 'https://www.easycard.com.tw/offers';
     console.log('[C1] 載入 easycard.com.tw/offers 列表頁...');
     await page.goto(listUrl, { waitUntil: 'networkidle2', timeout: 30000 });
 
-    // 掃描多頁（最多 15 頁，避免無限迴圈）
     for (let pageNum = 1; pageNum <= 15; pageNum++) {
-      // 捲動觸發 lazy load
       await page.evaluate(async () => {
         for (let i = 0; i < 8; i++) {
           window.scrollBy(0, 600);
@@ -131,60 +154,60 @@ async function collectEasycardOfferUrls(browser) {
       });
       await new Promise(r => setTimeout(r, 1500));
 
-      // 提取此頁所有活動連結
-      const links = await page.$$eval('a[href*="offer"]', as =>
-        as.map(a => a.href).filter(h =>
-          h.includes('id=') &&
-          (h.includes('easycard.com.tw/offer') || h.includes('easywallet.easycard.com.tw'))
-        )
+      // 提取連結 + 最近的文字作為 label
+      const items = await page.$$eval('a[href*="offer"]', as =>
+        as.filter(a => a.href.includes('id=') && a.href.includes('easycard.com.tw'))
+          .map(a => {
+            // 嘗試找最近的有意義文字
+            const card = a.closest('.card, .item, .offer-item, li, article, .col');
+            let label = '';
+            // 優先：圖片 alt
+            const img = (card || a).querySelector('img[alt]');
+            if (img && img.alt) label = img.alt;
+            // 次優先：連結自身文字
+            if (!label) label = a.textContent.trim();
+            // 再次：父元素文字
+            if (!label && card) label = card.textContent.trim().substring(0, 80);
+            return { href: a.href, label };
+          })
       );
 
       let newCount = 0;
-      for (const link of links) {
-        const idMatch = link.match(/id=(\d+)/);
+      for (const item of items) {
+        const idMatch = item.href.match(/id=(\d+)/);
         if (idMatch) {
           const before = seen.size;
-          addUrl(idMatch[1], link, 'easycard_list');
+          addUrl(idMatch[1], item.href, 'easycard_list', cleanLabel(item.label));
           if (seen.size > before) newCount++;
         }
       }
-      console.log(`[C1] 第 ${pageNum} 頁: 找到 ${links.length} 個連結，新增 ${newCount} 個`);
+      console.log(`[C1] 第 ${pageNum} 頁: ${items.length} 個連結，新增 ${newCount} 個`);
 
       // 嘗試點下一頁
       const hasNext = await page.evaluate((currentPage) => {
-        // 找頁碼區域的連結
         const pageLinks = document.querySelectorAll('.pagination a, .page-link, .pager a, a[href*="page="]');
         for (const a of pageLinks) {
           const text = a.textContent.trim();
-          const href = a.getAttribute('href') || '';
-          // 找到「下一頁」或下一個頁碼數字
           if (text === String(currentPage + 1) || text === '下一頁' || text === '>' || text === '»') {
             a.click();
             return true;
           }
         }
-        // 也嘗試用 page= 參數的連結
         const nextPageLink = document.querySelector(`a[href*="page=${currentPage + 1}"]`);
-        if (nextPageLink) {
-          nextPageLink.click();
-          return true;
-        }
+        if (nextPageLink) { nextPageLink.click(); return true; }
         return false;
       }, pageNum);
 
       if (!hasNext) {
-        console.log(`[C1] 無下一頁，共掃描 ${pageNum} 頁`);
+        console.log(`[C1] 無下一頁，共 ${pageNum} 頁`);
         break;
       }
-
-      // 等待頁面載入
       await new Promise(r => setTimeout(r, 3000));
       await page.waitForNetworkIdle({ timeout: 10000 }).catch(() => {});
     }
-
     await page.close();
   } catch (e) {
-    console.error('[C1] easycard.com.tw 列表頁掃描失敗:', e.message);
+    console.error('[C1] easycard 列表頁失敗:', e.message);
   }
 
   // --- C2: easywallet.easycard.com.tw/benefit 列表頁 ---
@@ -195,57 +218,81 @@ async function collectEasycardOfferUrls(browser) {
     console.log('[C2] 載入 easywallet 好康優惠列表頁...');
     await page.goto('https://easywallet.easycard.com.tw/benefit', { waitUntil: 'networkidle2', timeout: 30000 });
 
-    // easywallet 是 SPA，捲動載入更多
     for (let i = 0; i < 10; i++) {
       await page.evaluate(() => window.scrollBy(0, 600));
       await new Promise(r => setTimeout(r, 500));
     }
     await new Promise(r => setTimeout(r, 2000));
 
-    // 提取所有活動連結
-    const links = await page.$$eval('a[href*="benefit/content"]', as =>
-      as.map(a => a.href).filter(h => h.includes('id='))
+    const items = await page.$$eval('a[href*="benefit/content"]', as =>
+      as.filter(a => a.href.includes('id='))
+        .map(a => {
+          const card = a.closest('.card, .item, .benefit-item, li, article, div[class]');
+          let label = '';
+          const img = (card || a).querySelector('img[alt]');
+          if (img && img.alt) label = img.alt;
+          if (!label) label = a.textContent.trim();
+          if (!label && card) label = card.textContent.trim().substring(0, 80);
+          return { href: a.href, label };
+        })
     );
 
-    for (const link of links) {
-      const idMatch = link.match(/id=(\d+)/);
+    for (const item of items) {
+      const idMatch = item.href.match(/id=(\d+)/);
       if (idMatch) {
-        addUrl('ew_' + idMatch[1], link, 'easywallet_list');
+        addUrl('ew_' + idMatch[1], item.href, 'easywallet_list', cleanLabel(item.label));
       }
     }
-    console.log(`[C2] easywallet 列表頁找到 ${links.length} 個連結`);
-
+    console.log(`[C2] easywallet 列表: ${items.length} 個連結`);
     await page.close();
   } catch (e) {
-    console.error('[C2] easywallet 列表頁掃描失敗:', e.message);
+    console.error('[C2] easywallet 列表頁失敗:', e.message);
   }
 
   // --- C3: hardcoded 保底清單 ---
-  // 這些是已知重要但可能不在列表頁的活動 URL
-  // 每季或活動更新時手動維護
   const KNOWN_URLS = [
-    // 月級挑戰（三等級額滿分開偵測）
     { id: 'challenge_1766109563', url: 'https://easywallet.easycard.com.tw/benefit/content?id=1766109563', label: '月級挑戰', special: 'challenge' },
-    // 乘車碼10%回饋
     { id: 'ew_1771988018', url: 'https://www.easycard.com.tw/offer?id=1771988018', label: '乘車碼10%回饋' },
-    // 新會員3%回饋
     { id: 'ew_1766377676', url: 'https://easywallet.easycard.com.tw/benefit/content?id=1766377676', label: '新會員3%回饋' },
-    // 推薦好友送$100
     { id: 'ew_1766573956', url: 'https://www.easycard.com.tw/offer?id=1766573956', label: '推薦好友送$100' },
-    // 週五會員日（如果有獨立頁面的話，暫留佔位）
-    // { id: 'friday_xxx', url: '...', label: '週五會員日' },
   ];
 
+  let hardcodedAdded = 0;
   for (const item of KNOWN_URLS) {
     if (!seen.has(item.id)) {
       seen.add(item.id);
       results.push({ id: item.id, url: item.url, source: 'hardcoded', label: item.label, special: item.special });
+      hardcodedAdded++;
+    } else {
+      // 補 label 和 special
+      const existing = results.find(r => r.id === item.id);
+      if (existing) {
+        if (!existing.label && item.label) existing.label = item.label;
+        if (!existing.special && item.special) existing.special = item.special;
+      }
     }
   }
-  console.log(`[C3] hardcoded 保底: 補充 ${KNOWN_URLS.filter(u => results.find(r => r.id === u.id && r.source === 'hardcoded')).length} 個`);
-
-  console.log(`\n[悠遊付] 總計收集 ${results.length} 個活動 URL`);
+  console.log(`[C3] hardcoded 保底: 補充 ${hardcodedAdded} 個`);
+  console.log(`\n[悠遊付] 總計 ${results.length} 個活動 URL`);
   return results;
+}
+
+// ===== 用 puppeteer 取 SPA 頁面標題和內文 =====
+
+async function fetchSpaPage(browser, url, timeout = 15000) {
+  const page = await browser.newPage();
+  await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36');
+  try {
+    await page.goto(url, { waitUntil: 'networkidle2', timeout });
+    await new Promise(r => setTimeout(r, 1000));
+    const title = await page.title().catch(() => '');
+    const text = await page.evaluate(() => document.body?.innerText || '').catch(() => '');
+    await page.close();
+    return { title, text };
+  } catch (e) {
+    await page.close();
+    return { title: '', text: '' };
+  }
 }
 
 // ===== 主程式 =====
@@ -340,19 +387,35 @@ async function checkPromo() {
     console.error('[悠遊付] URL 收集失敗:', e.message);
   }
 
-  await browser.close();
-
   // --- C4: 逐頁掃描額滿 ---
   console.log('\n===== 悠遊付逐頁掃描額滿 =====');
   const ecardResults = {};
 
   for (const item of offerUrls) {
     try {
-      const html = await fetchPage(item.url);
-      const text = html.replace(/<[^>]+>/g, ' ');
-      const title = item.label || extractTitle(html) || `活動 ${item.id}`;
+      const isEasywallet = item.url.includes('easywallet.easycard.com.tw');
 
-      // 月級挑戰特殊處理：三個等級
+      let text, pageTitle;
+
+      if (isEasywallet) {
+        // SPA 頁面：用 puppeteer 渲染
+        const spa = await fetchSpaPage(browser, item.url);
+        text = spa.text;
+        pageTitle = spa.title
+          .replace(/-悠遊卡股份有限公司/, '')
+          .replace(/悠遊付｜.*/, '')
+          .trim();
+      } else {
+        // server-rendered：用 fetchPage
+        const html = await fetchPage(item.url);
+        text = html.replace(/<[^>]+>/g, ' ');
+        pageTitle = extractTitle(html);
+      }
+
+      // 標題優先順序：列表頁抓的 label > 頁面 title > fallback
+      const title = item.label || pageTitle || `悠遊付活動 ${item.id}`;
+
+      // 月級挑戰特殊處理
       if (item.special === 'challenge') {
         const levels = [
           { suffix: 'silver', label: '銀級', rx: new RegExp(monthNum + '月銀級回饋已於[\\s\\S]*?額滿') },
@@ -374,6 +437,8 @@ async function checkPromo() {
       console.error(`[${item.id}] 失敗:`, e.message);
     }
   }
+
+  await browser.close();
 
   // 把所有悠遊付活動加入 promos
   for (const [id, result] of Object.entries(ecardResults)) {
@@ -405,6 +470,13 @@ async function checkPromo() {
   console.log(`\n===== 總結 =====`);
   console.log(`總活動: ${promos.length} 項，額滿: ${promos.filter(p => p.full).length} 項`);
   for (const p of promos.filter(p => p.full)) console.log(`  [${p.category}] ${p.title}`);
+
+  // 列出所有標題，方便 debug
+  console.log('\n--- 悠遊付活動標題 ---');
+  for (const [id, result] of Object.entries(ecardResults)) {
+    console.log(`  ${id}: ${result.title} ${result.full ? '[額滿]' : ''}`);
+  }
+
   console.log(changed ? 'STATUS_CHANGED=true' : 'STATUS_CHANGED=false');
 }
 

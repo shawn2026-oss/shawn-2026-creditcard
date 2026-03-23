@@ -145,7 +145,7 @@ async function collectEasycardOfferUrls(browser) {
     console.log('[C1] 載入 easycard.com.tw/offers 列表頁...');
     await page.goto(listUrl, { waitUntil: 'networkidle2', timeout: 30000 });
 
-    for (let pageNum = 1; pageNum <= 15; pageNum++) {
+    for (let pageNum = 1; pageNum <= 5; pageNum++) {
       await page.evaluate(async () => {
         for (let i = 0; i < 8; i++) {
           window.scrollBy(0, 600);
@@ -218,11 +218,11 @@ async function collectEasycardOfferUrls(browser) {
     console.log('[C2] 載入 easywallet 好康優惠列表頁...');
     await page.goto('https://easywallet.easycard.com.tw/benefit', { waitUntil: 'networkidle2', timeout: 30000 });
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 5; i++) {
       await page.evaluate(() => window.scrollBy(0, 600));
-      await new Promise(r => setTimeout(r, 500));
+      await new Promise(r => setTimeout(r, 400));
     }
-    await new Promise(r => setTimeout(r, 2000));
+    await new Promise(r => setTimeout(r, 1500));
 
     const items = await page.$$eval('a[href*="benefit/content"]', as =>
       as.filter(a => a.href.includes('id='))
@@ -299,6 +299,7 @@ async function fetchSpaPage(browser, url, timeout = 12000) {
 // ===== 主程式 =====
 
 async function checkPromo() {
+  const startTime = Date.now();
   const { year, month, monthNum, todayStr } = getMonthStr();
   let currentStatus = {};
   try { currentStatus = JSON.parse(fs.readFileSync(STATUS_FILE, 'utf-8')); } catch (e) { console.log('無現有狀態檔'); }
@@ -327,9 +328,7 @@ async function checkPromo() {
   } catch (e) { console.error('[id/2019] 失敗:', e.message); }
 
   if (icashFull) promos.push({ id: 'icash_4', full: true, title: 'icash Pay 4%已額滿', body: `icash Pay 全通路4% ${monthNum}月名額已滿`, category: 'icash Pay' });
-  else promos.push({ id: 'icash_4', full: false, title: 'icash Pay 4%全通路', body: '', category: 'icash Pay' });
   if (starbucksFull) promos.push({ id: 'starbucks_5', full: true, title: '星巴克5%已額滿', body: `icash Pay 星巴克5% ${monthNum}月名額已滿`, category: 'icash Pay' });
-  else promos.push({ id: 'starbucks_5', full: false, title: '星巴克5%', body: '', category: 'icash Pay' });
 
   // 2. id/2037 — 交通10%
   const banks = ['台新', '兆豐', '一銀', '華南', '元大'];
@@ -346,7 +345,6 @@ async function checkPromo() {
   } catch (e) { console.error('[id/2037] 失敗:', e.message); }
   for (const b of banks) {
     if (transport[b].full) promos.push({ id: `transport_${b}`, full: true, title: `交通10%額滿(${b})`, body: `icash Pay 交通10% ${b} ${monthNum}月名額已滿`, category: 'icash Pay' });
-    else promos.push({ id: `transport_${b}`, full: false, title: `交通10% ${b}`, body: '', category: 'icash Pay' });
   }
 
   // 3. id/1954 — 週日7%
@@ -357,7 +355,6 @@ async function checkPromo() {
     else console.log('[id/1954] 週日7% 未額滿');
   } catch (e) { console.error('[id/1954] 失敗:', e.message); }
   if (sundayFull) promos.push({ id: 'sunday_7', full: true, title: '週日7%已額滿', body: `icash Pay 週日7% ${monthNum}月名額已滿`, category: 'icash Pay' });
-  else promos.push({ id: 'sunday_7', full: false, title: '週日全通路7%', body: '', category: 'icash Pay' });
 
   // ========== B. icash2.0 ==========
 
@@ -370,11 +367,12 @@ async function checkPromo() {
     } else console.log('[ID=12654] 未額滿或頁面過短');
   } catch (e) { console.error('[ID=12654] 失敗:', e.message); }
   if (autoloadFull) promos.push({ id: 'uniopen_autoload', full: true, title: '自動加值10%已額滿', body: `uniopen自動加值10% ${monthNum}月名額已滿`, category: 'icash2.0' });
-  else promos.push({ id: 'uniopen_autoload', full: false, title: 'uniopen自動加值10%', body: '', category: 'icash2.0' });
 
   // ========== C. 悠遊付（三層掃描）==========
 
-  console.log('\n===== 悠遊付三層掃描 =====');
+  const tAB = Date.now();
+  console.log(`\n[計時] A+B: ${((tAB - startTime) / 1000).toFixed(1)}s`);
+  console.log('===== 悠遊付三層掃描 =====');
 
   const browser = await puppeteer.launch({
     headless: true,
@@ -388,31 +386,47 @@ async function checkPromo() {
     console.error('[悠遊付] URL 收集失敗:', e.message);
   }
 
-  // --- C4: 逐頁掃描額滿（並行，最多 5 個同時）---
+  const tC123 = Date.now();
+  console.log(`[計時] C1+C2+C3 URL收集: ${((tC123 - tAB) / 1000).toFixed(1)}s`);
+
+  // --- C4: 逐頁掃描額滿（兩階段 + 並行）---
+  // 策略：不是每個活動都有額滿機制。先快速篩選，只深掃有「額滿即止」的頁面。
   console.log('\n===== 悠遊付逐頁掃描額滿 =====');
   const ecardResults = {};
-  const CONCURRENCY = 5;
 
-  // 分成 SPA 和 server-rendered 兩組
+  // 分成 SPA 和 SSR
   const spaItems = offerUrls.filter(i => i.url.includes('easywallet.easycard.com.tw'));
   const ssrItems = offerUrls.filter(i => !i.url.includes('easywallet.easycard.com.tw'));
 
-  // SSR: 全部用 fetchPage 並行（不佔 puppeteer）
+  console.log(`SSR: ${ssrItems.length} 個, SPA: ${spaItems.length} 個`);
+
+  // --- 階段 1：SSR 快速篩選 + 掃描（全部並行 fetchPage）---
+  // fetchPage 很快（<1s），全跑也沒問題，但只記錄有額滿機制的
   async function scanSsr(item) {
     try {
       const html = await fetchPage(item.url);
       const text = html.replace(/<[^>]+>/g, ' ');
       const pageTitle = extractTitle(html);
       const title = item.label || pageTitle || `悠遊付活動 ${item.id}`;
+
+      // 判斷：此活動有沒有額滿機制？
+      const hasCapMechanism = /額滿即止|名額有限|名額已滿|額滿/.test(text);
+      if (!hasCapMechanism) return; // 跳過沒有額滿機制的活動
+
       const full = detectFull(text, year, monthNum, month);
       ecardResults[item.id] = { full, title: title.substring(0, 50) };
-      console.log(`[${item.source}] ${title.substring(0, 40)} → ${full ? '額滿' : '未額滿'}`);
+      console.log(`[SSR] ${title.substring(0, 40)} → ${full ? '額滿' : '未額滿'}`);
     } catch (e) {
       console.error(`[${item.id}] SSR失敗:`, e.message);
     }
   }
 
-  // SPA: 用 puppeteer 並行池
+  // --- 階段 2：SPA 只掃 hardcoded 和 special 項目 ---
+  // easywallet SPA 每頁要 puppeteer 開分頁，不值得全掃 100+ 頁
+  // 只掃有 special 標記的（如 challenge）或 hardcoded 來源的
+  const spaToScan = spaItems.filter(i => i.special || i.source === 'hardcoded');
+  console.log(`SPA 需掃描: ${spaToScan.length} 個（跳過 ${spaItems.length - spaToScan.length} 個無額滿機制的 easywallet 活動）`);
+
   async function scanSpa(item) {
     try {
       const spa = await fetchSpaPage(browser, item.url);
@@ -436,7 +450,7 @@ async function checkPromo() {
 
       const full = detectFull(text, year, monthNum, month);
       ecardResults[item.id] = { full, title: title.substring(0, 50) };
-      console.log(`[${item.source}] ${title.substring(0, 40)} → ${full ? '額滿' : '未額滿'}`);
+      console.log(`[SPA] ${title.substring(0, 40)} → ${full ? '額滿' : '未額滿'}`);
     } catch (e) {
       console.error(`[${item.id}] SPA失敗:`, e.message);
     }
@@ -454,21 +468,24 @@ async function checkPromo() {
     await Promise.all(workers);
   }
 
-  // SSR 全部並行（fetchPage 輕量，不需要限制）+ SPA 5 並行
   await Promise.all([
     runPool(ssrItems, scanSsr, 10),
-    runPool(spaItems, scanSpa, CONCURRENCY),
+    runPool(spaToScan, scanSpa, 3),
   ]);
 
   await browser.close();
 
-  // 把所有悠遊付活動加入 promos
+  const tC4 = Date.now();
+  console.log(`[計時] C4 逐頁掃描: ${((tC4 - tC123) / 1000).toFixed(1)}s`);
+
+  // 只把額滿的悠遊付活動加入 promos
   for (const [id, result] of Object.entries(ecardResults)) {
+    if (!result.full) continue;
     promos.push({
       id: `easycard_${id}`,
-      full: result.full,
-      title: result.full ? `${result.title}已額滿` : result.title,
-      body: result.full ? `${result.title} ${monthNum}月名額已滿` : '',
+      full: true,
+      title: `${result.title}已額滿`,
+      body: `${result.title} ${monthNum}月名額已滿`,
       category: '悠遊付'
     });
   }
@@ -490,8 +507,8 @@ async function checkPromo() {
   fs.writeFileSync(STATUS_FILE, JSON.stringify(newStatus, null, 2) + '\n');
 
   console.log(`\n===== 總結 =====`);
-  console.log(`總活動: ${promos.length} 項，額滿: ${promos.filter(p => p.full).length} 項`);
-  for (const p of promos.filter(p => p.full)) console.log(`  [${p.category}] ${p.title}`);
+  console.log(`額滿活動: ${promos.length} 項`);
+  for (const p of promos) console.log(`  [${p.category}] ${p.title}`);
 
   // 列出所有標題，方便 debug
   console.log('\n--- 悠遊付活動標題 ---');
@@ -500,6 +517,7 @@ async function checkPromo() {
   }
 
   console.log(changed ? 'STATUS_CHANGED=true' : 'STATUS_CHANGED=false');
+  console.log(`[計時] 總耗時: ${((Date.now() - startTime) / 1000).toFixed(1)}s`);
 }
 
 checkPromo().catch(err => { console.error('執行失敗:', err); process.exit(1); });

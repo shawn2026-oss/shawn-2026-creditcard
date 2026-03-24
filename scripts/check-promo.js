@@ -490,6 +490,17 @@ async function checkPromo() {
     });
   }
 
+  // ========== 活動倒數提醒（手動維護）==========
+  // 在這裡加入有到期日的活動，iOS 端會自動排 7 天前 + 1 天前通知
+  // 過期的活動不用刪，iOS 端會自動跳過
+  const reminders = [
+    { id: 'cube_japan', title: 'CUBE 日本賞', endDate: '2026-04-30' },
+    { id: 'esun_pxpay', title: '玉山全支付綁卡3%', endDate: '2026-06-28' },
+    { id: 'easycard_challenge', title: '悠遊付月級挑戰', endDate: '2026-04-01' },
+    { id: 'easycard_bus10', title: '悠遊付乘車碼10%', endDate: '2026-03-31' },
+    { id: 'pxpay_japan', title: '全支付日本PayPay回饋', endDate: '2026-03-29' },
+  ];
+
   // ========== 寫入狀態 ==========
 
   const newStatus = {
@@ -500,6 +511,7 @@ async function checkPromo() {
     transport_10: transport,
     easycard_results: ecardResults,
     promos: promos,
+    reminders: reminders,
     updated: todayStr
   };
 

@@ -1,6 +1,6 @@
 /**
  * 自動檢查活動額滿狀態（puppeteer 版 v2）
- * GitHub Actions 每天台灣時間 10/14/18/22 點執行
+ * GitHub Actions 每天台灣時間 00/08/14/20 點執行
  *
  * A. icash Pay (icashpay.com.tw) — fetchPage
  * B. icash2.0 (icash.com.tw) — fetchPageWithCookie
@@ -87,20 +87,16 @@ function detectFull(text, year, monthNum, month) {
 }
 
 function extractTitle(html) {
-  // 嘗試多種方式提取標題
-  // 1. <title> tag
   let m = html.match(/<title[^>]*>(.*?)<\/title>/i);
   if (m && m[1]) {
     const t = m[1].replace(/-悠遊卡股份有限公司/, '').replace(/悠遊付｜.*/, '').replace(/\s+/g, ' ').trim();
     if (t.length > 2 && t.length < 80) return t;
   }
-  // 2. og:title
   m = html.match(/<meta\s+(?:property|name)=["']og:title["']\s+content=["'](.*?)["']/i);
   if (m && m[1]) {
     const t = m[1].replace(/-悠遊卡股份有限公司/, '').replace(/\s+/g, ' ').trim();
     if (t.length > 2 && t.length < 80) return t;
   }
-  // 3. 第一個 h1 或 h2
   m = html.match(/<h[12][^>]*>(.*?)<\/h[12]>/i);
   if (m && m[1]) {
     const t = m[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
@@ -123,20 +119,19 @@ function cleanLabel(text) {
 
 async function collectEasycardOfferUrls(browser) {
   const seen = new Set();
-  const results = []; // { id, url, source, label, special? }
+  const results = [];
 
   function addUrl(id, url, source, label, special) {
     if (!seen.has(id)) {
       seen.add(id);
       results.push({ id, url, source, label: label || '', special });
     } else if (label) {
-      // 已存在但之前沒標題，補上
       const existing = results.find(r => r.id === id);
       if (existing && !existing.label) existing.label = label;
     }
   }
 
-  // --- C1: easycard.com.tw/offers 列表頁（含翻頁 + 抓連結文字）---
+  // --- C1: easycard.com.tw/offers 列表頁 ---
   try {
     const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36');
@@ -154,19 +149,14 @@ async function collectEasycardOfferUrls(browser) {
       });
       await new Promise(r => setTimeout(r, 1500));
 
-      // 提取連結 + 最近的文字作為 label
       const items = await page.$$eval('a[href*="offer"]', as =>
         as.filter(a => a.href.includes('id=') && a.href.includes('easycard.com.tw'))
           .map(a => {
-            // 嘗試找最近的有意義文字
             const card = a.closest('.card, .item, .offer-item, li, article, .col');
             let label = '';
-            // 優先：圖片 alt
             const img = (card || a).querySelector('img[alt]');
             if (img && img.alt) label = img.alt;
-            // 次優先：連結自身文字
             if (!label) label = a.textContent.trim();
-            // 再次：父元素文字
             if (!label && card) label = card.textContent.trim().substring(0, 80);
             return { href: a.href, label };
           })
@@ -183,7 +173,6 @@ async function collectEasycardOfferUrls(browser) {
       }
       console.log(`[C1] 第 ${pageNum} 頁: ${items.length} 個連結，新增 ${newCount} 個`);
 
-      // 嘗試點下一頁
       const hasNext = await page.evaluate((currentPage) => {
         const pageLinks = document.querySelectorAll('.pagination a, .page-link, .pager a, a[href*="page="]');
         for (const a of pageLinks) {
@@ -264,7 +253,6 @@ async function collectEasycardOfferUrls(browser) {
       results.push({ id: item.id, url: item.url, source: 'hardcoded', label: item.label, special: item.special });
       hardcodedAdded++;
     } else {
-      // 補 label 和 special
       const existing = results.find(r => r.id === item.id);
       if (existing) {
         if (!existing.label && item.label) existing.label = item.label;
@@ -284,7 +272,6 @@ async function fetchSpaPage(browser, url, timeout = 12000) {
   await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36');
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout });
-    // 等 SPA 渲染，但不要等太久
     await page.waitForNetworkIdle({ idleTime: 500, timeout: 5000 }).catch(() => {});
     const title = await page.title().catch(() => '');
     const text = await page.evaluate(() => document.body?.innerText || '').catch(() => '');
@@ -389,19 +376,14 @@ async function checkPromo() {
   const tC123 = Date.now();
   console.log(`[計時] C1+C2+C3 URL收集: ${((tC123 - tAB) / 1000).toFixed(1)}s`);
 
-  // --- C4: 逐頁掃描額滿（兩階段 + 並行）---
-  // 策略：不是每個活動都有額滿機制。先快速篩選，只深掃有「額滿即止」的頁面。
   console.log('\n===== 悠遊付逐頁掃描額滿 =====');
   const ecardResults = {};
 
-  // 分成 SPA 和 SSR
   const spaItems = offerUrls.filter(i => i.url.includes('easywallet.easycard.com.tw'));
   const ssrItems = offerUrls.filter(i => !i.url.includes('easywallet.easycard.com.tw'));
 
   console.log(`SSR: ${ssrItems.length} 個, SPA: ${spaItems.length} 個`);
 
-  // --- 階段 1：SSR 快速篩選 + 掃描（全部並行 fetchPage）---
-  // fetchPage 很快（<1s），全跑也沒問題，但只記錄有額滿機制的
   async function scanSsr(item) {
     try {
       const html = await fetchPage(item.url);
@@ -409,9 +391,8 @@ async function checkPromo() {
       const pageTitle = extractTitle(html);
       const title = item.label || pageTitle || `悠遊付活動 ${item.id}`;
 
-      // 判斷：此活動有沒有額滿機制？
       const hasCapMechanism = /額滿即止|名額有限|名額已滿|額滿/.test(text);
-      if (!hasCapMechanism) return; // 跳過沒有額滿機制的活動
+      if (!hasCapMechanism) return;
 
       const full = detectFull(text, year, monthNum, month);
       ecardResults[item.id] = { full, title: title.substring(0, 50) };
@@ -421,9 +402,6 @@ async function checkPromo() {
     }
   }
 
-  // --- 階段 2：SPA 只掃 hardcoded 和 special 項目 ---
-  // easywallet SPA 每頁要 puppeteer 開分頁，不值得全掃 100+ 頁
-  // 只掃有 special 標記的（如 challenge）或 hardcoded 來源的
   const spaToScan = spaItems.filter(i => i.special || i.source === 'hardcoded');
   console.log(`SPA 需掃描: ${spaToScan.length} 個（跳過 ${spaItems.length - spaToScan.length} 個無額滿機制的 easywallet 活動）`);
 
@@ -456,7 +434,6 @@ async function checkPromo() {
     }
   }
 
-  // 並行池
   async function runPool(items, fn, concurrency) {
     let idx = 0;
     const workers = Array.from({ length: Math.min(concurrency, items.length) }, async () => {
@@ -501,6 +478,17 @@ async function checkPromo() {
     { id: 'pxpay_japan', title: '全支付日本PayPay回饋', endDate: '2026-03-29' },
   ];
 
+  // 無額滿時加佔位，讓 app 顯示功能正常運作中
+  if (promos.length === 0) {
+    promos.push({
+      id: 'no_promo',
+      full: true,
+      title: '本月目前無額滿活動',
+      body: '有活動額滿時將即時通知',
+      category: '狀態'
+    });
+  }
+
   // ========== 寫入狀態 ==========
 
   const newStatus = {
@@ -522,7 +510,6 @@ async function checkPromo() {
   console.log(`額滿活動: ${promos.length} 項`);
   for (const p of promos) console.log(`  [${p.category}] ${p.title}`);
 
-  // 列出所有標題，方便 debug
   console.log('\n--- 悠遊付活動標題 ---');
   for (const [id, result] of Object.entries(ecardResults)) {
     console.log(`  ${id}: ${result.title} ${result.full ? '[額滿]' : ''}`);

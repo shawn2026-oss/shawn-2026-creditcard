@@ -1,32 +1,32 @@
 {
-  "uniopen_icash_full": true,
-  "uniopen_icash_msg": "2026年3月 icash Pay 4% 加碼已額滿",
+  "uniopen_icash_full": false,
+  "uniopen_icash_msg": "",
   "starbucks_5_full": false,
   "starbucks_5_msg": "",
   "sunday_7_full": false,
   "sunday_7_msg": "",
-  "uniopen_autoload_full": true,
-  "uniopen_autoload_msg": "2026年3月 uniopen自動加值10%已額滿",
+  "uniopen_autoload_full": false,
+  "uniopen_autoload_msg": "",
   "transport_10": {
     "台新": {
-      "full": true,
-      "msg": "台新03月份贈點已於2026/03/04 18:41 p.m.額滿"
+      "full": false,
+      "msg": ""
     },
     "兆豐": {
-      "full": true,
-      "msg": "兆豐03月份贈點已於2026/03/17 17:02 p.m.額滿"
+      "full": false,
+      "msg": ""
     },
     "一銀": {
-      "full": true,
-      "msg": "一銀03月份贈點已於2026/03/08 08:27 a.m.額滿"
+      "full": false,
+      "msg": ""
     },
     "華南": {
-      "full": true,
-      "msg": "華南03月份贈點已於2026/03/19 10:26 a.m.額滿"
+      "full": false,
+      "msg": ""
     },
     "元大": {
-      "full": true,
-      "msg": "元大03月份贈點已於2026/03/08 22:28 p.m.額滿"
+      "full": false,
+      "msg": ""
     }
   },
   "easycard_results": {
@@ -38,53 +38,21 @@
       "full": false,
       "title": "彰銀帳戶綁定悠遊付 韓國扣款交易享加碼回饋"
     },
-    "1765877387": {
-      "full": true,
-      "title": "悠遊付逢1繳水電瓦斯費享筆筆加碼1%回饋"
-    },
-    "1765879622": {
-      "full": true,
-      "title": "悠遊卡生活購物嗶計畫 美廉社天天消費滿額享最高回饋16%"
-    },
     "1766109563": {
-      "full": true,
+      "full": false,
       "title": "月級挑戰-筆筆最高3%回饋"
     },
     "1766377676": {
       "full": false,
       "title": "悠遊付新會員筆筆3%｜週五最高5%現金回饋"
     },
-    "1766453971": {
-      "full": false,
-      "title": "悠遊付連結元大銀行帳戶至日常美食，單筆金額滿新臺幣200元回饋2%"
-    },
-    "1766573956": {
-      "full": false,
-      "title": "悠遊付推薦好友送$100"
-    },
-    "1766844961": {
-      "full": true,
-      "title": "7-ELEVEN悠遊付錢包/帳戶筆筆4% 滿額加贈券最高回饋12%"
-    },
-    "1767150789": {
-      "full": false,
-      "title": "玉山悠遊聯名卡至美廉社消費滿額享最高回饋16%"
-    },
     "1768282913": {
       "full": false,
       "title": "悠遊付綁定臺灣企銀存款帳戶消費滿500元，最高享150元悠遊付回饋金"
     },
     "1768462278": {
-      "full": true,
-      "title": "悠遊付繳學雜費最高回饋10% 首繳贈50%回饋券 加碼再抽iPad mini"
-    },
-    "1768462548": {
-      "full": true,
-      "title": "悠遊付綁定玉山信用卡繳學雜費單筆滿500元享1%回饋"
-    },
-    "1768462607": {
       "full": false,
-      "title": "元大銀行帳戶新綁定悠遊付 首筆消費滿50元享50元回饋金"
+      "title": "悠遊付繳學雜費最高回饋10% 首繳贈50%回饋券 加碼再抽iPad mini"
     },
     "1768875546": {
       "full": false,
@@ -95,12 +63,44 @@
       "title": "悠遊付繳牌照稅最高回饋9% 再享抽千元加油券 !"
     },
     "1770349203": {
-      "full": true,
+      "full": false,
       "title": "안녕하세요 悠遊付前進韓國！最高30%回饋"
     },
-    "1772008437": {
+    "1770783167": {
       "full": false,
-      "title": "悠遊付6週年慶 領券最高賺$666 再抽6倍回饋金"
+      "title": "【誠品生活】週四~週日悠遊付 滿額最高回饋15%"
+    },
+    "1771901593": {
+      "full": false,
+      "title": "悠遊付連結元大銀行新臺幣活期存款帳戶至指定百貨/影城通路，單筆扣款金額滿299元享3%回饋"
+    },
+    "1773653277": {
+      "full": false,
+      "title": "日常美食悠遊付 滿額回饋2%"
+    },
+    "1773653803": {
+      "full": false,
+      "title": "週末聚餐悠遊付 滿額回饋2%"
+    },
+    "1773654068": {
+      "full": false,
+      "title": "早餐速食悠遊付 筆筆回饋2%"
+    },
+    "1773721619": {
+      "full": false,
+      "title": "悠遊付春遊補給站 4月限定伴手禮美食筆筆回饋10%"
+    },
+    "1773799806": {
+      "full": false,
+      "title": "悠遊付連結元大銀行新臺幣活期存款帳戶至指定早餐/速食，單筆消費扣款金額額滿100元享3%回饋"
+    },
+    "1773801640": {
+      "full": false,
+      "title": "悠遊卡生活購物嗶計畫 美廉社天天消費滿額享最高回饋8%"
+    },
+    "1773886571": {
+      "full": false,
+      "title": "悠遊卡生活購物嗶計畫 消費滿額享最高回饋8%"
     },
     "1773905860": {
       "full": false,
@@ -114,144 +114,36 @@
       "full": false,
       "title": "悠遊付逢1繳水電瓦斯費享筆筆加碼2%回饋，首次繳費再送50%回饋券"
     },
+    "1774317925": {
+      "full": false,
+      "title": "悠遊付推薦好友送$100"
+    },
     "1774339188": {
       "full": false,
       "title": "7-ELEVEN悠遊付錢包/帳戶筆筆4% 滿額加贈券最高回饋12%"
     },
     "challenge_silver": {
-      "full": true,
+      "full": false,
       "title": "月級挑戰 銀級"
     },
     "challenge_gold": {
-      "full": true,
+      "full": false,
       "title": "月級挑戰 金級"
     },
     "challenge_platinum": {
-      "full": true,
+      "full": false,
       "title": "月級挑戰 白金級"
+    },
+    "ew_1771988018": {
+      "full": false,
+      "title": "乘車碼10%回饋"
+    },
+    "ew_1766573956": {
+      "full": false,
+      "title": "推薦好友送$100"
     }
   },
-  "promos": [
-    {
-      "id": "icash_4",
-      "full": true,
-      "title": "icash Pay 4%已額滿",
-      "body": "icash Pay 全通路4% 3月名額已滿",
-      "category": "icash Pay"
-    },
-    {
-      "id": "transport_台新",
-      "full": true,
-      "title": "交通10%額滿(台新)",
-      "body": "icash Pay 交通10% 台新 3月名額已滿",
-      "category": "icash Pay"
-    },
-    {
-      "id": "transport_兆豐",
-      "full": true,
-      "title": "交通10%額滿(兆豐)",
-      "body": "icash Pay 交通10% 兆豐 3月名額已滿",
-      "category": "icash Pay"
-    },
-    {
-      "id": "transport_一銀",
-      "full": true,
-      "title": "交通10%額滿(一銀)",
-      "body": "icash Pay 交通10% 一銀 3月名額已滿",
-      "category": "icash Pay"
-    },
-    {
-      "id": "transport_華南",
-      "full": true,
-      "title": "交通10%額滿(華南)",
-      "body": "icash Pay 交通10% 華南 3月名額已滿",
-      "category": "icash Pay"
-    },
-    {
-      "id": "transport_元大",
-      "full": true,
-      "title": "交通10%額滿(元大)",
-      "body": "icash Pay 交通10% 元大 3月名額已滿",
-      "category": "icash Pay"
-    },
-    {
-      "id": "uniopen_autoload",
-      "full": true,
-      "title": "自動加值10%已額滿",
-      "body": "uniopen自動加值10% 3月名額已滿",
-      "category": "icash2.0"
-    },
-    {
-      "id": "easycard_1765877387",
-      "full": true,
-      "title": "悠遊付逢1繳水電瓦斯費享筆筆加碼1%回饋已額滿",
-      "body": "悠遊付逢1繳水電瓦斯費享筆筆加碼1%回饋 3月名額已滿",
-      "category": "悠遊付"
-    },
-    {
-      "id": "easycard_1765879622",
-      "full": true,
-      "title": "悠遊卡生活購物嗶計畫 美廉社天天消費滿額享最高回饋16%已額滿",
-      "body": "悠遊卡生活購物嗶計畫 美廉社天天消費滿額享最高回饋16% 3月名額已滿",
-      "category": "悠遊付"
-    },
-    {
-      "id": "easycard_1766109563",
-      "full": true,
-      "title": "月級挑戰-筆筆最高3%回饋已額滿",
-      "body": "月級挑戰-筆筆最高3%回饋 3月名額已滿",
-      "category": "悠遊付"
-    },
-    {
-      "id": "easycard_1766844961",
-      "full": true,
-      "title": "7-ELEVEN悠遊付錢包/帳戶筆筆4% 滿額加贈券最高回饋12%已額滿",
-      "body": "7-ELEVEN悠遊付錢包/帳戶筆筆4% 滿額加贈券最高回饋12% 3月名額已滿",
-      "category": "悠遊付"
-    },
-    {
-      "id": "easycard_1768462278",
-      "full": true,
-      "title": "悠遊付繳學雜費最高回饋10% 首繳贈50%回饋券 加碼再抽iPad mini已額滿",
-      "body": "悠遊付繳學雜費最高回饋10% 首繳贈50%回饋券 加碼再抽iPad mini 3月名額已滿",
-      "category": "悠遊付"
-    },
-    {
-      "id": "easycard_1768462548",
-      "full": true,
-      "title": "悠遊付綁定玉山信用卡繳學雜費單筆滿500元享1%回饋已額滿",
-      "body": "悠遊付綁定玉山信用卡繳學雜費單筆滿500元享1%回饋 3月名額已滿",
-      "category": "悠遊付"
-    },
-    {
-      "id": "easycard_1770349203",
-      "full": true,
-      "title": "안녕하세요 悠遊付前進韓國！最高30%回饋已額滿",
-      "body": "안녕하세요 悠遊付前進韓國！最高30%回饋 3月名額已滿",
-      "category": "悠遊付"
-    },
-    {
-      "id": "easycard_challenge_silver",
-      "full": true,
-      "title": "月級挑戰 銀級已額滿",
-      "body": "月級挑戰 銀級 3月名額已滿",
-      "category": "悠遊付"
-    },
-    {
-      "id": "easycard_challenge_gold",
-      "full": true,
-      "title": "月級挑戰 金級已額滿",
-      "body": "月級挑戰 金級 3月名額已滿",
-      "category": "悠遊付"
-    },
-    {
-      "id": "easycard_challenge_platinum",
-      "full": true,
-      "title": "月級挑戰 白金級已額滿",
-      "body": "月級挑戰 白金級 3月名額已滿",
-      "category": "悠遊付"
-    }
-  ],
+  "promos": [],
   "reminders": [
     {
       "id": "cube_japan",
@@ -279,5 +171,5 @@
       "endDate": "2026-03-29"
     }
   ],
-  "updated": "2026-03-31"
+  "updated": "2026-04-01"
 }

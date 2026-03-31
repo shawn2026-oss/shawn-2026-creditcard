@@ -1,31 +1,28 @@
 name: 更新活動狀態
 on:
   schedule:
-    - cron: '0 2,6,10,14 * * *'  # 台灣時間 10/14/18/22 點
+    - cron: '0 16 * * *'  # 台灣時間 00:00
+    - cron: '0 0 * * *'   # 台灣時間 08:00
+    - cron: '0 6 * * *'   # 台灣時間 14:00
+    - cron: '0 12 * * *'  # 台灣時間 20:00
   workflow_dispatch:
-
 permissions:
   contents: write
-
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
+      - uses: actions/checkout@v5
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '20'
-
       - name: Install puppeteer
         run: npm install puppeteer
-
       - name: 執行額滿檢查
         run: node scripts/check-promo.js
         env:
           TZ: Asia/Taipei
-
       - name: 檢查是否有變更
         id: check_changes
         run: |
@@ -34,7 +31,6 @@ jobs:
           else
             echo "changed=true" >> $GITHUB_OUTPUT
           fi
-
       - name: 提交變更
         if: steps.check_changes.outputs.changed == 'true'
         run: |

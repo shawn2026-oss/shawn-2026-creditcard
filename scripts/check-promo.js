@@ -478,11 +478,11 @@ async function checkPromo() {
     { id: 'pxpay_japan', title: '全支付日本PayPay回饋', endDate: '2026-03-29' },
   ];
 
-  // 無額滿時加佔位，讓 app 顯示功能正常運作中
+ // 無額滿時加佔位，讓 app 顯示功能正常運作中
   if (promos.length === 0) {
     promos.push({
       id: 'no_promo',
-      full: true,
+      full: false, // 修正為 false，表示未額滿
       title: '本月目前無額滿活動',
       body: '有活動額滿時將即時通知',
       category: '狀態'

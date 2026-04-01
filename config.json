@@ -1,3 +1,5 @@
 {
-  "news": "v3.0重磅更新，請快去app store更新體驗超多新功能吧"
+  "news": "v3.0重磅更新，請快去app store更新體驗超多新功能吧",
+  "min_version": "1.0.0",
+  "force_update_message": "此版本已不再支援，請更新至最新版本以繼續使用。"
 }

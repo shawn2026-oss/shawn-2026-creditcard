@@ -9,8 +9,8 @@
   "uniopen_autoload_msg": "",
   "transport_10": {
     "台新": {
-      "full": false,
-      "msg": ""
+      "full": true,
+      "msg": "台新04月份贈點已於2026/04/04 17:21 p.m.額滿"
     },
     "兆豐": {
       "full": false,
@@ -143,7 +143,15 @@
       "title": "推薦好友送$100"
     }
   },
-  "promos": [],
+  "promos": [
+    {
+      "id": "transport_台新",
+      "full": true,
+      "title": "交通10%額滿(台新)",
+      "body": "icash Pay 交通10% 台新 4月名額已滿",
+      "category": "icash Pay"
+    }
+  ],
   "reminders": [
     {
       "id": "cube_japan",

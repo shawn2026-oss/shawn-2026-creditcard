@@ -343,6 +343,23 @@ async function checkPromo() {
   } catch (e) { console.error('[id/1954] 失敗:', e.message); }
   if (sundayFull) promos.push({ id: 'sunday_7', full: true, title: '週日7%已額滿', body: `icash Pay 週日7% ${monthNum}月名額已滿`, category: 'icash Pay' });
 
+  // 4. id/2033 — 網購3C 10%
+  const banks3c = ['玉山', '國泰', '台新', '富邦', '兆豐'];
+  let online3c = currentStatus.online3c_10 || {};
+  if (needReset) { online3c = {}; for (const b of banks3c) online3c[b] = { full: false, msg: '' }; }
+  else { for (const b of banks3c) if (!online3c[b]) online3c[b] = { full: false, msg: '' }; }
+  try {
+    const p = await fetchPage('https://www.icashpay.com.tw/advertMessage/view/id/2033');
+    for (const b of banks3c) {
+      const m = p.match(new RegExp(b + monthNum.padStart(2, '0') + '月份贈點已於[\\s\\S]*?額滿'));
+      if (m) { online3c[b].full = true; online3c[b].msg = m[0].replace(/&nbsp;/g, ' ').trim(); console.log(`[id/2033] ${b} 額滿`); }
+      else console.log(`[id/2033] ${b} 未額滿`);
+    }
+  } catch (e) { console.error('[id/2033] 失敗:', e.message); }
+  for (const b of banks3c) {
+    if (online3c[b].full) promos.push({ id: `online3c_${b}`, full: true, title: `網購3C 10%額滿(${b})`, body: `icash Pay 網購3C 10% ${b} ${monthNum}月名額已滿`, category: 'icash Pay' });
+  }
+
   // ========== B. icash2.0 ==========
 
   let autoloadFull = prev('uniopen_autoload_full'), autoloadMsg = needReset ? '' : (currentStatus.uniopen_autoload_msg || '');
@@ -476,6 +493,7 @@ async function checkPromo() {
     { id: 'easycard_challenge', title: '悠遊付月級挑戰', endDate: '2026-04-01' },
     { id: 'easycard_bus10', title: '悠遊付乘車碼10%', endDate: '2026-03-31' },
     { id: 'pxpay_japan', title: '全支付日本PayPay回饋', endDate: '2026-03-29' },
+    { id: 'icashpay_3c', title: 'icash Pay 網購3C 10%', endDate: '2026-06-30' },
   ];
 
   // ========== 寫入狀態 ==========
@@ -486,6 +504,7 @@ async function checkPromo() {
     sunday_7_full: sundayFull, sunday_7_msg: sundayMsg,
     uniopen_autoload_full: autoloadFull, uniopen_autoload_msg: autoloadMsg,
     transport_10: transport,
+    online3c_10: online3c,
     easycard_results: ecardResults,
     promos: promos,
     reminders: reminders,

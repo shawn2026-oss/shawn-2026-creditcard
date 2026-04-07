@@ -1,0 +1,120 @@
+name: Check card_merchants.json expiry
+
+on:
+  schedule:
+    # 每天 UTC 16:00 = 台灣 00:00
+    - cron: '0 16 * * *'
+  workflow_dispatch:  # 也允許手動觸發
+
+jobs:
+  check-expiry:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check expiry and open issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            // 路徑：依你 repo 實際位置調整
+            const jsonPath = path.join(process.env.GITHUB_WORKSPACE, 'card_merchants.json');
+
+            if (!fs.existsSync(jsonPath)) {
+              core.setFailed(`找不到 ${jsonPath}`);
+              return;
+            }
+
+            const data = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+            const today = new Date();
+            today.setUTCHours(0, 0, 0, 0);
+
+            // 收集所有 section 的到期日
+            const expiringEntries = [];
+
+            for (const [cardId, card] of Object.entries(data.cards || {})) {
+              const sections = card.sections || {};
+              for (const [sectionKey, section] of Object.entries(sections)) {
+                if (!section.valid_until) continue;
+
+                const validUntil = new Date(section.valid_until + 'T00:00:00Z');
+                const daysLeft = Math.floor((validUntil - today) / (1000 * 60 * 60 * 24));
+
+                // 14 天內到期或已過期都納入
+                if (daysLeft <= 14) {
+                  expiringEntries.push({
+                    cardId,
+                    sectionKey,
+                    sectionName: section.name || sectionKey,
+                    validUntil: section.valid_until,
+                    daysLeft,
+                  });
+                }
+              }
+            }
+
+            if (expiringEntries.length === 0) {
+              console.log('沒有 section 即將到期或已過期');
+              return;
+            }
+
+            // 撈現有 open issue,避免重複開
+            const { data: existingIssues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'merchants-expiry',
+              per_page: 100,
+            });
+
+            const existingTitles = new Set(existingIssues.map(i => i.title));
+
+            for (const entry of expiringEntries) {
+              const { cardId, sectionKey, sectionName, validUntil, daysLeft } = entry;
+
+              let title, body, labels;
+              if (daysLeft < 0) {
+                title = `🔴 ${cardId}.${sectionKey} 已過期 ${Math.abs(daysLeft)} 天 (${validUntil})`;
+                body = `\`card_merchants.json\` 的 \`${cardId}.${sectionKey}\` (${sectionName}) 已於 **${validUntil}** 過期 ${Math.abs(daysLeft)} 天。\n\n` +
+                       `iOS 端會自動隱藏這個 section,UI 上對應方案會消失。請盡快:\n` +
+                       `- 更新 \`valid_until\` 延長有效期\n` +
+                       `- 或更新該季新通路清單\n` +
+                       `- 或從 JSON 移除這個 section`;
+                labels = ['merchants-expiry', 'expired'];
+              } else if (daysLeft === 0) {
+                title = `🟠 ${cardId}.${sectionKey} 今天到期 (${validUntil})`;
+                body = `\`card_merchants.json\` 的 \`${cardId}.${sectionKey}\` (${sectionName}) **今天 (${validUntil}) 到期**。\n\n` +
+                       `明天起 iOS 端會自動隱藏這個 section。請更新 JSON。`;
+                labels = ['merchants-expiry', 'urgent'];
+              } else {
+                title = `⏰ ${cardId}.${sectionKey} 將於 ${validUntil} 到期 (剩 ${daysLeft} 天)`;
+                body = `\`card_merchants.json\` 的 \`${cardId}.${sectionKey}\` (${sectionName}) 將於 **${validUntil}** 到期,剩 ${daysLeft} 天。\n\n` +
+                       `請在到期前更新 JSON:\n` +
+                       `- 延長 \`valid_until\`(若銀行續用同一批通路)\n` +
+                       `- 或更新該季新通路清單\n` +
+                       `- 或移除這個 section\n\n` +
+                       `提醒:到期後 iOS 端會自動隱藏 section,造成 UI 空白。`;
+                labels = ['merchants-expiry'];
+              }
+
+              if (existingTitles.has(title)) {
+                console.log(`已存在 issue: ${title}`);
+                continue;
+              }
+
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels,
+              });
+              console.log(`已開 issue: ${title}`);
+            }

@@ -39,16 +39,16 @@
       "msg": ""
     },
     "台新": {
-      "full": false,
-      "msg": ""
+      "full": true,
+      "msg": "台新04月份贈點已於2026/04/06 23:59</span></span><strong><span style=\"color:#ff0000\"><span style=\"background-color:#ffff00\"> p.m.額滿"
     },
     "富邦": {
       "full": true,
-      "msg": "富邦04月份贈點已於2026/04/01 00:06 a.m.額滿"
+      "msg": "富邦04月份贈點已於2026/04/01 00:06</span></span><strong><span style=\"color:#ff0000\"><span style=\"background-color:#ffff00\"> a.m.</span></span></strong><span style=\"color:#ff0000\"><span style=\"background-color:#ffff00\">額滿"
     },
     "兆豐": {
       "full": true,
-      "msg": "兆豐04月份贈點已於2026/04/01 00:07 a.m.額滿"
+      "msg": "兆豐04月份贈點已於2026/</span></span></strong><strong><span style=\"color:#ff0000\"><span style=\"background-color:#ffff00\">04/01 00:07</span></span><strong><span style=\"color:#ff0000\"><span style=\"background-color:#ffff00\"> a.m.額滿"
     }
   },
   "easycard_results": {
@@ -171,6 +171,13 @@
       "full": true,
       "title": "交通10%額滿(台新)",
       "body": "icash Pay 交通10% 台新 4月名額已滿",
+      "category": "icash Pay"
+    },
+    {
+      "id": "online3c_台新",
+      "full": true,
+      "title": "網購3C 10%額滿(台新)",
+      "body": "icash Pay 網購3C 10% 台新 4月名額已滿",
       "category": "icash Pay"
     },
     {

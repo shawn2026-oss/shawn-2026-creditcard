@@ -751,6 +751,87 @@
           ]
         }
       }
+    },
+    "c6": {
+      "name": "台新街口豬富卡",
+      "sections": {
+        "selected": {
+          "name": "精選通路",
+          "value": "selected",
+          "rate_type": "fixed",
+          "rate": 0.035,
+          "valid_from": "2026-01-01",
+          "valid_until": "2026-12-31",
+          "groups": [
+            {
+              "label_full": "旅遊交通",
+              "label_short": "旅遊交通",
+              "merchants": [
+                "韓國",
+                "Klook",
+                "KKday",
+                "易遊網",
+                "Agoda",
+                "Airbnb",
+                "DJB",
+                "酷遊卡",
+                "高鐵",
+                "Uber",
+                "叫車吧",
+                "台灣快綫",
+                "聯通",
+                "USPACE",
+                "俥亭停車"
+              ]
+            },
+            {
+              "label_full": "生活購物",
+              "label_short": "生活購物",
+              "merchants": [
+                "新光三越",
+                "遠東百貨",
+                "遠東巨城",
+                "LaLaport",
+                "三井(MITSUI OUTLET PARK)",
+                "康是美",
+                "美廉社",
+                "聖德科斯"
+              ]
+            },
+            {
+              "label_full": "外送美食",
+              "label_short": "外送美食",
+              "merchants": [
+                "Uber Eats",
+                "foodpanda",
+                "Foodomo",
+                "EZTABLE",
+                "85度C",
+                "清心福全",
+                "三商餐飲"
+              ]
+            },
+            {
+              "label_full": "影城K歌",
+              "label_short": "影城K歌",
+              "merchants": [
+                "威秀影城",
+                "國賓影城",
+                "新光影城",
+                "喜樂時代影城",
+                "秀泰影城",
+                "錢櫃",
+                "好樂迪",
+                "享溫馨",
+                "凱悅KTV",
+                "星聚點",
+                "Sing Go",
+                "ONCOR響艷都市會所"
+              ]
+            }
+          ]
+        }
+      }
     }
   }
 }

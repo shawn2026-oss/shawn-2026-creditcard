@@ -29,6 +29,28 @@
       "msg": ""
     }
   },
+  "online3c_10": {
+    "玉山": {
+      "full": false,
+      "msg": ""
+    },
+    "國泰": {
+      "full": false,
+      "msg": ""
+    },
+    "台新": {
+      "full": false,
+      "msg": ""
+    },
+    "富邦": {
+      "full": true,
+      "msg": "富邦04月份贈點已於2026/04/01 00:06 a.m.額滿"
+    },
+    "兆豐": {
+      "full": true,
+      "msg": "兆豐04月份贈點已於2026/04/01 00:07 a.m.額滿"
+    }
+  },
   "easycard_results": {
     "1764573917": {
       "full": false,
@@ -152,6 +174,20 @@
       "category": "icash Pay"
     },
     {
+      "id": "online3c_富邦",
+      "full": true,
+      "title": "網購3C 10%額滿(富邦)",
+      "body": "icash Pay 網購3C 10% 富邦 4月名額已滿",
+      "category": "icash Pay"
+    },
+    {
+      "id": "online3c_兆豐",
+      "full": true,
+      "title": "網購3C 10%額滿(兆豐)",
+      "body": "icash Pay 網購3C 10% 兆豐 4月名額已滿",
+      "category": "icash Pay"
+    },
+    {
       "id": "easycard_1770349203",
       "full": true,
       "title": "안녕하세요 悠遊付前進韓國！最高30%回饋已額滿",
@@ -184,6 +220,11 @@
       "id": "pxpay_japan",
       "title": "全支付日本PayPay回饋",
       "endDate": "2026-03-29"
+    },
+    {
+      "id": "icashpay_3c",
+      "title": "icash Pay 網購3C 10%",
+      "endDate": "2026-06-30"
     }
   ],
   "updated": "2026-04-07"

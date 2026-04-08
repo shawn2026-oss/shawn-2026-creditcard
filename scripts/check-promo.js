@@ -4,6 +4,7 @@
  *
  * A. icash Pay (icashpay.com.tw) — fetchPage
  * B. icash2.0 (icash.com.tw) — fetchPageWithCookie
+ * B2. 聯邦銀行 iPASS MONEY — fetchPage
  * C. 悠遊付 — 三層掃描：
  *    C1. easycard.com.tw/offers 列表頁（puppeteer 翻頁 + 抓連結文字）
  *    C2. easywallet.easycard.com.tw/benefit 列表頁（puppeteer + 抓連結文字）
@@ -372,6 +373,40 @@ async function checkPromo() {
   } catch (e) { console.error('[ID=12654] 失敗:', e.message); }
   if (autoloadFull) promos.push({ id: 'uniopen_autoload', full: true, title: '自動加值10%已額滿', body: `uniopen自動加值10% ${monthNum}月名額已滿`, category: 'icash2.0' });
 
+  // ========== B2. 聯邦銀行 iPASS MONEY 10% ==========
+  // 半年活動 (1~6月)，每月分別額滿
+  let ubotIpass = currentStatus.ubot_ipassmoney || {};
+  const ipassMonths = ['1', '2', '3', '4', '5', '6'];
+  if (needReset) {
+    ubotIpass = {};
+    for (const m of ipassMonths) ubotIpass[m] = { full: false, msg: '' };
+  } else {
+    for (const m of ipassMonths) if (!ubotIpass[m]) ubotIpass[m] = { full: false, msg: '' };
+  }
+  try {
+    const p = await fetchPage('https://activity.ubot.com.tw/aws_act/2026/2026ipassmoney/index.htm');
+    for (const m of ipassMonths) {
+      const rx = new RegExp(m + '月活動已額滿');
+      if (p.match(rx)) {
+        ubotIpass[m].full = true;
+        ubotIpass[m].msg = `${m}月活動已額滿`;
+        console.log(`[聯邦iPASS] ${m}月 額滿`);
+      } else if (!ubotIpass[m].full) {
+        console.log(`[聯邦iPASS] ${m}月 未額滿`);
+      }
+    }
+  } catch (e) { console.error('[聯邦iPASS] 失敗:', e.message); }
+  // 只把「當月」額滿狀態推到 promos（避免每月都顯示 1~6 月所有額滿訊息）
+  if (ubotIpass[monthNum] && ubotIpass[monthNum].full) {
+    promos.push({
+      id: `ubot_ipassmoney_${monthNum}`,
+      full: true,
+      title: `聯邦iPASS MONEY 10%額滿(${monthNum}月)`,
+      body: `聯邦信用卡綁定iPASS MONEY 10%綠點 ${monthNum}月名額已滿`,
+      category: '聯邦'
+    });
+  }
+
   // ========== C. 悠遊付（三層掃描）==========
 
   const tAB = Date.now();
@@ -494,6 +529,7 @@ async function checkPromo() {
     { id: 'easycard_bus10', title: '悠遊付乘車碼10%', endDate: '2026-03-31' },
     { id: 'pxpay_japan', title: '全支付日本PayPay回饋', endDate: '2026-03-29' },
     { id: 'icashpay_3c', title: 'icash Pay 網購3C 10%', endDate: '2026-06-30' },
+    { id: 'ubot_ipassmoney', title: '聯邦iPASS MONEY 10%綠點', endDate: '2026-06-30' },
   ];
 
   // ========== 寫入狀態 ==========
@@ -505,6 +541,7 @@ async function checkPromo() {
     uniopen_autoload_full: autoloadFull, uniopen_autoload_msg: autoloadMsg,
     transport_10: transport,
     online3c_10: online3c,
+    ubot_ipassmoney: ubotIpass,
     easycard_results: ecardResults,
     promos: promos,
     reminders: reminders,

@@ -51,6 +51,32 @@
       "msg": "兆豐04月份贈點已於2026/</span></span></strong><strong><span style=\"color:#ff0000\"><span style=\"background-color:#ffff00\">04/01 00:07</span></span><strong><span style=\"color:#ff0000\"><span style=\"background-color:#ffff00\"> a.m.額滿"
     }
   },
+  "ubot_ipassmoney": {
+    "1": {
+      "full": true,
+      "msg": "1月活動已額滿"
+    },
+    "2": {
+      "full": true,
+      "msg": "2月活動已額滿"
+    },
+    "3": {
+      "full": true,
+      "msg": "3月活動已額滿"
+    },
+    "4": {
+      "full": false,
+      "msg": ""
+    },
+    "5": {
+      "full": false,
+      "msg": ""
+    },
+    "6": {
+      "full": false,
+      "msg": ""
+    }
+  },
   "easycard_results": {
     "1764573917": {
       "full": false,
@@ -231,6 +257,11 @@
     {
       "id": "icashpay_3c",
       "title": "icash Pay 網購3C 10%",
+      "endDate": "2026-06-30"
+    },
+    {
+      "id": "ubot_ipassmoney",
+      "title": "聯邦iPASS MONEY 10%綠點",
       "endDate": "2026-06-30"
     }
   ],

@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: '20'
       - name: Install puppeteer
-        run: npm install puppeteer
+      npm install puppeteer pdf-parse
       - name: 執行額滿檢查
         run: node scripts/check-promo.js
         env:

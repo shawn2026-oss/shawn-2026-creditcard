@@ -1,20 +1,24 @@
 /**
- * 自動檢查活動額滿狀態(puppeteer 版 v2.3)
+ * 自動檢查活動額滿狀態(puppeteer 版 v2.3.1)
  * GitHub Actions 每天台灣時間 00/08/14/20 點執行
  *
+ * ⚠️ workflow 需要加 pdf-parse 套件:
+ *    npm install puppeteer pdf-parse
+ *
+ * v2.3.1 修正:
+ *   - detectFull() 加「活動期間」排除規則,避免活動起訖日期被誤判為額滿時間
+ *     (例如 1766109563 頁面的「2026/4/1 01:59」是活動結束日,不是額滿日)
+ *   - challenge 銀/金/白金判定改寬鬆邏輯:先看硬 regex,再用「級別+額滿」上下文
+ *   - 新增 scanQuotaReachedPdf():爬悠遊卡官方 quotareached.pdf 拿到月級挑戰額滿資料
+ *     當網頁版沒即時更新時,PDF 是第二來源
+ *
  * v2.3 修正:
- *   - detectFull() 重寫,涵蓋悠遊付實際公告格式:
- *       「活動二已於08/24 16:28:26額滿」
- *       「本活動已於11/17 (五)18:51額滿」
- *       「元大已於10/30(四)09:27額滿」
- *     原本只認「年月/額滿」連續寫法,造成 easycard 大量漏判
- *   - 悠遊付 C1/C2 爬列表時額外抓 epkaw.easycard.com.tw/advertisement 連結
- *     這類頁面雖然 deep link 會擋 /home,但個別 advertisement/{UUID} 可以
- *     直接 fetch(Google 也有收錄,等同公開頁面)
- *   - 新增 scanEpkaw() 走 SSR pipeline
+ *   - detectFull() 涵蓋悠遊付格式「X/D (週) HH:MM 額滿」「MM/DD HH:MM:SS額滿」
+ *   - 爬 C1/C2 時順便抓 epkaw 連結
+ *   - 新增 scanEpkaw() 處理 epkaw advertisement/{UUID} 頁面
  *
  * v2.2 修正:
- *   - icash Pay 改用列表頁自動發現,防換頁漏抓(id/2019 → id/1982)
+ *   - icash Pay 改用列表頁自動發現
  *
  * v2.1 修正:
  *   - id/2019 額滿上下文判定 + online3c/transport 的 msg 脫 HTML
@@ -24,6 +28,10 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 const puppeteer = require('puppeteer');
+
+// pdf-parse 是選用的——如果 workflow 沒安裝也能跑(月級挑戰走 web 那邊)
+let pdfParse = null;
+try { pdfParse = require('pdf-parse'); } catch (e) { console.log('[info] pdf-parse 未安裝,將跳過 PDF 掃描'); }
 
 const STATUS_FILE = 'promo_status.json';
 
@@ -43,6 +51,25 @@ function fetchPage(url, timeout = 15000) {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => { clearTimeout(timer); resolve(data); });
+    }).on('error', (e) => { clearTimeout(timer); reject(e); });
+  });
+}
+
+/** 抓二進位內容(for PDF) */
+function fetchBuffer(url, timeout = 20000) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => resolve(null), timeout);
+    const mod = url.startsWith('https') ? https : http;
+    mod.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        clearTimeout(timer);
+        const next = res.headers.location.startsWith('http') ? res.headers.location : new URL(res.headers.location, url).href;
+        res.resume();
+        return fetchBuffer(next, timeout).then(resolve).catch(reject);
+      }
+      const chunks = [];
+      res.on('data', c => chunks.push(c));
+      res.on('end', () => { clearTimeout(timer); resolve(Buffer.concat(chunks)); });
     }).on('error', (e) => { clearTimeout(timer); reject(e); });
   });
 }
@@ -88,43 +115,50 @@ function stripHtml(s) {
     .trim();
 }
 
-// ===== 額滿偵測(通用,v2.3 重寫) =====
+// ===== 額滿偵測(通用,v2.3.1) =====
 
 /**
- * 判斷文字是否包含本月的「額滿」公告。
- * 涵蓋格式:
- *   1. 「已於 YYYY/M/D ... 額滿」(icash Pay 格式)
- *   2. 「已於 YYYY/MM/D ... 額滿」
- *   3. 「已於 YYYY年M月 ... 額滿」
- *   4. 「已於 M/D (週X) HH:MM 額滿」(悠遊付主流格式,無年份)
- *   5. 「已於 MM/DD HH:MM:SS 額滿」(悠遊付帶秒數)
- *   6. 「M月...額滿」(icash Pay 寬鬆)
- *   7. 「於 M/D 額滿」(純日期)
+ * 判斷文字是否包含本月的額滿公告。
  *
- * 策略:掃描所有「額滿」字元,取前 200 字作為上下文,
- *      看上下文裡是否存在合法的日期表示(年份或 M/D 對應當月)
+ * 策略(兩層):
+ *   強信號:「已於 X/Y 額滿」/「YYYY/M/D 額滿」這種明確句型 → 直接信任
+ *   弱信號:額滿前後 200 字有「本月日期」→ 但排除「活動期間」上下文
  */
 function detectFull(text, year, monthNum, month) {
   const plain = typeof text === 'string' ? text : String(text);
   if (!plain || !plain.includes('額滿')) return false;
 
   const mm = monthNum.padStart(2, '0');
-  // 年份共現:YYYY年M月 / YYYY/MM / YYYY/M / 年YYYY
-  // 月日共現:M/D 或 MM/DD(需排除 YYYY/MM/DD 中的 MM/DD 部分被重複算)
-  // M/D 格式(含本月 M)
-  const mdRx = new RegExp(
-    `(?:^|[^0-9/])(${monthNum}|${mm})\\s*[/月]\\s*\\d{1,2}`
-  );
-  // 本月年份格式
-  const yearFmtRx = new RegExp(
-    `(${year}年${monthNum}月|${year}年${mm}月|${year}/${monthNum}|${year}/${mm})`
-  );
-  // 純月份字樣(4月 / 04月 / 4月份)
-  const monthOnlyRx = new RegExp(
-    `(?:^|[^0-9/])(${monthNum}月|${mm}月|${monthNum}月份|${mm}月份)`
-  );
-  // 其他年份(用來排除歷史公告,例如「2025年4月曾經額滿」)
+
+  // === 第一層:強信號 ===
+  // 明確的「於 X/Y HH:MM 額滿」句型,直接回 true,不管活動期間
+  // 這個 pattern 足夠精確到不會誤判,同時涵蓋所有實際觀察到的格式
+  const strongPatterns = [
+    // 「已於 2026/4/8」/「已於 2026/04/08」
+    new RegExp(`已於\\s*${year}[/年]\\s*${monthNum}[/月]\\s*\\d{1,2}[\\s\\S]{0,40}?額滿`),
+    new RegExp(`已於\\s*${year}[/年]\\s*${mm}[/月]\\s*\\d{1,2}[\\s\\S]{0,40}?額滿`),
+    // 「於 4/8 11:00 額滿」/「於 04/08 ... 額滿」(無年份)
+    new RegExp(`[於以]\\s*${monthNum}/\\d{1,2}[\\s\\S]{0,40}?額滿`),
+    new RegExp(`[於以]\\s*${mm}/\\d{1,2}[\\s\\S]{0,40}?額滿`),
+    // 「4月 ... 已於 ... 額滿」
+    new RegExp(`(?:^|[^0-9])${monthNum}月[\\s\\S]{0,60}?已於[\\s\\S]{0,60}?額滿`),
+    new RegExp(`(?:^|[^0-9])${mm}月[\\s\\S]{0,60}?已於[\\s\\S]{0,60}?額滿`),
+    // 「4月份贈點已於 ... 額滿」(icash Pay 格式)
+    new RegExp(`${monthNum}月份[\\s\\S]{0,30}?已於[\\s\\S]{0,50}?額滿`),
+    new RegExp(`${mm}月份[\\s\\S]{0,30}?已於[\\s\\S]{0,50}?額滿`),
+    // 「2026年4月 ... 額滿」
+    new RegExp(`${year}年${monthNum}月[\\s\\S]{0,80}?額滿`),
+  ];
+  for (const p of strongPatterns) {
+    if (p.test(plain)) return true;
+  }
+
+  // === 第二層:弱信號 ===
+  // 上下文有「本月 M/D」或「4月名額」等,但要排除「活動期間」描述
+  const mdRx = new RegExp(`(?:^|[^0-9/])(${monthNum}|${mm})\\s*[/月]\\s*\\d{1,2}`);
+  const monthOnlyRx = new RegExp(`(?:^|[^0-9/])(${monthNum}月|${mm}月|${monthNum}月份|${mm}月份)`);
   const otherYearRx = new RegExp(`(${year - 1}|${year - 2}|${year + 1})年`);
+  const periodRx = /活動期間|存續期間|活動時間|活動日期|資格判定區間|回饋期間/;
 
   const fullRx = /額滿/g;
   let m;
@@ -133,15 +167,14 @@ function detectFull(text, year, monthNum, month) {
     const end = Math.min(plain.length, m.index + 30);
     const ctx = plain.substring(start, end);
 
-    // 條件一:上下文含本年的年份格式(最可信,即使同時提到他年也以本年為準)
-    if (yearFmtRx.test(ctx)) return true;
-
-    // 若上下文出現其他年份(歷史公告),除非同時有本年年份,否則不認
+    // 排除歷史年份
     if (otherYearRx.test(ctx)) continue;
 
-    // 條件二:上下文含 M/D 且 M 是本月
+    // 排除活動期間描述
+    if (periodRx.test(ctx)) continue;
+
+    // 含 M/D 或 M月
     if (mdRx.test(ctx)) return true;
-    // 條件三:上下文含 M月 字樣
     if (monthOnlyRx.test(ctx)) return true;
   }
   return false;
@@ -173,6 +206,64 @@ function cleanLabel(text) {
     .replace(/悠遊卡股份有限公司/g, '')
     .trim()
     .substring(0, 50);
+}
+
+// ===== 悠遊付月級挑戰:掃 quotareached.pdf =====
+
+/**
+ * 爬 https://www.easycard.com.tw/_upload/files/quotareached.pdf
+ * PDF 格式:
+ *   每月額滿時間  白金級         金級           銀級
+ *   1月          1/13 11:50:26  1/11 14:53:33  1/9 10:19:34
+ *   2月          2/11 00:01:26  2/11 06:57:22  2/9 09:01:02
+ *   ...
+ *
+ * 回傳當月的三個子級別狀態。
+ */
+async function scanQuotaReachedPdf(monthNum) {
+  if (!pdfParse) {
+    console.log('[PDF] pdf-parse 未安裝,跳過');
+    return { silver: false, gold: false, platinum: false };
+  }
+
+  try {
+    const buf = await fetchBuffer('https://www.easycard.com.tw/_upload/files/quotareached.pdf');
+    if (!buf || buf.length < 100) {
+      console.log('[PDF] 下載失敗或檔案過小');
+      return { silver: false, gold: false, platinum: false };
+    }
+
+    const parsed = await pdfParse(buf);
+    const text = parsed.text || '';
+    console.log(`[PDF] 內容: "${text.replace(/\s+/g, ' ').substring(0, 200)}..."`);
+
+    // 找 "N月 M/D HH:MM:SS M/D HH:MM:SS M/D HH:MM:SS" 列
+    const lines = text.split(/\r?\n/);
+    const rowRx = new RegExp(
+      `^\\s*${monthNum}月\\s+` +
+      `(\\d{1,2}/\\d{1,2}\\s+[\\d:]+)\\s+` +   // 白金
+      `(\\d{1,2}/\\d{1,2}\\s+[\\d:]+)\\s+` +   // 金
+      `(\\d{1,2}/\\d{1,2}\\s+[\\d:]+)`          // 銀
+    );
+
+    for (const line of lines) {
+      const m = line.match(rowRx);
+      if (m) {
+        console.log(`[PDF] 找到 ${monthNum} 月:白金=${m[1]} 金=${m[2]} 銀=${m[3]}`);
+        return {
+          platinum: { full: true, time: m[1].trim() },
+          gold: { full: true, time: m[2].trim() },
+          silver: { full: true, time: m[3].trim() },
+        };
+      }
+    }
+
+    console.log(`[PDF] 未找到 ${monthNum} 月的額滿記錄(PDF 可能還沒更新)`);
+    return { silver: false, gold: false, platinum: false };
+  } catch (e) {
+    console.error('[PDF] 解析失敗:', e.message);
+    return { silver: false, gold: false, platinum: false };
+  }
 }
 
 // ===== icash Pay 列表頁自動發現 =====
@@ -324,7 +415,7 @@ async function scanIcashPayBucket(entries, year, monthNum, { subMatch, excludeSu
   return { full: false, sourceId: null, snippet: null };
 }
 
-// ===== 悠遊付:URL 收集(C1 + C2 + C3 + C_epkaw) =====
+// ===== 悠遊付:URL 收集 =====
 
 async function collectEasycardOfferUrls(browser) {
   const seen = new Set();
@@ -381,7 +472,6 @@ async function collectEasycardOfferUrls(browser) {
       }
       console.log(`[C1] 第 ${pageNum} 頁: ${items.length} 個連結,新增 ${newCount} 個`);
 
-      // 順便抓 epkaw 連結
       const epkawLinks = await page.$$eval('a[href*="epkaw.easycard.com.tw/advertisement"]', as =>
         as.map(a => {
           const card = a.closest('.card, .item, .offer-item, li, article, .col');
@@ -461,7 +551,6 @@ async function collectEasycardOfferUrls(browser) {
     }
     console.log(`[C2] easywallet 列表: ${items.length} 個連結`);
 
-    // 順便抓 epkaw 連結
     const epkawLinks = await page.$$eval('a[href*="epkaw.easycard.com.tw/advertisement"]', as =>
       as.map(a => {
         const card = a.closest('.card, .item, .benefit-item, li, article, div[class]');
@@ -544,7 +633,7 @@ async function checkPromo() {
 
   const promos = [];
 
-  // ========== A. icash Pay(列表頁自動發現)==========
+  // ========== A. icash Pay ==========
 
   console.log('\n===== icash Pay 列表自動發現 =====');
   const icashBuckets = await discoverIcashPayPages();
@@ -566,7 +655,7 @@ async function checkPromo() {
   } catch (e) { console.error('[icash Pay 4%] 失敗:', e.message); }
   if (icashFull) promos.push({ id: 'icash_4', full: true, title: 'icash Pay 4%已額滿', body: `icash Pay 全通路4% ${monthNum}月名額已滿`, category: 'icash Pay' });
 
-  // --- A2. 星巴克筆筆 5% ---
+  // --- A2. 星巴克 5% ---
   let starbucksFull = prev('starbucks_5_full'), starbucksMsg = needReset ? '' : (currentStatus.starbucks_5_msg || '');
   try {
     const combined = [...icashBuckets.starbucks_5pct, ...icashBuckets.uniopen_4pct];
@@ -705,11 +794,15 @@ async function checkPromo() {
     });
   }
 
-  // ========== C. 悠遊付(四層掃描:easycard + easywallet + hardcoded + epkaw)==========
+  // ========== C. 悠遊付 ==========
 
   const tAB = Date.now();
   console.log(`\n[計時] A+B: ${((tAB - startTime) / 1000).toFixed(1)}s`);
   console.log('===== 悠遊付掃描 =====');
+
+  // --- C0. 優先:quotareached.pdf 掃月級挑戰 ---
+  console.log('[C0] 掃官方 quotareached.pdf...');
+  const pdfChallenge = await scanQuotaReachedPdf(monthNum);
 
   const browser = await puppeteer.launch({
     headless: true,
@@ -786,15 +879,53 @@ async function checkPromo() {
       const title = item.label || pageTitle || `悠遊付活動 ${item.id}`;
 
       if (item.special === 'challenge') {
+        // 月級挑戰:三道防線
+        // 1. 硬 regex(舊邏輯,格式固定時最精準)
+        // 2. 寬鬆:級別關鍵字 + 額滿 + 當月 M/D
+        // 3. PDF(在主流程已取得 pdfChallenge)
         const levels = [
-          { suffix: 'silver', label: '銀級', rx: new RegExp(monthNum + '月銀級回饋已於[\\s\\S]*?額滿') },
-          { suffix: 'gold', label: '金級', rx: new RegExp(monthNum + '月金級回饋已於[\\s\\S]*?額滿') },
-          { suffix: 'platinum', label: '白金級', rx: new RegExp(monthNum + '月白金回饋已於[\\s\\S]*?額滿') },
+          { suffix: 'silver', label: '銀級', hardRx: new RegExp(monthNum + '月銀級回饋已於[\\s\\S]*?額滿'), keywordRx: /銀級/ },
+          { suffix: 'gold', label: '金級', hardRx: new RegExp(monthNum + '月金級回饋已於[\\s\\S]*?額滿'), keywordRx: /金級/ },
+          { suffix: 'platinum', label: '白金級', hardRx: new RegExp(monthNum + '月白金回饋已於[\\s\\S]*?額滿'), keywordRx: /白金/ },
         ];
+
+        const mm = monthNum.padStart(2, '0');
+        const mdRx = new RegExp(`(?:^|[^0-9/])(${monthNum}|${mm})\\s*[/月]\\s*\\d{1,2}`);
+
         for (const lv of levels) {
-          const full = !!text.match(lv.rx);
+          let full = false;
+          let source = '';
+
+          // 防線 1:硬 regex
+          if (lv.hardRx.test(text)) {
+            full = true;
+            source = 'hard-regex';
+          }
+
+          // 防線 2:級別+額滿+本月共現
+          if (!full) {
+            const fullRx = /額滿/g;
+            let m;
+            while ((m = fullRx.exec(text)) !== null) {
+              const start = Math.max(0, m.index - 150);
+              const end = Math.min(text.length, m.index + 30);
+              const ctx = text.substring(start, end);
+              if (lv.keywordRx.test(ctx) && mdRx.test(ctx)) {
+                full = true;
+                source = 'keyword-context';
+                break;
+              }
+            }
+          }
+
+          // 防線 3:PDF
+          if (!full && pdfChallenge[lv.suffix] && pdfChallenge[lv.suffix].full) {
+            full = true;
+            source = 'pdf';
+          }
+
           ecardResults[`challenge_${lv.suffix}`] = { full, title: `月級挑戰 ${lv.label}` };
-          console.log(`[月級挑戰] ${lv.label} → ${full ? '額滿' : '未額滿'}`);
+          console.log(`[月級挑戰] ${lv.label} → ${full ? '額滿' : '未額滿'}${source ? ` (${source})` : ''}`);
         }
         return;
       }
@@ -826,6 +957,21 @@ async function checkPromo() {
 
   await browser.close();
 
+  // 如果 spaToScan 沒有 challenge(例如列表頁沒抓到、hardcoded 沒進去)
+  // 但 PDF 有資料,仍然要寫入 ecardResults
+  if (!ecardResults.challenge_silver && pdfChallenge.silver && pdfChallenge.silver.full) {
+    ecardResults.challenge_silver = { full: true, title: '月級挑戰 銀級' };
+    console.log('[月級挑戰] 銀級 → 額滿 (pdf, spaToScan 未包含 challenge)');
+  }
+  if (!ecardResults.challenge_gold && pdfChallenge.gold && pdfChallenge.gold.full) {
+    ecardResults.challenge_gold = { full: true, title: '月級挑戰 金級' };
+    console.log('[月級挑戰] 金級 → 額滿 (pdf, spaToScan 未包含 challenge)');
+  }
+  if (!ecardResults.challenge_platinum && pdfChallenge.platinum && pdfChallenge.platinum.full) {
+    ecardResults.challenge_platinum = { full: true, title: '月級挑戰 白金級' };
+    console.log('[月級挑戰] 白金級 → 額滿 (pdf, spaToScan 未包含 challenge)');
+  }
+
   const tC4 = Date.now();
   console.log(`[計時] C 逐頁掃描: ${((tC4 - tC123) / 1000).toFixed(1)}s`);
 
@@ -840,7 +986,7 @@ async function checkPromo() {
     });
   }
 
-  // ========== 活動倒數提醒(手動維護)==========
+  // ========== 活動倒數提醒 ==========
   const reminders = [
     { id: 'cube_japan', title: 'CUBE 日本賞', endDate: '2026-04-30' },
     { id: 'esun_pxpay', title: '玉山全支付綁卡3%', endDate: '2026-06-28' },

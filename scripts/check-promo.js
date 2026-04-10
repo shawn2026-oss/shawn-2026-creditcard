@@ -1,16 +1,22 @@
 /**
- * 自動檢查活動額滿狀態(puppeteer 版 v2.3.1)
+ * 自動檢查活動額滿狀態(puppeteer 版 v2.3.3)
  * GitHub Actions 每天台灣時間 00/08/14/20 點執行
  *
  * ⚠️ workflow 需要加 pdf-parse 套件:
  *    npm install puppeteer pdf-parse
  *
+ * v2.3.3 修正(2026-04-10):
+ *   - C2 easywallet.easycard.com.tw/benefit 改用純 HTTP fetchPage
+ *     (之前 puppeteer 只抓首頁,實測 easywallet 是純 SSR 不需要 puppeteer)
+ *   - 掃全部 easywallet 活動內頁(之前 filter 成 special+hardcoded,漏 70+ 個)
+ *   - scanSpa 拆成 scanEasywallet(純 HTTP)和 scanChallengeSpa(月級挑戰走 puppeteer)
+ *   - 清除 C3 hardcoded 的 ew_1771988018(乘車碼 3 月舊活動已結束)
+ *   - 修正 PChome 8%、全家 6%、誠品 15% 等 20+ 個 easywallet 活動從未被掃額滿狀態的 bug
+ *
  * v2.3.1 修正:
  *   - detectFull() 加「活動期間」排除規則,避免活動起訖日期被誤判為額滿時間
- *     (例如 1766109563 頁面的「2026/4/1 01:59」是活動結束日,不是額滿日)
  *   - challenge 銀/金/白金判定改寬鬆邏輯:先看硬 regex,再用「級別+額滿」上下文
  *   - 新增 scanQuotaReachedPdf():爬悠遊卡官方 quotareached.pdf 拿到月級挑戰額滿資料
- *     當網頁版沒即時更新時,PDF 是第二來源
  *
  * v2.3 修正:
  *   - detectFull() 涵蓋悠遊付格式「X/D (週) HH:MM 額滿」「MM/DD HH:MM:SS額滿」
@@ -424,7 +430,7 @@ async function collectEasycardOfferUrls(browser) {
     }
   }
 
-  // --- C1: easycard.com.tw/offers 列表頁 ---
+  // --- C1: easycard.com.tw/offers 列表頁(SPA,仍走 puppeteer) ---
   try {
     const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36');
@@ -510,69 +516,71 @@ async function collectEasycardOfferUrls(browser) {
     console.error('[C1] easycard 列表頁失敗:', e.message);
   }
 
-  // --- C2: easywallet.easycard.com.tw/benefit 列表頁 ---
+  // --- C2: easywallet.easycard.com.tw/benefit 列表頁(純 SSR,改用純 HTTP) ---
+  // 實測 easywallet 是純 server render HTML,puppeteer 反而不穩
+  // 總表 ?page=1 精選區塊就吐出所有當前活動(~75 項)
   try {
-    const page = await browser.newPage();
-    await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36');
-    console.log('[C2] 載入 easywallet 好康優惠列表頁...');
-    await page.goto('https://easywallet.easycard.com.tw/benefit', { waitUntil: 'networkidle2', timeout: 30000 });
-
-    for (let i = 0; i < 5; i++) {
-      await page.evaluate(() => window.scrollBy(0, 600));
-      await new Promise(r => setTimeout(r, 400));
-    }
-    await new Promise(r => setTimeout(r, 1500));
-
-    const items = await page.$$eval('a[href*="benefit/content"]', as =>
-      as.filter(a => a.href.includes('id='))
-        .map(a => {
-          const card = a.closest('.card, .item, .benefit-item, li, article, div[class]');
-          let label = '';
-          const img = (card || a).querySelector('img[alt]');
-          if (img && img.alt) label = img.alt;
-          if (!label) label = a.textContent.trim();
-          if (!label && card) label = card.textContent.trim().substring(0, 80);
-          return { href: a.href, label };
-        })
-    );
-
-    for (const item of items) {
-      const idMatch = item.href.match(/id=(\d+)/);
-      if (idMatch) {
-        addUrl('ew_' + idMatch[1], item.href, 'easywallet_list', cleanLabel(item.label));
+    console.log('[C2] 載入 easywallet 好康優惠列表頁(純 HTTP)...');
+    const html = await fetchPage('https://easywallet.easycard.com.tw/benefit/?page=1');
+    if (!html || html.length < 500) {
+      console.error('[C2] easywallet 列表頁內容過短,跳過');
+    } else {
+      // 抽所有 content.php?id=XXX 的 id 和緊鄰的 title
+      // 格式範例: [活動標題\n\n  2026-04-01 － 2026-06-30](https://easywallet.easycard.com.tw/benefit/content.php?id=1773289742)
+      // 或純 HTML: <a href="content.php?id=1773289742">活動標題</a>
+      const idRx = /content\.php\?id=(\d+)/g;
+      const foundIds = new Set();
+      let m;
+      while ((m = idRx.exec(html)) !== null) {
+        foundIds.add(m[1]);
       }
-    }
-    console.log(`[C2] easywallet 列表: ${items.length} 個連結`);
 
-    const epkawLinks = await page.$$eval('a[href*="epkaw.easycard.com.tw/advertisement"]', as =>
-      as.map(a => {
-        const card = a.closest('.card, .item, .benefit-item, li, article, div[class]');
+      // 對每個 id 抽它的 title(往前找最近的 <a> 或 markdown 連結文字)
+      // 更可靠的方法:掃一遍文字,在 content.php?id= 附近抓標題
+      let count = 0;
+      for (const id of foundIds) {
+        // 試兩種 pattern:
+        // 1. <a ... href="...content.php?id=ID">TITLE</a>  (HTML)
+        // 2. [TITLE\n\n DATE-DATE](...content.php?id=ID)  (markdown-ish)
         let label = '';
-        const img = (card || a).querySelector('img[alt]');
-        if (img && img.alt) label = img.alt;
-        if (!label) label = a.textContent.trim();
-        if (!label && card) label = card.textContent.trim().substring(0, 80);
-        return { href: a.href, label };
-      })
-    );
-    for (const item of epkawLinks) {
-      const uuidMatch = item.href.match(/advertisement\/([a-f0-9-]+)/i);
-      if (uuidMatch) {
-        addUrl('epkaw_' + uuidMatch[1].substring(0, 13), item.href, 'c2_epkaw', cleanLabel(item.label));
-      }
-    }
-    if (epkawLinks.length) console.log(`[C2] 額外抓到 ${epkawLinks.length} 個 epkaw 連結`);
 
-    await page.close();
+        // HTML link pattern
+        const htmlRx = new RegExp(`<a[^>]*href=["'][^"']*content\\.php\\?id=${id}[^"']*["'][^>]*>([\\s\\S]*?)<\\/a>`, 'i');
+        const htmlM = html.match(htmlRx);
+        if (htmlM && htmlM[1]) {
+          label = stripHtml(htmlM[1]).split('2026-')[0].trim();
+        }
+
+        // 如果 HTML pattern 沒抓到 label,用 fallback 標題
+        if (!label || label.length < 3) {
+          label = `悠遊付活動 ${id}`;
+        }
+
+        addUrl(
+          'ew_' + id,
+          `https://easywallet.easycard.com.tw/benefit/content.php?id=${id}`,
+          'easywallet_list',
+          cleanLabel(label)
+        );
+        count++;
+      }
+      console.log(`[C2] easywallet 列表: 抽到 ${count} 個活動 id`);
+    }
   } catch (e) {
     console.error('[C2] easywallet 列表頁失敗:', e.message);
   }
 
   // --- C3: hardcoded 保底清單 ---
+  // 只保留真的需要特殊處理的活動:
+  //   challenge_1766109563 — 月級挑戰,需特殊 regex 解析三等級
+  //   新會員 3% — 確保掃到
+  //   推薦好友 — 確保掃到
+  // 移除項目:
+  //   ew_1771988018 — 乘車碼舊活動,Q1 已結束
+  //                   (Q2 新活動 id=1774595852 頁面不寫額滿時間,走 C 方案,不在此處理)
   const KNOWN_URLS = [
     { id: 'challenge_1766109563', url: 'https://easywallet.easycard.com.tw/benefit/content?id=1766109563', label: '月級挑戰', special: 'challenge' },
-    { id: 'ew_1771988018', url: 'https://www.easycard.com.tw/offer?id=1771988018', label: '乘車碼10%回饋' },
-    { id: 'ew_1766377676', url: 'https://easywallet.easycard.com.tw/benefit/content?id=1766377676', label: '新會員3%回饋' },
+    { id: 'ew_1766377676', url: 'https://easywallet.easycard.com.tw/benefit/content.php?id=1766377676', label: '新會員3%回饋' },
     { id: 'ew_1766573956', url: 'https://www.easycard.com.tw/offer?id=1766573956', label: '推薦好友送$100' },
   ];
 
@@ -816,13 +824,20 @@ async function checkPromo() {
   const ecardResults = {};
 
   const epkawItems = offerUrls.filter(i => i.url.includes('epkaw.easycard.com.tw/advertisement'));
-  const spaItems = offerUrls.filter(i => i.url.includes('easywallet.easycard.com.tw'));
+  const easywalletItems = offerUrls.filter(i => i.url.includes('easywallet.easycard.com.tw'));
   const ssrItems = offerUrls.filter(i =>
     !i.url.includes('easywallet.easycard.com.tw') &&
     !i.url.includes('epkaw.easycard.com.tw')
   );
 
-  console.log(`SSR(easycard): ${ssrItems.length} 個, SPA(easywallet): ${spaItems.length} 個, epkaw: ${epkawItems.length} 個`);
+  // easywallet 內部再分流:月級挑戰走 puppeteer(頁面有多個分頁區塊),其餘純 HTTP
+  const challengeItems = easywalletItems.filter(i => i.special === 'challenge');
+  const easywalletNormalItems = easywalletItems.filter(i => i.special !== 'challenge');
+
+  console.log(`SSR(easycard.com.tw/offer): ${ssrItems.length} 個`);
+  console.log(`easywallet normal(純 HTTP): ${easywalletNormalItems.length} 個`);
+  console.log(`easywallet challenge(puppeteer): ${challengeItems.length} 個`);
+  console.log(`epkaw: ${epkawItems.length} 個`);
 
   async function scanSsr(item) {
     try {
@@ -861,73 +876,82 @@ async function checkPromo() {
     }
   }
 
-  const spaToScan = spaItems.filter(i => i.special || i.source === 'hardcoded');
-  console.log(`SPA 需掃描: ${spaToScan.length} 個(跳過 ${spaItems.length - spaToScan.length} 個無額滿機制的 easywallet 活動)`);
-
-  async function scanSpa(item) {
+  // easywallet 一般活動:純 HTTP,不需要 puppeteer
+  async function scanEasywallet(item) {
     try {
-      const spa = await fetchSpaPage(browser, item.url);
-      const text = spa.text;
-      const pageTitle = spa.title.replace(/-悠遊卡股份有限公司/, '').replace(/悠遊付｜.*/, '').trim();
+      const html = await fetchPage(item.url);
+      if (!html || html.length < 500) return;
+      const text = stripHtml(html);
+      const pageTitle = extractTitle(html);
       const title = item.label || pageTitle || `悠遊付活動 ${item.id}`;
 
-      if (item.special === 'challenge') {
-        // 月級挑戰:三道防線
-        // 1. 硬 regex(舊邏輯,格式固定時最精準)
-        // 2. 寬鬆:級別關鍵字 + 額滿 + 當月 M/D
-        // 3. PDF(在主流程已取得 pdfChallenge)
-        const levels = [
-          { suffix: 'silver', label: '銀級', hardRx: new RegExp(monthNum + '月銀級回饋已於[\\s\\S]*?額滿'), keywordRx: /銀級/ },
-          { suffix: 'gold', label: '金級', hardRx: new RegExp(monthNum + '月金級回饋已於[\\s\\S]*?額滿'), keywordRx: /金級/ },
-          { suffix: 'platinum', label: '白金級', hardRx: new RegExp(monthNum + '月白金回饋已於[\\s\\S]*?額滿'), keywordRx: /白金/ },
-        ];
-
-        const mm = monthNum.padStart(2, '0');
-        const mdRx = new RegExp(`(?:^|[^0-9/])(${monthNum}|${mm})\\s*[/月]\\s*\\d{1,2}`);
-
-        for (const lv of levels) {
-          let full = false;
-          let source = '';
-
-          // 防線 1:硬 regex
-          if (lv.hardRx.test(text)) {
-            full = true;
-            source = 'hard-regex';
-          }
-
-          // 防線 2:級別+額滿+本月共現
-          if (!full) {
-            const fullRx = /額滿/g;
-            let m;
-            while ((m = fullRx.exec(text)) !== null) {
-              const start = Math.max(0, m.index - 150);
-              const end = Math.min(text.length, m.index + 30);
-              const ctx = text.substring(start, end);
-              if (lv.keywordRx.test(ctx) && mdRx.test(ctx)) {
-                full = true;
-                source = 'keyword-context';
-                break;
-              }
-            }
-          }
-
-          // 防線 3:PDF
-          if (!full && pdfChallenge[lv.suffix] && pdfChallenge[lv.suffix].full) {
-            full = true;
-            source = 'pdf';
-          }
-
-          ecardResults[`challenge_${lv.suffix}`] = { full, title: `月級挑戰 ${lv.label}` };
-          console.log(`[月級挑戰] ${lv.label} → ${full ? '額滿' : '未額滿'}${source ? ` (${source})` : ''}`);
-        }
+      const hasCapMechanism = /額滿即止|名額有限|名額已滿|額滿/.test(text);
+      if (!hasCapMechanism) {
+        // 即使沒額滿字樣也記錄下來,讓 iOS 端看到「在追蹤中但未額滿」
+        ecardResults[item.id] = { full: false, title: title.substring(0, 50) };
         return;
       }
 
       const full = detectFull(text, year, monthNum, month);
       ecardResults[item.id] = { full, title: title.substring(0, 50) };
-      console.log(`[SPA] ${title.substring(0, 40)} → ${full ? '額滿' : '未額滿'}`);
+      console.log(`[easywallet] ${title.substring(0, 40)} → ${full ? '額滿' : '未額滿'}`);
     } catch (e) {
-      console.error(`[${item.id}] SPA失敗:`, e.message);
+      console.error(`[${item.id}] easywallet 失敗:`, e.message);
+    }
+  }
+
+  // 月級挑戰:三道防線(puppeteer 路線,保留原邏輯)
+  async function scanChallengeSpa(item) {
+    try {
+      const spa = await fetchSpaPage(browser, item.url);
+      const text = spa.text;
+
+      const levels = [
+        { suffix: 'silver', label: '銀級', hardRx: new RegExp(monthNum + '月銀級回饋已於[\\s\\S]*?額滿'), keywordRx: /銀級/ },
+        { suffix: 'gold', label: '金級', hardRx: new RegExp(monthNum + '月金級回饋已於[\\s\\S]*?額滿'), keywordRx: /金級/ },
+        { suffix: 'platinum', label: '白金級', hardRx: new RegExp(monthNum + '月白金回饋已於[\\s\\S]*?額滿'), keywordRx: /白金/ },
+      ];
+
+      const mm = monthNum.padStart(2, '0');
+      const mdRx = new RegExp(`(?:^|[^0-9/])(${monthNum}|${mm})\\s*[/月]\\s*\\d{1,2}`);
+
+      for (const lv of levels) {
+        let full = false;
+        let source = '';
+
+        // 防線 1:硬 regex
+        if (lv.hardRx.test(text)) {
+          full = true;
+          source = 'hard-regex';
+        }
+
+        // 防線 2:級別+額滿+本月共現
+        if (!full) {
+          const fullRx = /額滿/g;
+          let m;
+          while ((m = fullRx.exec(text)) !== null) {
+            const start = Math.max(0, m.index - 150);
+            const end = Math.min(text.length, m.index + 30);
+            const ctx = text.substring(start, end);
+            if (lv.keywordRx.test(ctx) && mdRx.test(ctx)) {
+              full = true;
+              source = 'keyword-context';
+              break;
+            }
+          }
+        }
+
+        // 防線 3:PDF
+        if (!full && pdfChallenge[lv.suffix] && pdfChallenge[lv.suffix].full) {
+          full = true;
+          source = 'pdf';
+        }
+
+        ecardResults[`challenge_${lv.suffix}`] = { full, title: `月級挑戰 ${lv.label}` };
+        console.log(`[月級挑戰] ${lv.label} → ${full ? '額滿' : '未額滿'}${source ? ` (${source})` : ''}`);
+      }
+    } catch (e) {
+      console.error(`[${item.id}] challenge 失敗:`, e.message);
     }
   }
 
@@ -944,25 +968,26 @@ async function checkPromo() {
 
   await Promise.all([
     runPool(ssrItems, scanSsr, 10),
-    runPool(spaToScan, scanSpa, 3),
+    runPool(easywalletNormalItems, scanEasywallet, 10),  // 純 HTTP 可以開到 10 併發
+    runPool(challengeItems, scanChallengeSpa, 2),
     runPool(epkawItems, scanEpkaw, 8),
   ]);
 
   await browser.close();
 
-  // 如果 spaToScan 沒有 challenge(例如列表頁沒抓到、hardcoded 沒進去)
+  // 如果 challengeItems 是空(C2 列表沒抓到月級挑戰 + hardcoded 失敗)
   // 但 PDF 有資料,仍然要寫入 ecardResults
   if (!ecardResults.challenge_silver && pdfChallenge.silver && pdfChallenge.silver.full) {
     ecardResults.challenge_silver = { full: true, title: '月級挑戰 銀級' };
-    console.log('[月級挑戰] 銀級 → 額滿 (pdf, spaToScan 未包含 challenge)');
+    console.log('[月級挑戰] 銀級 → 額滿 (pdf, challengeItems 為空)');
   }
   if (!ecardResults.challenge_gold && pdfChallenge.gold && pdfChallenge.gold.full) {
     ecardResults.challenge_gold = { full: true, title: '月級挑戰 金級' };
-    console.log('[月級挑戰] 金級 → 額滿 (pdf, spaToScan 未包含 challenge)');
+    console.log('[月級挑戰] 金級 → 額滿 (pdf, challengeItems 為空)');
   }
   if (!ecardResults.challenge_platinum && pdfChallenge.platinum && pdfChallenge.platinum.full) {
     ecardResults.challenge_platinum = { full: true, title: '月級挑戰 白金級' };
-    console.log('[月級挑戰] 白金級 → 額滿 (pdf, spaToScan 未包含 challenge)');
+    console.log('[月級挑戰] 白金級 → 額滿 (pdf, challengeItems 為空)');
   }
 
   const tC4 = Date.now();

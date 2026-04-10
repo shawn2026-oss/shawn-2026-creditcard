@@ -118,11 +118,17 @@ function stripHtml(s) {
 // ===== 額滿偵測(通用,v2.3.1) =====
 
 /**
- * 判斷文字是否包含本月的額滿公告。
+ * 判斷文字是否包含本月的真實額滿公告。
  *
- * 策略(兩層):
- *   強信號:「已於 X/Y 額滿」/「YYYY/M/D 額滿」這種明確句型 → 直接信任
- *   弱信號:額滿前後 200 字有「本月日期」→ 但排除「活動期間」上下文
+ * 策略:只信任「明確記錄了額滿時間點」的句型。
+ * 拒絕:「額滿即止」「於 APP 公告額滿狀態」等制度性文字。
+ *
+ * 實作:
+ *   1. 掃描每個「額滿」位置
+ *   2. 取前 30 字窄窗口(要求時間點緊鄰「額滿」)
+ *   3. 窗口必須同時含:本月日期 + HH:MM 時間標記
+ *   4. 額外排除:窗口內含「起」「~」「至」等範圍符號(代表是活動期間而非單一時間點)
+ *   5. 排除歷史年份
  */
 function detectFull(text, year, monthNum, month) {
   const plain = typeof text === 'string' ? text : String(text);
@@ -130,53 +136,40 @@ function detectFull(text, year, monthNum, month) {
 
   const mm = monthNum.padStart(2, '0');
 
-  // === 第一層:強信號 ===
-  // 明確的「於 X/Y HH:MM 額滿」句型,直接回 true,不管活動期間
-  // 這個 pattern 足夠精確到不會誤判,同時涵蓋所有實際觀察到的格式
-  const strongPatterns = [
-    // 「已於 2026/4/8」/「已於 2026/04/08」
-    new RegExp(`已於\\s*${year}[/年]\\s*${monthNum}[/月]\\s*\\d{1,2}[\\s\\S]{0,40}?額滿`),
-    new RegExp(`已於\\s*${year}[/年]\\s*${mm}[/月]\\s*\\d{1,2}[\\s\\S]{0,40}?額滿`),
-    // 「於 4/8 11:00 額滿」/「於 04/08 ... 額滿」(無年份)
-    new RegExp(`[於以]\\s*${monthNum}/\\d{1,2}[\\s\\S]{0,40}?額滿`),
-    new RegExp(`[於以]\\s*${mm}/\\d{1,2}[\\s\\S]{0,40}?額滿`),
-    // 「4月 ... 已於 ... 額滿」
-    new RegExp(`(?:^|[^0-9])${monthNum}月[\\s\\S]{0,60}?已於[\\s\\S]{0,60}?額滿`),
-    new RegExp(`(?:^|[^0-9])${mm}月[\\s\\S]{0,60}?已於[\\s\\S]{0,60}?額滿`),
-    // 「4月份贈點已於 ... 額滿」(icash Pay 格式)
-    new RegExp(`${monthNum}月份[\\s\\S]{0,30}?已於[\\s\\S]{0,50}?額滿`),
-    new RegExp(`${mm}月份[\\s\\S]{0,30}?已於[\\s\\S]{0,50}?額滿`),
-    // 「2026年4月 ... 額滿」
-    new RegExp(`${year}年${monthNum}月[\\s\\S]{0,80}?額滿`),
-  ];
-  for (const p of strongPatterns) {
-    if (p.test(plain)) return true;
-  }
-
-  // === 第二層:弱信號 ===
-  // 上下文有「本月 M/D」或「4月名額」等,但要排除「活動期間」描述
-  const mdRx = new RegExp(`(?:^|[^0-9/])(${monthNum}|${mm})\\s*[/月]\\s*\\d{1,2}`);
-  const monthOnlyRx = new RegExp(`(?:^|[^0-9/])(${monthNum}月|${mm}月|${monthNum}月份|${mm}月份)`);
+  // 本月日期:M/D 或 MM/DD 或 YYYY/M/D
+  const monthDateRx = new RegExp(
+    `(?:^|[^0-9/])(?:${year}[年/])?(?:${monthNum}|${mm})[/月]\\s*\\d{1,2}`
+  );
+  // 時間標記:HH:MM / HH:MM:SS / am / pm
+  const realTimeRx = /\d{1,2}:\d{2}(?::\d{2})?|[ap]\.?\s?m\.?/i;
+  // 範圍符號(表示這是活動期間,不是單一時間點)
+  const rangeRx = /起[\s~～\-]|~\s*20\d{2}|至\s*20\d{2}|[~～\-]\s*(?:20\d{2}|\d{1,2}\/\d{1,2})/;
   const otherYearRx = new RegExp(`(${year - 1}|${year - 2}|${year + 1})年`);
-  const periodRx = /活動期間|存續期間|活動時間|活動日期|資格判定區間|回饋期間/;
 
   const fullRx = /額滿/g;
   let m;
   while ((m = fullRx.exec(plain)) !== null) {
-    const start = Math.max(0, m.index - 200);
-    const end = Math.min(plain.length, m.index + 30);
-    const ctx = plain.substring(start, end);
+    // 窄窗口:取「額滿」前 25 字
+    // 真實句型如「已於 2026/04/04 17:21 p.m. 額滿」最多 22 字
+    // 設太大會吃到前一句的「活動期間」造成誤判
+    const start = Math.max(0, m.index - 25);
+    const ctx = plain.substring(start, m.index);
 
-    // 排除歷史年份
+    // 條件 1:窗口含本月日期
+    if (!monthDateRx.test(ctx)) continue;
+
+    // 條件 2:窗口含 HH:MM 時間點
+    if (!realTimeRx.test(ctx)) continue;
+
+    // 條件 3:窗口不能是範圍表達(活動期間)
+    if (rangeRx.test(ctx)) continue;
+
+    // 條件 4:排除歷史年份
     if (otherYearRx.test(ctx)) continue;
 
-    // 排除活動期間描述
-    if (periodRx.test(ctx)) continue;
-
-    // 含 M/D 或 M月
-    if (mdRx.test(ctx)) return true;
-    if (monthOnlyRx.test(ctx)) return true;
+    return true;
   }
+
   return false;
 }
 

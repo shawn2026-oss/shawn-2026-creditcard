@@ -1,9 +1,17 @@
 /**
- * 自動檢查活動額滿狀態(puppeteer 版 v2.3.3)
+ * 自動檢查活動額滿狀態(puppeteer 版 v2.3.4)
  * GitHub Actions 每天台灣時間 00/08/14/20 點執行
  *
  * ⚠️ workflow 需要加 pdf-parse 套件:
  *    npm install puppeteer pdf-parse
+ *
+ * v2.3.4 修正(2026-04-10 晚):
+ *   - C2 抽 id 時 skip 月級挑戰 1766109563(由 C3 hardcoded 用 challenge_ 前綴處理)
+ *     避免孤兒 ew_1766109563 永遠 full:false 污染 easycard_results
+ *   - C2 抽 id 時 skip 已在 C1 收錄的 raw id
+ *     修正 C1 存 "1769673733" + C2 存 "ew_1769673733" 被當成兩項的 collision
+ *   - promos 陣列悠遊付區段用 title 去重,防止 UI 出現重複條目
+ *     (繳牌照稅、韓國、集集樂曾出現兩次)
  *
  * v2.3.3 修正(2026-04-10):
  *   - C2 easywallet.easycard.com.tw/benefit 改用純 HTTP fetchPage
@@ -538,7 +546,23 @@ async function collectEasycardOfferUrls(browser) {
       // 對每個 id 抽它的 title(往前找最近的 <a> 或 markdown 連結文字)
       // 更可靠的方法:掃一遍文字,在 content.php?id= 附近抓標題
       let count = 0;
+      let skippedCollision = 0;
+      let skippedChallenge = 0;
       for (const id of foundIds) {
+        // 跳過月級挑戰:由 C3 hardcoded 用 'challenge_' 前綴處理(有特殊 regex 邏輯)
+        // 避免 C2 抽到後產生孤兒 ew_1766109563
+        if (id === '1766109563') {
+          skippedChallenge++;
+          continue;
+        }
+
+        // 跳過 C1 已收集的 id(避免 C1 存 "1769673733" 和 C2 存 "ew_1769673733" 變重複)
+        // C1 用的 id 沒前綴,所以直接檢查 seen.has(id)
+        if (seen.has(id)) {
+          skippedCollision++;
+          continue;
+        }
+
         // 試兩種 pattern:
         // 1. <a ... href="...content.php?id=ID">TITLE</a>  (HTML)
         // 2. [TITLE\n\n DATE-DATE](...content.php?id=ID)  (markdown-ish)
@@ -564,7 +588,7 @@ async function collectEasycardOfferUrls(browser) {
         );
         count++;
       }
-      console.log(`[C2] easywallet 列表: 抽到 ${count} 個活動 id`);
+      console.log(`[C2] easywallet 列表: 抽到 ${count} 個活動 id (skip collision=${skippedCollision}, challenge=${skippedChallenge})`);
     }
   } catch (e) {
     console.error('[C2] easywallet 列表頁失敗:', e.message);
@@ -993,8 +1017,16 @@ async function checkPromo() {
   const tC4 = Date.now();
   console.log(`[計時] C 逐頁掃描: ${((tC4 - tC123) / 1000).toFixed(1)}s`);
 
+  // 悠遊付 promos 用 title 去重 — 防止 C1/C2 抓到同活動時 push 兩次
+  // (C1 存 "1769673733",C2 存 "ew_1769673733",title 相同但 id 不同)
+  const seenTitles = new Set();
   for (const [id, result] of Object.entries(ecardResults)) {
     if (!result.full) continue;
+    if (seenTitles.has(result.title)) {
+      console.log(`[悠遊付] 跳過重複: ${result.title}(已由 ${id} 外的其他 id 收錄)`);
+      continue;
+    }
+    seenTitles.add(result.title);
     promos.push({
       id: `easycard_${id}`,
       full: true,

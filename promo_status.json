@@ -5,8 +5,8 @@
   "starbucks_5_msg": "",
   "sunday_7_full": false,
   "sunday_7_msg": "",
-  "uniopen_autoload_full": false,
-  "uniopen_autoload_msg": "",
+  "uniopen_autoload_full": true,
+  "uniopen_autoload_msg": "2026年4月 uniopen自動加值10%已額滿",
   "transport_10": {
     "台新": {
       "full": true,
@@ -218,6 +218,13 @@
       "title": "網購3C 10%額滿(兆豐)",
       "body": "icash Pay 網購3C 10% 兆豐 4月名額已滿",
       "category": "icash Pay"
+    },
+    {
+      "id": "uniopen_autoload",
+      "full": true,
+      "title": "自動加值10%已額滿",
+      "body": "uniopen自動加值10% 4月名額已滿",
+      "category": "icash2.0"
     },
     {
       "id": "ubot_ipassmoney_4",

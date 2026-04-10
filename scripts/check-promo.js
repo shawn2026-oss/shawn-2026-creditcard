@@ -1,20 +1,17 @@
 /**
- * 自動檢查活動額滿狀態(puppeteer 版 v2.1)
+ * 自動檢查活動額滿狀態(puppeteer 版 v2.2)
  * GitHub Actions 每天台灣時間 00/08/14/20 點執行
  *
- * v2.1 修正:
- *   - id/2019 icash Pay 4% / 星巴克 5% 改用「額滿上下文 + 共現」判定,
- *     涵蓋官方不同月份常改格式的情況(「2026年4月...額滿」「04月已於...額滿」等)
- *   - online3c_10 / transport_10 的 msg 欄位先脫 HTML tag 再存,不再殘留 </span></strong>
+ * v2.2 修正:
+ *   - icash Pay 改用「列表頁自動發現 + 標題關鍵字分類」,避免 icash Pay
+ *     換頁(id/2019 → id/1982)時爬蟲完全失效
+ *   - 每個子活動類別(uniopen 4% / 星巴克 / 交通 / 3C / 週日)對到多個候選頁面,
+ *     任一頁抓到本月額滿就算額滿
+ *   - 保留原本四個 hardcoded id 作為 fallback
  *
- * A. icash Pay (icashpay.com.tw) — fetchPage
- * B. icash2.0 (icash.com.tw) — fetchPageWithCookie
- * B2. 聯邦銀行 iPASS MONEY — fetchPage
- * C. 悠遊付 — 三層掃描:
- *    C1. easycard.com.tw/offers 列表頁(puppeteer 翻頁 + 抓連結文字)
- *    C2. easywallet.easycard.com.tw/benefit 列表頁(puppeteer + 抓連結文字)
- *    C3. hardcoded 保底清單(已知重要活動)
- *    C4. 逐頁偵測額滿(easycard 用 fetchPage,easywallet 用 puppeteer)
+ * v2.1 修正:
+ *   - id/2019 icash Pay 4% / 星巴克 5% 改用「額滿上下文 + 共現」判定
+ *   - online3c_10 / transport_10 的 msg 欄位先脫 HTML tag 再存
  */
 
 const https = require('https');
@@ -76,7 +73,6 @@ function getMonthStr() {
   return { year, month, monthNum: String(now.getMonth() + 1), todayStr: `${year}-${month}-${String(now.getDate()).padStart(2, '0')}` };
 }
 
-// ===== 通用:HTML 脫標籤 + 空白正規化 =====
 function stripHtml(s) {
   return (s || '')
     .replace(/<[^>]+>/g, ' ')
@@ -86,7 +82,7 @@ function stripHtml(s) {
     .trim();
 }
 
-// ===== 額滿偵測(通用) =====
+// ===== 額滿偵測(通用,供悠遊付用) =====
 
 function detectFull(text, year, monthNum, month) {
   const patterns = [
@@ -121,7 +117,6 @@ function extractTitle(html) {
   return '';
 }
 
-// ===== 清理標題 =====
 function cleanLabel(text) {
   return text
     .replace(/<[^>]+>/g, '')
@@ -129,6 +124,179 @@ function cleanLabel(text) {
     .replace(/悠遊卡股份有限公司/g, '')
     .trim()
     .substring(0, 50);
+}
+
+// ===== icash Pay 列表頁自動發現 =====
+
+/**
+ * 爬 advertMessage/index 1~5 頁,把所有活動按標題關鍵字分到 5 個 bucket。
+ * 呼叫端對每個 bucket 內所有頁面都掃一次,任一頁額滿就算額滿。
+ */
+async function discoverIcashPayPages() {
+  const buckets = {
+    uniopen_4pct: [],
+    starbucks_5pct: [],
+    transport_10pct: [],
+    online3c_10pct: [],
+    sunday_7pct: [],
+  };
+  const seenIds = new Set();
+
+  for (let pageNum = 1; pageNum <= 5; pageNum++) {
+    const url = pageNum === 1
+      ? 'https://www.icashpay.com.tw/advertMessage/index'
+      : `https://www.icashpay.com.tw/advertMessage/index/page/${pageNum}`;
+    let html = '';
+    try {
+      html = await fetchPage(url);
+    } catch (e) {
+      console.error(`[icash Pay 列表] page ${pageNum} 失敗:`, e.message);
+      continue;
+    }
+    if (!html || html.length < 500) {
+      console.log(`[icash Pay 列表] page ${pageNum} 內容過短,跳過`);
+      continue;
+    }
+
+    // 抓所有 advertMessage/view/id/\d+ 連結 + <a> 內的文字作為標題
+    const linkRx = /<a[^>]*href=["']([^"']*advertMessage\/view\/id\/(\d+)[^"']*)["'][^>]*>([\s\S]*?)<\/a>/gi;
+    let match;
+    let foundInPage = 0;
+    while ((match = linkRx.exec(html)) !== null) {
+      const href = match[1];
+      const id = match[2];
+      const inner = match[3];
+
+      if (seenIds.has(id)) continue;
+      seenIds.add(id);
+
+      let title = stripHtml(inner);
+
+      // 標題太短(只有 img),往後抓 400 字當 context
+      if (title.length < 5) {
+        const afterIdx = match.index + match[0].length;
+        const after = html.substring(afterIdx, afterIdx + 400);
+        title = stripHtml(after).substring(0, 100);
+      }
+      if (!title) continue;
+
+      const fullUrl = href.startsWith('http')
+        ? href
+        : `https://www.icashpay.com.tw${href.startsWith('/') ? '' : '/'}${href}`;
+      const entry = { id, url: fullUrl, title };
+
+      // === 標題關鍵字分類(注意順序:具體優先)===
+      let classified = false;
+
+      // 星巴克 5%
+      if (/星巴克|starbucks/i.test(title) && /5\s*%|筆筆/.test(title)) {
+        buckets.starbucks_5pct.push(entry);
+        classified = true;
+      }
+
+      // 網購 3C 10%
+      if (/(網購|3\s*C|數位|電商)/.test(title) && /10\s*%/.test(title)) {
+        buckets.online3c_10pct.push(entry);
+        classified = true;
+      }
+
+      // 交通 10%
+      if (/(交通|捷運|公車|大眾運輸|YouBike|iPASS|悠遊)/.test(title) && /10\s*%/.test(title)) {
+        buckets.transport_10pct.push(entry);
+        classified = true;
+      }
+
+      // 週日 7%
+      if (/週日|星期日|日曜/.test(title) && /7\s*%/.test(title)) {
+        buckets.sunday_7pct.push(entry);
+        classified = true;
+      }
+
+      // UNIOPEN 4% 全通路(最寬,最後判斷)
+      // 標題範例:「icash Pay超強支付 綁uniopen聯名卡天天最高11%」「全通路4%」
+      if (!classified && /uniopen|UNIOPEN|全通路|天天最高|天天回饋/i.test(title)) {
+        buckets.uniopen_4pct.push(entry);
+        classified = true;
+      }
+
+      if (classified) foundInPage++;
+    }
+    console.log(`[icash Pay 列表] page ${pageNum}: 分類到 ${foundInPage} 個活動`);
+  }
+
+  // === Fallback:保底加入原本 hardcoded 的 id,防列表頁抓不到 ===
+  const FALLBACK = [
+    { bucket: 'uniopen_4pct', id: '2019', title: '[fallback] id/2019' },
+    { bucket: 'uniopen_4pct', id: '1982', title: '[fallback] id/1982' },
+    { bucket: 'starbucks_5pct', id: '2019', title: '[fallback] id/2019' },
+    { bucket: 'starbucks_5pct', id: '1982', title: '[fallback] id/1982' },
+    { bucket: 'transport_10pct', id: '2037', title: '[fallback] id/2037' },
+    { bucket: 'online3c_10pct', id: '2033', title: '[fallback] id/2033' },
+    { bucket: 'sunday_7pct', id: '1954', title: '[fallback] id/1954' },
+  ];
+  for (const f of FALLBACK) {
+    if (!buckets[f.bucket].some(e => e.id === f.id)) {
+      buckets[f.bucket].push({
+        id: f.id,
+        url: `https://www.icashpay.com.tw/advertMessage/view/id/${f.id}`,
+        title: f.title
+      });
+    }
+  }
+
+  for (const [bucketName, entries] of Object.entries(buckets)) {
+    console.log(`[icash Pay 分類] ${bucketName}: ${entries.length} 個`);
+    for (const e of entries) {
+      console.log(`    id/${e.id}  "${e.title.substring(0, 60)}"`);
+    }
+  }
+
+  return buckets;
+}
+
+/**
+ * 掃描某個 bucket 裡的所有頁面,任一頁抓到本月額滿就回 {full:true,...}
+ * subMatch: context 必須含這個 pattern 才算
+ * excludeSubMatch: context 含這個 pattern 就跳過
+ */
+async function scanIcashPayBucket(entries, year, monthNum, { subMatch, excludeSubMatch } = {}) {
+  const mm = monthNum.padStart(2, '0');
+  const monthRx = new RegExp(
+    `(${year}年${monthNum}月|${year}/${mm}|${year}/${monthNum}|(?<![0-9])${mm}月|(?<![0-9])${monthNum}月份)`
+  );
+
+  for (const entry of entries) {
+    let html = '';
+    try {
+      html = await fetchPage(entry.url);
+    } catch (e) {
+      console.log(`  [id/${entry.id}] 取頁失敗:`, e.message);
+      continue;
+    }
+    if (!html || html.length < 200) continue;
+
+    const plainText = stripHtml(html);
+
+    const fullRx = /額滿/g;
+    let fm;
+    while ((fm = fullRx.exec(plainText)) !== null) {
+      const start = Math.max(0, fm.index - 150);
+      const end = Math.min(plainText.length, fm.index + 50);
+      const ctx = plainText.substring(start, end);
+
+      if (!monthRx.test(ctx)) continue;
+      if (excludeSubMatch && excludeSubMatch.test(ctx)) continue;
+      if (subMatch && !subMatch.test(ctx)) continue;
+
+      return {
+        full: true,
+        sourceId: entry.id,
+        snippet: ctx.trim().substring(0, 100),
+      };
+    }
+  }
+
+  return { full: false, sourceId: null, snippet: null };
 }
 
 // ===== 悠遊付:三層掃描收集 URL + 標題 =====
@@ -151,7 +319,6 @@ async function collectEasycardOfferUrls(browser) {
   try {
     const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36');
-
     const listUrl = 'https://www.easycard.com.tw/offers';
     console.log('[C1] 載入 easycard.com.tw/offers 列表頁...');
     await page.goto(listUrl, { waitUntil: 'networkidle2', timeout: 30000 });
@@ -219,7 +386,6 @@ async function collectEasycardOfferUrls(browser) {
   try {
     const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36');
-
     console.log('[C2] 載入 easywallet 好康優惠列表頁...');
     await page.goto('https://easywallet.easycard.com.tw/benefit', { waitUntil: 'networkidle2', timeout: 30000 });
 
@@ -281,8 +447,6 @@ async function collectEasycardOfferUrls(browser) {
   return results;
 }
 
-// ===== 用 puppeteer 取 SPA 頁面標題和內文 =====
-
 async function fetchSpaPage(browser, url, timeout = 12000) {
   const page = await browser.newPage();
   await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36');
@@ -314,122 +478,120 @@ async function checkPromo() {
 
   const promos = [];
 
-  // ========== A. icash Pay ==========
+  // ========== A. icash Pay(列表頁自動發現)==========
 
-  // 1. id/2019 — 4%全通路 + 星巴克5%
-  //
-  // 修正歷史:原本用「2026年4月...額滿」直接 regex,但 icash Pay 公告格式會變
-  //   ("04月已於...額滿" / "4月全通路...已額滿" / "已於2026/4/8...額滿"),
-  //   4/8 早上的「全通路4%」實際額滿但爬蟲沒抓到。
-  // 新邏輯:抓「額滿」前後 ±150 字的上下文 → 檢查是否提及本月 → 再用關鍵字
-  //   歸到星巴克子活動或全通路子活動。
+  console.log('\n===== icash Pay 列表自動發現 =====');
+  const icashBuckets = await discoverIcashPayPages();
+
+  // --- A1. UNIOPEN 全通路 4% ---
   let icashFull = prev('uniopen_icash_full'), icashMsg = needReset ? '' : (currentStatus.uniopen_icash_msg || '');
+  try {
+    const result = await scanIcashPayBucket(icashBuckets.uniopen_4pct, year, monthNum, {
+      subMatch: /全通路|不限金額|4\s*%/,
+      excludeSubMatch: /星巴克|筆筆5%/,
+    });
+    if (result.full && !icashFull) {
+      icashFull = true;
+      icashMsg = `${year}年${monthNum}月 icash Pay 4%已額滿`;
+      console.log(`[icash Pay 4%] 額滿 ← id/${result.sourceId} "${result.snippet}"`);
+    } else if (!icashFull) {
+      console.log('[icash Pay 4%] 未額滿');
+    }
+  } catch (e) { console.error('[icash Pay 4%] 失敗:', e.message); }
+  if (icashFull) promos.push({ id: 'icash_4', full: true, title: 'icash Pay 4%已額滿', body: `icash Pay 全通路4% ${monthNum}月名額已滿`, category: 'icash Pay' });
+
+  // --- A2. 星巴克筆筆 5% ---
   let starbucksFull = prev('starbucks_5_full'), starbucksMsg = needReset ? '' : (currentStatus.starbucks_5_msg || '');
   try {
-    const p = await fetchPage('https://www.icashpay.com.tw/advertMessage/view/id/2019');
-    const plainText = stripHtml(p);
-    const mm = monthNum.padStart(2, '0');
-
-    // 抓每個「額滿」周圍 ±150 字的上下文
-    const contexts = [];
-    const fullRx = /額滿/g;
-    let fm;
-    while ((fm = fullRx.exec(plainText)) !== null) {
-      const start = Math.max(0, fm.index - 150);
-      const end = Math.min(plainText.length, fm.index + 50);
-      contexts.push(plainText.substring(start, end));
+    // 星巴克可能在專屬頁面或跟 uniopen 4% 共頁,兩個 bucket 合併掃
+    const combined = [...icashBuckets.starbucks_5pct, ...icashBuckets.uniopen_4pct];
+    const result = await scanIcashPayBucket(combined, year, monthNum, {
+      subMatch: /星巴克|筆筆回饋5%|筆筆饋5%|筆筆5%/,
+    });
+    if (result.full && !starbucksFull) {
+      starbucksFull = true;
+      starbucksMsg = `${year}年${monthNum}月 星巴克筆筆5%已額滿`;
+      console.log(`[星巴克 5%] 額滿 ← id/${result.sourceId} "${result.snippet}"`);
+    } else if (!starbucksFull) {
+      console.log('[星巴克 5%] 未額滿');
     }
-
-    // 月份條件:context 裡必須提到本月的任一寫法
-    // (?<![0-9]) lookbehind 避免「2026/04」被「04月」重複吃
-    const monthRx = new RegExp(
-      `(${year}年${monthNum}月|${year}/${mm}|${year}/${monthNum}|(?<![0-9])${mm}月|(?<![0-9])${monthNum}月份)`
-    );
-
-    for (const ctx of contexts) {
-      if (!monthRx.test(ctx)) continue;
-
-      // 星巴克子活動(優先判斷,避免被「全通路」規則誤吃)
-      if (/星巴克|筆筆回饋5%|筆筆饋5%|筆筆5%/.test(ctx)) {
-        if (!starbucksFull) {
-          starbucksFull = true;
-          starbucksMsg = `${year}年${monthNum}月 星巴克筆筆5%已額滿`;
-          console.log('[id/2019] 星巴克5% 額滿 ← "' + ctx.trim().substring(0, 80) + '"');
-        }
-        continue;
-      }
-
-      // 全通路 4% 子活動
-      if (/全通路|不限金額|4\s*%|uniopen|UNIOPEN|聯名卡/.test(ctx)) {
-        if (!icashFull) {
-          icashFull = true;
-          icashMsg = `${year}年${monthNum}月 icash Pay 4%已額滿`;
-          console.log('[id/2019] icash Pay 4% 額滿 ← "' + ctx.trim().substring(0, 80) + '"');
-        }
-      }
-    }
-
-    // Fallback log:有額滿+本月但無法歸類,印出 context 讓下次對照改 regex
-    if (!icashFull && !starbucksFull) {
-      if (contexts.length > 0 && contexts.some(c => monthRx.test(c))) {
-        console.log('[id/2019] 警告:偵測到額滿但無法歸類到子活動,原文片段:');
-        for (const ctx of contexts.slice(0, 3)) {
-          if (monthRx.test(ctx)) console.log('  → ' + ctx.trim().substring(0, 120));
-        }
-      } else {
-        console.log('[id/2019] icash Pay 4% 未額滿');
-        console.log('[id/2019] 星巴克5% 未額滿');
-      }
-    } else {
-      if (!icashFull) console.log('[id/2019] icash Pay 4% 未額滿');
-      if (!starbucksFull) console.log('[id/2019] 星巴克5% 未額滿');
-    }
-  } catch (e) { console.error('[id/2019] 失敗:', e.message); }
-
-  if (icashFull) promos.push({ id: 'icash_4', full: true, title: 'icash Pay 4%已額滿', body: `icash Pay 全通路4% ${monthNum}月名額已滿`, category: 'icash Pay' });
+  } catch (e) { console.error('[星巴克 5%] 失敗:', e.message); }
   if (starbucksFull) promos.push({ id: 'starbucks_5', full: true, title: '星巴克5%已額滿', body: `icash Pay 星巴克5% ${monthNum}月名額已滿`, category: 'icash Pay' });
 
-  // 2. id/2037 — 交通10%
+  // --- A3. 交通 10%(多銀行)---
   const banks = ['台新', '兆豐', '一銀', '華南', '元大'];
   let transport = currentStatus.transport_10 || {};
   if (needReset) { transport = {}; for (const b of banks) transport[b] = { full: false, msg: '' }; }
   else { for (const b of banks) if (!transport[b]) transport[b] = { full: false, msg: '' }; }
+
   try {
-    const p = await fetchPage('https://www.icashpay.com.tw/advertMessage/view/id/2037');
-    const plainP = stripHtml(p);
-    for (const b of banks) {
-      const m = plainP.match(new RegExp(b + monthNum.padStart(2, '0') + '月份贈點已於[\\s\\S]*?額滿'));
-      if (m) { transport[b].full = true; transport[b].msg = stripHtml(m[0]); console.log(`[id/2037] ${b} 額滿`); }
-      else console.log(`[id/2037] ${b} 未額滿`);
+    for (const entry of icashBuckets.transport_10pct) {
+      let html = '';
+      try { html = await fetchPage(entry.url); } catch (e) { continue; }
+      if (!html) continue;
+      const plainP = stripHtml(html);
+      for (const b of banks) {
+        if (transport[b].full) continue;
+        const m = plainP.match(new RegExp(b + monthNum.padStart(2, '0') + '月份贈點已於[\\s\\S]*?額滿'));
+        if (m) {
+          transport[b].full = true;
+          transport[b].msg = stripHtml(m[0]);
+          console.log(`[交通 10%] ${b} 額滿 ← id/${entry.id}`);
+        }
+      }
     }
-  } catch (e) { console.error('[id/2037] 失敗:', e.message); }
+    for (const b of banks) {
+      if (!transport[b].full) console.log(`[交通 10%] ${b} 未額滿`);
+    }
+  } catch (e) { console.error('[交通 10%] 失敗:', e.message); }
+
   for (const b of banks) {
     if (transport[b].full) promos.push({ id: `transport_${b}`, full: true, title: `交通10%額滿(${b})`, body: `icash Pay 交通10% ${b} ${monthNum}月名額已滿`, category: 'icash Pay' });
   }
 
-  // 3. id/1954 — 週日7%
+  // --- A4. 週日 7% ---
   let sundayFull = prev('sunday_7_full'), sundayMsg = needReset ? '' : (currentStatus.sunday_7_msg || '');
   try {
-    const p = await fetchPage('https://www.icashpay.com.tw/advertMessage/view/id/1954');
-    if (p.match(new RegExp(year + '年' + monthNum + '月[\\s\\S]*?週日[\\s\\S]*?額滿'))) { sundayFull = true; sundayMsg = `${year}年${monthNum}月 週日7%已額滿`; console.log('[id/1954] 週日7%額滿'); }
-    else console.log('[id/1954] 週日7% 未額滿');
-  } catch (e) { console.error('[id/1954] 失敗:', e.message); }
+    const result = await scanIcashPayBucket(icashBuckets.sunday_7pct, year, monthNum, {
+      subMatch: /週日|星期日/,
+    });
+    if (result.full && !sundayFull) {
+      sundayFull = true;
+      sundayMsg = `${year}年${monthNum}月 週日7%已額滿`;
+      console.log(`[週日 7%] 額滿 ← id/${result.sourceId}`);
+    } else if (!sundayFull) {
+      console.log('[週日 7%] 未額滿');
+    }
+  } catch (e) { console.error('[週日 7%] 失敗:', e.message); }
   if (sundayFull) promos.push({ id: 'sunday_7', full: true, title: '週日7%已額滿', body: `icash Pay 週日7% ${monthNum}月名額已滿`, category: 'icash Pay' });
 
-  // 4. id/2033 — 網購3C 10%
+  // --- A5. 網購 3C 10%(多銀行)---
   const banks3c = ['玉山', '國泰', '台新', '富邦', '兆豐'];
   let online3c = currentStatus.online3c_10 || {};
   if (needReset) { online3c = {}; for (const b of banks3c) online3c[b] = { full: false, msg: '' }; }
   else { for (const b of banks3c) if (!online3c[b]) online3c[b] = { full: false, msg: '' }; }
+
   try {
-    const p = await fetchPage('https://www.icashpay.com.tw/advertMessage/view/id/2033');
-    const plainP = stripHtml(p);
-    for (const b of banks3c) {
-      const m = plainP.match(new RegExp(b + monthNum.padStart(2, '0') + '月份贈點已於[\\s\\S]*?額滿'));
-      if (m) { online3c[b].full = true; online3c[b].msg = stripHtml(m[0]); console.log(`[id/2033] ${b} 額滿`); }
-      else console.log(`[id/2033] ${b} 未額滿`);
+    for (const entry of icashBuckets.online3c_10pct) {
+      let html = '';
+      try { html = await fetchPage(entry.url); } catch (e) { continue; }
+      if (!html) continue;
+      const plainP = stripHtml(html);
+      for (const b of banks3c) {
+        if (online3c[b].full) continue;
+        const m = plainP.match(new RegExp(b + monthNum.padStart(2, '0') + '月份贈點已於[\\s\\S]*?額滿'));
+        if (m) {
+          online3c[b].full = true;
+          online3c[b].msg = stripHtml(m[0]);
+          console.log(`[網購3C 10%] ${b} 額滿 ← id/${entry.id}`);
+        }
+      }
     }
-  } catch (e) { console.error('[id/2033] 失敗:', e.message); }
+    for (const b of banks3c) {
+      if (!online3c[b].full) console.log(`[網購3C 10%] ${b} 未額滿`);
+    }
+  } catch (e) { console.error('[網購3C 10%] 失敗:', e.message); }
+
   for (const b of banks3c) {
     if (online3c[b].full) promos.push({ id: `online3c_${b}`, full: true, title: `網購3C 10%額滿(${b})`, body: `icash Pay 網購3C 10% ${b} ${monthNum}月名額已滿`, category: 'icash Pay' });
   }
@@ -447,7 +609,6 @@ async function checkPromo() {
   if (autoloadFull) promos.push({ id: 'uniopen_autoload', full: true, title: '自動加值10%已額滿', body: `uniopen自動加值10% ${monthNum}月名額已滿`, category: 'icash2.0' });
 
   // ========== B2. 聯邦銀行 iPASS MONEY 10% ==========
-  // 半年活動 (1~6月),每月分別額滿
   let ubotIpass = currentStatus.ubot_ipassmoney || {};
   const ipassMonths = ['1', '2', '3', '4', '5', '6'];
   if (needReset) {
@@ -469,7 +630,6 @@ async function checkPromo() {
       }
     }
   } catch (e) { console.error('[聯邦iPASS] 失敗:', e.message); }
-  // 只把「當月」額滿狀態推到 promos(避免每月都顯示 1~6 月所有額滿訊息)
   if (ubotIpass[monthNum] && ubotIpass[monthNum].full) {
     promos.push({
       id: `ubot_ipassmoney_${monthNum}`,
@@ -580,7 +740,6 @@ async function checkPromo() {
   const tC4 = Date.now();
   console.log(`[計時] C4 逐頁掃描: ${((tC4 - tC123) / 1000).toFixed(1)}s`);
 
-  // 只把額滿的悠遊付活動加入 promos
   for (const [id, result] of Object.entries(ecardResults)) {
     if (!result.full) continue;
     promos.push({
@@ -593,8 +752,6 @@ async function checkPromo() {
   }
 
   // ========== 活動倒數提醒(手動維護)==========
-  // 在這裡加入有到期日的活動,iOS 端會自動排 7 天前 + 1 天前通知
-  // 過期的活動不用刪,iOS 端會自動跳過
   const reminders = [
     { id: 'cube_japan', title: 'CUBE 日本賞', endDate: '2026-04-30' },
     { id: 'esun_pxpay', title: '玉山全支付綁卡3%', endDate: '2026-06-28' },

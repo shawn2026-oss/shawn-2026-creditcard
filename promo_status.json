@@ -1,6 +1,6 @@
 {
-  "uniopen_icash_full": false,
-  "uniopen_icash_msg": "",
+  "uniopen_icash_full": true,
+  "uniopen_icash_msg": "2026年4月 icash Pay 4%已額滿",
   "starbucks_5_full": true,
   "starbucks_5_msg": "2026年4月 星巴克筆筆5%已額滿",
   "sunday_7_full": false,
@@ -184,6 +184,13 @@
     }
   },
   "promos": [
+    {
+      "id": "icash_4",
+      "full": true,
+      "title": "icash Pay 4%已額滿",
+      "body": "icash Pay 全通路4% 4月名額已滿",
+      "category": "icash Pay"
+    },
     {
       "id": "starbucks_5",
       "full": true,

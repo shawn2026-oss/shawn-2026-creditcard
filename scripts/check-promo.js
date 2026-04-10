@@ -140,8 +140,8 @@ function detectFull(text, year, monthNum, month) {
   const monthDateRx = new RegExp(
     `(?:^|[^0-9/])(?:${year}[年/])?(?:${monthNum}|${mm})[/月]\\s*\\d{1,2}`
   );
-  // 時間標記:HH:MM / HH:MM:SS / am / pm
-  const realTimeRx = /\d{1,2}:\d{2}(?::\d{2})?|[ap]\.?\s?m\.?/i;
+  // 時間標記:HH:MM / HH:MM:SS / am / pm(支援全形冒號 U+FF1A)
+  const realTimeRx = /\d{1,2}[:：]\d{2}(?:[:：]\d{2})?|[ap]\.?\s?m\.?/i;
   // 範圍符號(表示這是活動期間,不是單一時間點)
   const rangeRx = /起[\s~～\-]|~\s*20\d{2}|至\s*20\d{2}|[~～\-]\s*(?:20\d{2}|\d{1,2}\/\d{1,2})/;
   const otherYearRx = new RegExp(`(${year - 1}|${year - 2}|${year + 1})年`);

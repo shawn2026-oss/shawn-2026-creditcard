@@ -17,8 +17,8 @@
       "msg": ""
     },
     "一銀": {
-      "full": false,
-      "msg": ""
+      "full": true,
+      "msg": "一銀04月份贈點已於2026/04/09 09:48 a.m.額滿"
     },
     "華南": {
       "full": false,
@@ -174,13 +174,13 @@
       "full": false,
       "title": "月級挑戰 白金級"
     },
-    "ew_1771988018": {
-      "full": false,
-      "title": "乘車碼10%回饋"
-    },
     "ew_1766573956": {
       "full": false,
       "title": "推薦好友送$100"
+    },
+    "ew_1771988018": {
+      "full": false,
+      "title": "乘車碼10%回饋"
     }
   },
   "promos": [
@@ -203,6 +203,13 @@
       "full": true,
       "title": "交通10%額滿(台新)",
       "body": "icash Pay 交通10% 台新 4月名額已滿",
+      "category": "icash Pay"
+    },
+    {
+      "id": "transport_一銀",
+      "full": true,
+      "title": "交通10%額滿(一銀)",
+      "body": "icash Pay 交通10% 一銀 4月名額已滿",
       "category": "icash Pay"
     },
     {

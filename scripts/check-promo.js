@@ -1,9 +1,17 @@
 /**
- * 自動檢查活動額滿狀態(puppeteer 版 v2.3.4)
+ * 自動檢查活動額滿狀態(puppeteer 版 v2.4)
  * GitHub Actions 每天台灣時間 00/08/14/20 點執行
  *
  * ⚠️ workflow 需要加 pdf-parse 套件:
  *    npm install puppeteer pdf-parse
+ *
+ * v2.4 新增(2026-04-15):
+ *   - 新增 manualCheckPromos 陣列輸出
+ *   - 月級挑戰 3 項(銀/金/白金)在爬蟲命中前,以「需 APP 確認」狀態呈現
+ *     iOS 端會顯示為可點擊 row,點擊跳悠遊付 app 讓使用者直達查詢
+ *   - 爬蟲命中後(PDF 補資料)會自動從 manualCheckPromos 移除,
+ *     改走正常的 promos 陣列顯示「已額滿」
+ *   - 舊版 app(v3.6.1 前)decode 時忽略此欄位,向下相容
  *
  * v2.3.4 修正(2026-04-10 晚):
  *   - C2 抽 id 時 skip 月級挑戰 1766109563(由 C3 hardcoded 用 challenge_ 前綴處理)
@@ -1036,6 +1044,54 @@ async function checkPromo() {
     });
   }
 
+  // ========== 需 APP 確認的活動清單(Tier C) ==========
+  //
+  // 有些活動的當月額滿狀態只在悠遊付 APP 內公告,網頁/PDF 更新延遲長
+  // (例如 4 月白金級 4/5 就額滿,但官方 PDF 要到月底才補資料)。
+  // 這些活動在爬蟲真的抓到之前,先以「需 APP 確認」狀態呈現,讓 iOS 端
+  // 顯示為可點擊 row,點擊跳悠遊付 app 讓使用者直達查詢。
+  //
+  // 規則:只有當「對應的爬蟲結果還沒命中」時才 push 進 manualCheckPromos。
+  // 一旦爬蟲命中(promos 陣列已經有對應 id),這個清單就會跳過該項,
+  // iOS 端看到的就是正常的「已額滿」紅橘標籤而不是「APP 確認」琥珀色。
+  const manualCheckCatalog = [
+    {
+      id: 'easycard_challenge_silver',
+      title: '月級挑戰 銀級',
+      deepLink: 'easywallet://',
+      fallbackUrl: 'https://apps.apple.com/tw/app/easy-wallet/id786065396'
+    },
+    {
+      id: 'easycard_challenge_gold',
+      title: '月級挑戰 金級',
+      deepLink: 'easywallet://',
+      fallbackUrl: 'https://apps.apple.com/tw/app/easy-wallet/id786065396'
+    },
+    {
+      id: 'easycard_challenge_platinum',
+      title: '月級挑戰 白金級',
+      deepLink: 'easywallet://',
+      fallbackUrl: 'https://apps.apple.com/tw/app/easy-wallet/id786065396'
+    },
+  ];
+
+  const detectedIds = new Set(promos.map(p => p.id));
+  const manualCheckPromos = [];
+  for (const entry of manualCheckCatalog) {
+    if (detectedIds.has(entry.id)) {
+      console.log(`[manual check] 跳過 ${entry.title}(爬蟲已命中,走正常額滿流程)`);
+      continue;
+    }
+    manualCheckPromos.push({
+      id: entry.id,
+      title: entry.title,
+      category: '需 APP 確認',
+      deepLink: entry.deepLink,
+      fallbackUrl: entry.fallbackUrl,
+    });
+    console.log(`[manual check] ${entry.title} → 需 APP 確認`);
+  }
+
   // ========== 活動倒數提醒 ==========
   const reminders = [
     { id: 'cube_japan', title: 'CUBE 日本賞', endDate: '2026-04-30' },
@@ -1059,6 +1115,7 @@ async function checkPromo() {
     ubot_ipassmoney: ubotIpass,
     easycard_results: ecardResults,
     promos: promos,
+    manualCheckPromos: manualCheckPromos,
     reminders: reminders,
     updated: todayStr
   };

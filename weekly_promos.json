@@ -1,0 +1,26 @@
+{
+  "version": "2026-04-25",
+  "promos": [
+    {
+      "card_id": "c10",
+      "weekday": 2,
+      "title": "星巴克大杯飲料買1送1",
+      "merchant": "星巴克",
+      "note": "限實體卡/Apple Pay/Google Pay/Samsung Pay/icash 2.0，不適用 icash Pay/LINE Pay"
+    },
+    {
+      "card_id": "c10",
+      "weekday": 3,
+      "title": "COLD STONE 買1送1",
+      "merchant": "COLD STONE",
+      "note": "限實體卡/Apple Pay/Google Pay/Samsung Pay/icash 2.0，不適用 icash Pay/LINE Pay"
+    },
+    {
+      "card_id": "c10",
+      "weekday": 6,
+      "title": "COLD STONE 買1送1",
+      "merchant": "COLD STONE",
+      "note": "限實體卡/Apple Pay/Google Pay/Samsung Pay/icash 2.0，不適用 icash Pay/LINE Pay"
+    }
+  ]
+}

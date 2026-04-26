@@ -6,7 +6,7 @@
   "sunday_7_full": false,
   "sunday_7_msg": "",
   "uniopen_autoload_full": true,
-  "uniopen_autoload_msg": "2026年4月 uniopen自動加值10%已額滿",
+  "uniopen_autoload_msg": "2026 年 4 月 中信 UniOpen 卡 自動加值 10% 已額滿",
   "transport_10": {
     "台新": {
       "full": true,
@@ -162,10 +162,6 @@
       "full": false,
       "title": "悠遊付繳所得稅最高回饋800 再享抽稅單幫您付 !"
     },
-    "ew_1773653803": {
-      "full": false,
-      "title": "週末聚餐悠遊付 滿額回饋2%"
-    },
     "ew_1774580356": {
       "full": false,
       "title": "臺北惜物網世界地球日｜惜物讓價值再延續｜最高10%回饋"
@@ -174,33 +170,37 @@
       "full": true,
       "title": "全家便利商店 悠遊付錢包帳戶滿額最高回饋6% 首次消費加贈20%回饋券"
     },
-    "ew_1771901593": {
-      "full": false,
-      "title": "悠遊付連結元大銀行新臺幣活期存款帳戶至指定百貨/影城通路，單筆扣款金額滿299元享3%回饋"
-    },
     "ew_1773653277": {
       "full": false,
       "title": "日常美食悠遊付 滿額回饋2%"
     },
-    "ew_1773721619": {
+    "ew_1773653803": {
       "full": false,
-      "title": "悠遊付春遊補給站 4月限定伴手禮美食筆筆回饋10%"
+      "title": "週末聚餐悠遊付 滿額回饋2%"
+    },
+    "ew_1771901593": {
+      "full": false,
+      "title": "悠遊付連結元大銀行新臺幣活期存款帳戶至指定百貨/影城通路，單筆扣款金額滿299元享3%回饋"
     },
     "ew_1773728616": {
       "full": false,
       "title": "王道新戶綁定悠遊付最高賺$7,300"
     },
-    "ew_1768532216": {
-      "full": false,
-      "title": "悠遊付早餐生活節 筆筆最高回饋8%"
-    },
     "ew_1773654068": {
       "full": true,
       "title": "早餐速食悠遊付 筆筆回饋2%"
     },
+    "ew_1773721619": {
+      "full": false,
+      "title": "悠遊付春遊補給站 4月限定伴手禮美食筆筆回饋10%"
+    },
     "ew_1770783167": {
       "full": true,
       "title": "【誠品生活】週四~週日悠遊付 滿額最高回饋15%"
+    },
+    "ew_1768532216": {
+      "full": false,
+      "title": "悠遊付早餐生活節 筆筆最高回饋8%"
     },
     "challenge_silver": {
       "full": true,
@@ -214,13 +214,13 @@
       "full": true,
       "title": "月級挑戰 白金級"
     },
-    "ew_1770965611": {
-      "full": false,
-      "title": "【微風女神節】悠遊付滿額最高回饋16%"
-    },
     "ew_1747884970": {
       "full": false,
       "title": "週五會員日 最高回饋5%"
+    },
+    "ew_1770965611": {
+      "full": false,
+      "title": "【微風女神節】悠遊付滿額最高回饋16%"
     },
     "ew_1775112496": {
       "full": false,
@@ -242,33 +242,33 @@
       "full": false,
       "title": "屈臣氏週一至週四 嗶悠遊卡享最高10%回饋"
     },
-    "ew_1776840470": {
-      "full": false,
-      "title": "台中捷運掃悠遊付乘車碼，筆筆回饋50%"
-    },
     "ew_1773729784": {
       "full": false,
       "title": "頂呱呱_悠遊經典餐175元"
+    },
+    "ew_1776840470": {
+      "full": false,
+      "title": "台中捷運掃悠遊付乘車碼，筆筆回饋50%"
     },
     "ew_1774831878": {
       "full": false,
       "title": "寵物公園錢包帳戶滿額贈100元回饋券"
     },
-    "ew_1774850460": {
-      "full": false,
-      "title": "台亞加油站人工加油-悠遊付錢包/銀行帳戶最高回饋7%"
-    },
-    "ew_1767860614": {
-      "full": false,
-      "title": "第一銀行悠遊聯名卡 悠遊付享3%刷卡金活動"
-    },
     "ew_1766573956": {
       "full": false,
       "title": "推薦好友送$100"
     },
+    "ew_1774850460": {
+      "full": false,
+      "title": "台亞加油站人工加油-悠遊付錢包/銀行帳戶最高回饋7%"
+    },
     "ew_1767176891": {
       "full": false,
       "title": "丁丁藥局週一至週四 嗶悠遊卡享最高10%回饋"
+    },
+    "ew_1767860614": {
+      "full": false,
+      "title": "第一銀行悠遊聯名卡 悠遊付享3%刷卡金活動"
     },
     "ew_1770102243": {
       "full": false,
@@ -278,13 +278,13 @@
       "full": false,
       "title": "夢時代週四會員日 悠遊付滿額回饋30"
     },
-    "ew_1773989462": {
-      "full": false,
-      "title": "【悟饕池上飯包】悠遊卡滿$150贈10%現金回饋券"
-    },
     "ew_1773822218": {
       "full": false,
       "title": "【鬍鬚張】悠遊卡滿額最高回饋30元現金回饋券"
+    },
+    "ew_1773989462": {
+      "full": false,
+      "title": "【悟饕池上飯包】悠遊卡滿$150贈10%現金回饋券"
     },
     "ew_1774332967": {
       "full": false,
@@ -302,13 +302,13 @@
       "full": false,
       "title": "悠遊康是美，週一享最高回饋30元"
     },
-    "ew_1764668818": {
-      "full": true,
-      "title": "【誠品生活5號會員日】悠遊付滿額最高享8%"
-    },
     "ew_1773653000": {
       "full": false,
       "title": "三商巧福-點購指定套餐享加價購"
+    },
+    "ew_1764668818": {
+      "full": true,
+      "title": "【誠品生活5號會員日】悠遊付滿額最高享8%"
     },
     "ew_1773717256": {
       "full": false,
@@ -322,13 +322,13 @@
       "full": false,
       "title": "三商炸雞-炸雞獨享餐特價119元"
     },
-    "ew_1739775992": {
-      "full": false,
-      "title": "什麼？手機可以感應悠遊卡，隨時幫卡片加值？ 2025-02-17 －"
-    },
     "ew_1772607375": {
       "full": true,
       "title": "悠遊付連結元大銀行新臺幣活期存款帳戶繳納牌照稅，單筆金額滿10,000元贈100元悠遊付回饋金"
+    },
+    "ew_1739775992": {
+      "full": false,
+      "title": "什麼？手機可以感應悠遊卡，隨時幫卡片加值？ 2025-02-17 －"
     },
     "ew_1776825805": {
       "full": false,
@@ -342,13 +342,13 @@
       "full": false,
       "title": "MyCard滿500送3%｜滿千最高領8%｜再抽多樣好禮"
     },
-    "ew_1773295480": {
-      "full": true,
-      "title": "91APP合作品牌｜寵愛加倍滿千最高25%"
-    },
     "ew_1773289742": {
       "full": true,
       "title": "PChome｜滿千最高8%回饋｜滿5千再加碼$300"
+    },
+    "ew_1773295480": {
+      "full": true,
+      "title": "91APP合作品牌｜寵愛加倍滿千最高25%"
     },
     "ew_1773388438": {
       "full": true,
@@ -378,10 +378,6 @@
       "full": false,
       "title": "選用悠遊付領臺北市補助款 首筆加發補助金10%！最高回饋300元！"
     },
-    "ew_1773716190": {
-      "full": false,
-      "title": "品川蘭-指定套餐特價289元"
-    },
     "ew_1743060351": {
       "full": false,
       "title": "孕媽咪專屬悠遊付新會員贈$100優惠！"
@@ -390,113 +386,117 @@
       "full": false,
       "title": "選用悠遊付領臺北市補助款 首筆加發補助金10%！最高回饋300元！ 2025-04-01 －"
     },
-    "ew_1773717653": {
+    "ew_1773716190": {
       "full": false,
-      "title": "拿坡里-悠遊兩人餐特價320元"
+      "title": "品川蘭-指定套餐特價289元"
     },
     "ew_1772784116": {
       "full": false,
       "title": "Samsung Galaxy S26購機 悠遊卡回饋加值金"
     },
-    "ew_1766377676": {
+    "ew_1773717653": {
       "full": false,
-      "title": "新會員3%回饋"
+      "title": "拿坡里-悠遊兩人餐特價320元"
     },
     "ew_1767689969": {
       "full": false,
       "title": "Samsung Wallet悠遊卡購機回饋加值金抽獎"
+    },
+    "ew_1766377676": {
+      "full": false,
+      "title": "新會員3%回饋"
     }
   },
   "promos": [
     {
       "id": "icash_4",
       "full": true,
-      "title": "icash Pay 4%已額滿",
-      "body": "icash Pay 全通路4% 4月名額已滿",
+      "title": "UniOpen icash Pay 4% 已額滿",
+      "body": "中信 UniOpen 卡 icash Pay 全通路 4% 4 月名額已滿",
       "category": "icash Pay"
     },
     {
       "id": "starbucks_5",
       "full": true,
-      "title": "星巴克5%已額滿",
-      "body": "icash Pay 星巴克5% 4月名額已滿",
+      "title": "UniOpen 星巴克 5% 已額滿",
+      "body": "中信 UniOpen 卡 icash Pay 星巴克 5% 4 月名額已滿",
       "category": "icash Pay"
     },
     {
       "id": "transport_台新",
       "full": true,
-      "title": "交通10%額滿(台新)",
-      "body": "icash Pay 交通10% 台新 4月名額已滿",
+      "title": "台新 交通 10% 已額滿",
+      "body": "台新 icash Pay 交通 10% 4 月名額已滿",
       "category": "icash Pay"
     },
     {
       "id": "transport_兆豐",
       "full": true,
-      "title": "交通10%額滿(兆豐)",
-      "body": "icash Pay 交通10% 兆豐 4月名額已滿",
+      "title": "兆豐 交通 10% 已額滿",
+      "body": "兆豐 icash Pay 交通 10% 4 月名額已滿",
       "category": "icash Pay"
     },
     {
       "id": "transport_一銀",
       "full": true,
-      "title": "交通10%額滿(一銀)",
-      "body": "icash Pay 交通10% 一銀 4月名額已滿",
+      "title": "一銀 交通 10% 已額滿",
+      "body": "一銀 icash Pay 交通 10% 4 月名額已滿",
       "category": "icash Pay"
     },
     {
       "id": "transport_華南",
       "full": true,
-      "title": "交通10%額滿(華南)",
-      "body": "icash Pay 交通10% 華南 4月名額已滿",
+      "title": "華南 交通 10% 已額滿",
+      "body": "華南 icash Pay 交通 10% 4 月名額已滿",
       "category": "icash Pay"
     },
     {
       "id": "transport_元大",
       "full": true,
-      "title": "交通10%額滿(元大)",
-      "body": "icash Pay 交通10% 元大 4月名額已滿",
+      "title": "元大 交通 10% 已額滿",
+      "body": "元大 icash Pay 交通 10% 4 月名額已滿",
       "category": "icash Pay"
     },
     {
       "id": "online3c_國泰",
       "full": true,
-      "title": "網購3C 10%額滿(國泰)",
-      "body": "icash Pay 網購3C 10% 國泰 4月名額已滿",
+      "title": "國泰 網購 3C 10% 已額滿",
+      "body": "國泰 icash Pay 網購 3C 10% 4 月名額已滿",
       "category": "icash Pay"
     },
     {
       "id": "online3c_台新",
       "full": true,
-      "title": "網購3C 10%額滿(台新)",
-      "body": "icash Pay 網購3C 10% 台新 4月名額已滿",
+      "title": "台新 網購 3C 10% 已額滿",
+      "body": "台新 icash Pay 網購 3C 10% 4 月名額已滿",
       "category": "icash Pay"
     },
     {
       "id": "online3c_富邦",
       "full": true,
-      "title": "網購3C 10%額滿(富邦)",
-      "body": "icash Pay 網購3C 10% 富邦 4月名額已滿",
+      "title": "富邦 網購 3C 10% 已額滿",
+      "body": "富邦 icash Pay 網購 3C 10% 4 月名額已滿",
       "category": "icash Pay"
     },
     {
       "id": "online3c_兆豐",
       "full": true,
-      "title": "網購3C 10%額滿(兆豐)",
-      "body": "icash Pay 網購3C 10% 兆豐 4月名額已滿",
+      "title": "兆豐 網購 3C 10% 已額滿",
+      "body": "兆豐 icash Pay 網購 3C 10% 4 月名額已滿",
       "category": "icash Pay"
     },
     {
       "id": "uniopen_autoload",
       "full": true,
-      "title": "自動加值10%已額滿",
-      "body": "uniopen自動加值10% 4月名額已滿",
+      "title": "UniOpen 自動加值 10% 已額滿",
+      "body": "中信 UniOpen 卡 自動加值 10% 4 月名額已滿",
       "category": "icash2.0"
     },
     {
       "id": "ubot_ipassmoney_4",
       "full": true,
-      "title": "聯邦iPASS MONEY 10%額滿(4月)",
-      "body": "聯邦信用卡綁定iPASS MONEY 10%綠點 4月名額已滿",
+      "title": "聯邦信用卡 iPASS MONEY 10% 4 月已額滿",
+      "body": "聯邦信用卡 綁定 iPASS MONEY 10% 綠點 4 月名額已滿",
       "category": "聯邦"
     },
     {
@@ -612,17 +612,17 @@
       "category": "悠遊付"
     },
     {
-      "id": "easycard_ew_1773295480",
-      "full": true,
-      "title": "91APP合作品牌｜寵愛加倍滿千最高25%已額滿",
-      "body": "91APP合作品牌｜寵愛加倍滿千最高25% 4月名額已滿",
-      "category": "悠遊付"
-    },
-    {
       "id": "easycard_ew_1773289742",
       "full": true,
       "title": "PChome｜滿千最高8%回饋｜滿5千再加碼$300已額滿",
       "body": "PChome｜滿千最高8%回饋｜滿5千再加碼$300 4月名額已滿",
+      "category": "悠遊付"
+    },
+    {
+      "id": "easycard_ew_1773295480",
+      "full": true,
+      "title": "91APP合作品牌｜寵愛加倍滿千最高25%已額滿",
+      "body": "91APP合作品牌｜寵愛加倍滿千最高25% 4月名額已滿",
       "category": "悠遊付"
     },
     {

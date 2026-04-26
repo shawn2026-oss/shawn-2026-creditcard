@@ -697,13 +697,13 @@ async function checkPromo() {
     });
     if (result.full && !starbucksFull) {
       starbucksFull = true;
-      starbucksMsg = `${year} 年 ${monthNum} 月 中信 UniOpen 卡 星巴克筆筆 5% 已額滿`;
+      starbucksMsg = `${year} 年 ${monthNum} 月 icash Pay 星巴克筆筆 5% 已額滿`;
       console.log(`[星巴克 5%] 額滿 ← id/${result.sourceId} "${result.snippet}"`);
     } else if (!starbucksFull) {
       console.log('[星巴克 5%] 未額滿');
     }
   } catch (e) { console.error('[星巴克 5%] 失敗:', e.message); }
-  if (starbucksFull) promos.push({ id: 'starbucks_5', full: true, title: 'UniOpen 星巴克 5% 已額滿', body: `中信 UniOpen 卡 icash Pay 星巴克 5% ${monthNum} 月名額已滿`, category: 'icash Pay' });
+  if (starbucksFull) promos.push({ id: 'starbucks_5', full: true, title: 'icash Pay 星巴克 5% 已額滿', body: `icash Pay 星巴克 5% ${monthNum} 月名額已滿`, category: 'icash Pay' });
 
   // --- A3. 交通 10% ---
   const banks = ['台新', '兆豐', '一銀', '華南', '元大'];
@@ -744,13 +744,13 @@ async function checkPromo() {
     });
     if (result.full && !sundayFull) {
       sundayFull = true;
-      sundayMsg = `${year} 年 ${monthNum} 月 中信 UniOpen 卡 星期天 7% 已額滿`;
+      sundayMsg = `${year} 年 ${monthNum} 月 icash Pay 星期天 7% 已額滿`;
       console.log(`[週日 7%] 額滿 ← id/${result.sourceId}`);
     } else if (!sundayFull) {
       console.log('[週日 7%] 未額滿');
     }
   } catch (e) { console.error('[週日 7%] 失敗:', e.message); }
-  if (sundayFull) promos.push({ id: 'sunday_7', full: true, title: 'UniOpen 星期天 7% 已額滿', body: `中信 UniOpen 卡 icash Pay 星期天 7% ${monthNum} 月名額已滿`, category: 'icash Pay' });
+  if (sundayFull) promos.push({ id: 'sunday_7', full: true, title: 'icash Pay 星期天 7% 已額滿', body: `icash Pay 星期天 7% ${monthNum} 月名額已滿`, category: 'icash Pay' });
 
   // --- A5. 網購 3C 10% ---
   const banks3c = ['玉山', '國泰', '台新', '富邦', '兆豐'];

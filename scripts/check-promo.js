@@ -680,13 +680,13 @@ async function checkPromo() {
     });
     if (result.full && !icashFull) {
       icashFull = true;
-      icashMsg = `${year}年${monthNum}月 icash Pay 4%已額滿`;
+      icashMsg = `${year} 年 ${monthNum} 月 中信 UniOpen 卡 icash Pay 4% 已額滿`;
       console.log(`[icash Pay 4%] 額滿 ← id/${result.sourceId} "${result.snippet}"`);
     } else if (!icashFull) {
       console.log('[icash Pay 4%] 未額滿');
     }
   } catch (e) { console.error('[icash Pay 4%] 失敗:', e.message); }
-  if (icashFull) promos.push({ id: 'icash_4', full: true, title: 'icash Pay 4%已額滿', body: `icash Pay 全通路4% ${monthNum}月名額已滿`, category: 'icash Pay' });
+  if (icashFull) promos.push({ id: 'icash_4', full: true, title: 'UniOpen icash Pay 4% 已額滿', body: `中信 UniOpen 卡 icash Pay 全通路 4% ${monthNum} 月名額已滿`, category: 'icash Pay' });
 
   // --- A2. 星巴克 5% ---
   let starbucksFull = prev('starbucks_5_full'), starbucksMsg = needReset ? '' : (currentStatus.starbucks_5_msg || '');
@@ -697,13 +697,13 @@ async function checkPromo() {
     });
     if (result.full && !starbucksFull) {
       starbucksFull = true;
-      starbucksMsg = `${year}年${monthNum}月 星巴克筆筆5%已額滿`;
+      starbucksMsg = `${year} 年 ${monthNum} 月 中信 UniOpen 卡 星巴克筆筆 5% 已額滿`;
       console.log(`[星巴克 5%] 額滿 ← id/${result.sourceId} "${result.snippet}"`);
     } else if (!starbucksFull) {
       console.log('[星巴克 5%] 未額滿');
     }
   } catch (e) { console.error('[星巴克 5%] 失敗:', e.message); }
-  if (starbucksFull) promos.push({ id: 'starbucks_5', full: true, title: '星巴克5%已額滿', body: `icash Pay 星巴克5% ${monthNum}月名額已滿`, category: 'icash Pay' });
+  if (starbucksFull) promos.push({ id: 'starbucks_5', full: true, title: 'UniOpen 星巴克 5% 已額滿', body: `中信 UniOpen 卡 icash Pay 星巴克 5% ${monthNum} 月名額已滿`, category: 'icash Pay' });
 
   // --- A3. 交通 10% ---
   const banks = ['台新', '兆豐', '一銀', '華南', '元大'];
@@ -733,7 +733,7 @@ async function checkPromo() {
   } catch (e) { console.error('[交通 10%] 失敗:', e.message); }
 
   for (const b of banks) {
-    if (transport[b].full) promos.push({ id: `transport_${b}`, full: true, title: `交通10%額滿(${b})`, body: `icash Pay 交通10% ${b} ${monthNum}月名額已滿`, category: 'icash Pay' });
+    if (transport[b].full) promos.push({ id: `transport_${b}`, full: true, title: `${b} 交通 10% 已額滿`, body: `${b} icash Pay 交通 10% ${monthNum} 月名額已滿`, category: 'icash Pay' });
   }
 
   // --- A4. 週日 7% ---
@@ -744,13 +744,13 @@ async function checkPromo() {
     });
     if (result.full && !sundayFull) {
       sundayFull = true;
-      sundayMsg = `${year}年${monthNum}月 週日7%已額滿`;
+      sundayMsg = `${year} 年 ${monthNum} 月 中信 UniOpen 卡 星期天 7% 已額滿`;
       console.log(`[週日 7%] 額滿 ← id/${result.sourceId}`);
     } else if (!sundayFull) {
       console.log('[週日 7%] 未額滿');
     }
   } catch (e) { console.error('[週日 7%] 失敗:', e.message); }
-  if (sundayFull) promos.push({ id: 'sunday_7', full: true, title: '週日7%已額滿', body: `icash Pay 週日7% ${monthNum}月名額已滿`, category: 'icash Pay' });
+  if (sundayFull) promos.push({ id: 'sunday_7', full: true, title: 'UniOpen 星期天 7% 已額滿', body: `中信 UniOpen 卡 icash Pay 星期天 7% ${monthNum} 月名額已滿`, category: 'icash Pay' });
 
   // --- A5. 網購 3C 10% ---
   const banks3c = ['玉山', '國泰', '台新', '富邦', '兆豐'];
@@ -780,7 +780,7 @@ async function checkPromo() {
   } catch (e) { console.error('[網購3C 10%] 失敗:', e.message); }
 
   for (const b of banks3c) {
-    if (online3c[b].full) promos.push({ id: `online3c_${b}`, full: true, title: `網購3C 10%額滿(${b})`, body: `icash Pay 網購3C 10% ${b} ${monthNum}月名額已滿`, category: 'icash Pay' });
+    if (online3c[b].full) promos.push({ id: `online3c_${b}`, full: true, title: `${b} 網購 3C 10% 已額滿`, body: `${b} icash Pay 網購 3C 10% ${monthNum} 月名額已滿`, category: 'icash Pay' });
   }
 
   // ========== B. icash2.0 ==========
@@ -790,10 +790,10 @@ async function checkPromo() {
     const raw = await fetchPageWithCookie('https://www.icash.com.tw/Home/NewsDetail?ID=12654');
     const t = raw.replace(/<[^>]+>/g, '');
     if (t.length > 100 && t.match(new RegExp(monthNum + '月[\\s\\S]*?加值[\\s\\S]*?額滿'))) {
-      autoloadFull = true; autoloadMsg = `${year}年${monthNum}月 uniopen自動加值10%已額滿`; console.log('[ID=12654] 額滿');
+      autoloadFull = true; autoloadMsg = `${year} 年 ${monthNum} 月 中信 UniOpen 卡 自動加值 10% 已額滿`; console.log('[ID=12654] 額滿');
     } else console.log('[ID=12654] 未額滿或頁面過短');
   } catch (e) { console.error('[ID=12654] 失敗:', e.message); }
-  if (autoloadFull) promos.push({ id: 'uniopen_autoload', full: true, title: '自動加值10%已額滿', body: `uniopen自動加值10% ${monthNum}月名額已滿`, category: 'icash2.0' });
+  if (autoloadFull) promos.push({ id: 'uniopen_autoload', full: true, title: 'UniOpen 自動加值 10% 已額滿', body: `中信 UniOpen 卡 自動加值 10% ${monthNum} 月名額已滿`, category: 'icash2.0' });
 
   // ========== B2. 聯邦銀行 iPASS MONEY 10% ==========
   let ubotIpass = currentStatus.ubot_ipassmoney || {};
@@ -821,8 +821,8 @@ async function checkPromo() {
     promos.push({
       id: `ubot_ipassmoney_${monthNum}`,
       full: true,
-      title: `聯邦iPASS MONEY 10%額滿(${monthNum}月)`,
-      body: `聯邦信用卡綁定iPASS MONEY 10%綠點 ${monthNum}月名額已滿`,
+      title: `聯邦信用卡 iPASS MONEY 10% ${monthNum} 月已額滿`,
+      body: `聯邦信用卡 綁定 iPASS MONEY 10% 綠點 ${monthNum} 月名額已滿`,
       category: '聯邦'
     });
   }

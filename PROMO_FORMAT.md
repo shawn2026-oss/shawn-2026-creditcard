@@ -1,121 +1,125 @@
-# promo_status.json 文案規範
+# 文案格式
 
-iOS app（CardRewardManager）會把 `promos[]` 內的 `title` 顯示在首頁「活動額滿狀態」清單、`body` 用在本機推播通知。為避免使用者看到「icash Pay 4% 已額滿」卻不知道是哪張卡的活動，所有額滿訊息**必須帶卡名識別**。
+## title 格式（首頁清單顯示、建議 < 25 字）
+
+```
+[卡片簡名或支付方式] [活動名] [%] 已額滿
+```
+
+範例：
+
+- `UniOpen icash Pay 4% 已額滿`（卡片限定）
+- `icash Pay 星巴克 5% 已額滿`（通用活動）
+- `台新 交通 10% 已額滿`（銀行識別）
+- `聯邦信用卡 iPASS MONEY 10% 4 月已額滿`
+
+## body 格式（推播完整、建議 < 60 字）
+
+```
+[卡片全名或支付方式] [通路/活動] [%] [月份] 名額已滿
+```
+
+範例：
+
+- `中信 UniOpen 卡 icash Pay 全通路 4% 4 月名額已滿`（卡片限定）
+- `icash Pay 星巴克 5% 4 月名額已滿`（通用活動）
+- `台新 icash Pay 交通 10% 4 月名額已滿`
+- `聯邦信用卡 綁定 iPASS MONEY 10% 綠點 4 月名額已滿`
 
 ---
 
-## 顯示位置與字串長度
+# 活動分類原則（重要）
 
-| 字段 | 顯示位置 | 空間 |
-|------|---------|------|
-| `title` | 首頁清單列、單行 | 緊（建議 < 25 字） |
-| `body` | iOS 本機推播通知 body | 寬（可較長、容錯） |
+## 一、卡片限定的活動
 
-→ **title 用「卡片簡名」**、**body 用「卡片全名」**。
+條款明確寫「限 XX 卡綁定 / 使用 XX 卡」、title／body 帶卡名前綴。
+
+範例：
+
+- `icash_4`：條款寫「使用 icash Pay 綁定 uniopen 聯名卡…全通路享 4%」→ 限 UniOpen 聯名卡
+- `uniopen_autoload`：條款寫「使用中國信託 uniopen 聯名卡 icash 2.0 進行自動加值」→ 限中信 UniOpen 聯名卡 icash 2.0
+
+## 二、支付通用的活動（不綁特定信用卡）
+
+條款只寫「使用 XX 支付方式」、不要求特定卡。title／body 用「支付方式名稱」、不掛卡名。
+
+範例：
+
+- `starbucks_5`：條款寫「使用 icash Pay 於星巴克實體門市消費或儲值隨行卡」→ icash Pay 通用
+- `sunday_7`：條款寫「使用 icash Pay 於全通路消費（限 icash Pay 帳戶餘額、連結銀行帳戶付款）」→ icash Pay 通用
+
+## 三、銀行限定的支付活動
+
+條款寫「綁定 XX 銀行卡 + 使用 XX 支付」、title／body 用銀行名識別、不掛 UniOpen 等其他卡名。
+
+範例：
+
+- `transport_台新`：條款限「台新銀行卡 + icash Pay」→ 用「台新」識別
+- `online3c_國泰`：條款限「國泰世華卡 + icash Pay」→ 用「國泰」識別
 
 ---
 
-## 卡片簡名／全名對照
+# 判定方法
 
-| 簡名（title 用） | 全名（body / 頂層 msg 用） |
+寫範本前、先看條款「活動內容」段落的關鍵字眼：
+
+| 條款寫 | 歸類 | title／body 開頭 |
+|---|---|---|
+| 「使用 XX 卡」/「綁定 XX 聯名卡」 | 一、卡片限定 | 卡片簡名 |
+| 「使用 XX 支付」（不要求特定卡） | 二、支付通用 | 支付方式名稱 |
+| 「綁定 XX 銀行卡 + 使用 XX 支付」 | 三、銀行限定 | 銀行名 |
+
+---
+
+# 陷阱
+
+## 陷阱一：點數歸戶機制不等於活動限制
+
+條款結尾常出現「點數匯入 uniopen 會員帳戶」這類「點數歸戶機制」、與「活動參加資格」無關、不影響歸類。
+
+例如 `sunday_7` 條款結尾寫「點數匯入 icash Pay 所綁定的 uniopen 會員帳戶中」、但這只是 OPENPOINT 點數歸戶機制（uniopen 會員是 OPENPOINT 帳戶、不等於 uniopen 聯名信用卡）、活動本身仍是 icash Pay 通用、不限 UniOpen 卡。
+
+## 陷阱二：爬蟲變數名不等於活動限制
+
+爬蟲程式碼變數名（如 `uniopen_4pct`、`uniopen_autoload`、`starbucks_5pct`）只代表「爬蟲爬的活動所在頁面分類」、不等於「活動限該卡」。
+
+判定一律以官網條款原文為準、不以變數名推論。
+
+---
+
+# 卡片簡名／全名對照（卡片限定活動用）
+
+| 簡名（title 用） | 全名（body 用） |
 |---|---|
 | UniOpen | 中信 UniOpen 卡 |
-| 聯邦信用卡 | 聯邦信用卡（多卡共用活動，如 iPASS MONEY 綠點，不限特定卡） |
-| (其他卡) | 待補 |
+| 聯邦信用卡 | 聯邦信用卡 |
 
-各銀行 icash Pay 系列（交通 10% / 網購 3C 10%）：title／body 都用銀行名（已是卡片識別、不需再加「卡」字）。
-
----
-
-## 各系列 title／body 模板
-
-### A. UniOpen（中信 UniOpen 卡）icash Pay 系列
-
-對應 promos[] id：`icash_4`、`starbucks_5`、`sunday_7`、`uniopen_autoload`
-
-```
-title: "UniOpen [活動名] [%] 已額滿"
-body:  "中信 UniOpen 卡 icash Pay [活動名] [%] [月份] 名額已滿"
-```
-
-例：
-- `icash_4` — title `"UniOpen icash Pay 4% 已額滿"` / body `"中信 UniOpen 卡 icash Pay 全通路 4% 4 月名額已滿"`
-- `starbucks_5` — title `"UniOpen 星巴克 5% 已額滿"` / body `"中信 UniOpen 卡 icash Pay 星巴克 5% 4 月名額已滿"`
-- `uniopen_autoload` — title `"UniOpen 自動加值 10% 已額滿"` / body `"中信 UniOpen 卡 自動加值 10% 4 月名額已滿"`
-
-### B. 各銀行 icash Pay 交通 10% 系列
-
-對應 id pattern：`transport_[銀行名]`（台新／兆豐／一銀／華南／元大）
-
-```
-title: "[銀行名] 交通 10% 已額滿"
-body:  "[銀行名] icash Pay 交通 10% [月份] 名額已滿"
-```
-
-例：
-- `transport_台新` — title `"台新 交通 10% 已額滿"` / body `"台新 icash Pay 交通 10% 4 月名額已滿"`
-
-### C. 各銀行 icash Pay 網購 3C 10% 系列
-
-對應 id pattern：`online3c_[銀行名]`（玉山／國泰／台新／富邦／兆豐）
-
-```
-title: "[銀行名] 網購 3C 10% 已額滿"
-body:  "[銀行名] icash Pay 網購 3C 10% [月份] 名額已滿"
-```
-
-例：
-- `online3c_台新` — title `"台新 網購 3C 10% 已額滿"` / body `"台新 icash Pay 網購 3C 10% 4 月名額已滿"`
-
-### D. 聯邦信用卡 iPASS MONEY 系列（綁卡活動，多卡共用）
-
-對應 id pattern：`ubot_ipassmoney_[月份]`
-
-聯邦旗下多張卡（c2 聯邦綠卡 / c5 聯邦賴點卡 / j2 聯邦吉鶴卡 / ubot_m 聯邦M卡 / ubot_lb 聯邦LINE Bank聯名卡）綁 iPASS MONEY app 都能參加，不限特定卡，故 title／body 用「聯邦信用卡」泛稱。
-
-```
-title: "聯邦信用卡 iPASS MONEY 10% [月份] 已額滿"
-body:  "聯邦信用卡 綁定 iPASS MONEY 10% 綠點 [月份] 名額已滿"
-```
-
-例：
-- `ubot_ipassmoney_4` — title `"聯邦信用卡 iPASS MONEY 10% 4 月已額滿"` / body `"聯邦信用卡 綁定 iPASS MONEY 10% 綠點 4 月名額已滿"`
+未來新卡再加。
 
 ---
 
-## 頂層 msg 字段
+# 支付方式名稱（支付通用活動用）
 
-`uniopen_icash_msg` 等頂層欄位是 iOS app 直接顯示在卡片詳情頁的字串、需依現有內容判斷怎麼插卡名、不要硬塞改變語意：
-
-| 欄位 | 模板 |
-|------|------|
-| `uniopen_icash_msg` | `"YYYY 年 M 月 中信 UniOpen 卡 icash Pay 4% 已額滿"`（保留時間前綴） |
-| `starbucks_5_msg` | `"中信 UniOpen 卡 星巴克 5% 已額滿"` |
-| `sunday_7_msg` | `"中信 UniOpen 卡 星期天 7% 已額滿"`（**僅當 `sunday_7_full: true` 才填**、否則保留 `""`） |
-| `uniopen_autoload_msg` | `"中信 UniOpen 卡 自動加值 10% 已額滿"` |
-
-→ `*_full: false` 時 `*_msg` 保留 `""`、避免顯示「已額滿」誤導。
+| 名稱 | 用法說明 |
+|---|---|
+| icash Pay | icash Pay 帳戶餘額或連結銀行帳戶付款（多卡通用） |
+| icash 2.0 | 限 icash 2.0 實體卡 |
 
 ---
 
-## 範圍外（不規範化）
+# 半形空格規則
 
-下列字段目前**不**走此規範：
+中文與英文／數字之間用半形空格。
 
-- `easycard_results`（80 筆悠遊付活動）— 卡名歸屬複雜、改造工作量大、未來再說
-- `cube_mobile_msg`（國泰 CUBE）— 待整合 CUBE 卡時再規範
-- `transport_10` / `online3c_10` 頂層 dict 內的 `msg`（如 `"台新04月份贈點已於2026/04/04 17:21 p.m.額滿"`）— 屬爬蟲原文、不規範化、僅 `promos[]` 規範化版本進入 iOS 顯示
-- `reminders[]` / `manualCheckPromos[]` — 另有規則
+範例：「4 月」、「icash Pay 4%」、「中信 UniOpen 卡」
 
 ---
 
-## 變更原則
+# 變更原則（避免重蹈覆轍）
 
-修改 `promos[]` 時：
-- **只動 `title` / `body` 字串**、`id` / `full` / `category` 原樣
-- title 必須帶卡片簡名（除非銀行名本身就是識別）
-- body 必須帶卡片全名（除非銀行名本身就是識別）
-- 已額滿訊息結尾統一「已額滿」/「名額已滿」、保持與舊版 iOS 端 `replacingOccurrences("已額滿", "")` 後處理相容
-- 數字、百分比、月份等之間留全形空格（如 `"icash Pay 4% 已額滿"` 而非 `"icash Pay 4%已額滿"`）
+新增 / 修改 promo 範本前、必做以下事：
 
-修改完整跑一次 `python3 -c "import json; json.load(open('promo_status.json'))"` 驗 JSON 合法。
+1. **fetch 官網條款原文**：用 `curl` 抓活動頁面、看「活動內容」段落
+2. **判定分類**：對照「判定方法」表格
+3. **不憑變數名 / 頁面分類推論**：爬蟲變數名 `uniopen_*` 不等於活動限 UniOpen
+4. **不憑印象 / 直覺寫卡名**：卡名要在 codebase 或官網實際存在、否則不寫進範本

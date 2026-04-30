@@ -26,29 +26,60 @@
           "name": "玩數位",
           "value": "digital",
           "rate_type": "tiered",
-          "rate_levels": ["level1", "level2", "level3"],
+          "rate_levels": [
+            "level1",
+            "level2",
+            "level3"
+          ],
           "valid_from": "2026-01-01",
           "valid_until": "2026-06-30",
           "groups": [
             {
               "label_full": "AI工具",
               "label_short": "AI工具",
-              "merchants": ["ChatGPT","Canva","Claude","Cursor","Duolingo","Gamma","Gemini","Notion","Perplexity","Speak"]
+              "merchants": [
+                "ChatGPT",
+                "Canva",
+                "Claude",
+                "Cursor",
+                "Duolingo",
+                "Gamma",
+                "Gemini",
+                "Notion",
+                "Perplexity",
+                "Speak"
+              ]
             },
             {
               "label_full": "數位/串流平台",
               "label_short": "串流平台",
-              "merchants": ["Apple 媒體服務","Google Play","Disney+","Netflix","Spotify","YouTube Premium","Max"]
+              "merchants": [
+                "Apple 媒體服務",
+                "Google Play",
+                "Disney+",
+                "Netflix",
+                "Spotify",
+                "YouTube Premium",
+                "Max"
+              ]
             },
             {
               "label_full": "網購平台",
               "label_short": "網購",
-              "merchants": ["蝦皮購物","momo購物網","PChome 24h購物(不含儲值及電子票券)","小樹購(不含電子票券)"]
+              "merchants": [
+                "蝦皮購物",
+                "momo購物網",
+                "PChome 24h購物(不含儲值及電子票券)",
+                "小樹購(不含電子票券)"
+              ]
             },
             {
               "label_full": "國際電商",
               "label_short": "國際電商",
-              "merchants": ["Coupang 酷澎(台灣)","淘寶/天貓"]
+              "merchants": [
+                "Coupang 酷澎(台灣)",
+                "淘寶/天貓"
+              ]
             }
           ]
         },
@@ -56,29 +87,77 @@
           "name": "樂饗購",
           "value": "dining",
           "rate_type": "tiered",
-          "rate_levels": ["level1", "level2", "level3"],
+          "rate_levels": [
+            "level1",
+            "level2",
+            "level3"
+          ],
           "valid_from": "2026-01-01",
           "valid_until": "2026-06-30",
           "groups": [
             {
               "label_full": "國內指定百貨",
               "label_short": "百貨",
-              "merchants": ["遠東SOGO百貨","遠東Garden City","新光三越","遠東百貨","台北101","BELLAVITA","微風廣場","統一時代台北店(不含DREAM PLAZA)","誠品生活","ATT 4 FUN","京站","美麗華","NOKE忠泰樂生活","大葉高島屋","Mitsui Shopping Park LaLaport(南港、台中)","宏匯廣場","台茂購物中心","大江國際購物中心","Big City遠東巨城購物中心","中友百貨","廣三SOGO","南紡購物中心","耐斯廣場","夢時代","漢神百貨","漢神巨蛋","新月廣場","CITYLINK","秀泰生活","環球購物中心","太平洋百貨","華泰名品城","SKM Park","MITSUI OUTLET PARK(林口、台中港、台南)"]
+              "merchants": [
+                "遠東SOGO百貨",
+                "遠東Garden City",
+                "新光三越",
+                "遠東百貨",
+                "台北101",
+                "BELLAVITA",
+                "微風廣場",
+                "統一時代台北店(不含DREAM PLAZA)",
+                "誠品生活",
+                "ATT 4 FUN",
+                "京站",
+                "美麗華",
+                "NOKE忠泰樂生活",
+                "大葉高島屋",
+                "Mitsui Shopping Park LaLaport(南港、台中)",
+                "宏匯廣場",
+                "台茂購物中心",
+                "大江國際購物中心",
+                "Big City遠東巨城購物中心",
+                "中友百貨",
+                "廣三SOGO",
+                "南紡購物中心",
+                "耐斯廣場",
+                "夢時代",
+                "漢神百貨",
+                "漢神巨蛋",
+                "新月廣場",
+                "CITYLINK",
+                "秀泰生活",
+                "環球購物中心",
+                "太平洋百貨",
+                "華泰名品城",
+                "SKM Park",
+                "MITSUI OUTLET PARK(林口、台中港、台南)"
+              ]
             },
             {
               "label_full": "國內外送平台",
               "label_short": "外送",
-              "merchants": ["Uber Eats","foodpanda"]
+              "merchants": [
+                "Uber Eats",
+                "foodpanda"
+              ]
             },
             {
               "label_full": "國內餐飲",
               "label_short": "餐飲",
-              "merchants": ["國內餐飲(不含餐券)","連鎖速食-麥當勞"]
+              "merchants": [
+                "國內餐飲(不含餐券)",
+                "連鎖速食-麥當勞"
+              ]
             },
             {
               "label_full": "國內藥妝",
               "label_short": "藥妝",
-              "merchants": ["康是美","屈臣氏"]
+              "merchants": [
+                "康是美",
+                "屈臣氏"
+              ]
             }
           ]
         },
@@ -86,44 +165,111 @@
           "name": "趣旅行",
           "value": "travel",
           "rate_type": "tiered",
-          "rate_levels": ["level1", "level2", "level3"],
+          "rate_levels": [
+            "level1",
+            "level2",
+            "level3"
+          ],
           "valid_from": "2026-01-01",
           "valid_until": "2026-06-30",
           "groups": [
             {
               "label_full": "指定海外消費",
               "label_short": "海外",
-              "merchants": ["海外實體消費(含國外餐飲、飯店到店付款等)"]
+              "merchants": [
+                "海外實體消費(含國外餐飲、飯店到店付款等)"
+              ]
             },
             {
               "label_full": "日本指定遊樂園",
               "label_short": "日本樂園",
-              "merchants": ["東京迪士尼樂園","東京華納兄弟哈利波特影城","大阪環球影城(USJ)"]
+              "merchants": [
+                "東京迪士尼樂園",
+                "東京華納兄弟哈利波特影城",
+                "大阪環球影城(USJ)"
+              ]
             },
             {
               "label_full": "指定國內外交通",
               "label_short": "交通",
-              "merchants": ["Apple錢包指定交通卡 (SUICA、PASMO、ICOCA)","Uber","Grab","台灣高鐵","yoxi","台灣大車隊","iRent","和運租車","格上租車"]
+              "merchants": [
+                "Apple錢包指定交通卡 (SUICA、PASMO、ICOCA)",
+                "Uber",
+                "Grab",
+                "台灣高鐵",
+                "yoxi",
+                "台灣大車隊",
+                "iRent",
+                "和運租車",
+                "格上租車"
+              ]
             },
             {
               "label_full": "指定航空公司",
               "label_short": "航空",
-              "merchants": ["中華航空","長榮航空","星宇航空","台灣虎航","國泰航空","樂桃航空","阿聯酋航空","酷航","捷星航空","日本航空","ANA全日空","亞洲航空","聯合航空","新加坡航空","越捷航空","大韓航空","達美航空","土耳其航空","卡達航空","法國航空"]
+              "merchants": [
+                "中華航空",
+                "長榮航空",
+                "星宇航空",
+                "台灣虎航",
+                "國泰航空",
+                "樂桃航空",
+                "阿聯酋航空",
+                "酷航",
+                "捷星航空",
+                "日本航空",
+                "ANA全日空",
+                "亞洲航空",
+                "聯合航空",
+                "新加坡航空",
+                "越捷航空",
+                "大韓航空",
+                "達美航空",
+                "土耳其航空",
+                "卡達航空",
+                "法國航空"
+              ]
             },
             {
               "label_full": "指定飯店住宿",
               "label_short": "飯店",
-              "merchants": ["國內飯店住宿","星野集團","全球迪士尼飯店","東橫INN"]
+              "merchants": [
+                "國內飯店住宿",
+                "星野集團",
+                "全球迪士尼飯店",
+                "東橫INN"
+              ]
             },
             {
               "label_full": "指定旅遊/訂房平台",
               "label_short": "訂房平台",
-              "merchants": ["KKday","Klook","Agoda","Airbnb","Booking.com","Trip.com","ezTravel易遊網"]
+              "merchants": [
+                "KKday",
+                "Klook",
+                "Agoda",
+                "Airbnb",
+                "Booking.com",
+                "Trip.com",
+                "ezTravel易遊網"
+              ]
             },
             {
               "label_full": "指定旅行社",
               "label_short": "旅行社",
-              "merchants": ["雄獅旅遊","可樂旅遊","東南旅遊","五福旅遊","燦星旅遊","山富旅遊","長汎假期","鳳凰旅行社","Ezfly易飛網","理想旅遊","永利旅行社","三賀旅行社"]
+              "merchants": [
+                "雄獅旅遊",
+                "可樂旅遊",
+                "東南旅遊",
+                "五福旅遊",
+                "燦星旅遊",
+                "山富旅遊",
+                "長汎假期",
+                "鳳凰旅行社",
+                "Ezfly易飛網",
+                "理想旅遊",
+                "永利旅行社",
+                "三賀旅行社"
+              ]
             }
           ]
         },
@@ -138,32 +284,52 @@
             {
               "label_full": "充電站",
               "label_short": "充電",
-              "merchants": ["U-POWER","EVOASIS","EVALUE","TAIL","iCharging"]
+              "merchants": [
+                "U-POWER",
+                "EVOASIS",
+                "EVALUE",
+                "TAIL",
+                "iCharging"
+              ]
             },
             {
               "label_full": "停車費",
               "label_short": "停車",
-              "merchants": ["車麻吉(不含加油、充電)","uTagGo(不含月租停車)"]
+              "merchants": [
+                "車麻吉(不含加油、充電)",
+                "uTagGo(不含月租停車)"
+              ]
             },
             {
               "label_full": "量販超市",
               "label_short": "量販",
-              "merchants": ["家樂福","LOPIA台灣","全聯福利中心 實體門市(不含大全聯)"]
+              "merchants": [
+                "家樂福",
+                "LOPIA台灣",
+                "全聯福利中心 實體門市(不含大全聯)"
+              ]
             },
             {
               "label_full": "指定加油",
               "label_short": "加油",
-              "merchants": ["台灣中油-直營站"]
+              "merchants": [
+                "台灣中油-直營站"
+              ]
             },
             {
               "label_full": "指定超商",
               "label_short": "超商",
-              "merchants": ["7-ELEVEN (7-11) 實體門市","全家便利商店 實體門市"]
+              "merchants": [
+                "7-ELEVEN (7-11) 實體門市",
+                "全家便利商店 實體門市"
+              ]
             },
             {
               "label_full": "生活家居",
               "label_short": "家居",
-              "merchants": ["IKEA宜家家居"]
+              "merchants": [
+                "IKEA宜家家居"
+              ]
             }
           ]
         },
@@ -171,39 +337,107 @@
           "name": "慶生月 10%",
           "value": "birthday_high",
           "rate_type": "fixed",
-          "rate": 0.10,
+          "rate": 0.1,
           "valid_from": "2026-04-01",
           "valid_until": "2026-06-30",
           "groups": [
             {
               "label_full": "桃竹美食,讓味蕾得到幸福與滿足",
               "label_short": "桃竹美食",
-              "merchants": ["七彩雲南","Postman 義式餐酒館","Make Eat Work 早方法","夜更 BAR","小紅樓砂鍋菜","彼刻義式餐酒館","Terzo","SABI","裏月・晴酒","小院子・台食茶館","滾滾風居","川阜和牛燒肉","享廚鐵板燒","豪軒"]
+              "merchants": [
+                "七彩雲南",
+                "Postman 義式餐酒館",
+                "Make Eat Work 早方法",
+                "夜更 BAR",
+                "小紅樓砂鍋菜",
+                "彼刻義式餐酒館",
+                "Terzo",
+                "SABI",
+                "裏月・晴酒",
+                "小院子・台食茶館",
+                "滾滾風居",
+                "川阜和牛燒肉",
+                "享廚鐵板燒",
+                "豪軒"
+              ]
             },
             {
               "label_full": "春夏早午餐日料、微醺餐食療癒感官",
               "label_short": "春夏早午餐日料、微醺餐食",
-              "merchants": ["青沐","芮秋 Rachel","立秋 Li Chiu","SAVORA 白日慢嚐","BeApe 法國傳統餐酒館 | Gras French","酒桃 Sake momo","The other.Eatery","二本松涮涮屋 | 橋山壽喜燒","kaï bistro à vin","Bar Pine 松","天狐 Tenko Table","Yoru","月見里山炭火燒肉","山里見月割烹鍋物","小麥所","春間艸艸","逸之牛"]
+              "merchants": [
+                "青沐",
+                "芮秋 Rachel",
+                "立秋 Li Chiu",
+                "SAVORA 白日慢嚐",
+                "BeApe 法國傳統餐酒館 | Gras French",
+                "酒桃 Sake momo",
+                "The other.Eatery",
+                "二本松涮涮屋 | 橋山壽喜燒",
+                "kaï bistro à vin",
+                "Bar Pine 松",
+                "天狐 Tenko Table",
+                "Yoru",
+                "月見里山炭火燒肉",
+                "山里見月割烹鍋物",
+                "小麥所",
+                "春間艸艸",
+                "逸之牛"
+              ]
             },
             {
               "label_full": "從農場到餐桌,嚴選在地當季食材",
               "label_short": "在地食材",
-              "merchants": ["Peppa","RORA.Bistro","柴公館","Firoo","龍富天婦羅","ZAI","huist 卉寓","heng"]
+              "merchants": [
+                "Peppa",
+                "RORA.Bistro",
+                "柴公館",
+                "Firoo",
+                "龍富天婦羅",
+                "ZAI",
+                "huist 卉寓",
+                "heng"
+              ]
             },
             {
               "label_full": "全台連鎖燒肉、鍋物及甜點饗宴",
               "label_short": "連鎖燒肉鍋物甜點",
-              "merchants": ["Pastaio | Pastaio noodle cafe","UNCLE SHAWN 燒肉餐酒館","竣師父牛肉麵","UNCLE RAY 串燒・牛飲・咖喱(台北大安/台中店)","陳阿姨火鍋灶咖","蜀叔麻辣鍋","吳留手串燒居酒屋","如嬌花膠雞・鍋物","如媽私廚・職人料理","如嫦卜卜蜆・港式雞煲","法國的秘密甜點(大安店/官網)","高 GAO Taipei (門市/官網)","creammm.t (門市/官網)","mine kitchen (官網)"]
+              "merchants": [
+                "Pastaio | Pastaio noodle cafe",
+                "UNCLE SHAWN 燒肉餐酒館",
+                "竣師父牛肉麵",
+                "UNCLE RAY 串燒・牛飲・咖喱(台北大安/台中店)",
+                "陳阿姨火鍋灶咖",
+                "蜀叔麻辣鍋",
+                "吳留手串燒居酒屋",
+                "如嬌花膠雞・鍋物",
+                "如媽私廚・職人料理",
+                "如嫦卜卜蜆・港式雞煲",
+                "法國的秘密甜點(大安店/官網)",
+                "高 GAO Taipei (門市/官網)",
+                "creammm.t (門市/官網)",
+                "mine kitchen (官網)"
+              ]
             },
             {
               "label_full": "盡享日本指定樂園及遊戲娛樂時光",
               "label_short": "日本樂園・遊戲娛樂",
-              "merchants": ["東京迪士尼樂園","大阪環球影城(USJ)","PlayStation","Nintendo","巴哈姆特動畫瘋"]
+              "merchants": [
+                "東京迪士尼樂園",
+                "大阪環球影城(USJ)",
+                "PlayStation",
+                "Nintendo",
+                "巴哈姆特動畫瘋"
+              ]
             },
             {
               "label_full": "讓音樂與歌聲為身心暢快充電",
               "label_short": "KTV",
-              "merchants": ["錢櫃KTV","好樂迪KTV","星聚點KTV","享溫馨KTV"]
+              "merchants": [
+                "錢櫃KTV",
+                "好樂迪KTV",
+                "星聚點KTV",
+                "享溫馨KTV"
+              ]
             }
           ]
         },
@@ -218,7 +452,12 @@
             {
               "label_full": "購物美好享受生活,增添更多精彩",
               "label_short": "購物",
-              "merchants": ["新光三越 (不含SKM Park Outlets 高雄草衙)","Uber Eats","Klook","FunNow"]
+              "merchants": [
+                "新光三越 (不含SKM Park Outlets 高雄草衙)",
+                "Uber Eats",
+                "Klook",
+                "FunNow"
+              ]
             }
           ]
         },
@@ -232,17 +471,33 @@
           "unlock_condition": "客戶與其未成年子女須持有本行帳戶 + 持有有效CUBE信用卡正卡(每月20日前符合條件,次月1日起可切換)",
           "rate_groups": [
             {
-              "rate": 0.10,
+              "rate": 0.1,
               "groups": [
                 {
                   "label_full": "嬰幼童品牌官網 10%",
                   "label_short": "嬰幼童品牌",
-                  "merchants": ["10mois台灣官網","Mamas&Papas台灣官網","古北町台灣官網","Tiger Family台灣官網","Little Wonders台灣官網","Seahorse Originals台灣官網"]
+                  "merchants": [
+                    "10mois台灣官網",
+                    "Mamas&Papas台灣官網",
+                    "古北町台灣官網",
+                    "Tiger Family台灣官網",
+                    "Little Wonders台灣官網",
+                    "Seahorse Originals台灣官網"
+                  ]
                 },
                 {
                   "label_full": "五感體驗課 10%",
                   "label_short": "五感體驗課",
-                  "merchants": ["朱宗慶打擊樂教學系統","雲門舞集舞蹈教室","Yamaha音樂教室","TutorABC Junior","SKI SCHOOL(限台北及高雄學校)","Etalking Kids","iSKI滑雪俱樂部","汐游寶寶/風城游汐谷"]
+                  "merchants": [
+                    "朱宗慶打擊樂教學系統",
+                    "雲門舞集舞蹈教室",
+                    "Yamaha音樂教室",
+                    "TutorABC Junior",
+                    "SKI SCHOOL(限台北及高雄學校)",
+                    "Etalking Kids",
+                    "iSKI滑雪俱樂部",
+                    "汐游寶寶/風城游汐谷"
+                  ]
                 }
               ]
             },
@@ -252,22 +507,71 @@
                 {
                   "label_full": "親子餐廳 5%",
                   "label_short": "親子餐廳",
-                  "merchants": ["雞湯大叔","YAYOI彌生軒(限街邊店)","大戶屋","甲蟲秘境","貳樓","大樹先生的家","Money Jump 媽妳講親子餐廳","小島3.5度親子餐廳","Zone Cafe 弄咖啡親子餐廳","小院子・台食茶館"]
+                  "merchants": [
+                    "雞湯大叔",
+                    "YAYOI彌生軒(限街邊店)",
+                    "大戶屋",
+                    "甲蟲秘境",
+                    "貳樓",
+                    "大樹先生的家",
+                    "Money Jump 媽妳講親子餐廳",
+                    "小島3.5度親子餐廳",
+                    "Zone Cafe 弄咖啡親子餐廳",
+                    "小院子・台食茶館"
+                  ]
                 },
                 {
                   "label_full": "親子育樂 5%",
                   "label_short": "親子育樂",
-                  "merchants": ["Klook","東京迪士尼樂園","大阪環球影城(USJ)","麗寶樂園","六福村主題樂園","九族文化村","劍湖山世界主題樂園","義大遊樂世界","小叮噹科學園區主題樂園"]
+                  "merchants": [
+                    "Klook",
+                    "東京迪士尼樂園",
+                    "大阪環球影城(USJ)",
+                    "麗寶樂園",
+                    "六福村主題樂園",
+                    "九族文化村",
+                    "劍湖山世界主題樂園",
+                    "義大遊樂世界",
+                    "小叮噹科學園區主題樂園"
+                  ]
                 },
                 {
                   "label_full": "親子飯店 5%",
                   "label_short": "親子飯店",
-                  "merchants": ["台北喜來登大飯店","蘭城晶英酒店","台南晶英酒店","礁溪寒沐酒店","大溪笠復威斯汀度假酒店","煙波大飯店新竹湖濱館","麗寶福容大飯店","雲品溫泉酒店","和逸飯店(台南西門館、桃園館)","義大皇家酒店","高雄萬豪酒店","墾丁凱撒大飯店","花蓮遠雄悅來大飯店","瑞穗天合國際觀光酒店","六福莊","宜蘭礁溪鳳凰酒店","桃園名人堂花園大飯店"]
+                  "merchants": [
+                    "台北喜來登大飯店",
+                    "蘭城晶英酒店",
+                    "台南晶英酒店",
+                    "礁溪寒沐酒店",
+                    "大溪笠復威斯汀度假酒店",
+                    "煙波大飯店新竹湖濱館",
+                    "麗寶福容大飯店",
+                    "雲品溫泉酒店",
+                    "和逸飯店(台南西門館、桃園館)",
+                    "義大皇家酒店",
+                    "高雄萬豪酒店",
+                    "墾丁凱撒大飯店",
+                    "花蓮遠雄悅來大飯店",
+                    "瑞穗天合國際觀光酒店",
+                    "六福莊",
+                    "宜蘭礁溪鳳凰酒店",
+                    "桃園名人堂花園大飯店"
+                  ]
                 },
                 {
                   "label_full": "母嬰用品店 5%",
                   "label_short": "母嬰用品",
-                  "merchants": ["卡多摩嬰童館","樂兒屋","寶齡婦幼館/步步樂BuBuLuv","安琪兒婦嬰百貨","宜兒樂","麗兒采家","Taobaby濤寶日記","俏媽咪","媽媽好"]
+                  "merchants": [
+                    "卡多摩嬰童館",
+                    "樂兒屋",
+                    "寶齡婦幼館/步步樂BuBuLuv",
+                    "安琪兒婦嬰百貨",
+                    "宜兒樂",
+                    "麗兒采家",
+                    "Taobaby濤寶日記",
+                    "俏媽咪",
+                    "媽媽好"
+                  ]
                 }
               ]
             },
@@ -277,7 +581,19 @@
                 {
                   "label_full": "指定私校學費 1%",
                   "label_short": "私校學費",
-                  "merchants": ["台北美國學校","台北歐洲學校","台北市私立道明外僑學校","馬禮遜學校","康乃薾美國學校","台北私立立人國際國小","康橋國際學校","華盛頓小學","復興實驗高中","維多利亞雙語中小學","高雄美國學校"],
+                  "merchants": [
+                    "台北美國學校",
+                    "台北歐洲學校",
+                    "台北市私立道明外僑學校",
+                    "馬禮遜學校",
+                    "康乃薾美國學校",
+                    "台北私立立人國際國小",
+                    "康橋國際學校",
+                    "華盛頓小學",
+                    "復興實驗高中",
+                    "維多利亞雙語中小學",
+                    "高雄美國學校"
+                  ],
                   "note": "僅限透過 i 繳費平台繳學費"
                 }
               ]
@@ -298,7 +614,18 @@
                 {
                   "label_full": "大啖日系美食 8%",
                   "label_short": "大啖日系美食",
-                  "merchants": ["王品瘋Pay指定餐廳 (聚日式鍋物、和牛涮、陶板屋、藝奇)","I'm donut ?","挽肉と米","武田咖哩食堂 TORIAEZU CURRY","MERCER BRUNCH TAIWAN","富錦樹鐵球食堂","雞湯桑指定門市","二本松涮涮屋","橋山壽喜燒","Suki Salon"]
+                  "merchants": [
+                    "王品瘋Pay指定餐廳 (聚日式鍋物、和牛涮、陶板屋、藝奇)",
+                    "I'm donut ?",
+                    "挽肉と米",
+                    "武田咖哩食堂 TORIAEZU CURRY",
+                    "MERCER BRUNCH TAIWAN",
+                    "富錦樹鐵球食堂",
+                    "雞湯桑指定門市",
+                    "二本松涮涮屋",
+                    "橋山壽喜燒",
+                    "Suki Salon"
+                  ]
                 }
               ]
             },
@@ -308,7 +635,9 @@
                 {
                   "label_full": "規劃日本旅遊 機票/住宿/行程 6%",
                   "label_short": "日本旅遊",
-                  "merchants": ["Klook 指定日本消費 (排除即享券交易)"]
+                  "merchants": [
+                    "Klook 指定日本消費 (排除即享券交易)"
+                  ]
                 }
               ]
             },
@@ -318,32 +647,55 @@
                 {
                   "label_full": "日本人氣專賣店",
                   "label_short": "人氣專賣店",
-                  "merchants": ["吉伊卡哇MOGUMOGU本舖","SANRIO 三麗鷗指定門市"]
+                  "merchants": [
+                    "吉伊卡哇MOGUMOGU本舖",
+                    "SANRIO 三麗鷗指定門市"
+                  ]
                 },
                 {
                   "label_full": "卡友票選勝出!3/16起權益升級 5%",
                   "label_short": "卡友票選餐飲",
-                  "merchants": ["叙叙苑","AFURI","Blue Bottle Coffee","星巴克(不含儲值)","%Arabica","HARBS","LOFT (不含店中櫃)"]
+                  "merchants": [
+                    "叙叙苑",
+                    "AFURI",
+                    "Blue Bottle Coffee",
+                    "星巴克(不含儲值)",
+                    "%Arabica",
+                    "HARBS",
+                    "LOFT (不含店中櫃)"
+                  ]
                 },
                 {
                   "label_full": "規劃日本旅遊 5%",
                   "label_short": "訂房平台",
-                  "merchants": ["Hotels.com 專屬網頁訂房","Expedia 專屬網頁訂房"]
+                  "merchants": [
+                    "Hotels.com 專屬網頁訂房",
+                    "Expedia 專屬網頁訂房"
+                  ]
                 },
                 {
                   "label_full": "大啖日系美食 5%",
                   "label_short": "壽司郎",
-                  "merchants": ["台灣壽司郎"]
+                  "merchants": [
+                    "台灣壽司郎"
+                  ]
                 },
                 {
                   "label_full": "機場交通 5%",
                   "label_short": "機場交通",
-                  "merchants": ["桃園機場捷運"]
+                  "merchants": [
+                    "桃園機場捷運"
+                  ]
                 },
                 {
                   "label_full": "日系購物名店 5%",
                   "label_short": "日系購物 5%",
-                  "merchants": ["LOPIA","台灣DON DON DONKI","明曜百貨","UNITED ARROWS LTD.官方購物網站"]
+                  "merchants": [
+                    "LOPIA",
+                    "台灣DON DON DONKI",
+                    "明曜百貨",
+                    "UNITED ARROWS LTD.官方購物網站"
+                  ]
                 }
               ]
             },
@@ -353,17 +705,37 @@
                 {
                   "label_full": "日本必逛、出行 指定消費 3.5%",
                   "label_short": "日本必逛出行",
-                  "merchants": ["日本實體消費","MITSUI OUTLET PARK 指定商場","大丸百貨福岡天神店","EDION愛電王實體門市","BicCamera集團實體門市","Apple錢包指定交通卡 (SUICA、PASMO、ICOCA)","日本GO Taxi App","完美行購物"]
+                  "merchants": [
+                    "日本實體消費",
+                    "MITSUI OUTLET PARK 指定商場",
+                    "大丸百貨福岡天神店",
+                    "EDION愛電王實體門市",
+                    "BicCamera集團實體門市",
+                    "Apple錢包指定交通卡 (SUICA、PASMO、ICOCA)",
+                    "日本GO Taxi App",
+                    "完美行購物"
+                  ]
                 },
                 {
                   "label_full": "規劃日本旅遊 3.5%",
                   "label_short": "日本旅遊 3.5%",
-                  "merchants": ["樂桃航空","Klook","KKday","Trip.com","可樂旅遊","東南旅遊","ezTravel易遊網"]
+                  "merchants": [
+                    "樂桃航空",
+                    "Klook",
+                    "KKday",
+                    "Trip.com",
+                    "可樂旅遊",
+                    "東南旅遊",
+                    "ezTravel易遊網"
+                  ]
                 },
                 {
                   "label_full": "大啖日系美食 3.5%",
                   "label_short": "外送速食",
-                  "merchants": ["foodpanda","摩斯漢堡"]
+                  "merchants": [
+                    "foodpanda",
+                    "摩斯漢堡"
+                  ]
                 }
               ]
             },
@@ -373,12 +745,18 @@
                 {
                   "label_full": "規劃日本旅遊 3%",
                   "label_short": "Agoda",
-                  "merchants": ["Agoda"]
+                  "merchants": [
+                    "Agoda"
+                  ]
                 },
                 {
                   "label_full": "日系購物名店 3%",
                   "label_short": "日系購物 3%",
-                  "merchants": ["新光三越","UNIQLO網路商店/直營店","GU網路商店"]
+                  "merchants": [
+                    "新光三越",
+                    "UNIQLO網路商店/直營店",
+                    "GU網路商店"
+                  ]
                 }
               ]
             }
@@ -400,22 +778,68 @@
             {
               "label_full": "旅遊交通",
               "label_short": "旅遊交通",
-              "merchants": ["韓國","Klook","KKday","易遊網","Agoda","Airbnb","DJB","酷遊卡","高鐵","Uber","叫車吧","台灣快綫","聯通","USPACE","俥亭停車"]
+              "merchants": [
+                "韓國",
+                "Klook",
+                "KKday",
+                "易遊網",
+                "Agoda",
+                "Airbnb",
+                "DJB",
+                "酷遊卡",
+                "高鐵",
+                "Uber",
+                "叫車吧",
+                "台灣快綫",
+                "聯通",
+                "USPACE",
+                "俥亭停車"
+              ]
             },
             {
               "label_full": "生活購物",
               "label_short": "生活購物",
-              "merchants": ["新光三越","遠東百貨","遠東巨城","LaLaport","三井(MITSUI OUTLET PARK)","康是美","美廉社","聖德科斯"]
+              "merchants": [
+                "新光三越",
+                "遠東百貨",
+                "遠東巨城",
+                "LaLaport",
+                "三井(MITSUI OUTLET PARK)",
+                "康是美",
+                "美廉社",
+                "聖德科斯"
+              ]
             },
             {
               "label_full": "外送美食",
               "label_short": "外送美食",
-              "merchants": ["Uber Eats","foodpanda","Foodomo","EZTABLE","85度C","清心福全","三商餐飲"]
+              "merchants": [
+                "Uber Eats",
+                "foodpanda",
+                "Foodomo",
+                "EZTABLE",
+                "85度C",
+                "清心福全",
+                "三商餐飲"
+              ]
             },
             {
               "label_full": "影城K歌",
               "label_short": "影城K歌",
-              "merchants": ["威秀影城","國賓影城","新光影城","喜樂時代影城","秀泰影城","錢櫃","好樂迪","享溫馨","凱悅KTV","星聚點","Sing Go","ONCOR響艷都市會所"]
+              "merchants": [
+                "威秀影城",
+                "國賓影城",
+                "新光影城",
+                "喜樂時代影城",
+                "秀泰影城",
+                "錢櫃",
+                "好樂迪",
+                "享溫馨",
+                "凱悅KTV",
+                "星聚點",
+                "Sing Go",
+                "ONCOR響艷都市會所"
+              ]
             }
           ]
         }
@@ -435,22 +859,54 @@
             {
               "label_full": "超商量販",
               "label_short": "超商量販",
-              "merchants": ["7-ELEVEN (限台新Pay)","全家便利商店 (限台新Pay)","家樂福","大買家","唐吉軻德","LOPIA"]
+              "merchants": [
+                "7-ELEVEN (限台新Pay)",
+                "全家便利商店 (限台新Pay)",
+                "家樂福",
+                "大買家",
+                "唐吉軻德",
+                "LOPIA"
+              ]
             },
             {
               "label_full": "通勤交通",
               "label_short": "通勤交通",
-              "merchants": ["臺鐵","高鐵","台灣大車隊","LINE GO","Yoxi","Uber","台灣Bolt"]
+              "merchants": [
+                "臺鐵",
+                "高鐵",
+                "台灣大車隊",
+                "LINE GO",
+                "Yoxi",
+                "Uber",
+                "台灣Bolt"
+              ]
             },
             {
               "label_full": "加油充電",
               "label_short": "加油充電",
-              "merchants": ["中油直營","全國加油","全國特急電","源點EVOASIS","華城電能EVALUE","USPACE","Autopass(車麻吉)"]
+              "merchants": [
+                "中油直營",
+                "全國加油",
+                "全國特急電",
+                "源點EVOASIS",
+                "華城電能EVALUE",
+                "USPACE",
+                "Autopass(車麻吉)"
+              ]
             },
             {
               "label_full": "藥妝藥局",
               "label_short": "藥妝藥局",
-              "merchants": ["寶雅","康是美","屈臣氏","杏一醫療","大樹藥局","丁丁藥局","佑全保健藥妝","健康人生藥局"]
+              "merchants": [
+                "寶雅",
+                "康是美",
+                "屈臣氏",
+                "杏一醫療",
+                "大樹藥局",
+                "丁丁藥局",
+                "佑全保健藥妝",
+                "健康人生藥局"
+              ]
             }
           ]
         },
@@ -465,22 +921,51 @@
             {
               "label_full": "指定百貨",
               "label_short": "指定百貨",
-              "merchants": ["新光三越","遠東SOGO","廣三SOGO","微風","台北101","遠東巨城","南紡購物中心","漢神百貨","漢神巨蛋","誠品生活"]
+              "merchants": [
+                "新光三越",
+                "遠東SOGO",
+                "廣三SOGO",
+                "微風",
+                "台北101",
+                "遠東巨城",
+                "南紡購物中心",
+                "漢神百貨",
+                "漢神巨蛋",
+                "誠品生活"
+              ]
             },
             {
               "label_full": "Outlet",
               "label_short": "Outlet",
-              "merchants": ["MITSUI OUTLET PARK (林口、台中港、台南)","Mitsui Shopping Park LaLaport (南港、台中)","華泰名品城","SKM Park Outlets"]
+              "merchants": [
+                "MITSUI OUTLET PARK (林口、台中港、台南)",
+                "Mitsui Shopping Park LaLaport (南港、台中)",
+                "華泰名品城",
+                "SKM Park Outlets"
+              ]
             },
             {
               "label_full": "居家裝修",
               "label_short": "居家裝修",
-              "merchants": ["IKEA宜家家居","特力屋","HOLA","宜得利家居","瑪黑家居"]
+              "merchants": [
+                "IKEA宜家家居",
+                "特力屋",
+                "HOLA",
+                "宜得利家居",
+                "瑪黑家居"
+              ]
             },
             {
               "label_full": "時尚品味",
               "label_short": "時尚品味",
-              "merchants": ["UNIQLO","GU","ZARA","NET","lativ","GAP"]
+              "merchants": [
+                "UNIQLO",
+                "GU",
+                "ZARA",
+                "NET",
+                "lativ",
+                "GAP"
+              ]
             }
           ]
         },
@@ -495,32 +980,70 @@
             {
               "label_full": "全台餐飲",
               "label_short": "全台餐飲",
-              "merchants": ["全台餐飲 (MCC 5811/5812/5813/5814，不含餐券)","王品瘋Pay"]
+              "merchants": [
+                "全台餐飲 (MCC 5811/5812/5813/5814，不含餐券)",
+                "王品瘋Pay"
+              ]
             },
             {
               "label_full": "外送平台",
               "label_short": "外送",
-              "merchants": ["Uber Eats","Foodpanda"]
+              "merchants": [
+                "Uber Eats",
+                "Foodpanda"
+              ]
             },
             {
               "label_full": "展演購票",
               "label_short": "購票",
-              "merchants": ["拓元售票","KKTIX","年代售票","寬宏售票","OPENTIX兩廳院文化生活"]
+              "merchants": [
+                "拓元售票",
+                "KKTIX",
+                "年代售票",
+                "寬宏售票",
+                "OPENTIX兩廳院文化生活"
+              ]
             },
             {
               "label_full": "指定樂園",
               "label_short": "指定樂園",
-              "merchants": ["義大遊樂世界","麗寶樂園","六福村主題遊樂園","九族文化村","劍湖山世界主題遊樂園","Xpark","國立海洋生物博物館","遠雄海洋公園","小人國主題樂園"]
+              "merchants": [
+                "義大遊樂世界",
+                "麗寶樂園",
+                "六福村主題遊樂園",
+                "九族文化村",
+                "劍湖山世界主題遊樂園",
+                "Xpark",
+                "國立海洋生物博物館",
+                "遠雄海洋公園",
+                "小人國主題樂園"
+              ]
             },
             {
               "label_full": "指定飯店",
               "label_short": "指定飯店",
-              "merchants": ["晶華國際酒店集團","台灣萬豪國際集團旗下飯店","煙波飯店","老爺酒店集團","福華集團","漢來飯店事業群","台北君悅酒店","高雄洲際酒店","礁溪寒沐酒店"]
+              "merchants": [
+                "晶華國際酒店集團",
+                "台灣萬豪國際集團旗下飯店",
+                "煙波飯店",
+                "老爺酒店集團",
+                "福華集團",
+                "漢來飯店事業群",
+                "台北君悅酒店",
+                "高雄洲際酒店",
+                "礁溪寒沐酒店"
+              ]
             },
             {
               "label_full": "5大KTV",
               "label_short": "KTV",
-              "merchants": ["錢櫃","好樂迪","ONCOR","Sing!Go","享溫馨"]
+              "merchants": [
+                "錢櫃",
+                "好樂迪",
+                "ONCOR",
+                "Sing!Go",
+                "享溫馨"
+              ]
             }
           ]
         },
@@ -535,22 +1058,58 @@
             {
               "label_full": "網購平台",
               "label_short": "網購",
-              "merchants": ["蝦皮購物","momo購物網","Coupang酷澎","PChome 24h購物 (不含儲值及電子票券)","淘寶","Amazon","東森購物","博客來","Richart Mart","PayEasy","iHerb","SHEIN","Selfridges","Farfetch","Olive Young"]
+              "merchants": [
+                "蝦皮購物",
+                "momo購物網",
+                "Coupang酷澎",
+                "PChome 24h購物 (不含儲值及電子票券)",
+                "淘寶",
+                "Amazon",
+                "東森購物",
+                "博客來",
+                "Richart Mart",
+                "PayEasy",
+                "iHerb",
+                "SHEIN",
+                "Selfridges",
+                "Farfetch",
+                "Olive Young"
+              ]
             },
             {
               "label_full": "線上課程",
               "label_short": "線上課程",
-              "merchants": ["知識衛星","Amazing Talker","Tutor ABC","Hahow","PressPlay"]
+              "merchants": [
+                "知識衛星",
+                "Amazing Talker",
+                "Tutor ABC",
+                "Hahow",
+                "PressPlay"
+              ]
             },
             {
               "label_full": "遊戲訂閱",
               "label_short": "遊戲訂閱",
-              "merchants": ["MyCard","遊戲橘子","Steam","PlayStation","Nintendo","Netflix","Disney+"]
+              "merchants": [
+                "MyCard",
+                "遊戲橘子",
+                "Steam",
+                "PlayStation",
+                "Nintendo",
+                "Netflix",
+                "Disney+"
+              ]
             },
             {
               "label_full": "AI工具",
               "label_short": "AI工具",
-              "merchants": ["ChatGPT","Notion","Canva","Perplexity","Claude"]
+              "merchants": [
+                "ChatGPT",
+                "Notion",
+                "Canva",
+                "Perplexity",
+                "Claude"
+              ]
             }
           ]
         },
@@ -565,27 +1124,167 @@
             {
               "label_full": "海外消費",
               "label_short": "海外消費",
-              "merchants": ["海外消費 (含實體及線上、歐洲國家交易)"]
+              "merchants": [
+                "海外消費 (含實體及線上、歐洲國家交易)"
+              ]
             },
             {
               "label_full": "海外交通/網路",
               "label_short": "海外交通",
-              "merchants": ["Uber (海外)","Grab","SUICA","ICOCA","PASMO","WOWPASS","AIRSIM"]
+              "merchants": [
+                "Uber (海外)",
+                "Grab",
+                "SUICA",
+                "ICOCA",
+                "PASMO",
+                "WOWPASS",
+                "AIRSIM"
+              ]
             },
             {
               "label_full": "航空公司",
               "label_short": "航空",
-              "merchants": ["中華航空","長榮航空","星宇航空","台灣虎航","國泰航空","華信航空","立榮航空","樂桃航空","阿聯酋航空","亞洲航空","酷航","捷星航空","新加坡航空","日本航空","越捷航空"]
+              "merchants": [
+                "中華航空",
+                "長榮航空",
+                "星宇航空",
+                "台灣虎航",
+                "國泰航空",
+                "華信航空",
+                "立榮航空",
+                "樂桃航空",
+                "阿聯酋航空",
+                "亞洲航空",
+                "酷航",
+                "捷星航空",
+                "新加坡航空",
+                "日本航空",
+                "越捷航空"
+              ]
             },
             {
               "label_full": "訂房平台",
               "label_short": "訂房",
-              "merchants": ["Klook","KKday","Agoda","Booking.com","Trip.com","Airbnb","Hotels.com","Expedia"]
+              "merchants": [
+                "Klook",
+                "KKday",
+                "Agoda",
+                "Booking.com",
+                "Trip.com",
+                "Airbnb",
+                "Hotels.com",
+                "Expedia"
+              ]
             },
             {
               "label_full": "旅行社",
               "label_short": "旅行社",
-              "merchants": ["雄獅旅遊","易遊網","東南旅遊","可樂旅遊","長汎假期","五福旅遊","喜鴻假期","易飛旅遊","燦星旅遊","加利利旅行社","鳳凰國際旅行社","山富旅遊","百威旅行社"]
+              "merchants": [
+                "雄獅旅遊",
+                "易遊網",
+                "東南旅遊",
+                "可樂旅遊",
+                "長汎假期",
+                "五福旅遊",
+                "喜鴻假期",
+                "易飛旅遊",
+                "燦星旅遊",
+                "加利利旅行社",
+                "鳳凰國際旅行社",
+                "山富旅遊",
+                "百威旅行社"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "ubot_m": {
+      "sections": {
+        "travel": {
+          "valid_from": "2026-04-10",
+          "valid_until": "2026-12-31",
+          "groups": [
+            {
+              "label_short": "航空",
+              "label_full": "航空（系統判定）",
+              "merchants": [
+                "國內外航空（依收單商店刷卡授權型態判定）"
+              ]
+            },
+            {
+              "label_short": "旅遊平台",
+              "label_full": "指定旅遊平台",
+              "merchants": [
+                "Klook",
+                "KKday",
+                "Funnow",
+                "萬達通"
+              ]
+            },
+            {
+              "label_short": "訂房網",
+              "label_full": "指定訂房網",
+              "merchants": [
+                "國內飯店（系統判定）",
+                "Booking.com",
+                "Agoda",
+                "Hotels.com",
+                "Expedia",
+                "Trip.com",
+                "AsiaYo",
+                "ezTravel",
+                "Airbnb"
+              ]
+            },
+            {
+              "label_short": "台鐵",
+              "label_full": "台鐵購票",
+              "merchants": [
+                "台鐵購票（不含高鐵）"
+              ]
+            },
+            {
+              "label_short": "指定客運",
+              "label_full": "指定客運購票",
+              "merchants": [
+                "國光",
+                "統聯",
+                "和欣",
+                "葛瑪蘭"
+              ]
+            },
+            {
+              "label_short": "指定計程車",
+              "label_full": "指定計程車",
+              "merchants": [
+                "Uber",
+                "LINE GO",
+                "yoxi",
+                "台灣大車隊",
+                "大都會計程車"
+              ]
+            },
+            {
+              "label_short": "指定租車",
+              "label_full": "指定租車",
+              "merchants": [
+                "聯邦",
+                "和運",
+                "格上租車"
+              ]
+            },
+            {
+              "label_short": "旅行社",
+              "label_full": "指定旅行社",
+              "merchants": [
+                "東南",
+                "山富",
+                "五福",
+                "雄獅",
+                "鳳凰",
+                "可樂旅遊（康福）"
+              ]
             }
           ]
         }

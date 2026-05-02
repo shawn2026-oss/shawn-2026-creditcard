@@ -1,5 +1,5 @@
 {
-  "version": "2026Q2.3",
+  "version": "2026Q2.4",
   "updated": "2026-05-02",
   "cards": {
     "cube1": {
@@ -1413,29 +1413,32 @@
           "value": "transit",
           "groups": [
             {
-              "label_full": "計程車",
+              "label_full": "指定計程車隊",
               "label_short": "計程車",
               "merchants": [
                 "台灣大車隊",
-                "大都會",
-                "yoxi"
+                "大都會車隊",
+                "yoxi車隊"
               ]
             },
             {
-              "label_full": "停車場",
+              "label_full": "指定停車場站",
               "label_short": "停車場",
               "merchants": [
-                "嘟嘟房",
-                "台灣聯通",
-                "詮營停車場"
+                "嘟嘟房停車場",
+                "俥亭停車",
+                "日月亭停車場",
+                "宜舍停車場",
+                "uTagGo合作停車場(限支援線上付)",
+                "臺南智慧停車柱"
               ]
             },
             {
-              "label_full": "加油站",
+              "label_full": "指定加油站",
               "label_short": "加油站",
               "merchants": [
-                "速邁樂",
-                "台灣中油直營人工島"
+                "速邁樂(限人工島,不含金門站)",
+                "台灣中油(限人工島,限直營站)"
               ]
             }
           ]

@@ -1,5 +1,5 @@
 {
-  "version": "2026Q2.2",
+  "version": "2026Q2.3",
   "updated": "2026-05-02",
   "cards": {
     "cube1": {
@@ -842,6 +842,38 @@
               ]
             }
           ]
+        },
+        "transit": {
+          "name": "icash Pay 交通",
+          "value": "transit",
+          "groups": [
+            {
+              "label_full": "計程車",
+              "label_short": "計程車",
+              "merchants": [
+                "台灣大車隊",
+                "大都會",
+                "yoxi"
+              ]
+            },
+            {
+              "label_full": "停車場",
+              "label_short": "停車場",
+              "merchants": [
+                "嘟嘟房",
+                "台灣聯通",
+                "詮營停車場"
+              ]
+            },
+            {
+              "label_full": "加油站",
+              "label_short": "加油站",
+              "merchants": [
+                "速邁樂",
+                "台灣中油直營人工島"
+              ]
+            }
+          ]
         }
       }
     },
@@ -1193,6 +1225,38 @@
                 "鳳凰國際旅行社",
                 "山富旅遊",
                 "百威旅行社"
+              ]
+            }
+          ]
+        },
+        "transit": {
+          "name": "icash Pay 交通",
+          "value": "transit",
+          "groups": [
+            {
+              "label_full": "計程車",
+              "label_short": "計程車",
+              "merchants": [
+                "台灣大車隊",
+                "大都會",
+                "yoxi"
+              ]
+            },
+            {
+              "label_full": "停車場",
+              "label_short": "停車場",
+              "merchants": [
+                "嘟嘟房",
+                "台灣聯通",
+                "詮營停車場"
+              ]
+            },
+            {
+              "label_full": "加油站",
+              "label_short": "加油站",
+              "merchants": [
+                "速邁樂",
+                "台灣中油直營人工島"
               ]
             }
           ]

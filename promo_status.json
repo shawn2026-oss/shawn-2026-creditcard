@@ -463,11 +463,5 @@
       "endDate": "2026-06-30"
     }
   ],
-  "updated": "2026-05-02 19:34",
-  "icashpay_transit": {
-    "fb1_full": false,
-    "c6_full": false,
-    "c11_full": false,
-    "last_updated": "2026-05-02"
-  }
+  "updated": "2026-05-02 19:49"
 }

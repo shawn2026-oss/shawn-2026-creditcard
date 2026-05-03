@@ -1,6 +1,6 @@
 {
-  "version": "2026Q2.5",
-  "updated": "2026-05-02",
+  "version": "2026Q2.6",
+  "updated": "2026-05-03",
   "cards": {
     "cube1": {
       "name": "國泰CUBE卡",
@@ -601,12 +601,13 @@
           ]
         },
         "japan": {
-          "name": "日本賞",
+          "name": "日本賞(限 CUBE JCB 卡)",
           "value": "japan",
           "rate_type": "tiered_by_merchant",
           "rate_range": "3% ~ 8%",
-          "valid_from": "2026-03-01",
-          "valid_until": "2026-04-30",
+          "valid_from": "2026-05-01",
+          "valid_until": "2026-05-31",
+          "unlock_condition": "限 CUBE JCB 信用卡;持 CUBE Visa / Mastercard 切換此權益無效,僅享 0.3% 一般消費。5/1 中午 12:00 起可切換。",
           "rate_groups": [
             {
               "rate": 0.08,
@@ -636,7 +637,7 @@
                   "label_full": "規劃日本旅遊 機票/住宿/行程 6%",
                   "label_short": "日本旅遊",
                   "merchants": [
-                    "Klook 指定日本消費 (排除即享券交易)"
+                    "Klook 指定日本商品 (排除即享券交易)"
                   ]
                 }
               ]
@@ -645,24 +646,11 @@
               "rate": 0.05,
               "groups": [
                 {
-                  "label_full": "日本人氣專賣店",
+                  "label_full": "日本人氣專賣店 5%",
                   "label_short": "人氣專賣店",
                   "merchants": [
                     "吉伊卡哇MOGUMOGU本舖",
                     "SANRIO 三麗鷗指定門市"
-                  ]
-                },
-                {
-                  "label_full": "卡友票選勝出!3/16起權益升級 5%",
-                  "label_short": "卡友票選餐飲",
-                  "merchants": [
-                    "叙叙苑",
-                    "AFURI",
-                    "Blue Bottle Coffee",
-                    "星巴克(不含儲值)",
-                    "%Arabica",
-                    "HARBS",
-                    "LOFT (不含店中櫃)"
                   ]
                 },
                 {
@@ -713,7 +701,8 @@
                     "BicCamera集團實體門市",
                     "Apple錢包指定交通卡 (SUICA、PASMO、ICOCA)",
                     "日本GO Taxi App",
-                    "完美行購物"
+                    "完美行購物",
+                    "福岡機場免稅店"
                   ]
                 },
                 {

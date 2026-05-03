@@ -613,7 +613,7 @@
               "rate": 0.08,
               "groups": [
                 {
-                  "label_full": "大啖日系美食 8%",
+                  "label_full": "大啖日系美食",
                   "label_short": "大啖日系美食",
                   "merchants": [
                     "王品瘋Pay指定餐廳 (聚日式鍋物、和牛涮、陶板屋、藝奇)",
@@ -634,7 +634,7 @@
               "rate": 0.06,
               "groups": [
                 {
-                  "label_full": "規劃日本旅遊 機票/住宿/行程 6%",
+                  "label_full": "規劃日本旅遊 機票/住宿/行程",
                   "label_short": "日本旅遊",
                   "merchants": [
                     "Klook 指定日本商品 (排除即享券交易)"
@@ -646,7 +646,7 @@
               "rate": 0.05,
               "groups": [
                 {
-                  "label_full": "日本人氣專賣店 5%",
+                  "label_full": "日本人氣專賣店",
                   "label_short": "人氣專賣店",
                   "merchants": [
                     "吉伊卡哇MOGUMOGU本舖",
@@ -654,7 +654,7 @@
                   ]
                 },
                 {
-                  "label_full": "規劃日本旅遊 5%",
+                  "label_full": "規劃日本旅遊",
                   "label_short": "訂房平台",
                   "merchants": [
                     "Hotels.com 專屬網頁訂房",
@@ -662,22 +662,22 @@
                   ]
                 },
                 {
-                  "label_full": "大啖日系美食 5%",
+                  "label_full": "大啖日系美食",
                   "label_short": "壽司郎",
                   "merchants": [
                     "台灣壽司郎"
                   ]
                 },
                 {
-                  "label_full": "機場交通 5%",
+                  "label_full": "機場交通",
                   "label_short": "機場交通",
                   "merchants": [
                     "桃園機場捷運"
                   ]
                 },
                 {
-                  "label_full": "日系購物名店 5%",
-                  "label_short": "日系購物 5%",
+                  "label_full": "日系購物名店",
+                  "label_short": "日系購物",
                   "merchants": [
                     "LOPIA",
                     "台灣DON DON DONKI",
@@ -691,7 +691,7 @@
               "rate": 0.035,
               "groups": [
                 {
-                  "label_full": "日本必逛、出行 指定消費 3.5%",
+                  "label_full": "日本必逛、出行 指定消費",
                   "label_short": "日本必逛出行",
                   "merchants": [
                     "日本實體消費",
@@ -706,8 +706,8 @@
                   ]
                 },
                 {
-                  "label_full": "規劃日本旅遊 3.5%",
-                  "label_short": "日本旅遊 3.5%",
+                  "label_full": "規劃日本旅遊",
+                  "label_short": "日本旅遊",
                   "merchants": [
                     "樂桃航空",
                     "Klook",
@@ -719,7 +719,7 @@
                   ]
                 },
                 {
-                  "label_full": "大啖日系美食 3.5%",
+                  "label_full": "大啖日系美食",
                   "label_short": "外送速食",
                   "merchants": [
                     "foodpanda",
@@ -732,15 +732,15 @@
               "rate": 0.03,
               "groups": [
                 {
-                  "label_full": "規劃日本旅遊 3%",
+                  "label_full": "規劃日本旅遊",
                   "label_short": "Agoda",
                   "merchants": [
                     "Agoda"
                   ]
                 },
                 {
-                  "label_full": "日系購物名店 3%",
-                  "label_short": "日系購物 3%",
+                  "label_full": "日系購物名店",
+                  "label_short": "日系購物",
                   "merchants": [
                     "新光三越",
                     "UNIQLO網路商店/直營店",

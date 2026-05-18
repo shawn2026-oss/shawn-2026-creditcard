@@ -827,6 +827,94 @@ async function checkPromo() {
     });
   }
 
+  // ========== B3. 一卡通 MONEY 整站掃描 ==========
+  // i-pass.com.tw 額滿格式: "[ 活動已於YYYY/M/D HH:MM額滿 ]" 前綴出現在 <title>
+  // 列表頁靜態 HTML,分頁 ?page=N (確認共 5 頁, 57 個活動)
+  const ipassListBase = 'https://www.i-pass.com.tw/Preferential';
+  const ipassSiteBase = 'https://www.i-pass.com.tw';
+  const ipassFullRx = /\[\s*(?:活動)?已於[^\]]*額滿\s*\]/;
+  const ipassExpiredRx = /\[(?:活動)?已結束\]|活動已結束/;
+
+  let ipassResults = currentStatus.ipass_results || {};
+
+  // 1. 收集所有 Detail URL(動態爬列表頁,不 hardcoded)
+  const ipassDetailPaths = new Set();
+  {
+    let page = 1;
+    while (true) {
+      const listUrl = page === 1 ? ipassListBase : `${ipassListBase}?page=${page}`;
+      console.log(`[一卡通] 爬列表頁 page=${page}: ${listUrl}`);
+      let listHtml = '';
+      try { listHtml = await fetchPage(listUrl); } catch (e) {
+        console.error(`[一卡通] 列表頁 page=${page} 失敗:`, e.message); break;
+      }
+      if (!listHtml || listHtml.length < 500) {
+        console.log(`[一卡通] 列表頁 page=${page} 內容過短,停止`); break;
+      }
+      const found = [...listHtml.matchAll(/href="(\/Preferential\/Detail\/[^"]+)"/g)];
+      if (found.length === 0) break;
+      for (const m of found) ipassDetailPaths.add(m[1]);
+      if (!listHtml.includes(`page=${page + 1}`)) break;
+      page++;
+    }
+  }
+  console.log(`[一卡通] 列表頁 URL = ${ipassListBase}`);
+  console.log(`[一卡通] 收集到 detail URL = ${ipassDetailPaths.size} 個`);
+
+  // 2. 逐頁掃描額滿狀態
+  for (const path of ipassDetailPaths) {
+    const slug = path.split('/').pop();
+    const fullUrl = `${ipassSiteBase}${path}`;
+    let html = '';
+    try {
+      html = await fetchPage(fullUrl);
+      await new Promise(r => setTimeout(r, 300));
+    } catch (e) {
+      console.log(`[一卡通][${slug}] WARN: fetch 失敗,保留舊狀態`);
+      continue;
+    }
+    // 防呆:內容過短或不像一卡通頁面 → 保留舊狀態
+    if (html.length < 1000 || !/(一卡通|i-PASS|iPASS|優惠)/i.test(html)) {
+      console.log(`[一卡通][${slug}] WARN: 防呆觸發(長度=${html.length}),保留舊狀態`);
+      continue;
+    }
+    // 從 <title> 取標題(額滿前綴就在這裡)
+    const titleM = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+    const rawTitle = titleM ? titleM[1].replace(/\s+/g, ' ').trim() : '';
+    const cleanTitle = rawTitle.replace(/\s*-\s*iPASS一卡通\s*$/, '').trim();
+
+    const isFull = ipassFullRx.test(rawTitle);
+    const isExpired = ipassExpiredRx.test(rawTitle);
+    const fullMatch = rawTitle.match(ipassFullRx);
+    const fullMsg = fullMatch ? fullMatch[0].replace(/[\[\]]/g, '').trim() : '';
+
+    if (isFull) {
+      ipassResults[slug] = { full: true, title: cleanTitle, msg: fullMsg };
+      console.log(`[一卡通][${slug}] 額滿: ${cleanTitle.substring(0, 50)}`);
+    } else if (isExpired) {
+      ipassResults[slug] = { full: false, expired: true, title: cleanTitle };
+      console.log(`[一卡通][${slug}] 已結束: ${cleanTitle.substring(0, 50)}`);
+    } else {
+      ipassResults[slug] = { full: false, title: cleanTitle };
+      console.log(`[一卡通][${slug}] 未額滿: ${cleanTitle.substring(0, 50)}`);
+    }
+  }
+
+  // 3. 把本次掃描到的額滿項目推進 promos
+  for (const path of ipassDetailPaths) {
+    const slug = path.split('/').pop();
+    const r = ipassResults[slug];
+    if (!r || !r.full || r.expired) continue;
+    const displayTitle = r.title.replace(ipassFullRx, '').trim();
+    promos.push({
+      id: `ipass_${slug}`,
+      full: true,
+      title: displayTitle || r.title,
+      body: r.msg,
+      category: '一卡通'
+    });
+  }
+
   // ========== C. 悠遊付 ==========
 
   const tAB = Date.now();
@@ -1113,6 +1201,7 @@ async function checkPromo() {
     transport_10: transport,
     online3c_10: online3c,
     ubot_ipassmoney: ubotIpass,
+    ipass_results: ipassResults,
     easycard_results: ecardResults,
     promos: promos,
     manualCheckPromos: manualCheckPromos,

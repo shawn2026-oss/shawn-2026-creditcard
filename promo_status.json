@@ -1,10 +1,10 @@
 {
   "uniopen_icash_full": false,
   "uniopen_icash_msg": "",
-  "starbucks_5_full": true,
-  "starbucks_5_msg": "2026 年 6 月 icash Pay 星巴克筆筆 5% 已額滿",
-  "sunday_7_full": true,
-  "sunday_7_msg": "2026 年 6 月 icash Pay 星期天 7% 已額滿",
+  "starbucks_5_full": false,
+  "starbucks_5_msg": "",
+  "sunday_7_full": false,
+  "sunday_7_msg": "",
   "uniopen_autoload_full": false,
   "uniopen_autoload_msg": "",
   "transport_10": {
@@ -353,15 +353,15 @@
       "title": "用悠遊付搭乘雙北捷運公車享筆筆15%回饋 加碼抽次月免費搭"
     },
     "challenge_silver": {
-      "full": true,
+      "full": false,
       "title": "月級挑戰 銀級"
     },
     "challenge_gold": {
-      "full": true,
+      "full": false,
       "title": "月級挑戰 金級"
     },
     "challenge_platinum": {
-      "full": true,
+      "full": false,
       "title": "月級挑戰 白金級"
     },
     "ew_1776829451": {
@@ -567,20 +567,6 @@
   },
   "promos": [
     {
-      "id": "starbucks_5",
-      "full": true,
-      "title": "icash Pay 星巴克 5% 已額滿",
-      "body": "icash Pay 星巴克 5% 6 月名額已滿",
-      "category": "icash Pay"
-    },
-    {
-      "id": "sunday_7",
-      "full": true,
-      "title": "icash Pay 星期天 7% 已額滿",
-      "body": "icash Pay 星期天 7% 6 月名額已滿",
-      "category": "icash Pay"
-    },
-    {
       "id": "online3c_富邦",
       "full": true,
       "title": "富邦 網購 3C 10% 已額滿",
@@ -593,37 +579,31 @@
       "title": "兆豐 網購 3C 10% 已額滿",
       "body": "兆豐 icash Pay 網購 3C 10% 6 月名額已滿",
       "category": "icash Pay"
-    },
+    }
+  ],
+  "manualCheckPromos": [
     {
       "id": "easycard_challenge_silver",
-      "full": true,
-      "title": "月級挑戰 銀級已額滿",
-      "body": "月級挑戰 銀級 6月名額已滿",
-      "category": "悠遊付"
+      "title": "月級挑戰 銀級",
+      "category": "需 APP 確認",
+      "deepLink": "easywallet://",
+      "fallbackUrl": "https://apps.apple.com/tw/app/easy-wallet/id786065396"
     },
     {
       "id": "easycard_challenge_gold",
-      "full": true,
-      "title": "月級挑戰 金級已額滿",
-      "body": "月級挑戰 金級 6月名額已滿",
-      "category": "悠遊付"
+      "title": "月級挑戰 金級",
+      "category": "需 APP 確認",
+      "deepLink": "easywallet://",
+      "fallbackUrl": "https://apps.apple.com/tw/app/easy-wallet/id786065396"
     },
     {
       "id": "easycard_challenge_platinum",
-      "full": true,
-      "title": "月級挑戰 白金級已額滿",
-      "body": "月級挑戰 白金級 6月名額已滿",
-      "category": "悠遊付"
-    },
-    {
-      "id": "easycard_ew_1773388438",
-      "full": true,
-      "title": "限定電商遊戲娛樂｜指定期間最高8%回饋已額滿",
-      "body": "限定電商遊戲娛樂｜指定期間最高8%回饋 6月名額已滿",
-      "category": "悠遊付"
+      "title": "月級挑戰 白金級",
+      "category": "需 APP 確認",
+      "deepLink": "easywallet://",
+      "fallbackUrl": "https://apps.apple.com/tw/app/easy-wallet/id786065396"
     }
   ],
-  "manualCheckPromos": [],
   "reminders": [
     {
       "id": "cube_japan",

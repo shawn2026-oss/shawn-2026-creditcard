@@ -152,46 +152,51 @@ function stripHtml(s) {
  *   4. 額外排除:窗口內含「起」「~」「至」等範圍符號(代表是活動期間而非單一時間點)
  *   5. 排除歷史年份
  */
+// 制度性後綴:「額滿」緊接這些字 → 是「額滿公告/額滿即止/額滿為止」等制度性文字,
+// 非真實額滿紀錄。補完下方註解「拒絕制度性文字」的意圖(原本只靠「窗內無時間」被動擋,
+// 一旦制度性額滿前面剛好有活動期間結束日時(如「~2026/6/30 23:59 …▌額滿公告」)就破功)。
+const INSTITUTIONAL_AFTER_RX = /^(公告|即止|為止|狀態|訊息|資訊|查詢)/;
+
+// 判斷 plain 中位於 idx 的單一「額滿」是否為「本月真實額滿紀錄」。
+// 抽自 detectFull 的逐筆驗證,供所有掃描路徑共用(scanIcashPayBucket / scanChallengeSpa 防線2 /
+// autoload / ipass),用同一套已驗證排除規則,避免各路徑自行用寬窗 monthRx 把活動期間結束日誤判額滿。
+// 策略:只信任「明確記錄了額滿時間點」的句型。拒絕:「額滿即止」「於 APP 公告額滿狀態」等制度性文字。
+//   0. 額滿後綴非制度性字(公告/即止/為止…)
+//   1. 前 25 字窄窗含本月日期(設太大會吃到前一句的「活動期間」造成誤判)
+//   2. 窄窗含 HH:MM 時間點(真實句型如「已於 2026/04/04 17:21 p.m. 額滿」最多 22 字)
+//   3. 窄窗非範圍表達(活動期間 起~至)
+//   4. 窄窗非歷史/他年
+function isGenuineFullAt(plain, idx, year, monthNum) {
+  const mm = String(monthNum).padStart(2, '0');
+
+  // 條件 0:額滿後綴守衛(制度性文字)
+  const after = plain.substring(idx + 2, idx + 6); // 「額滿」2 字之後 4 字
+  if (INSTITUTIONAL_AFTER_RX.test(after)) return false;
+
+  const ctx = plain.substring(Math.max(0, idx - 25), idx);
+  const monthDateRx = new RegExp(
+    `(?:^|[^0-9/])(?:${year}[年/])?(?:${monthNum}|${mm})[/月]\\s*\\d{1,2}`
+  );
+  const realTimeRx = /\d{1,2}[:：]\d{2}(?:[:：]\d{2})?|[ap]\.?\s?m\.?/i;
+  const rangeRx = /起[\s~～\-]|~\s*20\d{2}|至\s*20\d{2}|[~～\-]\s*(?:20\d{2}|\d{1,2}\/\d{1,2})/;
+  const otherYearRx = new RegExp(`(${year - 1}|${year - 2}|${year + 1})年`);
+
+  if (!monthDateRx.test(ctx)) return false;   // 條件 1
+  if (!realTimeRx.test(ctx)) return false;    // 條件 2
+  if (rangeRx.test(ctx)) return false;        // 條件 3
+  if (otherYearRx.test(ctx)) return false;    // 條件 4
+  return true;
+}
+
 function detectFull(text, year, monthNum, month) {
   const plain = typeof text === 'string' ? text : String(text);
   if (!plain || !plain.includes('額滿')) return false;
 
-  const mm = monthNum.padStart(2, '0');
-
-  // 本月日期:M/D 或 MM/DD 或 YYYY/M/D
-  const monthDateRx = new RegExp(
-    `(?:^|[^0-9/])(?:${year}[年/])?(?:${monthNum}|${mm})[/月]\\s*\\d{1,2}`
-  );
-  // 時間標記:HH:MM / HH:MM:SS / am / pm(支援全形冒號 U+FF1A)
-  const realTimeRx = /\d{1,2}[:：]\d{2}(?:[:：]\d{2})?|[ap]\.?\s?m\.?/i;
-  // 範圍符號(表示這是活動期間,不是單一時間點)
-  const rangeRx = /起[\s~～\-]|~\s*20\d{2}|至\s*20\d{2}|[~～\-]\s*(?:20\d{2}|\d{1,2}\/\d{1,2})/;
-  const otherYearRx = new RegExp(`(${year - 1}|${year - 2}|${year + 1})年`);
-
   const fullRx = /額滿/g;
   let m;
   while ((m = fullRx.exec(plain)) !== null) {
-    // 窄窗口:取「額滿」前 25 字
-    // 真實句型如「已於 2026/04/04 17:21 p.m. 額滿」最多 22 字
-    // 設太大會吃到前一句的「活動期間」造成誤判
-    const start = Math.max(0, m.index - 25);
-    const ctx = plain.substring(start, m.index);
-
-    // 條件 1:窗口含本月日期
-    if (!monthDateRx.test(ctx)) continue;
-
-    // 條件 2:窗口含 HH:MM 時間點
-    if (!realTimeRx.test(ctx)) continue;
-
-    // 條件 3:窗口不能是範圍表達(活動期間)
-    if (rangeRx.test(ctx)) continue;
-
-    // 條件 4:排除歷史年份
-    if (otherYearRx.test(ctx)) continue;
-
-    return true;
+    if (isGenuineFullAt(plain, m.index, year, monthNum)) return true;
   }
-
   return false;
 }
 
@@ -415,9 +420,11 @@ async function scanIcashPayBucket(entries, year, monthNum, { subMatch, excludeSu
       const end = Math.min(plainText.length, fm.index + 50);
       const ctx = plainText.substring(start, end);
 
-      if (!monthRx.test(ctx)) continue;
+      // 寬窗 ctx 僅供 subMatch 歸屬判定;額滿真偽改用 isGenuineFullAt(25 窗+時間+範圍+後綴守衛),
+      // 取代原本只查 monthRx 的寬窗判定(會把活動期間結束日 6/30 誤當本月額滿)。
       if (excludeSubMatch && excludeSubMatch.test(ctx)) continue;
       if (subMatch && !subMatch.test(ctx)) continue;
+      if (!isGenuineFullAt(plainText, fm.index, year, monthNum)) continue;
 
       return {
         full: true,
@@ -720,7 +727,7 @@ async function checkPromo() {
       for (const b of banks) {
         if (transport[b].full) continue;
         const m = plainP.match(new RegExp(b + monthNum.padStart(2, '0') + '月份贈點已於[\\s\\S]*?額滿'));
-        if (m) {
+        if (m && !INSTITUTIONAL_AFTER_RX.test(plainP.substring(m.index + m[0].length, m.index + m[0].length + 4))) {
           transport[b].full = true;
           transport[b].msg = stripHtml(m[0]);
           console.log(`[交通 10%] ${b} 額滿 ← id/${entry.id}`);
@@ -767,7 +774,7 @@ async function checkPromo() {
       for (const b of banks3c) {
         if (online3c[b].full) continue;
         const m = plainP.match(new RegExp(b + monthNum.padStart(2, '0') + '月份贈點已於[\\s\\S]*?額滿'));
-        if (m) {
+        if (m && !INSTITUTIONAL_AFTER_RX.test(plainP.substring(m.index + m[0].length, m.index + m[0].length + 4))) {
           online3c[b].full = true;
           online3c[b].msg = stripHtml(m[0]);
           console.log(`[網購3C 10%] ${b} 額滿 ← id/${entry.id}`);
@@ -789,7 +796,17 @@ async function checkPromo() {
   try {
     const raw = await fetchPageWithCookie('https://www.icash.com.tw/Home/NewsDetail?ID=12654');
     const t = raw.replace(/<[^>]+>/g, '');
-    if (t.length > 100 && t.match(new RegExp(monthNum + '月[\\s\\S]*?加值[\\s\\S]*?額滿'))) {
+    // 原本 `N月[\s\S]*?加值[\s\S]*?額滿` 鬆散匹配:活動期間 6 月 + 自動加值頁 + 制度性「額滿」即誤中。
+    // 改成掃每個額滿位置,要求附近有「加值」歸屬 + isGenuineFullAt(時間/範圍/後綴守衛)。
+    let autoloadHit = false;
+    if (t.length > 100) {
+      const afr = /額滿/g; let am;
+      while ((am = afr.exec(t)) !== null) {
+        const actx = t.substring(Math.max(0, am.index - 150), am.index + 20);
+        if (/加值/.test(actx) && isGenuineFullAt(t, am.index, year, monthNum)) { autoloadHit = true; break; }
+      }
+    }
+    if (autoloadHit) {
       autoloadFull = true; autoloadMsg = `${year} 年 ${monthNum} 月 中信 UniOpen 卡 自動加值 10% 已額滿`; console.log('[ID=12654] 額滿');
     } else console.log('[ID=12654] 未額滿或頁面過短');
   } catch (e) { console.error('[ID=12654] 失敗:', e.message); }
@@ -883,9 +900,15 @@ async function checkPromo() {
     const rawTitle = titleM ? titleM[1].replace(/\s+/g, ' ').trim() : '';
     const cleanTitle = rawTitle.replace(/\s*-\s*iPASS一卡通\s*$/, '').trim();
 
-    const isFull = ipassFullRx.test(rawTitle);
-    const isExpired = ipassExpiredRx.test(rawTitle);
     const fullMatch = rawTitle.match(ipassFullRx);
+    // 月份守衛:bracket 內「已於 … 額滿」須為本月真實額滿(isGenuineFullAt),
+    // 擋掉月初殘留上月「[已於 5/x 額滿]」標題被當本月額滿。
+    let isFull = false;
+    if (fullMatch) {
+      const pos = fullMatch.index + fullMatch[0].indexOf('額滿');
+      isFull = isGenuineFullAt(rawTitle, pos, year, monthNum);
+    }
+    const isExpired = ipassExpiredRx.test(rawTitle);
     const fullMsg = fullMatch ? fullMatch[0].replace(/[\[\]]/g, '').trim() : '';
 
     if (isFull) {
@@ -1053,7 +1076,9 @@ async function checkPromo() {
             const start = Math.max(0, m.index - 150);
             const end = Math.min(text.length, m.index + 30);
             const ctx = text.substring(start, end);
-            if (lv.keywordRx.test(ctx) && mdRx.test(ctx)) {
+            // 寬窗 ctx 僅供級別歸屬;額滿真偽改用 isGenuineFullAt,取代原本 mdRx(會把活動期間 6/x
+            // 或「額滿為止」制度性文字誤判本月額滿)。
+            if (lv.keywordRx.test(ctx) && isGenuineFullAt(text, m.index, year, monthNum)) {
               full = true;
               source = 'keyword-context';
               break;

@@ -39,6 +39,16 @@
  *   - 爬 C1/C2 時順便抓 epkaw 連結
  *   - 新增 scanEpkaw() 處理 epkaw advertisement/{UUID} 頁面
  *
+ * v2.5 修正(修法A):
+ *   - icash Pay 分類改「列表收id→逐id抓內頁→內文regex分類」:2026-07 列表頁改版成純圖卡
+ *     (<a> 只剩 background-image、無文字標題)→ 舊的列表標題分類全滅、只剩過期 fallback。
+ *     內頁仍有乾淨 <h1> 與純文字內文,對圖卡改版免疫;活動換期換 id 也自動跟上。
+ *   - 內頁 html 快取在 entry.html,掃描端優先用快取(省一半請求)。
+ *   - 新增 seven_10pct bucket:H2 新活動「7-ELEVEN實體門市10%」(id/2373,2026/7/1~12/31,
+ *     per-bank 額滿),banks=國泰/元大/滙豐/兆豐/一銀/合庫/陽信/台中銀。
+ *   - transport_10pct 保留(H1 交通10% 活動 6/30 止、H2 未續辦;續辦時自動接上)。
+ *   - fallback 清單更新到 H2 現行 id(2371/2370/2340/2373/2284)。
+ *
  * v2.2 修正:
  *   - icash Pay 改用列表頁自動發現
  *
@@ -295,9 +305,11 @@ async function discoverIcashPayPages() {
     transport_10pct: [],
     online3c_10pct: [],
     sunday_7pct: [],
+    seven_10pct: [],
   };
   const seenIds = new Set();
 
+  // 修法A 第一步:列表頁只收 id(圖卡改版後列表沒有文字標題,不再嘗試從列表分類)
   for (let pageNum = 1; pageNum <= 5; pageNum++) {
     const url = pageNum === 1
       ? 'https://www.icashpay.com.tw/advertMessage/index'
@@ -313,67 +325,78 @@ async function discoverIcashPayPages() {
       console.log(`[icash Pay 列表] page ${pageNum} 內容過短,跳過`);
       continue;
     }
-
-    const linkRx = /<a[^>]*href=["']([^"']*advertMessage\/view\/id\/(\d+)[^"']*)["'][^>]*>([\s\S]*?)<\/a>/gi;
-    let match;
-    let foundInPage = 0;
-    while ((match = linkRx.exec(html)) !== null) {
-      const href = match[1];
-      const id = match[2];
-      const inner = match[3];
-
-      if (seenIds.has(id)) continue;
-      seenIds.add(id);
-
-      let title = stripHtml(inner);
-
-      if (title.length < 5) {
-        const afterIdx = match.index + match[0].length;
-        const after = html.substring(afterIdx, afterIdx + 400);
-        title = stripHtml(after).substring(0, 100);
-      }
-      if (!title) continue;
-
-      const fullUrl = href.startsWith('http')
-        ? href
-        : `https://www.icashpay.com.tw${href.startsWith('/') ? '' : '/'}${href}`;
-      const entry = { id, url: fullUrl, title };
-
-      let classified = false;
-
-      if (/星巴克|starbucks/i.test(title) && /5\s*%|筆筆/.test(title)) {
-        buckets.starbucks_5pct.push(entry);
-        classified = true;
-      }
-      if (/(網購|3\s*C|數位|電商)/.test(title) && /10\s*%/.test(title)) {
-        buckets.online3c_10pct.push(entry);
-        classified = true;
-      }
-      if (/(交通|捷運|公車|大眾運輸|YouBike|iPASS|悠遊)/.test(title) && /10\s*%/.test(title)) {
-        buckets.transport_10pct.push(entry);
-        classified = true;
-      }
-      if (/週日|星期日|日曜/.test(title) && /7\s*%/.test(title)) {
-        buckets.sunday_7pct.push(entry);
-        classified = true;
-      }
-      if (!classified && /uniopen|UNIOPEN|全通路|天天最高|天天回饋/i.test(title)) {
-        buckets.uniopen_4pct.push(entry);
-        classified = true;
-      }
-      if (classified) foundInPage++;
+    const idRx = /advertMessage\/view\/id\/(\d+)/g;
+    let m;
+    let found = 0;
+    while ((m = idRx.exec(html)) !== null) {
+      if (!seenIds.has(m[1])) { seenIds.add(m[1]); found++; }
     }
-    console.log(`[icash Pay 列表] page ${pageNum}: 分類到 ${foundInPage} 個活動`);
+    console.log(`[icash Pay 列表] page ${pageNum}: 收到 ${found} 個新 id`);
   }
 
+  // 第二步:逐 id 抓內頁,用「<h1> 標題 + 內文前段」分類;html 快取供後續掃描共用
+  for (const id of seenIds) {
+    const url = `https://www.icashpay.com.tw/advertMessage/view/id/${id}`;
+    let html = '';
+    try {
+      html = await fetchPage(url);
+    } catch (e) {
+      console.log(`[icash Pay 內頁] id/${id} 取頁失敗:`, e.message);
+      continue;
+    }
+    if (!html || html.length < 200) continue;
+
+    let title = '';
+    const hm = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+    if (hm) title = stripHtml(hm[1]).substring(0, 80);
+    const text = stripHtml(html);
+    if (!title) title = text.substring(0, 60);
+    const entry = { id, url, title, html };
+
+    // 分類語料 = 標題 + 內文前 1500 字(額滿紀錄在後段、不影響歸類)
+    const t = title + ' ' + text.substring(0, 1500);
+    let classified = false;
+
+    if (/星巴克|starbucks/i.test(t) && /5\s*%|筆筆/.test(t)) {
+      buckets.starbucks_5pct.push(entry);
+      classified = true;
+    }
+    if (/7-ELEVEN實體門市/.test(t) && /10\s*%/.test(t)) {
+      buckets.seven_10pct.push(entry);
+      classified = true;
+    }
+    if (/(交通運輸|交通|捷運|公車|大眾運輸|YouBike)/.test(t) && /10\s*%/.test(t) && !/7-ELEVEN實體門市/.test(t)) {
+      buckets.transport_10pct.push(entry);
+      classified = true;
+    }
+    if (/(網購|3\s*C|電商)/.test(t) && /10\s*%/.test(t) && !/7-ELEVEN實體門市/.test(t)) {
+      buckets.online3c_10pct.push(entry);
+      classified = true;
+    }
+    if (/週日|星期日|星期天/.test(t) && /7\s*%/.test(t)) {
+      buckets.sunday_7pct.push(entry);
+      classified = true;
+    }
+    // uniopen 4%:放最後、僅未分類者——「全通路」字樣也出現在週日7%頁,先讓專屬分類吃掉
+    if (!classified && /(uniopen|UNIOPEN)/i.test(t) && /(4\s*%|滿\s*199|全通路)/.test(t)) {
+      buckets.uniopen_4pct.push(entry);
+      classified = true;
+    }
+    if (!classified && /全通路[\s\S]{0,20}(單筆滿|滿)\s*199/.test(t)) {
+      buckets.uniopen_4pct.push(entry);
+      classified = true;
+    }
+  }
+
+  // fallback:列表頁整個掛掉時的保底(H2 現行 id;掃描端會自抓內頁)
   const FALLBACK = [
-    { bucket: 'uniopen_4pct', id: '2019', title: '[fallback] id/2019' },
-    { bucket: 'uniopen_4pct', id: '1982', title: '[fallback] id/1982' },
-    { bucket: 'starbucks_5pct', id: '2019', title: '[fallback] id/2019' },
-    { bucket: 'starbucks_5pct', id: '1982', title: '[fallback] id/1982' },
-    { bucket: 'transport_10pct', id: '2037', title: '[fallback] id/2037' },
-    { bucket: 'online3c_10pct', id: '2033', title: '[fallback] id/2033' },
-    { bucket: 'sunday_7pct', id: '1954', title: '[fallback] id/1954' },
+    { bucket: 'uniopen_4pct', id: '2371', title: '[fallback] id/2371 綁uniopen聯名卡滿額最高11%(含全通路4%額滿公告)' },
+    { bucket: 'uniopen_4pct', id: '2370', title: '[fallback] id/2370 2026下半年uniopen聯名卡xICP疊加攻略' },
+    { bucket: 'starbucks_5pct', id: '2340', title: '[fallback] id/2340 星巴克筆筆5%' },
+    { bucket: 'seven_10pct', id: '2373', title: '[fallback] id/2373 7-ELEVEN實體門市10%' },
+    { bucket: 'sunday_7pct', id: '2284', title: '[fallback] id/2284 週日最好Pay 7%' },
+    { bucket: 'transport_10pct', id: '2037', title: '[fallback] id/2037 H1交通10%(6/30止,續辦時換新id)' },
+    { bucket: 'online3c_10pct', id: '2033', title: '[fallback] id/2033 H1網購3C(已到期,續辦時換新id)' },
   ];
   for (const f of FALLBACK) {
     if (!buckets[f.bucket].some(e => e.id === f.id)) {
@@ -402,12 +425,14 @@ async function scanIcashPayBucket(entries, year, monthNum, { subMatch, excludeSu
   );
 
   for (const entry of entries) {
-    let html = '';
-    try {
-      html = await fetchPage(entry.url);
-    } catch (e) {
-      console.log(`  [id/${entry.id}] 取頁失敗:`, e.message);
-      continue;
+    let html = entry.html || '';   // v2.5:discover 已抓過內頁就用快取
+    if (!html) {
+      try {
+        html = await fetchPage(entry.url);
+      } catch (e) {
+        console.log(`  [id/${entry.id}] 取頁失敗:`, e.message);
+        continue;
+      }
     }
     if (!html || html.length < 200) continue;
 
@@ -720,8 +745,8 @@ async function checkPromo() {
 
   try {
     for (const entry of icashBuckets.transport_10pct) {
-      let html = '';
-      try { html = await fetchPage(entry.url); } catch (e) { continue; }
+      let html = entry.html || '';
+      if (!html) { try { html = await fetchPage(entry.url); } catch (e) { continue; } }
       if (!html) continue;
       const plainP = stripHtml(html);
       for (const b of banks) {
@@ -741,6 +766,37 @@ async function checkPromo() {
 
   for (const b of banks) {
     if (transport[b].full) promos.push({ id: `transport_${b}`, full: true, title: `${b} 交通 10% 已額滿`, body: `${b} icash Pay 交通 10% ${monthNum} 月名額已滿`, category: 'icash Pay' });
+  }
+
+  // --- A3b. 7-ELEVEN 實體門市 10% (H2 新活動 2026/7/1~12/31, id/2373, per-bank 額滿) ---
+  const banksSeven = ['國泰', '元大', '滙豐', '兆豐', '一銀', '合庫', '陽信', '台中銀'];
+  let seven = currentStatus.seven_10 || {};
+  if (needReset) { seven = {}; for (const b of banksSeven) seven[b] = { full: false, msg: '' }; }
+  else { for (const b of banksSeven) if (!seven[b]) seven[b] = { full: false, msg: '' }; }
+
+  try {
+    for (const entry of icashBuckets.seven_10pct) {
+      let html = entry.html || '';
+      if (!html) { try { html = await fetchPage(entry.url); } catch (e) { continue; } }
+      if (!html) continue;
+      const plainP = stripHtml(html);
+      for (const b of banksSeven) {
+        if (seven[b].full) continue;
+        const m = plainP.match(new RegExp(b + monthNum.padStart(2, '0') + '月份贈點已於[\\s\\S]*?額滿'));
+        if (m && !INSTITUTIONAL_AFTER_RX.test(plainP.substring(m.index + m[0].length, m.index + m[0].length + 4))) {
+          seven[b].full = true;
+          seven[b].msg = stripHtml(m[0]);
+          console.log(`[7-11 10%] ${b} 額滿 ← id/${entry.id}`);
+        }
+      }
+    }
+    for (const b of banksSeven) {
+      if (!seven[b].full) console.log(`[7-11 10%] ${b} 未額滿`);
+    }
+  } catch (e) { console.error('[7-11 10%] 失敗:', e.message); }
+
+  for (const b of banksSeven) {
+    if (seven[b].full) promos.push({ id: `seven_${b}`, full: true, title: `${b} 7-11門市 10% 已額滿`, body: `${b} icash Pay 7-ELEVEN實體門市 10% ${monthNum} 月名額已滿`, category: 'icash Pay' });
   }
 
   // --- A4. 週日 7% ---
@@ -767,8 +823,8 @@ async function checkPromo() {
 
   try {
     for (const entry of icashBuckets.online3c_10pct) {
-      let html = '';
-      try { html = await fetchPage(entry.url); } catch (e) { continue; }
+      let html = entry.html || '';
+      if (!html) { try { html = await fetchPage(entry.url); } catch (e) { continue; } }
       if (!html) continue;
       const plainP = stripHtml(html);
       for (const b of banks3c) {
@@ -1224,6 +1280,7 @@ async function checkPromo() {
     sunday_7_full: sundayFull, sunday_7_msg: sundayMsg,
     uniopen_autoload_full: autoloadFull, uniopen_autoload_msg: autoloadMsg,
     transport_10: transport,
+    seven_10: seven,
     online3c_10: online3c,
     ubot_ipassmoney: ubotIpass,
     ipass_results: ipassResults,

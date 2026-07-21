@@ -1,6 +1,6 @@
 {
-  "news": " 3.12.4籌備中",
-  "latest_version": "3.12.3",
+  "news": " 直接升版3.13.0新增richart chill方案以及其他卡片優化性能",
+  "latest_version": "3.13.0",
   "min_version": "2.9.0",
   "force_update_message": "此版本已過舊,請更新至最新版本。"
 }

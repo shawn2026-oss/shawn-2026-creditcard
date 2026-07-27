@@ -1,9 +1,19 @@
 /**
- * 自動檢查活動額滿狀態(puppeteer 版 v2.6)
+ * 自動檢查活動額滿狀態(puppeteer 版 v2.7)
  * GitHub Actions 每天執行 8 班(cron UTC 1,3,5,7,9,11,13,15 = 台灣 09/11/13/15/17/19/21/23)
  *
  * ⚠️ workflow 需要加 pdf-parse 套件:
  *    npm install puppeteer pdf-parse
+ *
+ * v2.7 新增(2026-07-27):
+ *   - B2b 額外輸出 top-level flat flag ubot_laidian_even_full / ubot_laidian_even_msg,
+ *     命名與形狀比照 uniopen_icash_full / uniopen_icash_msg。
+ *     值 = ubot_laidian_even 當月 key 的 full,每次跑都重算、不 carry over。
+ *   - 用途:iOS 記帳頁(CardDetailView c5 選項區)要在偶數日 5% toggle 旁顯示額滿字樣,
+ *     照 c10 icashPayFull 的既有寫法讀一個 flat bool 即可,不必在 Swift 側取當月 key。
+ *   - 按月 key ubot_laidian_even 保留不動,仍是唯一真實狀態來源;flat flag 只是派生。
+ *     所以 8/1 起當月 key 為 false → flat flag 自動回 false(雙向性不受影響)。
+ *   - 到期註解沿用 v2.6:活動至 115/12/31,2027/1 需確認是否續辦(見 LAIDIAN_* 常數)。
  *
  * v2.6 新增(2026-07-27):
  *   - 新增 B2b 聯邦賴點卡「偶數日 LINE Pay 指定通路加碼 5%」全體名額額滿狀態。
@@ -1085,6 +1095,18 @@ async function checkPromo() {
     } catch (e) { console.error('[賴點卡] 失敗:', e.message); }
   }
 
+  // flat flag(v2.7):把「當月」的額滿狀態攤平成 top-level bool + msg,
+  // 命名與形狀比照 uniopen_icash_full / uniopen_icash_msg 的既有慣例。
+  // 用途:iOS 記帳頁(CardDetailView 的 c5 選項區)照 c10 讀 flat bool 的既有寫法就好,
+  //       不必在 Swift 側另外寫「從按月 key 取當月」的邏輯。
+  // ⚠️ 這是「額外派生」的欄位,不是取代:按月 key ubot_laidian_even 保留不動,
+  //    仍是唯一的真實狀態來源。flat flag 每次跑都由當月 key 重算、不 carry over,
+  //    所以 8/1 起 monthNum 變 "8"、當月 key 為 false → flat flag 自動回 false。
+  const laidianCurFull = !!(laidianActive && ubotLaidian[monthNum] && ubotLaidian[monthNum].full);
+  const laidianFlatMsg = laidianCurFull
+    ? `${year} 年 ${monthNum} 月 聯邦賴點卡 偶數日 LINE Pay 5% 已額滿`
+    : '';
+
   if (laidianActive && ubotLaidian[monthNum] && ubotLaidian[monthNum].full) {
     promos.push({
       id: `ubot_laidian_even_${monthNum}`,
@@ -1474,6 +1496,7 @@ async function checkPromo() {
     starbucks_5_full: starbucksFull, starbucks_5_msg: starbucksMsg,
     sunday_7_full: sundayFull, sunday_7_msg: sundayMsg,
     uniopen_autoload_full: autoloadFull, uniopen_autoload_msg: autoloadMsg,
+    ubot_laidian_even_full: laidianCurFull, ubot_laidian_even_msg: laidianFlatMsg,
     transport_10: transport,
     seven_10: seven,
     online3c_10: online3c,

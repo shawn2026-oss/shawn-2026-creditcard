@@ -1,9 +1,21 @@
 /**
- * 自動檢查活動額滿狀態(puppeteer 版 v2.4)
- * GitHub Actions 每天台灣時間 00/08/14/20 點執行
+ * 自動檢查活動額滿狀態(puppeteer 版 v2.6)
+ * GitHub Actions 每天執行 8 班(cron UTC 1,3,5,7,9,11,13,15 = 台灣 09/11/13/15/17/19/21/23)
  *
  * ⚠️ workflow 需要加 pdf-parse 套件:
  *    npm install puppeteer pdf-parse
+ *
+ * v2.6 新增(2026-07-27):
+ *   - 新增 B2b 聯邦賴點卡「偶數日 LINE Pay 指定通路加碼 5%」全體名額額滿狀態。
+ *     每月總回饋上限 100 萬點、達標即提前結束當月活動 → 額滿是當月一次性。
+ *   - 資料結構比照 B2 ubot_ipassmoney 的按月 key:ubot_laidian_even["7".."12"]。
+ *     按月 key 本身就是跨月歸零,不吃 needReset 的 1~3 號視窗(不會一次額滿就永久顯示額滿)。
+ *   - 額滿公告位置:信用卡介紹頁 cardDetail201 的內容片段,不是活動微網站。
+ *     微網站 2026LaiDianCard 從未刊過偶數日的額滿標示 → 降為第二來源、允許恆空。
+ *   - 偵測窗口鎖死在活動自己的 <h3>(到 </h3> 為止)。這張卡另有 4 個會額滿的名額
+ *     (卡面/新戶早鳥禮/滿額贈/新戶保費)加制度性宣告句,全頁字串比對必定誤報。
+ *   - 檔頭排程註解訂正:原本寫「台灣 00/08/14/20」與 check-promo.yml 的 cron 不符,
+ *     實際是一天 8 班(台灣 09/11/13/15/17/19/21/23)。cron 本身未變動。
  *
  * v2.4 新增(2026-04-15):
  *   - 新增 manualCheckPromos 陣列輸出
@@ -683,6 +695,140 @@ async function fetchSpaPage(browser, url, timeout = 12000) {
   }
 }
 
+// ===== 聯邦賴點卡 偶數日 LINE Pay 指定通路 5%(v2.6) =====
+//
+// 活動期間 115/7/1-115/12/31(民國 115 年 = 西元 2026 年)。每月活動總回饋上限 100 萬點,
+// 達上限即提前結束當月活動 → 額滿是「當月一次性」,下個月自動重新開始。
+// 因此資料結構比照 ubot_ipassmoney 用「按月 key」:當月 key 是獨立的一格,
+// 跨月自然歸零,不吃 needReset(不依賴 1~3 號有跑到)。
+//
+// ⚠️ 到期確認(2027/1):活動至 115/12/31(2026-12-31) 止。
+//    續辦 → 把 LAIDIAN_MONTHS 展開成新期間的月份、並更新 LAIDIAN_ACT_END。
+//    未續辦 → 把主程式的 B2b 整段連同 ubot_laidian_even key 一起移除。
+//    LAIDIAN_ACT_END 之後即使 key 還在,也一律視為未額滿(不掃描、不 push)。
+//
+// 主來源:信用卡介紹頁 cardDetail201 的內容片段。那頁是 Vue SPA,但內容來自這支
+//   靜態 .htm,純 HTTP fetchPage() 就能抓(不需要 puppeteer、不帶 cache-buster)。
+//   額滿標示塞在該活動自己的 <h3> 裡面:
+//     <h3>偶數日LINE Pay指定通路最高5%<span class="text-danger">(7月回饋於115/7/12 22:00額滿)</span></h3>
+// 第二來源:活動微網站 2026LaiDianCard 的注意事項 modal。標示形狀比照同頁新戶早鳥禮
+//   (活動名之後、全形冒號之前插一段紅字):
+//     新戶早鳥禮<span class="rfont">(已額滿)</span>：
+//   偶數日這條在微網站上目前從未出現過額滿標示 → 第二來源允許恆空,
+//   抓不到不報錯、也不覆寫主來源的結果。
+//
+// ⚠️ 為什麼不能全頁比對「額滿」:這張卡同時有 4 個其他會額滿的名額
+//    (卡面 50,000 名 / 新戶早鳥禮 2,400 名 / 滿額贈 5,000 份 / 新戶保費 2,500 戶),
+//    外加制度性宣告句「額滿將公告於聯邦銀行信用卡網站,恕不另行通知」。
+//    介紹頁現在就有卡面兩個「(已額滿)」、微網站現在就有早鳥禮「115/7/20 已額滿」,
+//    全頁比對必定誤報。所以兩個來源的窗口都鎖死:
+//      主來源 → 該 <h3> 自己的 markup 內,到 </h3> 為止,不外擴。
+//      第二來源 → 活動名到全形冒號之間(≤120 字);制度句在其後 677 字處,吃不到。
+
+const LAIDIAN_URL_MAIN = 'https://card.ubot.com.tw/ecard_source/html/CardDetail/cardDetail201.htm';
+const LAIDIAN_URL_ALT = 'https://activity.ubot.com.tw/2026LaiDianCard/index.htm';
+const LAIDIAN_MONTHS = ['7', '8', '9', '10', '11', '12'];
+const LAIDIAN_ACT_END = new Date(2026, 11, 31, 23, 59, 59); // 115/12/31 活動結束
+// 兩個來源的活動名寫法不同:介紹頁「指定通路最高5%」、微網站「指定通路加碼5%回饋」
+const LAIDIAN_NAME_RX = /偶數日\s*LINE\s*Pay\s*指定通路\s*(?:加碼|最高)?\s*5\s*%/;
+
+/**
+ * 從額滿標示文字取月份。
+ * 完整日期(民國 115/7/12,或官網哪天改西元 2026/7/12)優先於「7月」字樣;
+ * 兩者不一致時以日期為準。日期同時驗年份,擋掉去年/明年的殘留字串。
+ *
+ * 回傳三種結果,呼叫端要分開處理:
+ *   { ok: true, month, src }  取到月份
+ *   { ok: false, why }        有日期但年份不對 → 明確拒絕(不可退化成「視為當月」)
+ *   null                      文字裡完全沒有月份資訊
+ */
+function parseLaidianFullMonth(text, year) {
+  // (?<!\d) 避免把西元「2026/7/12」的「026」誤讀成民國年
+  const roc = text.match(/(?<!\d)(\d{3})\s*\/\s*(\d{1,2})\s*\/\s*\d{1,2}/);
+  if (roc) {
+    if (Number(roc[1]) + 1911 !== year) return { ok: false, why: `民國日期 ${roc[0]} 非當年(${year})` };
+    return { ok: true, month: String(Number(roc[2])), src: `民國日期 ${roc[0]}` };
+  }
+  const ad = text.match(/(?<!\d)(20\d{2})\s*\/\s*(\d{1,2})\s*\/\s*\d{1,2}/);
+  if (ad) {
+    if (Number(ad[1]) !== year) return { ok: false, why: `西元日期 ${ad[0]} 非當年(${year})` };
+    return { ok: true, month: String(Number(ad[2])), src: `西元日期 ${ad[0]}` };
+  }
+  const cn = text.match(/(\d{1,2})\s*月/);
+  if (cn) return { ok: true, month: String(Number(cn[1])), src: `月份字樣 ${cn[0]}` };
+  return null;
+}
+
+/**
+ * 從一段「窄窗文字」判定是否為偶數日 5% 的當月真實額滿標示。
+ * @param {string} plain  已脫 HTML 的窄窗文字(主來源=h3 內文,第二來源=名稱到冒號之間)
+ * @returns {{ month: string, msg: string } | null}  null = 未額滿
+ */
+function judgeLaidianFullText(plain, year, monthNum, tag) {
+  const idx = plain.indexOf('額滿');
+  if (idx < 0) return null;
+
+  // 制度性後綴守衛(「額滿公告」「額滿即止」…),跟其他掃描路徑共用同一組規則
+  if (INSTITUTIONAL_AFTER_RX.test(plain.substring(idx + 2, idx + 6))) {
+    console.log(`[賴點卡] ${tag} 命中制度性文字,不算額滿: "${plain}"`);
+    return null;
+  }
+
+  // 標示原文優先取括號內那段(「(7月回饋於115/7/12 22:00額滿)」),取不到就用整段窄窗
+  const paren = plain.match(/[（(]([^）)]*額滿[^）)]*)[）)]/);
+  const marker = paren ? paren[1] : plain;
+
+  const parsed = parseLaidianFullMonth(marker, year);
+  if (!parsed) {
+    // 標示存在但完全沒寫月份(例如微網站比照早鳥禮的「(已額滿)」)。
+    // 這種標示是頁面當下的即時狀態、不帶月份限定 → 視為當月。
+    // 窄窗已鎖死在活動名附近,不可能是別的活動的額滿字樣。
+    console.log(`[賴點卡] ${tag} 標示無月份,視為當月(${monthNum} 月): "${marker}"`);
+    return { month: monthNum, msg: marker };
+  }
+  if (parsed.month !== monthNum) {
+    console.log(`[賴點卡] ${tag} 標示月份 ${parsed.month} 月 ≠ 當月 ${monthNum} 月(依 ${parsed.src})→ 當月未額滿`);
+    return null;
+  }
+  console.log(`[賴點卡] ${tag} 額滿 ← ${parsed.src}: "${marker}"`);
+  return { month: parsed.month, msg: marker };
+}
+
+/**
+ * 主來源:只在偶數日 5% 那個 <h3> 自己的 markup 內找額滿,窗口到 </h3> 為止。
+ * 找不到 h3 / h3 內沒有額滿 / 月份不符 → 一律回 null(未額滿),不 throw。
+ */
+function scanLaidianMain(html, year, monthNum) {
+  const h3Rx = /<h3[^>]*>((?:(?!<\/h3>)[\s\S]){0,400})<\/h3>/g;
+  let m;
+  while ((m = h3Rx.exec(html)) !== null) {
+    if (!LAIDIAN_NAME_RX.test(m[1])) continue;
+    const plain = stripHtml(m[1]);
+    const hit = judgeLaidianFullText(plain, year, monthNum, '主來源 h3');
+    if (hit) return hit;
+    if (!plain.includes('額滿')) console.log(`[賴點卡] 主來源 h3「${plain}」無額滿標示 → 未額滿`);
+    return null; // 命中活動的 h3 就以它為準,不再往後找別的 h3
+  }
+  console.log('[賴點卡] 主來源找不到偶數日 5% 的 h3 → 未額滿(fail-safe)');
+  return null;
+}
+
+/**
+ * 第二來源:活動微網站注意事項,只看「活動名 … 全形冒號」之間那段窄窗。
+ * 目前這條在微網站上不會有標示,允許恆空 → 回 null,不報錯。
+ */
+function scanLaidianAlt(html, year, monthNum) {
+  const rx = /偶數日\s*LINE\s*Pay\s*指定通路\s*(?:加碼|最高)?\s*5\s*%\s*回饋((?:(?![：:])[\s\S]){0,120})[：:]/g;
+  let m, seen = 0;
+  while ((m = rx.exec(html)) !== null) {
+    seen++;
+    const hit = judgeLaidianFullText(stripHtml(m[1]), year, monthNum, '第二來源微網站');
+    if (hit) return hit;
+  }
+  console.log(`[賴點卡] 第二來源掃到 ${seen} 個活動名錨點,無額滿標示 → 未額滿(允許恆空)`);
+  return null;
+}
+
 // ===== 主程式 =====
 
 async function checkPromo() {
@@ -896,6 +1042,55 @@ async function checkPromo() {
       full: true,
       title: `聯邦信用卡 iPASS MONEY 10% ${monthNum} 月已額滿`,
       body: `聯邦信用卡 綁定 iPASS MONEY 10% 綠點 ${monthNum} 月名額已滿`,
+      category: '聯邦'
+    });
+  }
+
+  // ========== B2b. 聯邦賴點卡 偶數日 LINE Pay 指定通路 5%(v2.6) ==========
+  //
+  // 資料結構比照 B2 按月 key。刻意「不」做 needReset 清空:按月 key 本身就是
+  // 跨月歸零(下個月是另一格 key),不需要也不該吃 needReset 的 1~3 號視窗。
+  // 月內只進不退(跟 icash Pay 各路徑一致):當月標示一旦確認額滿就不因單次抓頁
+  // 失敗/官網暫時撤掉標示而翻回未額滿。
+  //
+  // ⚠️ 到期確認見上方 LAIDIAN_* 常數的註解(2027/1 需確認是否續辦)。
+  const laidianActive = new Date() <= LAIDIAN_ACT_END;
+  let ubotLaidian = currentStatus.ubot_laidian_even || {};
+  for (const m of LAIDIAN_MONTHS) if (!ubotLaidian[m]) ubotLaidian[m] = { full: false, msg: '' };
+
+  if (!laidianActive) {
+    console.log('[賴點卡] 活動已於 115/12/31 結束 → 跳過掃描,一律視為未額滿');
+  } else if (!LAIDIAN_MONTHS.includes(monthNum)) {
+    console.log(`[賴點卡] 當月 ${monthNum} 月不在活動期間內 → 跳過掃描`);
+  } else {
+    try {
+      const mainHtml = await fetchPage(LAIDIAN_URL_MAIN);
+      let hit = mainHtml ? scanLaidianMain(mainHtml, year, monthNum) : null;
+      if (!mainHtml) console.log('[賴點卡] 主來源取頁失敗或內容為空 → 未額滿(fail-safe)');
+
+      // 主來源沒命中才問第二來源;第二來源永遠不覆寫主來源結果
+      if (!hit) {
+        try {
+          const altHtml = await fetchPage(LAIDIAN_URL_ALT);
+          if (altHtml) hit = scanLaidianAlt(altHtml, year, monthNum);
+          else console.log('[賴點卡] 第二來源取頁失敗或內容為空 → 略過(允許恆空)');
+        } catch (e) { console.error('[賴點卡] 第二來源失敗:', e.message); }
+      }
+
+      if (hit && ubotLaidian[hit.month] && !ubotLaidian[hit.month].full) {
+        ubotLaidian[hit.month].full = true;
+        ubotLaidian[hit.month].msg = hit.msg;
+      }
+      if (!ubotLaidian[monthNum].full) console.log(`[賴點卡] ${monthNum} 月 未額滿`);
+    } catch (e) { console.error('[賴點卡] 失敗:', e.message); }
+  }
+
+  if (laidianActive && ubotLaidian[monthNum] && ubotLaidian[monthNum].full) {
+    promos.push({
+      id: `ubot_laidian_even_${monthNum}`,
+      full: true,
+      title: `聯邦賴點卡 偶數日 5% ${monthNum} 月已額滿`,
+      body: `聯邦賴點卡 LINE Pay 偶數日指定通路加碼 5% ${monthNum} 月名額已滿`,
       category: '聯邦'
     });
   }
@@ -1283,6 +1478,7 @@ async function checkPromo() {
     seven_10: seven,
     online3c_10: online3c,
     ubot_ipassmoney: ubotIpass,
+    ubot_laidian_even: ubotLaidian,
     ipass_results: ipassResults,
     easycard_results: ecardResults,
     promos: promos,

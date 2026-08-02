@@ -1,9 +1,17 @@
 /**
- * 自動檢查活動額滿狀態(puppeteer 版 v2.6)
+ * 自動檢查活動額滿狀態(puppeteer 版 v2.7)
  * GitHub Actions 每天執行 8 班(cron UTC 1,3,5,7,9,11,13,15 = 台灣 09/11/13/15/17/19/21/23)
  *
- * ⚠️ workflow 需要加 pdf-parse 套件:
+ * ⚠️ workflow 需要加 pdf-parse 套件(v2 以上):
  *    npm install puppeteer pdf-parse
+ *
+ * v2.7 修正(2026-07-27):
+ *   - scanQuotaReachedPdf() 改用 pdf-parse v2 API。package.json 鎖 ^2.4.5、workflow 也裝 v2,
+ *     但呼叫端還停在 v1 的 callable default(await pdfParse(buf)),v2 只匯出物件(PDFParse class)
+ *     → 每次執行都被 catch 吞成「[PDF] 解析失敗: pdfParse is not a function」。
+ *     結果:悠遊付月級挑戰(銀/金/白金)的官方 PDF 來源從來沒產出過資料,
+ *     三項永遠停在 manualCheckPromos 的「需 APP 確認」,不會翻成真正的已額滿。
+ *   - 維持原本的 graceful degradation:套件缺少或解析丟例外都只 log 後跳過,不讓整輪爬蟲失敗。
  *
  * v2.6 新增(2026-07-27):
  *   - 新增 B2b 聯邦賴點卡「偶數日 LINE Pay 指定通路加碼 5%」全體名額額滿狀態。
@@ -74,8 +82,10 @@ const fs = require('fs');
 const puppeteer = require('puppeteer');
 
 // pdf-parse 是選用的——如果 workflow 沒安裝也能跑(月級挑戰走 web 那邊)
-let pdfParse = null;
-try { pdfParse = require('pdf-parse'); } catch (e) { console.log('[info] pdf-parse 未安裝,將跳過 PDF 掃描'); }
+// v2 起改成具名匯出 class(v1 的 callable default 已移除),見 scanQuotaReachedPdf()
+let PDFParse = null;
+try { ({ PDFParse } = require('pdf-parse')); } catch (e) { console.log('[info] pdf-parse 未安裝,將跳過 PDF 掃描'); }
+if (!PDFParse) console.log('[info] pdf-parse 版本不符(需 v2 的 PDFParse),將跳過 PDF 掃描');
 
 const STATUS_FILE = 'promo_status.json';
 
@@ -263,7 +273,7 @@ function cleanLabel(text) {
  * 回傳當月的三個子級別狀態。
  */
 async function scanQuotaReachedPdf(monthNum) {
-  if (!pdfParse) {
+  if (!PDFParse) {
     console.log('[PDF] pdf-parse 未安裝,跳過');
     return { silver: false, gold: false, platinum: false };
   }
@@ -275,7 +285,13 @@ async function scanQuotaReachedPdf(monthNum) {
       return { silver: false, gold: false, platinum: false };
     }
 
-    const parsed = await pdfParse(buf);
+    const parser = new PDFParse({ data: buf });
+    let parsed;
+    try {
+      parsed = await parser.getText();
+    } finally {
+      await parser.destroy();
+    }
     const text = parsed.text || '';
     console.log(`[PDF] 內容: "${text.replace(/\s+/g, ' ').substring(0, 200)}..."`);
 

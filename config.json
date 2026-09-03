@@ -1,6 +1,6 @@
 {
-  "news": "3.19.0上線，優化性能及新增中信linepay卡",
-  "latest_version": "3.19.0",
+  "news": "3.20.0上線，優化性能及介面",
+  "latest_version": "3.20.0",
   "min_version": "2.9.0",
   "force_update_message": "此版本已過舊,請更新至最新版本。"
 }

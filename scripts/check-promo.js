@@ -1026,7 +1026,7 @@ async function checkPromo() {
 
   // ========== B2. 聯邦銀行 iPASS MONEY 10% ==========
   let ubotIpass = currentStatus.ubot_ipassmoney || {};
-  const ipassMonths = ['1', '2', '3', '4', '5', '6'];
+  const ipassMonths = ['7', '8', '9', '10', '11', '12'];
   if (needReset) {
     ubotIpass = {};
     for (const m of ipassMonths) ubotIpass[m] = { full: false, msg: '' };
@@ -1486,7 +1486,7 @@ async function checkPromo() {
     { id: 'easycard_bus10', title: '悠遊付乘車碼10%', endDate: '2026-03-31' },
     { id: 'pxpay_japan', title: '全支付日本PayPay回饋', endDate: '2026-03-29' },
     { id: 'icashpay_3c', title: 'icash Pay 網購3C 10%', endDate: '2026-06-30' },
-    { id: 'ubot_ipassmoney', title: '聯邦iPASS MONEY 10%綠點', endDate: '2026-06-30' },
+    { id: 'ubot_ipassmoney', title: '聯邦iPASS MONEY 10%綠點', endDate: '2026-12-31' },
   ];
 
   // ========== 寫入狀態 ==========

@@ -1,5 +1,21 @@
 /**
- * 自動檢查活動額滿狀態(puppeteer 版 v2.7)
+ * 自動檢查活動額滿狀態(puppeteer 版 v2.8)
+ *
+ * v2.8 新增(2026-10-12):
+ *   - 新增 D 段「全聯 銀行贈點活動查詢」(cardpoint.pxmartevent.com.tw)。
+ *     這是全聯官方公告各銀行 PX Pay／全支付／實體卡 週末贈點名額的頁面,純 JSON API:
+ *       GET /event/GetPeriodList?event_type=1            → 各檔期(最新在前)
+ *       GET /event/GetEventList?event_type=1&period=A~B  → 該檔期每家銀行:type_count(限量)、
+ *                                                           left_count(剩餘,贈完=null)、disbursed_time(贈完時間)
+ *     pay_type: 1=PX Pay、2=全支付、3=實體卡(event_type=2 是悠遊卡等票證,不收)。
+ *   - 輸出 pxmart_card { periodId, period, items[] } 整表,供 iOS 日後畫名額表;
+ *     promos 只推「全支付」(pay_type 含 2)已贈完的銀行,id 帶檔期 id,換檔期自動重新通知。
+ *   - 月級挑戰:hardcoded 的 1766109563 頁面已下架(空頁),改成「標題含『月級挑戰』」的活動
+ *     自動標成 special:'challenge'(現為 1790160236,10/1~1/1),換期不必再改 id。
+ *     ⚠️ 官方 quotareached.pdf 自 2026/2 起停止更新;活動頁明文寫「活動額滿將於悠遊付 APP
+ *     各活動頁公告」,網頁端沒有任何額滿字樣 → 三級額滿目前仍只能靠 manualCheckPromos(需 APP 確認)。
+ *     若日後拿到 APP 內活動頁的 https 連結(epkaw.easycard.com.tw/advertisement/{UUID}),
+ *     加進 KNOWN_URLS 並標 special:'challenge' 即可接上。
  * GitHub Actions 每天執行 8 班(cron UTC 1,3,5,7,9,11,13,15 = 台灣 09/11/13/15/17/19/21/23)
  *
  * ⚠️ workflow 需要加 pdf-parse 套件:
@@ -126,6 +142,74 @@ function fetchBuffer(url, timeout = 20000) {
       res.on('end', () => { clearTimeout(timer); resolve(Buffer.concat(chunks)); });
     }).on('error', (e) => { clearTimeout(timer); reject(e); });
   });
+}
+
+/** 抓 JSON(帶 Referer/Accept,全聯 cardpoint API 用) */
+function fetchJson(url, referer, timeout = 15000) {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => resolve(null), timeout);
+    const mod = url.startsWith('https') ? https : http;
+    const headers = {
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+      'Accept': 'application/json, text/plain, */*',
+    };
+    if (referer) headers['Referer'] = referer;
+    mod.get(url, { headers }, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        clearTimeout(timer);
+        try { resolve(JSON.parse(data)); } catch (e) { console.error(`[fetchJson] 非 JSON: ${url} (${res.statusCode})`); resolve(null); }
+      });
+    }).on('error', (e) => { clearTimeout(timer); console.error(`[fetchJson] 失敗: ${url}`, e.message); resolve(null); });
+  });
+}
+
+// ===== D. 全聯 銀行贈點活動查詢(全支付／PX Pay／實體卡) =====
+
+const PXMART_CARDPOINT = 'https://cardpoint.pxmartevent.com.tw';
+const PXMART_PAY_NAMES = { 1: 'PX Pay', 2: '全支付', 3: '實體卡' };
+
+/**
+ * 回傳 { periodId, period, items: [{bank, pay:[..], payNames, total, left, full, soldAt, text, sdate, edate}] }
+ * 只取最新檔期(GetPeriodList 第一筆)。檔期已結束(今天 > edate)時 items 仍存、但 promos 不推。
+ */
+async function scanPxmartCardpoint(todayStr) {
+  const empty = { periodId: null, period: null, items: [] };
+  const plist = await fetchJson(`${PXMART_CARDPOINT}/event/GetPeriodList?event_type=1`, PXMART_CARDPOINT + '/');
+  if (!plist || !plist.success || !Array.isArray(plist.data) || !plist.data.length) {
+    console.log('[全聯贈點] 檔期列表抓不到');
+    return empty;
+  }
+  const latest = plist.data[0];
+  const period = latest.period;
+  const [sdate, edate] = String(period).split('~');
+  const elist = await fetchJson(`${PXMART_CARDPOINT}/event/GetEventList?event_type=1&period=${encodeURIComponent(period)}`, PXMART_CARDPOINT + '/');
+  if (!elist || !elist.success || !Array.isArray(elist.data)) {
+    console.log(`[全聯贈點] 檔期 ${period} 活動列表抓不到`);
+    return { periodId: latest.id, period, items: [] };
+  }
+  const items = elist.data.map(d => {
+    let pay = [];
+    try { pay = JSON.parse(d.pay_type || '[]'); } catch (e) { pay = []; }
+    const left = (d.left_count === null || d.left_count === undefined) ? null : Number(d.left_count);
+    const full = !!d.disbursed_time || left === 0;
+    return {
+      bank: d.bank_name,
+      pay,
+      payNames: pay.map(x => PXMART_PAY_NAMES[x] || String(x)).join('/'),
+      total: d.type_count,
+      left,
+      full,
+      soldAt: d.disbursed_time || null,
+      text: (d.type_text || '').trim(),
+      extra: (d.extra_text || '').trim() || null,
+    };
+  });
+  const active = todayStr >= sdate && todayStr <= edate;
+  console.log(`[全聯贈點] 檔期 ${period}(id ${latest.id}) ${active ? '進行中' : '非進行中'}:${items.length} 筆,已贈完 ${items.filter(i => i.full).length} 筆`);
+  for (const it of items) console.log(`  ${it.bank} [${it.payNames}] 限量 ${it.total} 剩 ${it.left === null ? '-' : it.left} → ${it.full ? '已贈完 ' + it.soldAt : '未贈完'}`);
+  return { periodId: latest.id, period, sdate, edate, active, items };
 }
 
 function fetchPageWithCookie(url) {
@@ -664,8 +748,8 @@ async function collectEasycardOfferUrls(browser) {
   // 移除項目:
   //   ew_1771988018 — 乘車碼舊活動,Q1 已結束
   //                   (Q2 新活動 id=1774595852 頁面不寫額滿時間,走 C 方案,不在此處理)
+  // v2.8:月級挑戰改由標題判定(見下方),1766109563 已是空頁、不再 hardcode
   const KNOWN_URLS = [
-    { id: 'challenge_1766109563', url: 'https://easywallet.easycard.com.tw/benefit/content?id=1766109563', label: '月級挑戰', special: 'challenge' },
     { id: 'ew_1766377676', url: 'https://easywallet.easycard.com.tw/benefit/content.php?id=1766377676', label: '新會員3%回饋' },
     { id: 'ew_1766573956', url: 'https://www.easycard.com.tw/offer?id=1766573956', label: '推薦好友送$100' },
   ];
@@ -685,6 +769,13 @@ async function collectEasycardOfferUrls(browser) {
     }
   }
   console.log(`[C3] hardcoded 保底: 補充 ${hardcodedAdded} 個`);
+
+  // v2.8:標題含「月級挑戰」的活動一律標成 challenge(走三級別解析),換期換 id 自動跟上
+  let challengeTagged = 0;
+  for (const r of results) {
+    if (!r.special && /月級挑戰/.test(r.label || '')) { r.special = 'challenge'; challengeTagged++; }
+  }
+  console.log(`[C3] 月級挑戰 標題命中 ${challengeTagged} 個`);
   console.log(`\n[悠遊付] 總計 ${results.length} 個活動 URL`);
   return results;
 }
@@ -1239,16 +1330,17 @@ async function checkPromo() {
   console.log('\n===== 悠遊付逐頁掃描額滿 =====');
   const ecardResults = {};
 
-  const epkawItems = offerUrls.filter(i => i.url.includes('epkaw.easycard.com.tw/advertisement'));
-  const easywalletItems = offerUrls.filter(i => i.url.includes('easywallet.easycard.com.tw'));
-  const ssrItems = offerUrls.filter(i =>
+  // v2.8:月級挑戰不分網域(C1 的 easycard.com.tw/offer?id= 與 C2 的 easywallet 都可能收到),
+  // 先抽出來走 scanChallengeSpa(三級別解析),其餘再依網域分流
+  const challengeItems = offerUrls.filter(i => i.special === 'challenge');
+  const nonChallenge = offerUrls.filter(i => i.special !== 'challenge');
+  const epkawItems = nonChallenge.filter(i => i.url.includes('epkaw.easycard.com.tw/advertisement'));
+  const easywalletItems = nonChallenge.filter(i => i.url.includes('easywallet.easycard.com.tw'));
+  const ssrItems = nonChallenge.filter(i =>
     !i.url.includes('easywallet.easycard.com.tw') &&
     !i.url.includes('epkaw.easycard.com.tw')
   );
-
-  // easywallet 內部再分流:月級挑戰走 puppeteer(頁面有多個分頁區塊),其餘純 HTTP
-  const challengeItems = easywalletItems.filter(i => i.special === 'challenge');
-  const easywalletNormalItems = easywalletItems.filter(i => i.special !== 'challenge');
+  const easywalletNormalItems = easywalletItems;
 
   console.log(`SSR(easycard.com.tw/offer): ${ssrItems.length} 個`);
   console.log(`easywallet normal(純 HTTP): ${easywalletNormalItems.length} 個`);
@@ -1430,6 +1522,28 @@ async function checkPromo() {
     });
   }
 
+  // ========== D. 全聯 銀行贈點(全支付) ==========
+  console.log('\n===== 全聯 銀行贈點活動查詢 =====');
+  let pxmartCard = { periodId: null, period: null, items: [] };
+  try {
+    pxmartCard = await scanPxmartCardpoint(todayStr);
+  } catch (e) {
+    console.error('[全聯贈點] 失敗:', e.message);
+  }
+  if (pxmartCard.active) {
+    for (const it of pxmartCard.items) {
+      if (!it.full || !it.pay.includes(2)) continue;   // 只推全支付(含「PX Pay/全支付」合併項)
+      const bank = it.bank.replace(/銀行$/, '');
+      promos.push({
+        id: `pxmart_allpay_${pxmartCard.periodId}_${bank}`,
+        full: true,
+        title: `全聯 全支付 ${bank} 加碼已額滿`,
+        body: `${bank} 全支付「${it.text}」${pxmartCard.period.replace('~', '～')} 名額已贈完`,
+        category: '全支付'
+      });
+    }
+  }
+
   // ========== 需 APP 確認的活動清單(Tier C) ==========
   //
   // 有些活動的當月額滿狀態只在悠遊付 APP 內公告,網頁/PDF 更新延遲長
@@ -1504,6 +1618,7 @@ async function checkPromo() {
     ubot_laidian_even: ubotLaidian,
     ipass_results: ipassResults,
     easycard_results: ecardResults,
+    pxmart_card: pxmartCard,
     promos: promos,
     manualCheckPromos: manualCheckPromos,
     reminders: reminders,

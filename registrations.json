@@ -1,0 +1,73 @@
+{
+  "updated": "2026-10-15",
+  "items": [
+    {
+      "id": "ubot_delivery",
+      "title": "聯邦 Uber Eats／foodpanda 外送 3%",
+      "cids": [
+        "c5",
+        "c2",
+        "j2",
+        "ubot_m",
+        "ubot_lb"
+      ],
+      "schedule": {
+        "type": "monthly",
+        "day": 10,
+        "time": "15:00"
+      },
+      "from": "2026-07-01",
+      "until": "2026-12-31",
+      "quota": "每月限 6,000 名",
+      "how": "聯邦官網「限時登錄活動專區」→ 其他平台",
+      "url": "https://activity.ubot.com.tw/aws_act/2026/202607delivery/index.htm",
+      "note": "聯邦卡合計每月可刷 $6,667"
+    },
+    {
+      "id": "esun_icash_711",
+      "title": "玉山 icash 7-ELEVEN 加碼 6%",
+      "cids": [
+        "miao1"
+      ],
+      "schedule": {
+        "type": "monthly",
+        "day": 15,
+        "time": "10:00"
+      },
+      "quota": "每月限 6,000 名",
+      "how": "玉山銀行官網或 App「活動登錄」",
+      "note": "每月可刷 $3,333"
+    },
+    {
+      "id": "ubot_j2_jp_transit",
+      "title": "聯邦吉鶴卡 日本交通卡儲值 1.5%",
+      "cids": [
+        "j2"
+      ],
+      "schedule": {
+        "type": "monthly",
+        "day": 15,
+        "time": "10:00"
+      },
+      "quota": "每月限 10,000 名",
+      "how": "聯邦銀行官網「限時登錄活動專區」"
+    },
+    {
+      "id": "orange1_pay5",
+      "title": "王道橘卡 登錄指定支付 +5%",
+      "cids": [
+        "orange1"
+      ],
+      "schedule": {
+        "type": "monthly",
+        "day": 1,
+        "time": "12:00"
+      },
+      "from": "2026-10-01",
+      "until": "2026-12-31",
+      "quota": "每月限 5,000 名",
+      "how": "王道銀行 App「活動登錄」",
+      "note": "單筆滿 $300，每月可刷 $24,000"
+    }
+  ]
+}

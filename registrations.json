@@ -55,7 +55,8 @@
       },
       "until": "2026-12-31",
       "quota": "每月限 10,000 名",
-      "how": "聯邦銀行官網「限時登錄活動專區」"
+      "how": "聯邦信用卡官網「限時登錄活動專區」",
+      "url": "https://card.ubot.com.tw/"
     },
     {
       "id": "ubot_j2_5th",
@@ -70,8 +71,9 @@
       },
       "until": "2027-03-31",
       "quota": "每月限 20,000 名",
-      "how": "聯邦銀行官網「限時登錄活動專區」",
-      "note": "當月國內一般消費累積滿 $20,000 才有，每月可刷 $30,000"
+      "how": "聯邦信用卡官網「限時登錄活動專區」",
+      "note": "當月國內一般消費累積滿 $20,000 才有，每月可刷 $30,000",
+      "url": "https://card.ubot.com.tw/"
     },
     {
       "id": "orange1_pay5",
@@ -87,8 +89,9 @@
       "from": "2026-10-01",
       "until": "2026-12-31",
       "quota": "每月限 5,000 名",
-      "how": "王道銀行 App「活動登錄」",
-      "note": "指定八種行動支付、單筆滿 $300，每月可刷 $24,000"
+      "how": "王道銀行 App「活動登錄」（官網也有入口）",
+      "note": "指定八種行動支付、單筆滿 $300，每月可刷 $24,000",
+      "url": "https://www.o-bank.com/"
     },
     {
       "id": "orange1_overseas",
@@ -103,7 +106,8 @@
       "from": "2026-10-01",
       "until": "2026-12-31",
       "how": "王道銀行 App「活動登錄」（按月登錄，開放時間以官網為準）",
-      "note": "海外實體／海外網購，不含綁行動支付；每月可刷 $30,000"
+      "note": "海外實體／海外網購，不含綁行動支付；每月可刷 $30,000",
+      "url": "https://www.o-bank.com/"
     },
     {
       "id": "orange1_dept",
@@ -118,7 +122,8 @@
       "from": "2026-10-01",
       "until": "2026-12-31",
       "how": "王道銀行 App「活動登錄」（按月登錄，開放時間以官網為準）",
-      "note": "限實體卡於指定百貨餐飲；每月可刷 $10,000"
+      "note": "限實體卡於指定百貨餐飲；每月可刷 $10,000",
+      "url": "https://www.o-bank.com/"
     },
     {
       "id": "orange1_insurance",
@@ -133,7 +138,8 @@
       "from": "2026-09-10",
       "until": "2026-12-31",
       "how": "王道銀行 App「活動登錄」（按月登錄，開放時間以官網為準）",
-      "note": "當月保費累積滿 $3,000 才有；每月可刷 $84,400"
+      "note": "當月保費累積滿 $3,000 才有；每月可刷 $84,400",
+      "url": "https://www.o-bank.com/"
     },
     {
       "id": "kgi1_mobilepay",
@@ -194,8 +200,9 @@
       },
       "from": "2026-07-01",
       "until": "2026-12-31",
-      "how": "第一銀行官網活動頁登錄（活動期間登錄一次）",
-      "note": "icash Pay（不含 7-11）／全支付／HGPAY／中油PAY／寶雅pay；每月可刷 $10,000"
+      "how": "第一銀行信用卡官網活動頁登錄（活動期間登錄一次）",
+      "note": "icash Pay（不含 7-11）／全支付／HGPAY／中油PAY／寶雅pay；每月可刷 $10,000",
+      "url": "https://card.firstbank.com.tw/"
     },
     {
       "id": "ctbc_lp_overseas_q4",
@@ -211,7 +218,8 @@
       "until": "2026-12-31",
       "quota": "每週二開放、每次限 3,000 名",
       "how": "中國信託 LINE Pay 卡活動頁登錄；沒搶到等下週二",
-      "note": "一季登錄一次即可；每季可刷約 $20,000"
+      "note": "一季登錄一次即可；每季可刷約 $20,000",
+      "url": "https://www.ctbcbank.com/content/dam/minisite/long/creditcard/LINEPay/notice.html"
     },
     {
       "id": "ctbc_lp_visa_merchants",
@@ -227,7 +235,8 @@
       "until": "2026-12-31",
       "quota": "每通路每月限 8,000 名",
       "how": "中國信託 LINE Pay 卡活動頁逐通路登錄（星巴克每月 6 日 10:00 開放，其他通路以官網為準）",
-      "note": "每通路每季可刷 $2,500"
+      "note": "每通路每季可刷 $2,500",
+      "url": "https://www.ctbcbank.com/content/dam/minisite/long/creditcard/LINEPay/page_food.html"
     },
     {
       "id": "ctbc_lp_jcb_merchants",
@@ -242,7 +251,8 @@
       "until": "2026-12-31",
       "quota": "每通路每月限 5,000 名",
       "how": "中國信託 LINE Pay 卡活動頁逐通路登錄（開放時間以官網為準）",
-      "note": "每通路每季可刷 $2,222"
+      "note": "每通路每季可刷 $2,222",
+      "url": "https://www.ctbcbank.com/content/dam/minisite/long/creditcard/LINEPay/page_food.html"
     },
     {
       "id": "ileo1_delivery",
@@ -273,7 +283,8 @@
       "until": "2026-12-31",
       "quota": "每月限 3,500 份",
       "how": "第一銀行信用卡官網活動頁登錄（當月訂單限當月登錄，開放時間以官網為準）",
-      "note": "每月可刷 $33,333"
+      "note": "每月可刷 $33,333",
+      "url": "https://card.firstbank.com.tw/"
     },
     {
       "id": "j1_jkt",
@@ -288,8 +299,9 @@
       },
       "until": "2026-12-31",
       "quota": "每月限 20,000 名",
-      "how": "台北富邦官網 J 卡活動頁登錄；一季內登錄成功一次就整季有效",
-      "note": "單筆滿 $1,000；日韓每季可刷 $33,333、泰國 $20,000"
+      "how": "Fubon+ App「優惠 → 活動登錄」；一季內登錄成功一次就整季有效",
+      "note": "單筆滿 $1,000；日韓每季可刷 $33,333、泰國 $20,000",
+      "url": "https://www.fubon.com/banking/personal/credit_card/all_card/omiyage/omiyage.htm"
     },
     {
       "id": "j1_jp_transit",
@@ -304,8 +316,9 @@
       },
       "until": "2026-12-31",
       "quota": "每月限 10,000 名",
-      "how": "台北富邦官網 J 卡活動頁登錄；一季內登錄成功一次就整季有效",
-      "note": "單筆儲值滿 $2,000；每季可刷 $2,857"
+      "how": "Fubon+ App「優惠 → 活動登錄」；一季內登錄成功一次就整季有效",
+      "note": "單筆儲值滿 $2,000；每季可刷 $2,857",
+      "url": "https://www.fubon.com/banking/personal/credit_card/all_card/omiyage/omiyage.htm"
     },
     {
       "id": "j5_jkt_q4",
@@ -321,7 +334,8 @@
       "until": "2026-12-31",
       "quota": "限 3,000 名",
       "how": "永豐銀行官網活動頁登錄（12/21 10:00 開放）",
-      "note": "限 JCB 卡別、需永豐／京城帳戶自扣；每季可刷 $50,000"
+      "note": "限 JCB 卡別、需永豐／京城帳戶自扣；每季可刷 $50,000",
+      "url": "https://bank.sinopac.com/"
     },
     {
       "id": "c12_jkt_q4",
@@ -336,7 +350,8 @@
       "until": "2026-12-31",
       "quota": "每季限 5,000 名",
       "how": "永豐銀行官網活動頁登錄（開放時間以官網為準）",
-      "note": "限實體店面"
+      "note": "限實體店面",
+      "url": "https://bank.sinopac.com/"
     },
     {
       "id": "sunny1_donki_q4",
@@ -350,7 +365,8 @@
       "from": "2026-10-01",
       "until": "2026-12-31",
       "how": "陽信銀行官網活動頁登錄（活動期間登錄一次）",
-      "note": "每期可刷 $2,857"
+      "note": "每期可刷 $2,857",
+      "url": "https://www.sunnybank.com.tw/"
     },
     {
       "id": "c4_life",
@@ -365,7 +381,8 @@
       "from": "2026-07-01",
       "until": "2026-12-31",
       "how": "將來銀行 App 活動登錄（每月登錄，開放時間以官網為準）",
-      "note": "單筆滿 $1,000 起跳"
+      "note": "單筆滿 $1,000 起跳",
+      "url": "https://www.nextbank.com.tw/"
     }
   ]
 }

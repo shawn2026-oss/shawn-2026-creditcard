@@ -25,17 +25,21 @@
     },
     {
       "id": "esun_icash_711",
-      "title": "玉山 icash 7-ELEVEN 加碼 6%",
+      "title": "玉山 7-ELEVEN 綁 icash Pay 加碼 6%",
       "cids": [
-        "miao1"
+        "miao1",
+        "ubear1"
       ],
       "schedule": {
         "type": "monthly",
         "day": 15,
         "time": "10:00"
       },
+      "from": "2026-07-01",
+      "until": "2026-12-31",
       "quota": "每月限 6,000 名",
-      "how": "玉山銀行官網或 App「活動登錄」",
+      "how": "玉山銀行官網活動頁登錄（限正卡）",
+      "url": "https://www.esunbank.com/zh-tw/personal/credit-card/discount/shopInfo?sno=8023",
       "note": "每月可刷 $3,333"
     },
     {
@@ -49,12 +53,29 @@
         "day": 15,
         "time": "10:00"
       },
+      "until": "2026-12-31",
       "quota": "每月限 10,000 名",
       "how": "聯邦銀行官網「限時登錄活動專區」"
     },
     {
+      "id": "ubot_j2_5th",
+      "title": "聯邦吉鶴卡 5週年 國內滿 $20,000 整月 +2%",
+      "cids": [
+        "j2"
+      ],
+      "schedule": {
+        "type": "monthly",
+        "day": 15,
+        "time": "10:00"
+      },
+      "until": "2027-03-31",
+      "quota": "每月限 20,000 名",
+      "how": "聯邦銀行官網「限時登錄活動專區」",
+      "note": "當月國內一般消費累積滿 $20,000 才有，每月可刷 $30,000"
+    },
+    {
       "id": "orange1_pay5",
-      "title": "王道橘卡 登錄指定支付 +5%",
+      "title": "王道橘卡 刷支付 +5%",
       "cids": [
         "orange1"
       ],
@@ -67,7 +88,284 @@
       "until": "2026-12-31",
       "quota": "每月限 5,000 名",
       "how": "王道銀行 App「活動登錄」",
-      "note": "單筆滿 $300，每月可刷 $24,000"
+      "note": "指定八種行動支付、單筆滿 $300，每月可刷 $24,000"
+    },
+    {
+      "id": "orange1_overseas",
+      "title": "王道橘卡 海外刷王道 +5%",
+      "cids": [
+        "orange1"
+      ],
+      "schedule": {
+        "type": "monthly",
+        "day": 1
+      },
+      "from": "2026-10-01",
+      "until": "2026-12-31",
+      "how": "王道銀行 App「活動登錄」（按月登錄，開放時間以官網為準）",
+      "note": "海外實體／海外網購，不含綁行動支付；每月可刷 $30,000"
+    },
+    {
+      "id": "orange1_dept",
+      "title": "王道橘卡 年終犒賞季 百貨餐飲 +5%",
+      "cids": [
+        "orange1"
+      ],
+      "schedule": {
+        "type": "monthly",
+        "day": 1
+      },
+      "from": "2026-10-01",
+      "until": "2026-12-31",
+      "how": "王道銀行 App「活動登錄」（按月登錄，開放時間以官網為準）",
+      "note": "限實體卡於指定百貨餐飲；每月可刷 $10,000"
+    },
+    {
+      "id": "orange1_insurance",
+      "title": "王道橘卡 刷保費 +2%",
+      "cids": [
+        "orange1"
+      ],
+      "schedule": {
+        "type": "monthly",
+        "day": 1
+      },
+      "from": "2026-09-10",
+      "until": "2026-12-31",
+      "how": "王道銀行 App「活動登錄」（按月登錄，開放時間以官網為準）",
+      "note": "當月保費累積滿 $3,000 才有；每月可刷 $84,400"
+    },
+    {
+      "id": "kgi1_mobilepay",
+      "title": "凱基魔Buy卡 行動支付 +3.3%",
+      "cids": [
+        "kgi1"
+      ],
+      "schedule": {
+        "type": "monthly",
+        "day": 1
+      },
+      "until": "2026-12-31",
+      "how": "凱基銀行官網「活動登錄」（每月登錄，開放時間以官網為準）",
+      "url": "https://www.kgibank.com/creditcard/campaign/registrationlist",
+      "note": "當月行動支付國內消費滿 $3,000 才有；每月可刷 $9,090"
+    },
+    {
+      "id": "feib1_5pct",
+      "title": "遠銀快樂卡 指定通路／LINE Pay 5%",
+      "cids": [
+        "feib1"
+      ],
+      "schedule": {
+        "type": "monthly",
+        "day": 1
+      },
+      "from": "2026-07-01",
+      "until": "2026-12-31",
+      "quota": "每月限 10,000 名",
+      "how": "遠東商銀官網活動頁登錄（當月內登錄即可，不用搶時間）",
+      "url": "https://www.feib.com.tw/activity?id=1980",
+      "note": "百貨／超市／網購／服飾／藥妝／LINE Pay；每月可刷 $6,000"
+    },
+    {
+      "id": "feib1_easycard",
+      "title": "遠銀快樂卡 悠遊卡自動加值 5%",
+      "cids": [
+        "feib1"
+      ],
+      "schedule": {
+        "type": "monthly",
+        "day": 1
+      },
+      "from": "2026-07-01",
+      "until": "2026-12-31",
+      "how": "遠東商銀官網活動頁登錄（當月內登錄即可）",
+      "url": "https://www.feib.com.tw/activity?id=1980",
+      "note": "每月可刷 $1,000"
+    },
+    {
+      "id": "fb1_pay3",
+      "title": "一銀icash聯名卡 便利支付 3%",
+      "cids": [
+        "fb1"
+      ],
+      "schedule": {
+        "type": "once"
+      },
+      "from": "2026-07-01",
+      "until": "2026-12-31",
+      "how": "第一銀行官網活動頁登錄（活動期間登錄一次）",
+      "note": "icash Pay（不含 7-11）／全支付／HGPAY／中油PAY／寶雅pay；每月可刷 $10,000"
+    },
+    {
+      "id": "ctbc_lp_overseas_q4",
+      "title": "中信LINE Pay卡 海外實體 登錄加碼 +2.2%（第四季）",
+      "cids": [
+        "ctbc_lp",
+        "ctbc_lp_jcb"
+      ],
+      "schedule": {
+        "type": "once"
+      },
+      "from": "2026-10-01",
+      "until": "2026-12-31",
+      "quota": "每週二開放、每次限 3,000 名",
+      "how": "中國信託 LINE Pay 卡活動頁登錄；沒搶到等下週二",
+      "note": "一季登錄一次即可；每季可刷約 $20,000"
+    },
+    {
+      "id": "ctbc_lp_visa_merchants",
+      "title": "中信LINE Pay卡(VISA) 指定通路 5%（星巴克／Uber Eats／蝦皮／淘寶／萬家福…）",
+      "cids": [
+        "ctbc_lp"
+      ],
+      "schedule": {
+        "type": "monthly",
+        "day": 6,
+        "time": "10:00"
+      },
+      "until": "2026-12-31",
+      "quota": "每通路每月限 8,000 名",
+      "how": "中國信託 LINE Pay 卡活動頁逐通路登錄（星巴克每月 6 日 10:00 開放，其他通路以官網為準）",
+      "note": "每通路每季可刷 $2,500"
+    },
+    {
+      "id": "ctbc_lp_jcb_merchants",
+      "title": "中信LINE Pay卡(JCB) 指定通路 10%（摩斯／壽司郎／藏壽司／UNIQLO…）",
+      "cids": [
+        "ctbc_lp_jcb"
+      ],
+      "schedule": {
+        "type": "monthly",
+        "day": 1
+      },
+      "until": "2026-12-31",
+      "quota": "每通路每月限 5,000 名",
+      "how": "中國信託 LINE Pay 卡活動頁逐通路登錄（開放時間以官網為準）",
+      "note": "每通路每季可刷 $2,222"
+    },
+    {
+      "id": "ileo1_delivery",
+      "title": "一銀iLEO卡 Uber Eats／foodpanda／MOS 線上儲值加碼",
+      "cids": [
+        "ileo1"
+      ],
+      "schedule": {
+        "type": "monthly",
+        "day": 22,
+        "time": "10:00"
+      },
+      "until": "2026-12-31",
+      "quota": "每月限量，額滿即關",
+      "how": "第一銀行信用卡官網活動頁登錄",
+      "url": "https://card.firstbank.com.tw/sites/Satellite?c=CreditCard&cid=1565705058441&d=Touch&pagename=FirstBankCard%2FCreditCard%2Fzh%2FCardActivityDetailView"
+    },
+    {
+      "id": "ileo1_shopee",
+      "title": "一銀iLEO卡 蝦皮購物 單筆滿 $1,000 加碼 3%",
+      "cids": [
+        "ileo1"
+      ],
+      "schedule": {
+        "type": "monthly",
+        "day": 1
+      },
+      "until": "2026-12-31",
+      "quota": "每月限 3,500 份",
+      "how": "第一銀行信用卡官網活動頁登錄（當月訂單限當月登錄，開放時間以官網為準）",
+      "note": "每月可刷 $33,333"
+    },
+    {
+      "id": "j1_jkt",
+      "title": "富邦J卡 日韓泰實體 +3%（每季登錄一次即可）",
+      "cids": [
+        "j1"
+      ],
+      "schedule": {
+        "type": "monthly",
+        "day": 20,
+        "time": "16:00"
+      },
+      "until": "2026-12-31",
+      "quota": "每月限 20,000 名",
+      "how": "台北富邦官網 J 卡活動頁登錄；一季內登錄成功一次就整季有效",
+      "note": "單筆滿 $1,000；日韓每季可刷 $33,333、泰國 $20,000"
+    },
+    {
+      "id": "j1_jp_transit",
+      "title": "富邦J卡 日本交通卡儲值 +7%（每季登錄一次即可）",
+      "cids": [
+        "j1"
+      ],
+      "schedule": {
+        "type": "monthly",
+        "day": 18,
+        "time": "16:00"
+      },
+      "until": "2026-12-31",
+      "quota": "每月限 10,000 名",
+      "how": "台北富邦官網 J 卡活動頁登錄；一季內登錄成功一次就整季有效",
+      "note": "單筆儲值滿 $2,000；每季可刷 $2,857"
+    },
+    {
+      "id": "j5_jkt_q4",
+      "title": "永豐三井聯名卡 日韓泰季滿 $30,000 回 2%（第四季）",
+      "cids": [
+        "j5"
+      ],
+      "schedule": {
+        "type": "once",
+        "time": "10:00"
+      },
+      "from": "2026-12-21",
+      "until": "2026-12-31",
+      "quota": "限 3,000 名",
+      "how": "永豐銀行官網活動頁登錄（12/21 10:00 開放）",
+      "note": "限 JCB 卡別、需永豐／京城帳戶自扣；每季可刷 $50,000"
+    },
+    {
+      "id": "c12_jkt_q4",
+      "title": "永豐現金回饋JCB 日韓泰季滿 $20,000 送 $1,000（第四季）",
+      "cids": [
+        "c12"
+      ],
+      "schedule": {
+        "type": "once"
+      },
+      "from": "2026-10-01",
+      "until": "2026-12-31",
+      "quota": "每季限 5,000 名",
+      "how": "永豐銀行官網活動頁登錄（開放時間以官網為準）",
+      "note": "限實體店面"
+    },
+    {
+      "id": "sunny1_donki_q4",
+      "title": "陽信JCB晶緻卡 日本唐吉訶德／大國藥妝 +7%",
+      "cids": [
+        "sunny1"
+      ],
+      "schedule": {
+        "type": "once"
+      },
+      "from": "2026-10-01",
+      "until": "2026-12-31",
+      "how": "陽信銀行官網活動頁登錄（活動期間登錄一次）",
+      "note": "每期可刷 $2,857"
+    },
+    {
+      "id": "c4_life",
+      "title": "將來將將卡 理想生活 4.5%",
+      "cids": [
+        "c4"
+      ],
+      "schedule": {
+        "type": "monthly",
+        "day": 1
+      },
+      "from": "2026-07-01",
+      "until": "2026-12-31",
+      "how": "將來銀行 App 活動登錄（每月登錄，開放時間以官網為準）",
+      "note": "單筆滿 $1,000 起跳"
     }
   ]
 }

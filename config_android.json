@@ -1,6 +1,6 @@
 {
-  "news": "1.0.7上線：自建卡可設定多項目回饋，自動備份到雲端硬碟也上線了",
-  "latest_version": "1.0.7",
+  "news": "1.0.8上線：首頁新增「登錄提醒」，開放登錄就提醒你；聯邦卡 Uber Eats／foodpanda 外送登錄 +3% 也能記帳了",
+  "latest_version": "1.0.8",
   "min_version": "1.0.0",
   "force_update_message": "此版本已過舊，請更新至最新版本。"
 }

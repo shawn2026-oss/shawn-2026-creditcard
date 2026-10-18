@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-18T12:12:59.466Z",
+  "updated": "2026-10-18T12:17:47.331Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -146,10 +146,8 @@
       "since": "2026-10-18"
     },
     "j5_select7": {
-      "status": "unreachable",
-      "hit": "fetch failed",
-      "since": "2026-10-18",
-      "fails": 1
+      "status": "ok",
+      "since": "2026-10-18"
     },
     "j5_mop_tainan_anniv": {
       "status": "ok",
@@ -220,14 +218,6 @@
       "since": "2026-10-18"
     },
     "dbs_q4_ovs_travel": {
-      "status": "ok",
-      "since": "2026-10-18"
-    },
-    "cathay_apple_w1": {
-      "status": "ok",
-      "since": "2026-10-18"
-    },
-    "cathay_apple_w2": {
       "status": "ok",
       "since": "2026-10-18"
     },

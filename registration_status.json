@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-18T12:07:34.272Z",
+  "updated": "2026-10-18T12:12:59.466Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -18,15 +18,11 @@
       "since": "2026-10-18"
     },
     "orange1_pay5": {
-      "status": "full",
-      "month": "2026-10",
-      "hit": "參加者不得要求更換其他贈品、現金或以未獲知本活動登錄額滿訊息為理由要求補贈現金回",
+      "status": "ok",
       "since": "2026-10-18"
     },
     "orange1_overseas": {
-      "status": "full",
-      "month": "2026-10",
-      "hit": "示，登錄額滿即關閉，活動參加者不得以未獲知本活動登錄額滿訊息為理由要求補贈現金回",
+      "status": "ok",
       "since": "2026-10-18"
     },
     "orange1_dept": {
@@ -34,9 +30,7 @@
       "since": "2026-10-18"
     },
     "orange1_insurance": {
-      "status": "full",
-      "month": "2026-10",
-      "hit": "示，登錄額滿即關閉。活動參加者不得以未獲知本活動登錄額滿訊息為理由要求補贈現金回",
+      "status": "ok",
       "since": "2026-10-18"
     },
     "kgi1_mobilepay": {
@@ -140,26 +134,22 @@
       "since": "2026-10-18"
     },
     "j3_jcb_themepark_oct": {
-      "status": "full",
-      "month": "2026-10",
-      "hit": "成事前線上登錄，限量登錄12,000張JCB卡；登錄額滿即截止。 ※限日本人氣主",
+      "status": "ok",
       "since": "2026-10-18"
     },
     "j3_jcb_mitsui_jp_nov": {
-      "status": "full",
-      "month": "2026-10",
-      "hit": "成事前線上登錄，限量登錄12,000張JCB卡；登錄額滿即截止。 ※限日本人氣主",
+      "status": "ok",
       "since": "2026-10-18"
     },
     "j3_nagoya": {
-      "status": "full",
-      "month": "2026-10",
-      "hit": "成事前線上登錄，限量登錄12,000張JCB卡；登錄額滿即截止。 ※限日本人氣主",
+      "status": "ok",
       "since": "2026-10-18"
     },
     "j5_select7": {
-      "status": "ok",
-      "since": "2026-10-18"
+      "status": "unreachable",
+      "hit": "fetch failed",
+      "since": "2026-10-18",
+      "fails": 1
     },
     "j5_mop_tainan_anniv": {
       "status": "ok",
@@ -186,27 +176,19 @@
       "since": "2026-10-18"
     },
     "hsbc_q4_installment": {
-      "status": "full",
-      "month": "2026-10",
-      "hit": "(限量500名)。 10/10上午8點開始登錄(登錄額滿) 限量500名 11/",
+      "status": "ok",
       "since": "2026-10-18"
     },
     "hsbc_q4_double11": {
-      "status": "full",
-      "month": "2026-10",
-      "hit": "(限量500名)。 10/10上午8點開始登錄(登錄額滿) 限量500名 11/",
+      "status": "ok",
       "since": "2026-10-18"
     },
     "hsbc_q4_double12": {
-      "status": "full",
-      "month": "2026-10",
-      "hit": "(限量500名)。 10/10上午8點開始登錄(登錄額滿) 限量500名 11/",
+      "status": "ok",
       "since": "2026-10-18"
     },
     "hsbc_q4_fuel": {
-      "status": "full",
-      "month": "2026-10",
-      "hit": "(限量500名)。 10/10上午8點開始登錄(登錄額滿) 限量500名 11/",
+      "status": "ok",
       "since": "2026-10-18"
     },
     "dbs_q4_collect5": {
@@ -238,9 +220,7 @@
       "since": "2026-10-18"
     },
     "dbs_q4_ovs_travel": {
-      "status": "full",
-      "month": "2026-10",
-      "hit": "先生達成NT$80萬消費門檻時，其對應門檻的回饋名額已額滿，則可繼續依其先達成之N",
+      "status": "ok",
       "since": "2026-10-18"
     },
     "cathay_apple_w1": {
@@ -268,15 +248,11 @@
       "since": "2026-10-18"
     },
     "c6_jko_billpay": {
-      "status": "full",
-      "month": "2026-10",
-      "hit": "7 ※每月開放10,000名，序號數量有限，當月登錄額滿即截止。 ※活動期間每卡",
+      "status": "ok",
       "since": "2026-10-18"
     },
     "taishin_insurance_luggage": {
-      "status": "full",
-      "month": "2026-10",
-      "hit": "7 ※每月開放10,000名，序號數量有限，當月登錄額滿即截止。 ※活動期間每卡",
+      "status": "ok",
       "since": "2026-10-18"
     },
     "feib1_monthly_spend": {

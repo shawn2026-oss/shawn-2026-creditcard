@@ -650,29 +650,21 @@
       "full": false,
       "title": "月級挑戰 白金級"
     },
-    "ew_1790063482": {
-      "full": false,
-      "title": "燦坤愛不用等週年慶，悠遊付滿額最高回饋900元"
-    },
     "ew_1782456438": {
       "full": false,
       "title": "悠遊卡生活購物嗶計畫 週五六日萬家福/樂家康/Mia Cbon消費滿額享最高回饋8%"
     },
-    "ew_1784794791": {
+    "ew_1790063482": {
       "full": false,
-      "title": "歡慶上線！台中銀行 x 悠遊付 首綁消費扣款享回饋"
-    },
-    "ew_1789720786": {
-      "full": false,
-      "title": "悠遊付逢1生活繳費享筆筆加碼2%回饋"
+      "title": "燦坤愛不用等週年慶，悠遊付滿額最高回饋900元"
     },
     "ew_1790064312": {
       "full": false,
       "title": "喜美超市悠遊付 消費滿額享最高回饋8%，新會員輸入專屬推薦碼註冊悠遊付 最高領100元"
     },
-    "ew_1773728616": {
+    "ew_1789720786": {
       "full": false,
-      "title": "限時加碼！王道新戶綁悠遊付賺$888 指定行動支付最高12.8%現金回饋"
+      "title": "悠遊付逢1生活繳費享筆筆加碼2%回饋"
     },
     "ew_1791346423": {
       "full": false,
@@ -682,21 +674,41 @@
       "full": false,
       "title": "全家便利商店 悠遊付錢包帳戶滿額最高回饋16% 首次消費加贈20%回饋券"
     },
-    "ew_1789551533": {
+    "ew_1789539348": {
       "full": false,
-      "title": "悠遊卡生活購物嗶計畫 美廉社天天消費滿額享最高回饋10%"
+      "title": "【第一銀行 X 悠遊付】跟著小粉獅「悠遊」享回饋"
     },
     "ew_1784797318": {
       "full": false,
       "title": "喜美超市悠遊付 消費滿額享最高回饋8%"
     },
+    "ew_1789526598": {
+      "full": false,
+      "title": "【指定餐廳】 悠遊付週週領券最高回饋13%"
+    },
     "ew_1766573956": {
       "full": false,
       "title": "推薦好友送$100"
     },
-    "ew_1789539348": {
+    "ew_1789551533": {
       "full": false,
-      "title": "【第一銀行 X 悠遊付】跟著小粉獅「悠遊」享回饋"
+      "title": "悠遊卡生活購物嗶計畫 美廉社天天消費滿額享最高回饋10%"
+    },
+    "ew_1784794791": {
+      "full": false,
+      "title": "歡慶上線！台中銀行 x 悠遊付 首綁消費扣款享回饋"
+    },
+    "ew_1773728616": {
+      "full": false,
+      "title": "限時加碼！王道新戶綁悠遊付賺$888 指定行動支付最高12.8%現金回饋"
+    },
+    "ew_1747884970": {
+      "full": false,
+      "title": "週五會員日 最高回饋5%"
+    },
+    "ew_1790677750": {
+      "full": false,
+      "title": "用悠遊付搭乘雙北捷運公車 滿30趟最高送$100"
     },
     "ew_1790925074": {
       "full": false,
@@ -705,18 +717,6 @@
     "ew_1782179051": {
       "full": false,
       "title": "全國加油站嗶悠遊卡/悠遊聯名卡支付，汽油每公升降0.5元"
-    },
-    "ew_1790677750": {
-      "full": false,
-      "title": "用悠遊付搭乘雙北捷運公車 滿30趟最高送$100"
-    },
-    "ew_1747884970": {
-      "full": false,
-      "title": "週五會員日 最高回饋5%"
-    },
-    "ew_1789526598": {
-      "full": false,
-      "title": "【指定餐廳】 悠遊付週週領券最高回饋13%"
     },
     "ew_1789960541": {
       "full": false,
@@ -738,10 +738,6 @@
       "full": true,
       "title": "台灣中油悠遊卡/悠遊付加油享回饋"
     },
-    "ew_1785146027": {
-      "full": false,
-      "title": "【誠品生活週年慶】週四~週日 悠遊付滿額最高回饋17%"
-    },
     "ew_1780893747": {
       "full": false,
       "title": "【夢時代週四會員日】 悠遊付滿額回饋30"
@@ -753,6 +749,10 @@
     "ew_1785307223": {
       "full": false,
       "title": "【康是美週年慶】悠遊付滿額最高回饋10%"
+    },
+    "ew_1785146027": {
+      "full": false,
+      "title": "【誠品生活週年慶】週四~週日 悠遊付滿額最高回饋17%"
     },
     "ew_1780644836": {
       "full": false,
@@ -790,25 +790,25 @@
       "full": true,
       "title": "PChome秋冬購物季｜滿千最高8%｜滿額再拿$400"
     },
-    "ew_1789390040": {
-      "full": true,
-      "title": "momo購物網雙十開心購｜滿千最高8%｜滿額再加碼最高$1,500回饋"
-    },
     "ew_1789361414": {
       "full": true,
       "title": "寶雅線上買｜最高35%回饋 接力再升級！"
+    },
+    "ew_1789390040": {
+      "full": true,
+      "title": "momo購物網雙十開心購｜滿千最高8%｜滿額再加碼最高$1,500回饋"
     },
     "ew_1789386969": {
       "full": false,
       "title": "指定遊戲電商｜滿千最高8%回饋｜最高再加碼拿$200"
     },
-    "ew_1789389304": {
-      "full": false,
-      "title": "博客來｜閱讀豐收季 滿千最高8%現金回饋"
-    },
     "ew_1789555490": {
       "full": false,
       "title": "MyCard X 悠遊付 四重好康一次拿"
+    },
+    "ew_1789389304": {
+      "full": false,
+      "title": "博客來｜閱讀豐收季 滿千最高8%現金回饋"
     },
     "ew_1789359530": {
       "full": false,
@@ -818,6 +818,10 @@
       "full": false,
       "title": "康是美網購eShop｜最高45%回饋 接力再升級！"
     },
+    "ew_1789386225": {
+      "full": false,
+      "title": "限定電商遊戲娛樂｜滿千最高8%回饋"
+    },
     "ew_1769596449": {
       "full": false,
       "title": "嗶臺北市敬老卡可享扣抵點數泡溫泉!"
@@ -825,10 +829,6 @@
     "ew_1737338924": {
       "full": false,
       "title": "嗶桃園市好運卡，享專屬藥妝通路加碼優惠"
-    },
-    "ew_1789386225": {
-      "full": false,
-      "title": "限定電商遊戲娛樂｜滿千最高8%回饋"
     },
     "ew_1774403633": {
       "full": false,
@@ -838,10 +838,6 @@
       "full": false,
       "title": "孕媽咪專屬悠遊付新會員贈$100優惠！"
     },
-    "ew_1789539614": {
-      "full": false,
-      "title": "拿坡里-Mini雙享餐 特價299元"
-    },
     "ew_1789548305": {
       "full": false,
       "title": "品川蘭-指定套餐特價289元"
@@ -849,6 +845,10 @@
     "ew_1766377676": {
       "full": false,
       "title": "新會員3%回饋"
+    },
+    "ew_1789539614": {
+      "full": false,
+      "title": "拿坡里-Mini雙享餐 特價299元"
     }
   },
   "pxmart_card": {
@@ -1096,91 +1096,199 @@
       "full": true,
       "title": "UniOpen icash Pay 4% 已額滿",
       "body": "中信 UniOpen 卡 icash Pay 全通路 4% 10 月名額已滿",
-      "category": "icash Pay"
+      "category": "icash Pay",
+      "pay": "icash",
+      "scope": "card",
+      "cids": [
+        "c10"
+      ]
     },
     {
       "id": "starbucks_5",
       "full": true,
       "title": "icash Pay 星巴克 5% 已額滿",
       "body": "icash Pay 星巴克 5% 10 月名額已滿",
-      "category": "icash Pay"
+      "category": "icash Pay",
+      "pay": "icash",
+      "scope": "wallet",
+      "cids": []
     },
     {
       "id": "seven_滙豐",
       "full": true,
       "title": "滙豐 7-11門市 10% 已額滿",
       "body": "滙豐 icash Pay 7-ELEVEN實體門市 10% 10 月名額已滿",
-      "category": "icash Pay"
+      "category": "icash Pay",
+      "pay": "icash",
+      "scope": "bank",
+      "bank": "滙豐",
+      "cids": [
+        "c9",
+        "hsbc_live",
+        "hsbc_titan"
+      ]
     },
     {
       "id": "seven_一銀",
       "full": true,
       "title": "一銀 7-11門市 10% 已額滿",
       "body": "一銀 icash Pay 7-ELEVEN實體門市 10% 10 月名額已滿",
-      "category": "icash Pay"
+      "category": "icash Pay",
+      "pay": "icash",
+      "scope": "bank",
+      "bank": "一銀",
+      "cids": [
+        "ileo1",
+        "fb1"
+      ]
     },
     {
       "id": "ubot_ipassmoney_10",
       "full": true,
       "title": "聯邦信用卡 iPASS MONEY 10% 10 月已額滿",
       "body": "聯邦信用卡 綁定 iPASS MONEY 10% 綠點 10 月名額已滿",
-      "category": "聯邦"
+      "category": "聯邦",
+      "pay": "ipass",
+      "scope": "bank",
+      "bank": "聯邦",
+      "cids": [
+        "c5",
+        "c2",
+        "j2",
+        "ubot_m",
+        "ubot_lb"
+      ]
     },
     {
       "id": "ubot_laidian_even_10",
       "full": true,
       "title": "聯邦賴點卡 偶數日 5% 10 月已額滿",
       "body": "聯邦賴點卡 LINE Pay 偶數日指定通路加碼 5% 10 月名額已滿",
-      "category": "聯邦"
+      "category": "聯邦",
+      "pay": "linepay",
+      "scope": "card",
+      "cids": [
+        "c5"
+      ]
     },
     {
       "id": "easycard_1785403330",
       "full": true,
       "title": "悠遊付連結元大銀行新臺幣活期存款帳戶繳納學雜費，單筆金額滿5,999元贈100元悠遊付回饋金已額滿",
       "body": "悠遊付連結元大銀行新臺幣活期存款帳戶繳納學雜費，單筆金額滿5,999元贈100元悠遊付回饋金 10月名額已滿",
-      "category": "悠遊付"
+      "category": "悠遊付",
+      "pay": "easywallet",
+      "scope": "bank",
+      "bank": "元大",
+      "cids": []
     },
     {
       "id": "easycard_1785477114",
       "full": true,
       "title": "悠遊付繳學雜費最高10%回饋，綁定玉山信用卡滿額登錄享3期0利率已額滿",
       "body": "悠遊付繳學雜費最高10%回饋，綁定玉山信用卡滿額登錄享3期0利率 10月名額已滿",
-      "category": "悠遊付"
+      "category": "悠遊付",
+      "pay": "easywallet",
+      "scope": "bank",
+      "bank": "玉山",
+      "cids": [
+        "c7",
+        "j3",
+        "ubear1",
+        "miao1"
+      ]
     },
     {
       "id": "easycard_ew_1786502890",
       "full": true,
       "title": "【摩斯漢堡】卡付同享消費3筆送$50現金回饋券已額滿",
       "body": "【摩斯漢堡】卡付同享消費3筆送$50現金回饋券 10月名額已滿",
-      "category": "悠遊付"
+      "category": "悠遊付",
+      "pay": "easywallet",
+      "scope": "wallet",
+      "cids": []
     },
     {
       "id": "easycard_ew_1787715465",
       "full": true,
       "title": "台灣中油悠遊卡/悠遊付加油享回饋已額滿",
       "body": "台灣中油悠遊卡/悠遊付加油享回饋 10月名額已滿",
-      "category": "悠遊付"
+      "category": "悠遊付",
+      "pay": "easywallet",
+      "scope": "wallet",
+      "cids": []
     },
     {
       "id": "easycard_ew_1789388498",
       "full": true,
       "title": "PChome秋冬購物季｜滿千最高8%｜滿額再拿$400已額滿",
       "body": "PChome秋冬購物季｜滿千最高8%｜滿額再拿$400 10月名額已滿",
-      "category": "悠遊付"
-    },
-    {
-      "id": "easycard_ew_1789390040",
-      "full": true,
-      "title": "momo購物網雙十開心購｜滿千最高8%｜滿額再加碼最高$1,500回饋已額滿",
-      "body": "momo購物網雙十開心購｜滿千最高8%｜滿額再加碼最高$1,500回饋 10月名額已滿",
-      "category": "悠遊付"
+      "category": "悠遊付",
+      "pay": "easywallet",
+      "scope": "wallet",
+      "cids": []
     },
     {
       "id": "easycard_ew_1789361414",
       "full": true,
       "title": "寶雅線上買｜最高35%回饋 接力再升級！已額滿",
       "body": "寶雅線上買｜最高35%回饋 接力再升級！ 10月名額已滿",
-      "category": "悠遊付"
+      "category": "悠遊付",
+      "pay": "easywallet",
+      "scope": "wallet",
+      "cids": []
+    },
+    {
+      "id": "easycard_ew_1789390040",
+      "full": true,
+      "title": "momo購物網雙十開心購｜滿千最高8%｜滿額再加碼最高$1,500回饋已額滿",
+      "body": "momo購物網雙十開心購｜滿千最高8%｜滿額再加碼最高$1,500回饋 10月名額已滿",
+      "category": "悠遊付",
+      "pay": "easywallet",
+      "scope": "wallet",
+      "cids": []
+    },
+    {
+      "id": "taishin_lp_一",
+      "full": true,
+      "title": "台新 LINE Pay 指定加油站 已額滿",
+      "body": "台新信用卡 指定加油站，享最高LINE POINTS 2%回饋 10 月名額已滿",
+      "category": "LINE Pay",
+      "pay": "linepay",
+      "scope": "bank",
+      "bank": "台新",
+      "cids": [
+        "c6",
+        "c11"
+      ]
+    },
+    {
+      "id": "taishin_lp_二",
+      "full": true,
+      "title": "台新 LINE Pay 指定計程車 已額滿",
+      "body": "台新信用卡 指定計程車，最高LINE POINTS 2%回饋 10 月名額已滿",
+      "category": "LINE Pay",
+      "pay": "linepay",
+      "scope": "bank",
+      "bank": "台新",
+      "cids": [
+        "c6",
+        "c11"
+      ]
+    },
+    {
+      "id": "taishin_lp_四",
+      "full": true,
+      "title": "台新 LINE Pay 韓國指定-吃喝補給 已額滿",
+      "body": "台新信用卡 韓國指定-吃喝補給，最高LINE POINTS 8% 活動期間內，使用LINE 10 月名額已滿",
+      "category": "LINE Pay",
+      "pay": "linepay",
+      "scope": "bank",
+      "bank": "台新",
+      "cids": [
+        "c6",
+        "c11"
+      ]
     }
   ],
   "manualCheckPromos": [
@@ -1189,23 +1297,107 @@
       "title": "月級挑戰 銀級",
       "category": "需 APP 確認",
       "deepLink": "easywallet://",
-      "fallbackUrl": "https://apps.apple.com/tw/app/easy-wallet/id786065396"
+      "fallbackUrl": "https://apps.apple.com/tw/app/easy-wallet/id786065396",
+      "pay": "easywallet",
+      "scope": "wallet",
+      "cids": []
     },
     {
       "id": "easycard_challenge_gold",
       "title": "月級挑戰 金級",
       "category": "需 APP 確認",
       "deepLink": "easywallet://",
-      "fallbackUrl": "https://apps.apple.com/tw/app/easy-wallet/id786065396"
+      "fallbackUrl": "https://apps.apple.com/tw/app/easy-wallet/id786065396",
+      "pay": "easywallet",
+      "scope": "wallet",
+      "cids": []
     },
     {
       "id": "easycard_challenge_platinum",
       "title": "月級挑戰 白金級",
       "category": "需 APP 確認",
       "deepLink": "easywallet://",
-      "fallbackUrl": "https://apps.apple.com/tw/app/easy-wallet/id786065396"
+      "fallbackUrl": "https://apps.apple.com/tw/app/easy-wallet/id786065396",
+      "pay": "easywallet",
+      "scope": "wallet",
+      "cids": []
+    },
+    {
+      "id": "pxpay_esun_3",
+      "title": "全支付 綁玉山卡 3%（每週限量 8 萬點）",
+      "category": "需 APP 確認",
+      "deepLink": "https://www.pxpayplus.com/",
+      "fallbackUrl": "https://event.esunbank.com.tw/credit/1110914pxpay/index.html",
+      "pay": "pxpay",
+      "scope": "bank",
+      "cids": [
+        "c7",
+        "j3",
+        "ubear1",
+        "miao1"
+      ],
+      "bank": "玉山"
+    },
+    {
+      "id": "pxpay_cathay_5",
+      "title": "全支付 綁國泰卡 指定場域 5%（每週限量 10 萬點）",
+      "category": "需 APP 確認",
+      "deepLink": "https://www.pxpayplus.com/",
+      "fallbackUrl": "https://www.cathay-cube.com.tw/cathaybk/personal/event/overview/credit-card/shopping/202604/CUBE_PXPayPlus_2026",
+      "pay": "pxpay",
+      "scope": "bank",
+      "cids": [
+        "cube1",
+        "cathay_am"
+      ],
+      "bank": "國泰"
+    },
+    {
+      "id": "pxpay_obank_5",
+      "title": "全支付 綁王道簽帳卡 5%（每週限量 5,000 點）",
+      "category": "需 APP 確認",
+      "deepLink": "https://www.pxpayplus.com/",
+      "fallbackUrl": "https://www.o-bank.com/retail/event/event-announce/debit_20270103_1",
+      "pay": "pxpay",
+      "scope": "card",
+      "cids": [
+        "orange1"
+      ],
+      "bank": "王道"
     }
   ],
+  "bank_pages": {
+    "taishin_lp": {
+      "url": "https://mkpcard.taishinbank.com.tw/tscccms/promotion/detail/WM_20260929170820825",
+      "sections": [
+        {
+          "no": "一",
+          "name": "指定加油站，享最高LINE POINTS 2%回饋",
+          "full": true
+        },
+        {
+          "no": "二",
+          "name": "指定計程車，最高LINE POINTS 2%回饋",
+          "full": true
+        },
+        {
+          "no": "四",
+          "name": "韓國指定-吃喝補給，最高LINE POINTS 8% 活動期間內，使用LINE",
+          "full": true
+        },
+        {
+          "no": "五",
+          "name": "韓國指定-旅遊購物，最高LINE POINTS 3% 活動期間內，使用LINE",
+          "full": false
+        },
+        {
+          "no": "六",
+          "name": "台新Richart卡，LINE Pay享最高2.3% 2026/7/1-2027",
+          "full": false
+        }
+      ]
+    }
+  },
   "reminders": [
     {
       "id": "cube_japan",

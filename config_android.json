@@ -1,6 +1,6 @@
 {
-  "news": "2.0.2上線：額滿通知只推跟你的卡、常用支付有關的",
-  "latest_version": "2.0.2",
+  "news": "2.0.4上線：登錄提醒可依卡片篩選，待登錄多的卡排前面",
+  "latest_version": "2.0.4",
   "min_version": "1.0.0",
   "force_update_message": "此版本已過舊，請更新至最新版本。"
 }

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-22T06:22:12.726Z",
+  "updated": "2026-10-22T16:29:02.905Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -42,8 +42,10 @@
       "since": "2026-10-18"
     },
     "feib1_easycard": {
-      "status": "ok",
-      "since": "2026-10-18"
+      "status": "unreachable",
+      "hit": "fetch failed",
+      "since": "2026-10-23",
+      "fails": 1
     },
     "fb1_pay3": {
       "status": "ok",
@@ -286,10 +288,11 @@
       "since": "2026-10-18"
     },
     "c10_icash_autoload": {
-      "status": "full",
-      "month": "2026-10",
-      "hit": "門推薦 ▲ 活動內容 登錄期間 我要登錄 查詢 【10月活動已額滿】uniopen聯名卡ic",
-      "since": "2026-10-18"
+      "status": "ok",
+      "rewardFull": true,
+      "rewardMonth": "2026-10",
+      "rewardHit": "門推薦 ▲ 活動內容 登錄期間 我要登錄 查詢 【10月活動已額滿】uniopen聯名卡ic",
+      "since": "2026-10-23"
     },
     "c10_books_weekend": {
       "status": "ok",

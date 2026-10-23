@@ -21,7 +21,14 @@
    "quota": "每月限 6,000 名",
    "how": "聯邦官網「限時登錄活動專區」→ 其他平台",
    "url": "https://activity.ubot.com.tw/aws_act/2026/202607delivery/index.htm",
-   "note": "聯邦卡合計每月可刷 $6,667"
+   "note": "聯邦卡合計每月可刷 $6,667",
+   "rids": [
+    "c2_ubot_delivery",
+    "c5_ubot_delivery",
+    "j2_ubot_delivery",
+    "ubot_m_ubot_delivery",
+    "ubot_lb_ubot_delivery"
+   ]
   },
   {
    "id": "esun_icash_711",
@@ -40,7 +47,11 @@
    "quota": "每月限 6,000 名",
    "how": "玉山銀行官網活動頁登錄（限正卡）",
    "url": "https://www.esunbank.com/zh-tw/personal/credit-card/discount/shopInfo?sno=8023",
-   "note": "每月可刷 $3,333"
+   "note": "每月可刷 $3,333",
+   "rids": [
+    "ubear1_seven",
+    "miao1_seven"
+   ]
   },
   {
    "id": "ubot_j2_jp_transit",
@@ -58,7 +69,10 @@
    "quota": "每月限 10,000 名",
    "how": "聯邦信用卡官網登錄頁（cardweb.ubot.com.tw/register_extra），當月消費須當月登錄",
    "url": "https://activity.ubot.com.tw/2026JiHoCard/index.htm",
-   "note": "日幣儲值 SUICA／ICOCA／PASMO"
+   "note": "日幣儲值 SUICA／ICOCA／PASMO",
+   "rids": [
+    "j2_transit_jp"
+   ]
   },
   {
    "id": "ubot_j2_5th",
@@ -76,7 +90,10 @@
    "quota": "每月限 20,000 名",
    "how": "聯邦信用卡官網線上活動登錄，每月分別登錄（15日10:00～月底23:59）",
    "url": "https://activity.ubot.com.tw/aws_act/2026/JiHoCard_Anniversary/index.htm",
-   "note": "當月國內消費累積滿 $20,000 才有，每月回饋上限 600 元（可刷 $30,000）"
+   "note": "當月國內消費累積滿 $20,000 才有，每月回饋上限 600 元（可刷 $30,000）",
+   "rids": [
+    "j2_dom2"
+   ]
   },
   {
    "id": "orange1_pay5",
@@ -94,7 +111,10 @@
    "quota": "每月限 5,000 名",
    "how": "王道銀行活動登錄頁（o-bank.com/egift/RegisterCampaign），每月 1 日 12:00，遇假日順延次一營業日（11 月為 11/2）",
    "url": "https://www.o-bank.com/retail/event/event-announce/debit_20261231_6",
-   "note": "Apple Pay／LINE Pay／街口／悠遊付／全盈+／iPASS MONEY／icash Pay／全支付，單筆滿 $300；每月上限 1,200 元（$24,000）；Uber Eats 內 LINE Pay 不算"
+   "note": "Apple Pay／LINE Pay／街口／悠遊付／全盈+／iPASS MONEY／icash Pay／全支付，單筆滿 $300；每月上限 1,200 元（$24,000）；Uber Eats 內 LINE Pay 不算",
+   "rids": [
+    "orange1_reg_pay_q4"
+   ]
   },
   {
    "id": "orange1_overseas",
@@ -112,7 +132,10 @@
    "quota": "每月限 3,000 名",
    "how": "https://www.o-bank.com/egift/RegisterCampaign，每月第一個營業日 12:00（10/1、11/2、12/1），須消費當月登錄",
    "url": "https://www.o-bank.com/retail/event/event-announce/debit_20261231_7",
-   "note": "海外實體／海外網購，不含綁行動支付、排除部分歐洲國家；每月上限 1,500 元（$30,000）"
+   "note": "海外實體／海外網購，不含綁行動支付、排除部分歐洲國家；每月上限 1,500 元（$30,000）",
+   "rids": [
+    "orange1_overseas"
+   ]
   },
   {
    "id": "orange1_dept",
@@ -130,7 +153,10 @@
    "quota": "每月限 2,000 名",
    "how": "https://www.o-bank.com/egift/RegisterCampaign，每月 1 日 12:00，假日順延次一營業日",
    "url": "https://www.o-bank.com/retail/event/event-compaign",
-   "note": "限實體卡、不適用綁行動支付；每月上限 500 元（$10,000）"
+   "note": "限實體卡、不適用綁行動支付；每月上限 500 元（$10,000）",
+   "rids": [
+    "orange1_fun_q4"
+   ]
   },
   {
    "id": "orange1_insurance",
@@ -148,7 +174,10 @@
    "quota": "每月限 5,000 名",
    "how": "https://www.o-bank.com/egift/RegisterCampaign，每月 10 日 12:00，遇假日提前到前一營業日（10/08、11/10、12/10），扣繳當月月底前登錄",
    "url": "https://www.o-bank.com/retail/event/event-announce/debit_20261231_4",
-   "note": "當月保費累積滿 $3,000 才有；每月上限 1,688 元（$84,400）"
+   "note": "當月保費累積滿 $3,000 才有；每月上限 1,688 元（$84,400）",
+   "rids": [
+    "orange1_insurance"
+   ]
   },
   {
    "id": "kgi1_mobilepay",
@@ -163,7 +192,10 @@
    "until": "2026-12-31",
    "how": "凱基銀行官網「活動登錄」（每月登錄，開放時間以官網為準）",
    "url": "https://www.kgibank.com/creditcard/campaign/registrationlist",
-   "note": "當月行動支付國內消費滿 $3,000 才有；每月可刷 $9,090"
+   "note": "當月行動支付國內消費滿 $3,000 才有；每月可刷 $9,090",
+   "rids": [
+    "kgi1_mobile_pay"
+   ]
   },
   {
    "id": "feib1_5pct",
@@ -180,7 +212,11 @@
    "quota": "每月限 10,000 名",
    "how": "遠東商銀官網活動頁登錄（當月內登錄即可，不用搶時間）",
    "url": "https://www.feib.com.tw/activity?id=1980",
-   "note": "百貨／超市／網購／服飾／藥妝／LINE Pay；每月可刷 $6,000"
+   "note": "百貨／超市／網購／服飾／藥妝／LINE Pay；每月可刷 $6,000",
+   "rids": [
+    "feib1_channel_pay",
+    "feib1_channel_merchant"
+   ]
   },
   {
    "id": "feib1_easycard",
@@ -196,7 +232,10 @@
    "until": "2026-12-31",
    "how": "遠東商銀官網活動頁登錄（當月內登錄即可）",
    "url": "https://www.feib.com.tw/activity?id=1980",
-   "note": "每月可刷 $1,000"
+   "note": "每月可刷 $1,000",
+   "rids": [
+    "feib1_autoload"
+   ]
   },
   {
    "id": "fb1_pay3",
@@ -211,7 +250,10 @@
    "until": "2026-12-31",
    "how": "第一銀行信用卡官網活動頁登錄（活動期間登錄一次）",
    "note": "icash Pay（不含 7-11）／全支付／HGPAY／中油PAY／寶雅pay；每月可刷 $10,000",
-   "url": "https://card.firstbank.com.tw/"
+   "url": "https://card.firstbank.com.tw/",
+   "rids": [
+    "fb1_mobilepay"
+   ]
   },
   {
    "id": "ctbc_lp_overseas_q4",
@@ -228,7 +270,11 @@
    "quota": "每週二開放、每次限 3,000 名",
    "how": "中國信託 LINE Pay 卡活動頁登錄；沒搶到等下週二",
    "note": "一季登錄一次即可；每季可刷約 $20,000",
-   "url": "https://www.ctbcbank.com/content/dam/minisite/long/creditcard/LINEPay/page_travel.html"
+   "url": "https://www.ctbcbank.com/content/dam/minisite/long/creditcard/LINEPay/page_travel.html",
+   "rids": [
+    "ctbc_lp_oversea_bonus_layer",
+    "ctbc_lp_jcb_oversea_bonus_layer"
+   ]
   },
   {
    "id": "ctbc_lp_visa_merchants",
@@ -246,7 +292,19 @@
    "quota": "每通路每月限 8,000 名",
    "how": "中國信託 LINE Pay 卡活動頁逐通路登錄，所有 VISA 通路皆每月 6 日 10:00 開放；每季登錄一次即整季有效（10月登錄＝10–12月），沒搶到隔月 6 日再登",
    "url": "https://www.ctbcbank.com/content/dam/minisite/long/creditcard/LINEPay/store.html",
-   "note": "每通路每季上限 100 點（加碼 4%，約刷 $2,500）"
+   "note": "每通路每季上限 100 點（加碼 4%，約刷 $2,500）",
+   "rids": [
+    "ctbc_lp_ubereats",
+    "ctbc_lp_starbucks",
+    "ctbc_lp_shopee",
+    "ctbc_lp_tripcom",
+    "ctbc_lp_airbnb",
+    "ctbc_lp_taobao",
+    "ctbc_lp_coupang",
+    "ctbc_lp_netflix",
+    "ctbc_lp_wanjiafu",
+    "ctbc_lp_ikea"
+   ]
   },
   {
    "id": "ctbc_lp_jcb_merchants",
@@ -264,7 +322,18 @@
    "quota": "每通路每月限 5,000 名",
    "how": "中國信託 LINE Pay 卡活動頁逐通路登錄，每月 6 日 13:00 開放；每季登錄一次即整季有效",
    "url": "https://www.ctbcbank.com/content/dam/minisite/long/creditcard/LINEPay/store.html",
-   "note": "每通路每季上限 200 點（加碼 9%，約刷 $2,222）；台灣虎航限國內消費"
+   "note": "每通路每季上限 200 點（加碼 9%，約刷 $2,222）；台灣虎航限國內消費",
+   "rids": [
+    "ctbc_lp_jcb_mos",
+    "ctbc_lp_jcb_kurasushi",
+    "ctbc_lp_jcb_tigerair",
+    "ctbc_lp_jcb_lopia",
+    "ctbc_lp_jcb_sushiro",
+    "ctbc_lp_jcb_komeda",
+    "ctbc_lp_jcb_uniqlo",
+    "ctbc_lp_jcb_donki",
+    "ctbc_lp_jcb_nitori"
+   ]
   },
   {
    "id": "ileo1_delivery",
@@ -298,7 +367,10 @@
    "quota": "各平台名額不同，見蝦皮活動頁",
    "how": "第一銀行信用卡登錄活動頁（ccard.firstbank.com.tw/cmsweb/Act/iLeo_Index）；當月訂單限當月登錄",
    "url": "https://ccard.firstbank.com.tw/cmsweb/Act/iLeo_Index",
-   "note": "每月上限 1,000 元（可刷 $33,333）；單筆分期滿 $10,000 再加 2%（上限 1,500 元）"
+   "note": "每月上限 1,000 元（可刷 $33,333）；單筆分期滿 $10,000 再加 2%（上限 1,500 元）",
+   "rids": [
+    "ileo1_shopee_reg"
+   ]
   },
   {
    "id": "j1_jkt",
@@ -349,7 +421,10 @@
    "quota": "限 3,000 名",
    "how": "永豐 MMA 活動登錄頁（第四季 Code=XH66，12/21 10:00 開放），正卡人登錄",
    "url": "https://mma.sinopac.com/SinoCard/Activity/Register?Code=XH66",
-   "note": "限 JCB 卡別、需永豐／京城帳戶自扣；日韓泰實體店；每卡戶每季上限 $1,000（約 $50,000）；第三方支付不算"
+   "note": "限 JCB 卡別、需永豐／京城帳戶自扣；日韓泰實體店；每卡戶每季上限 $1,000（約 $50,000）；第三方支付不算",
+   "rids": [
+    "j5_target"
+   ]
   },
   {
    "id": "sunny1_donki_q4",
@@ -366,7 +441,10 @@
    "quota": "不限名額",
    "how": "陽信銀行官網「信用卡活動登錄」，活動期間登錄一次",
    "url": "https://www.sunnybank.com.tw/portal/pt/pt01002/PT01002Index.xhtml",
-   "note": "限實體卡、不含網購；正附卡合併上限 200 點（$2,857）"
+   "note": "限實體卡、不含網購；正附卡合併上限 200 點（$2,857）",
+   "rids": [
+    "sunny1_jpdrug"
+   ]
   },
   {
    "id": "c4_life",
@@ -382,7 +460,10 @@
    "until": "2026-12-31",
    "how": "將來銀行 App 活動登錄，每月 1 日～月底內登錄即可，不可事後補登",
    "url": "https://www.nextbank.com.tw/announcement/45c1e31fa40000000285cadc56793797/event1186",
-   "note": "單筆滿 $1,000 每筆回 45 N點，每月上限 225 N點（約 5 筆）；國外／旅遊交通／LINE Pay／街口／icash Pay／餐飲／外送／Apple・Google 數位"
+   "note": "單筆滿 $1,000 每筆回 45 N點，每月上限 225 N點（約 5 筆）；國外／旅遊交通／LINE Pay／街口／icash Pay／餐飲／外送／Apple・Google 數位",
+   "rids": [
+    "c4_life"
+   ]
   },
   {
    "id": "esun_icash_wanchiafu",
@@ -641,7 +722,10 @@
    "until": "2026-12-31",
    "how": "永豐 MMA 活動登錄頁（Code=XH64），另須設電子／行動帳單＋永豐或京城帳戶自扣，三項都完成才有",
    "url": "https://mma.sinopac.com/SinoCard/Activity/Register?Code=XH64",
-   "note": "館外餐飲＝MCC 5811–5814 實體餐飲，百貨／商場／飯店內、第三方平台、行動支付店家與三井館內餐飲不算；每期帳單上限 $100（約 $1,429）；名額與是否只需登錄一次頁面未明載"
+   "note": "館外餐飲＝MCC 5811–5814 實體餐飲，百貨／商場／飯店內、第三方平台、行動支付店家與三井館內餐飲不算；每期帳單上限 $100（約 $1,429）；名額與是否只需登錄一次頁面未明載",
+   "rids": [
+    "j5_dining"
+   ]
   },
   {
    "id": "j5_mop_tainan_anniv",
@@ -692,7 +776,10 @@
    "quota": "每季限 5,000 名",
    "how": "永豐 MMA 活動登錄頁（Code=XI88），2027/3/25 10:00 開放",
    "url": "https://mma.sinopac.com/SinoCard/Activity/Register?Code=XI88",
-   "note": "每卡戶每季上限 $1,000；活動已延到 2027/3/31"
+   "note": "每卡戶每季上限 $1,000；活動已延到 2027/3/31",
+   "rids": [
+    "c12_quarterly"
+   ]
   },
   {
    "id": "sinopac_superpay_q4",
@@ -1350,7 +1437,10 @@
    "quota": "每月限 3,000 名",
    "how": "iLEO App 領券（每月 15 日 10:00；11 月提前為 11/13）",
    "url": "https://card.firstbank.com.tw/sites/card/zh_TW/1565707769555&openExternalBrowser=1",
-   "note": "當月 3 筆單筆滿 $1,000 且一銀帳戶自扣＋電子帳單；訂閱 5% 每月上限 200 元（$4,000）、momo／蝦皮／酷澎／Klook／KKday 3% 每月上限 200 元（$6,666）"
+   "note": "當月 3 筆單筆滿 $1,000 且一銀帳戶自扣＋電子帳單；訂閱 5% 每月上限 200 元（$4,000）、momo／蝦皮／酷澎／Klook／KKday 3% 每月上限 200 元（$6,666）",
+   "rids": [
+    "ileo1_shopee_voucher"
+   ]
   },
   {
    "id": "fb1_autoload2",

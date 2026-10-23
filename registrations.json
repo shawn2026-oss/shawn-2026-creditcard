@@ -75,6 +75,25 @@
    ]
   },
   {
+   "id": "ubot_j2_jp_mpay",
+   "title": "聯邦吉鶴卡 日本 Apple Pay／Google Pay 加碼 1.5%（登錄一次）",
+   "cids": [
+    "j2"
+   ],
+   "schedule": {
+    "type": "once"
+   },
+   "from": "2026-07-01",
+   "until": "2026-12-31",
+   "quota": "不限名額",
+   "how": "聯邦信用卡官網活動登錄（cardweb.ubot.com.tw/register_extra），活動期間登錄一次；不溯及登錄前的月份",
+   "url": "https://activity.ubot.com.tw/2026JiHoCard/index.htm",
+   "note": "日本實體店感應支付單筆滿 $100；不含網路、交通與 QUICPay；每月回饋上限 $600",
+   "rids": [
+    "j2_apple_jp"
+   ]
+  },
+  {
    "id": "ubot_j2_5th",
    "title": "聯邦吉鶴卡 5週年 國內滿 $20,000 整月 +2%",
    "cids": [
@@ -387,7 +406,11 @@
    "quota": "每月限 20,000 名",
    "how": "Fubon+ App「優惠 → 活動登錄」；一季內登錄成功一次就整季有效",
    "note": "單筆滿 $1,000；日韓每季可刷 $33,333、泰國 $20,000",
-   "url": "https://cardpromote.taipeifubon.com.tw/promotion/Detail?sn=C000307"
+   "url": "https://cardpromote.taipeifubon.com.tw/promotion/Detail?sn=C000307",
+   "rids": [
+    "j1_jpkr_physical",
+    "j1_th_physical"
+   ]
   },
   {
    "id": "j1_jp_transit",
@@ -404,7 +427,10 @@
    "quota": "每月限 10,000 名",
    "how": "Fubon+ App「優惠 → 活動登錄」；一季內登錄成功一次就整季有效",
    "note": "單筆儲值滿 $2,000；每季可刷 $2,857",
-   "url": "https://www.fubon.com/banking/personal/credit_card/all_card/omiyage/omiyage.htm"
+   "url": "https://www.fubon.com/banking/personal/credit_card/all_card/omiyage/omiyage.htm",
+   "rids": [
+    "j1_suica"
+   ]
   },
   {
    "id": "j5_jkt_q4",

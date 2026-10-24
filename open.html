@@ -46,6 +46,12 @@ h1{font-size:22px;margin:8px 0 2px}
   function b62dec(s){ var n=BigInt(0), K=BigInt(62); for(var i=0;i<s.length;i++){ var k=B62.indexOf(s[i]); if(k<0) throw new Error('bad'); n=n*K+BigInt(k); } var out=[], F=BigInt(255), E=BigInt(8); while(n>BigInt(0)){ out.push(Number(n&F)); n=n>>E; } out.reverse(); if(out[0]!==1) throw new Error('bad'); return new Uint8Array(out.slice(1)); }
   async function pipe(u8, stream){ var w=stream.writable.getWriter(); w.write(u8); w.close(); return new Uint8Array(await new Response(stream.readable).arrayBuffer()); }
   function b64dec(s){ s=s.replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4) s+='='; var bin=atob(s); var u=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i); return new TextDecoder().decode(u); }
+  function readRaw(){
+    var q = location.search.slice(1), m;
+    if(q && (m = q.match(/(?:^|&)d=([^&]*)/))) return m[1];
+    if(q && /^[0-9A-Za-z]+$/.test(q)) return q;
+    return location.hash.slice(1);
+  }
   async function encodeData(obj){
     var u = new TextEncoder().encode(JSON.stringify(obj));
     if(window.CompressionStream){ try { return 'z' + b62enc(await pipe(u, new CompressionStream('deflate-raw'))); } catch(e){} }
@@ -59,7 +65,7 @@ h1{font-size:22px;margin:8px 0 2px}
   }
   function money(n){ return '$'+String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
   function md(s){ var p=String(s).split('-'); return (+p[1])+'/'+(+p[2]); }
-  var raw = (new URLSearchParams(location.search).get('d')) || location.hash.slice(1), data = null;
+  var raw = readRaw(), data = null;
   try { data = await decodeData(raw); } catch(e){ data = null; }
   if(!data || !data.t || !data.t.length){ $('bad').classList.remove('hidden'); return; }
   $('ok').classList.remove('hidden');

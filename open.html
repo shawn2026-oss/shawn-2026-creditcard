@@ -59,7 +59,7 @@ h1{font-size:22px;margin:8px 0 2px}
   }
   function money(n){ return '$'+String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
   function md(s){ var p=String(s).split('-'); return (+p[1])+'/'+(+p[2]); }
-  var raw = location.hash.slice(1), data = null;
+  var raw = (new URLSearchParams(location.search).get('d')) || location.hash.slice(1), data = null;
   try { data = await decodeData(raw); } catch(e){ data = null; }
   if(!data || !data.t || !data.t.length){ $('bad').classList.remove('hidden'); return; }
   $('ok').classList.remove('hidden');

@@ -140,7 +140,8 @@ input.amt{font-size:30px;font-weight:600;text-align:center;padding:12px}
   if(!cfg || !cfg.c || !cfg.c.length){
     $('nocfg').classList.remove('hidden');
     if(raw){ $('nocfgMsg').textContent = '網址不完整，可能在傳送時被截斷了。'; }
-    $('diag').textContent = '（v4｜?後 ' + location.search.length + '｜#後 ' + location.hash.length + '｜資料 ' + raw.length + '）';
+    $('diag').textContent = '（v5）收到的網址：' + location.href;
+    $('diag').style.wordBreak = 'break-all';
     return;
   }
   $('app').classList.remove('hidden');
@@ -253,7 +254,7 @@ input.amt{font-size:30px;font-weight:600;text-align:center;padding:12px}
   async function buildMessage(){
     var names = {}; items.forEach(function(it){ var c = cardOf(it[0]); if(c) names[it[0]] = [c.name, c.cash ? 1 : 0]; });
     var payload = { v:1, by: myName || '家人', c: names, t: items };
-    var link = BASE + 'o.html?' + await encodeData(payload);
+    var link = BASE + 'o/' + await encodeData(payload);
     var sum = items.reduce(function(s,it){ return s+it[1]; }, 0);
     var lines = [ (myName||'家人') + '報帳 ' + items.length + ' 筆，共 ' + money(sum) ];
     items.forEach(function(it){

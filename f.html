@@ -24,6 +24,13 @@ h1{font-size:22px;margin:8px 0 2px}
 .chip.on{background:var(--on);color:var(--onText);font-weight:600}
 input{font-family:inherit;font-size:16px;color:var(--text);background:var(--chip);border:0;border-radius:10px;padding:10px 12px;width:100%}
 input.amt{font-size:30px;font-weight:600;text-align:center;padding:12px}
+.amtbox{background:var(--chip);border-radius:10px;padding:8px 12px;text-align:right;min-height:64px}
+.expr{font-size:14px;color:var(--sub);min-height:20px;word-break:break-all}
+.amt{font-size:30px;font-weight:600}
+.pad{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
+.pad button{border:0;border-radius:10px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line);font-size:22px;padding:12px 0;color:var(--text);font-family:inherit}
+.pad button.op{background:var(--chip);font-weight:600}
+.pad button:active{opacity:.6}
 .row2{display:flex;gap:8px}
 .row2>*{flex:1}
 .btn{display:block;width:100%;border:0;border-radius:12px;padding:14px;font-size:17px;font-weight:600;font-family:inherit;margin-top:14px}
@@ -71,7 +78,13 @@ input.amt{font-size:30px;font-weight:600;text-align:center;padding:12px}
       <div class="chips" id="presets"></div>
     </div>
     <div class="lbl">金額</div>
-    <input id="amt" class="amt" inputmode="numeric" pattern="[0-9]*" placeholder="$0" autocomplete="off">
+    <div class="amtbox"><div id="amtExpr" class="expr"></div><div id="amtShow" class="amt">$0</div></div>
+    <div class="pad" id="pad">
+      <button type="button" data-k="7">7</button><button type="button" data-k="8">8</button><button type="button" data-k="9">9</button><button type="button" data-k="del" class="op" aria-label="退格">⌫</button>
+      <button type="button" data-k="4">4</button><button type="button" data-k="5">5</button><button type="button" data-k="6">6</button><button type="button" data-k="-" class="op">−</button>
+      <button type="button" data-k="1">1</button><button type="button" data-k="2">2</button><button type="button" data-k="3">3</button><button type="button" data-k="+" class="op">+</button>
+      <button type="button" data-k="C" class="op">C</button><button type="button" data-k="0">0</button><button type="button" data-k="00">00</button><button type="button" data-k="=" class="op">=</button>
+    </div>
     <div class="err" id="amtErr"></div>
     <div class="row2">
       <div><div class="lbl">日期</div><input id="date" type="date"></div>
@@ -96,7 +109,7 @@ input.amt{font-size:30px;font-weight:600;text-align:center;padding:12px}
       <button class="btn ghost" id="clear" style="margin-top:8px">已傳出，清空這幾筆</button>
     </div>
   </div>
-  <p class="foot">資料只存在這支手機，不會上傳到任何伺服器。</p>
+  <p class="foot">還沒傳出的報帳只存在這支手機。</p>
 </div>
 </main>
 <script>
@@ -236,10 +249,37 @@ input.amt{font-size:30px;font-weight:600;text-align:center;padding:12px}
   function save(){ ls('fr_items', JSON.stringify(items)); }
 
   $('note').addEventListener('input', function(){ render(); });
-  $('amt').addEventListener('input', function(){ this.value = this.value.replace(/[^0-9]/g,''); $('amtErr').textContent=''; });
+  // 計算機：市場很多攤可以一直按 + 累加
+  var expr = '';
+  function exprTotal(e){
+    var t = e.replace(/[+\-]$/, ''); if(!t) return 0;
+    var m = t.match(/[+\-]?\d+/g) || []; return m.reduce(function(s,x){ return s + parseInt(x,10); }, 0);
+  }
+  function showAmt(){
+    var tot = exprTotal(expr);
+    $('amtShow').textContent = money(Math.max(tot,0));
+    $('amtExpr').textContent = /[+\-]/.test(expr.replace(/^-/,'')) ? expr.replace(/-/g,'−') + ' =' : '';
+  }
+  $('pad').addEventListener('click', function(ev){
+    var b = ev.target.closest('button'); if(!b) return;
+    var k = b.getAttribute('data-k'); $('amtErr').textContent='';
+    if(k==='C'){ expr=''; }
+    else if(k==='del'){ expr = expr.slice(0,-1); }
+    else if(k==='='){ var t = exprTotal(expr); expr = t > 0 ? String(t) : ''; }
+    else if(k==='+' || k==='-'){ if(!expr) return; expr = expr.replace(/[+\-]$/, '') + k; }
+    else {
+      var last = expr.split(/[+\-]/).pop();
+      if(last.length >= 7) return;
+      if(last === '' && k === '00') return;
+      if(last === '0') expr = expr.slice(0,-1);
+      expr += k;
+    }
+    showAmt();
+  });
+  function amountValue(){ return exprTotal(expr); }
   $('add').onclick = function(){
-    var a = parseInt($('amt').value, 10);
-    if(!a || a<=0){ $('amtErr').textContent='請輸入金額'; $('amt').focus(); return; }
+    var a = amountValue();
+    if(!a || a<=0){ $('amtErr').textContent='請輸入金額'; return; }
     if(!myName){ $('nameCard').classList.remove('hidden'); $('myName').focus(); $('amtErr').textContent='先填你的名字（只要填一次）'; return; }
     var c = cardOf(sel.card);
     var id = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
@@ -249,7 +289,7 @@ input.amt{font-size:30px;font-weight:600;text-align:center;padding:12px}
     last.card = sel.card; last.pays = last.pays || {}; if(!(c && c.cash)) last.pays[sel.card] = sel.pay;
     ls('fr_last', JSON.stringify(last));
     $('nameCard').classList.add('hidden');
-    $('amt').value=''; $('note').value=''; sel.cat=''; sel.preset=''; $('date').value = today();
+    expr=''; showAmt(); $('note').value=''; sel.cat=''; sel.preset=''; $('date').value = today();
     $('sentAsk').classList.add('hidden');
     render();
     $('listCard').scrollIntoView({behavior:'smooth', block:'nearest'});

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>家人報帳</title>
+<style>
+:root{--bg:#f2f2f4;--card:#fff;--text:#111;--sub:#6b6b70;--muted:#a0a0a6;--line:rgba(0,0,0,.1);--on:#111;--onText:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#000;--card:#1c1c1e;--text:#f2f2f2;--sub:#a0a0a6;--muted:#6b6b70;--line:rgba(255,255,255,.12);--on:#f2f2f2;--onText:#111}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",sans-serif;font-size:16px;line-height:1.5}
+main{max-width:520px;margin:0 auto;padding:16px 16px calc(32px + env(safe-area-inset-bottom))}
+h1{font-size:22px;margin:8px 0 2px}
+.sub{color:var(--sub);font-size:13px;margin:0}
+.card{background:var(--card);border-radius:16px;padding:14px;margin-top:14px}
+.item{display:flex;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.m{font-size:13px;color:var(--sub)}
+.btn{display:block;text-align:center;text-decoration:none;width:100%;border:0;border-radius:12px;padding:14px;font-size:17px;font-weight:600;font-family:inherit;margin-top:14px}
+.main{background:var(--on);color:var(--onText)}
+.ghost{background:transparent;color:var(--text);border:1px solid var(--line);font-weight:500;font-size:15px;padding:11px}
+.hint{color:var(--sub);font-size:13px;margin-top:12px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<main>
+  <div id="bad" class="hidden"><h1>連結不完整</h1><div class="card">這個報帳連結讀不到資料，請對方重新傳一次。</div></div>
+  <div id="ok" class="hidden">
+    <h1 id="title"></h1>
+    <p class="sub" id="sum"></p>
+    <div class="card" id="list"></div>
+    <a class="btn main" id="openApp">打開刷卡回饋管家記帳</a>
+    <button class="btn ghost" id="copy">複製連結</button>
+    <p class="hint" id="hint">按了沒反應：先按「複製連結」，再打開刷卡回饋管家 → 設定 → 家人報帳 → 從剪貼簿貼上。</p>
+    <p class="hint">還沒有 App？<a href="https://apps.apple.com/app/id6759591355">App Store 下載</a></p>
+  </div>
+</main>
+<script>
+(async function(){
+  function $(id){ return document.getElementById(id); }
+  // 編碼：z＝deflate 壓縮＋base62（只用英數字，LINE 辨識連結不會斷）；y＝不壓縮 base62；其他＝舊版 base64url
+  var B62='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  function b62enc(u8){ var n=BigInt(1); var E=BigInt(8), K=BigInt(62); for(var i=0;i<u8.length;i++) n=(n<<E)|BigInt(u8[i]); var s=''; while(n>BigInt(0)){ s=B62[Number(n%K)]+s; n=n/K; } return s; }
+  function b62dec(s){ var n=BigInt(0), K=BigInt(62); for(var i=0;i<s.length;i++){ var k=B62.indexOf(s[i]); if(k<0) throw new Error('bad'); n=n*K+BigInt(k); } var out=[], F=BigInt(255), E=BigInt(8); while(n>BigInt(0)){ out.push(Number(n&F)); n=n>>E; } out.reverse(); if(out[0]!==1) throw new Error('bad'); return new Uint8Array(out.slice(1)); }
+  async function pipe(u8, stream){ var w=stream.writable.getWriter(); w.write(u8); w.close(); return new Uint8Array(await new Response(stream.readable).arrayBuffer()); }
+  function b64dec(s){ s=s.replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4) s+='='; var bin=atob(s); var u=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i); return new TextDecoder().decode(u); }
+  async function encodeData(obj){
+    var u = new TextEncoder().encode(JSON.stringify(obj));
+    if(window.CompressionStream){ try { return 'z' + b62enc(await pipe(u, new CompressionStream('deflate-raw'))); } catch(e){} }
+    return 'y' + b62enc(u);
+  }
+  async function decodeData(s){
+    if(!s) return null;
+    if(s[0]==='z') return JSON.parse(new TextDecoder().decode(await pipe(b62dec(s.slice(1)), new DecompressionStream('deflate-raw'))));
+    if(s[0]==='y') return JSON.parse(new TextDecoder().decode(b62dec(s.slice(1))));
+    return JSON.parse(b64dec(s));
+  }
+  function money(n){ return '$'+String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+  function md(s){ var p=String(s).split('-'); return (+p[1])+'/'+(+p[2]); }
+  var raw = (new URLSearchParams(location.search).get('d')) || location.hash.slice(1), data = null;
+  try { data = await decodeData(raw); } catch(e){ data = null; }
+  if(!data || !data.t || !data.t.length){ $('bad').classList.remove('hidden'); return; }
+  $('ok').classList.remove('hidden');
+  var sum = data.t.reduce(function(s,it){ return s + (+it[1]||0); }, 0);
+  $('title').textContent = (data.by||'家人') + '報帳・' + data.t.length + ' 筆';
+  $('sum').textContent = '共 ' + money(sum);
+  data.t.forEach(function(it){
+    var row = document.createElement('div'); row.className='item';
+    var l = document.createElement('div');
+    var cn = (data.c && data.c[it[0]]) || null;
+    var t = document.createElement('div'); t.textContent = (cn ? cn[0] : '卡片') + (cn && cn[1] ? '' : (it[3] ? '・' + it[3] : ''));
+    var m = document.createElement('div'); m.className='m'; m.textContent = md(it[2]) + (it[4]?' '+it[4]:'') + (it[5]?' '+it[5]:'');
+    l.appendChild(t); l.appendChild(m);
+    var r = document.createElement('div'); r.textContent = money(it[1]);
+    row.appendChild(l); row.appendChild(r); $('list').appendChild(row);
+  });
+  $('openApp').href = 'cardreward://family?d=' + raw;
+  $('copy').onclick = function(){
+    var done = function(){ $('copy').textContent = '已複製'; };
+    if(navigator.clipboard){ navigator.clipboard.writeText(location.href).then(done, function(){}); }
+  };
+})();
+</script>
+</body>
+</html>

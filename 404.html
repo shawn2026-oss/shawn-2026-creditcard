@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>刷卡回饋管家</title>
+<style>body{margin:0;background:#f2f2f4;color:#111;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",sans-serif;padding:24px 16px}@media (prefers-color-scheme:dark){body{background:#000;color:#f2f2f2}}.s{color:#888;font-size:12px;word-break:break-all;margin-top:12px}</style>
+</head>
+<body>
+<p id="m">載入中…</p>
+<p class="s" id="d"></p>
+<script>
+// 家人報帳：資料放在路徑 /f/<資料>、/o/<資料>（LINE 開外部瀏覽器會丟掉 ? 和 # 後面，路徑會留著）
+// 這頁在同一個瀏覽器裡把資料轉交給 f.html／o.html，不再經過 LINE
+(function(){
+  var m = location.pathname.match(/^(.*\/)(f|o)\/([0-9A-Za-z_-]+)\/?$/);
+  if(m){ location.replace(m[1] + m[2] + '.html#' + m[3]); return; }
+  document.getElementById('m').textContent = '找不到這個頁面。';
+  document.getElementById('d').textContent = '收到的網址：' + location.href;
+})();
+</script>
+</body>
+</html>

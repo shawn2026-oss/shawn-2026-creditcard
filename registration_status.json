@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-23T06:16:17.449Z",
+  "updated": "2026-10-24T06:10:56.893Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -12,6 +12,10 @@
     "ubot_j2_jp_transit": {
       "status": "ok",
       "since": "2026-10-18"
+    },
+    "ubot_j2_jp_mpay": {
+      "status": "ok",
+      "since": "2026-10-24"
     },
     "ubot_j2_5th": {
       "status": "ok",

@@ -45,8 +45,9 @@ input.amt{font-size:30px;font-weight:600;text-align:center;padding:12px}
 <main>
 <div id="nocfg" class="hidden">
   <h1>家人報帳</h1>
-  <div class="card"><p style="margin:0">這個網頁要用「刷卡回饋管家」App 產生的網址打開。</p>
-  <p class="sub" style="margin-top:8px">請家人在 App 的「設定 → 家人報帳」傳一次網址給你。</p></div>
+  <div class="card"><p style="margin:0" id="nocfgMsg">這個網頁要用「刷卡回饋管家」App 產生的網址打開。</p>
+  <p class="sub" style="margin-top:8px">請家人在 App 的「設定 → 家人報帳」傳一次網址給你。</p>
+  <p class="sub" style="margin-top:8px;color:var(--muted)" id="diag"></p></div>
 </div>
 
 <div id="app" class="hidden">
@@ -114,7 +115,12 @@ input.amt{font-size:30px;font-weight:600;text-align:center;padding:12px}
   var cfg = null, raw = location.hash.slice(1);
   try { if(raw){ cfg = JSON.parse(b64dec(raw)); ls('fr_cfg', raw); } } catch(e){ cfg = null; }
   if(!cfg){ try{ var saved = ls('fr_cfg'); if(saved) cfg = JSON.parse(b64dec(saved)); }catch(e){ cfg=null; } }
-  if(!cfg || !cfg.c || !cfg.c.length){ $('nocfg').classList.remove('hidden'); return; }
+  if(!cfg || !cfg.c || !cfg.c.length){
+    $('nocfg').classList.remove('hidden');
+    if(raw){ $('nocfgMsg').textContent = '網址不完整，可能在傳送時被截斷了。'; }
+    $('diag').textContent = '（網址資料長度 ' + raw.length + '）';
+    return;
+  }
   $('app').classList.remove('hidden');
 
   var to = cfg.to || '對方';

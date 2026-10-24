@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-18",
+ "updated": "2026-10-24",
  "items": [
   {
    "id": "ubot_delivery",
@@ -691,34 +691,33 @@
   },
   {
    "id": "j3_jcb_themepark_oct",
-   "title": "玉山熊本熊卡 JCB 日本主題樂園滿 ¥10,000 回 ¥2,000",
+   "group": "network",
+   "network": "JCB",
+   "title": "JCB 日本環球影城（USJ）滿 ¥10,000 回 ¥2,000（20%）",
    "cids": [
-    "j3"
+    "c6",
+    "cube1",
+    "c11",
+    "j1",
+    "j2",
+    "j3",
+    "j5",
+    "c12",
+    "sunny1",
+    "fb1",
+    "miao1",
+    "feib1",
+    "ctbc_lp_jcb"
    ],
    "schedule": {
     "type": "once"
    },
    "from": "2026-09-01",
    "until": "2026-10-31",
-   "quota": "限 12,000 張卡",
-   "how": "JCB 活動頁事前線上登錄（登錄期間日本時間 9/1 10:00～10/31 23:59）",
-   "url": "https://event.esunbank.com.tw/credit/kumamon-card/campaign.html",
-   "note": "10月於指定樂園實體店累積滿 ¥10,000；停車場、附設飯店、線上商店不算；JCB 全球活動，其他 JCB 卡也可參加"
-  },
-  {
-   "id": "j3_jcb_mitsui_jp_nov",
-   "title": "玉山熊本熊卡 JCB 日本 MITSUI OUTLET PARK 滿 ¥80,000 回 ¥16,000",
-   "cids": [
-    "j3"
-   ],
-   "schedule": {
-    "type": "once"
-   },
-   "from": "2026-10-01",
-   "until": "2026-11-30",
-   "how": "JCB 活動頁事前線上登錄（登錄期間日本時間 10/1 10:00～11/30 23:59）",
-   "url": "https://event.esunbank.com.tw/credit/kumamon-card/campaign.html",
-   "note": "11月實體店累積滿 ¥80,000；名額頁面未載明；JCB 全球活動"
+   "quota": "限 12,000 張卡，登錄額滿即截止",
+   "how": "JCB 官網 Now on JAPAN 活動頁登錄（需先用 email 建立 JCB 帳號；登錄截止日本時間 10/31 23:59＝台灣 22:59）",
+   "url": "https://www.specialoffers.jcb/zh-tw/campaign/detail/usj/93849/",
+   "note": "台灣發行 JCB 卡適用（限 JCB 版，同一張卡有 Visa／Mastercard 版的不適用）；10 月於 USJ 園區內實體店累積滿 ¥10,000；停車場、附設飯店、線上購票不算；登錄後的消費才算，每卡上限 ¥2,000"
   },
   {
    "id": "j3_nagoya",

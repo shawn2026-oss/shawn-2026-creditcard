@@ -81,6 +81,7 @@ input.amt{font-size:30px;font-weight:600;text-align:center;padding:12px}
     </div>
     <div class="lbl">備註（可略過）</div>
     <input id="note" placeholder="例如：全聯" maxlength="30">
+    <div class="chips" id="notes" style="margin-top:8px"></div>
     <button class="btn main" id="add">加入這筆</button>
   </div>
 
@@ -123,6 +124,8 @@ input.amt{font-size:30px;font-weight:600;text-align:center;padding:12px}
 
   var cards = cfg.c.map(function(x){ return {id:x[0], name:x[1], cash:!!x[2], presets:(x[3]||[]).map(function(p){ return {id:p[0], name:p[1]}; })}; });
   var cats = cfg.k || [];
+  var noteAll = cfg.n || [], notePer = cfg.cn || {};
+  var catsOpen = false;
   var last = {}; try{ last = JSON.parse(ls('fr_last')||'{}'); }catch(e){ last={}; }
   var sel = { card: cards.some(function(c){return c.id===last.card;}) ? last.card : cards[0].id,
               pay: last.pays && last.pays[last.card] ? last.pays[last.card] : '實體卡', cat: '', preset: '' };
@@ -152,7 +155,17 @@ input.amt{font-size:30px;font-weight:600;text-align:center;padding:12px}
     PAYS.forEach(function(p){ pc.appendChild(chip(p, p===sel.pay, function(){ sel.pay=p; render(); })); });
     $('catBox').classList.toggle('hidden', cats.length===0);
     var kc = $('cats'); kc.innerHTML='';
-    cats.forEach(function(k){ kc.appendChild(chip(k, k===sel.cat, function(){ sel.cat = (sel.cat===k?'':k); render(); })); });
+    var showCats = (catsOpen || cats.length <= 12) ? cats : cats.slice(0, 11);
+    if(!catsOpen && sel.cat && showCats.indexOf(sel.cat) < 0) showCats = showCats.concat([sel.cat]);
+    showCats.forEach(function(k){ kc.appendChild(chip(k, k===sel.cat, function(){ sel.cat = (sel.cat===k?'':k); render(); })); });
+    if(cats.length > 12){ var more = chip(catsOpen ? '收起' : '更多…', false, function(){ catsOpen = !catsOpen; render(); }); more.style.color = 'var(--sub)'; kc.appendChild(more); }
+    // 備註：這張卡常打的在前，再補全部卡共用的
+    var nl = (notePer[sel.card] || []).slice();
+    noteAll.forEach(function(n){ if(nl.indexOf(n) < 0) nl.push(n); });
+    nl = nl.slice(0, 10);
+    var nc = $('notes'); nc.innerHTML='';
+    var cur = $('note').value.trim();
+    nl.forEach(function(n){ nc.appendChild(chip(n, n===cur, function(){ $('note').value = (cur===n ? '' : n); render(); })); });
     renderList();
   }
 
@@ -181,6 +194,7 @@ input.amt{font-size:30px;font-weight:600;text-align:center;padding:12px}
   }
   function save(){ ls('fr_items', JSON.stringify(items)); }
 
+  $('note').addEventListener('input', function(){ render(); });
   $('amt').addEventListener('input', function(){ this.value = this.value.replace(/[^0-9]/g,''); $('amtErr').textContent=''; });
   $('add').onclick = function(){
     var a = parseInt($('amt').value, 10);

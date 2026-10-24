@@ -14,8 +14,9 @@
 // 家人報帳：資料放在路徑 /f/<資料>、/o/<資料>（LINE 開外部瀏覽器會丟掉 ? 和 # 後面，路徑會留著）
 // 這頁在同一個瀏覽器裡把資料轉交給 f.html／o.html，不再經過 LINE
 (function(){
-  var m = location.pathname.match(/^(.*\/)(f|o)\/([0-9A-Za-z_-]+)\/?$/);
-  if(m){ location.replace(m[1] + m[2] + '.html#' + m[3]); return; }
+  // 資料每 80 字切一段（LINE 會整段丟掉太長的一段），這裡接回去
+  var m = location.pathname.match(/^(.*\/)(f|o)\/([0-9A-Za-z_\/-]+?)\/?$/);
+  if(m){ location.replace(m[1] + m[2] + '.html#' + m[3].replace(/\//g, '')); return; }
   document.getElementById('m').textContent = '找不到這個頁面。';
   document.getElementById('d').textContent = '收到的網址：' + location.href;
 })();

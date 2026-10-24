@@ -100,12 +100,27 @@ input.amt{font-size:30px;font-weight:600;text-align:center;padding:12px}
 </div>
 </main>
 <script>
-(function(){
+(async function(){
   var BASE = location.href.split('#')[0].replace(/family\.html.*$/, '');
   var PAYS = ['實體卡','Apple Pay','LINE Pay','街口','全支付','悠遊付','icash Pay','台灣Pay','其他'];
   function ls(k, v){ try{ if(v===undefined){ return localStorage.getItem(k); } if(v===null){ localStorage.removeItem(k); } else { localStorage.setItem(k, v); } }catch(e){ return null; } }
+  // 編碼：z＝deflate 壓縮＋base62（只用英數字，LINE 辨識連結不會斷）；y＝不壓縮 base62；其他＝舊版 base64url
+  var B62='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  function b62enc(u8){ var n=BigInt(1); var E=BigInt(8), K=BigInt(62); for(var i=0;i<u8.length;i++) n=(n<<E)|BigInt(u8[i]); var s=''; while(n>BigInt(0)){ s=B62[Number(n%K)]+s; n=n/K; } return s; }
+  function b62dec(s){ var n=BigInt(0), K=BigInt(62); for(var i=0;i<s.length;i++){ var k=B62.indexOf(s[i]); if(k<0) throw new Error('bad'); n=n*K+BigInt(k); } var out=[], F=BigInt(255), E=BigInt(8); while(n>BigInt(0)){ out.push(Number(n&F)); n=n>>E; } out.reverse(); if(out[0]!==1) throw new Error('bad'); return new Uint8Array(out.slice(1)); }
+  async function pipe(u8, stream){ var w=stream.writable.getWriter(); w.write(u8); w.close(); return new Uint8Array(await new Response(stream.readable).arrayBuffer()); }
   function b64dec(s){ s=s.replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4) s+='='; var bin=atob(s); var u=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i); return new TextDecoder().decode(u); }
-  function b64enc(str){ var u=new TextEncoder().encode(str); var bin=''; for(var i=0;i<u.length;i++) bin+=String.fromCharCode(u[i]); return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+  async function encodeData(obj){
+    var u = new TextEncoder().encode(JSON.stringify(obj));
+    if(window.CompressionStream){ try { return 'z' + b62enc(await pipe(u, new CompressionStream('deflate-raw'))); } catch(e){} }
+    return 'y' + b62enc(u);
+  }
+  async function decodeData(s){
+    if(!s) return null;
+    if(s[0]==='z') return JSON.parse(new TextDecoder().decode(await pipe(b62dec(s.slice(1)), new DecompressionStream('deflate-raw'))));
+    if(s[0]==='y') return JSON.parse(new TextDecoder().decode(b62dec(s.slice(1))));
+    return JSON.parse(b64dec(s));
+  }
   function money(n){ return '$'+String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
   function today(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
   function md(s){ var p=s.split('-'); return (+p[1])+'/'+(+p[2]); }
@@ -113,8 +128,8 @@ input.amt{font-size:30px;font-weight:600;text-align:center;padding:12px}
 
   // 設定：網址 # 後面（App 產生），沒有就用上次存在這支手機的
   var cfg = null, raw = location.hash.slice(1);
-  try { if(raw){ cfg = JSON.parse(b64dec(raw)); ls('fr_cfg', raw); } } catch(e){ cfg = null; }
-  if(!cfg){ try{ var saved = ls('fr_cfg'); if(saved) cfg = JSON.parse(b64dec(saved)); }catch(e){ cfg=null; } }
+  try { if(raw){ cfg = await decodeData(raw); ls('fr_cfg', raw); } } catch(e){ cfg = null; }
+  if(!cfg){ try{ var saved = ls('fr_cfg'); if(saved) cfg = await decodeData(saved); }catch(e){ cfg=null; } }
   if(!cfg || !cfg.c || !cfg.c.length){
     $('nocfg').classList.remove('hidden');
     if(raw){ $('nocfgMsg').textContent = '網址不完整，可能在傳送時被截斷了。'; }
@@ -140,7 +155,7 @@ input.amt{font-size:30px;font-weight:600;text-align:center;padding:12px}
   var myName = ls('fr_name') || '';
   $('myName').value = myName;
   if(myName) $('nameCard').classList.add('hidden');
-  $('myName').addEventListener('input', function(){ myName = this.value.trim(); ls('fr_name', myName); });
+  $('myName').addEventListener('input', function(){ myName = this.value.trim(); ls('fr_name', myName); rebuildMessage(); });
   $('date').value = today();
 
   function cardOf(id){ for(var i=0;i<cards.length;i++) if(cards[i].id===id) return cards[i]; return null; }
@@ -195,6 +210,7 @@ input.amt{font-size:30px;font-weight:600;text-align:center;padding:12px}
       right.appendChild(a); right.appendChild(d);
       row.appendChild(left); row.appendChild(right); l.appendChild(row);
     });
+    rebuildMessage();
     $('cnt').textContent = items.length + ' 筆';
     $('sum').textContent = money(sum);
   }
@@ -219,10 +235,18 @@ input.amt{font-size:30px;font-weight:600;text-align:center;padding:12px}
     $('listCard').scrollIntoView({behavior:'smooth', block:'nearest'});
   };
 
-  function buildMessage(){
+  // 訊息先算好放著（壓縮是非同步的，按下傳送時直接用，iOS 才不會擋分享）
+  var cachedMsg = null;
+  async function rebuildMessage(){
+    var n = items.length;
+    var m = n ? await buildMessage() : null;
+    if(m) m.count = n;
+    cachedMsg = m;
+  }
+  async function buildMessage(){
     var names = {}; items.forEach(function(it){ var c = cardOf(it[0]); if(c) names[it[0]] = [c.name, c.cash ? 1 : 0]; });
     var payload = { v:1, by: myName || '家人', c: names, t: items };
-    var link = BASE + 'open.html#' + b64enc(JSON.stringify(payload));
+    var link = BASE + 'open.html#' + await encodeData(payload);
     var sum = items.reduce(function(s,it){ return s+it[1]; }, 0);
     var lines = [ (myName||'家人') + '報帳 ' + items.length + ' 筆，共 ' + money(sum) ];
     items.forEach(function(it){
@@ -236,14 +260,14 @@ input.amt{font-size:30px;font-weight:600;text-align:center;padding:12px}
   function afterSend(){ $('sentAsk').classList.remove('hidden'); }
 
   $('sendLine').onclick = function(){
-    if(!items.length) return;
-    var m = buildMessage();
+    if(!items.length || !cachedMsg || cachedMsg.count !== items.length) return;
+    var m = cachedMsg;
     afterSend();
     location.href = 'https://line.me/R/share?text=' + encodeURIComponent(m.text);
   };
   $('sendOther').onclick = function(){
-    if(!items.length) return;
-    var m = buildMessage();
+    if(!items.length || !cachedMsg || cachedMsg.count !== items.length) return;
+    var m = cachedMsg;
     if(navigator.share){ navigator.share({ text: m.text }).then(afterSend).catch(function(){}); return; }
     if(navigator.clipboard){ navigator.clipboard.writeText(m.text).then(function(){ afterSend(); alertBox('已複製，貼到對話裡傳出去'); }); }
   };

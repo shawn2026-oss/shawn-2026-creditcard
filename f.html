@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="報帳">
+<meta name="theme-color" content="#111111">
+<title>家人報帳</title>
+<style>
+:root{--bg:#f2f2f4;--card:#fff;--text:#111;--sub:#6b6b70;--muted:#a0a0a6;--line:rgba(0,0,0,.1);--chip:#ececef;--on:#111;--onText:#fff;--green:#06c755;--warn:#b26a00;--warnBg:#fff4e0;--red:#d93025}
+@media (prefers-color-scheme:dark){:root{--bg:#000;--card:#1c1c1e;--text:#f2f2f2;--sub:#a0a0a6;--muted:#6b6b70;--line:rgba(255,255,255,.12);--chip:#2c2c2e;--on:#f2f2f2;--onText:#111;--warnBg:#3a2a10;--warn:#f0b45a}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",sans-serif;font-size:16px;line-height:1.5}
+main{max-width:520px;margin:0 auto;padding:16px 16px calc(32px + env(safe-area-inset-bottom))}
+h1{font-size:22px;margin:8px 0 2px}
+.sub{color:var(--sub);font-size:13px;margin:0}
+.card{background:var(--card);border-radius:16px;padding:14px;margin-top:14px}
+.lbl{font-size:13px;color:var(--sub);margin:12px 0 6px}
+.lbl:first-child{margin-top:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:0;background:var(--chip);color:var(--text);font-size:15px;padding:8px 13px;border-radius:999px;font-family:inherit}
+.chip.on{background:var(--on);color:var(--onText);font-weight:600}
+input{font-family:inherit;font-size:16px;color:var(--text);background:var(--chip);border:0;border-radius:10px;padding:10px 12px;width:100%}
+input.amt{font-size:30px;font-weight:600;text-align:center;padding:12px}
+.row2{display:flex;gap:8px}
+.row2>*{flex:1}
+.btn{display:block;width:100%;border:0;border-radius:12px;padding:14px;font-size:17px;font-weight:600;font-family:inherit;margin-top:14px}
+.btn.main{background:var(--on);color:var(--onText)}
+.btn.line{background:var(--green);color:#fff}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line);font-weight:500;font-size:15px;padding:11px}
+.err{color:var(--red);font-size:13px;margin-top:6px;min-height:0}
+.item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.item .m{font-size:13px;color:var(--sub)}
+.del{border:0;background:transparent;color:var(--muted);font-size:20px;padding:4px 8px}
+.total{display:flex;justify-content:space-between;font-weight:600;margin-top:8px}
+.warn{background:var(--warnBg);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:13px;margin-top:12px}
+.hidden{display:none}
+.foot{color:var(--muted);font-size:12px;text-align:center;margin-top:20px}
+</style>
+</head>
+<body>
+<main>
+<div id="nocfg" class="hidden">
+  <h1>家人報帳</h1>
+  <div class="card"><p style="margin:0" id="nocfgMsg">這個網頁要用「刷卡回饋管家」App 產生的網址打開。</p>
+  <p class="sub" style="margin-top:8px">請家人在 App 的「設定 → 家人報帳」傳一次網址給你。</p>
+  <p class="sub" style="margin-top:8px;color:var(--muted)" id="diag"></p></div>
+</div>
+
+<div id="app" class="hidden">
+  <h1 id="title">報帳</h1>
+  <p class="sub">記好後一次傳給對方，對方點連結就能記到帳裡。</p>
+
+  <div class="card" id="nameCard">
+    <div class="lbl">你的名字（會顯示在報帳訊息上）</div>
+    <input id="myName" placeholder="例如：老婆" maxlength="10">
+  </div>
+
+  <div class="card">
+    <div class="lbl">刷哪張卡</div>
+    <div class="chips" id="cards"></div>
+    <div id="payBox">
+      <div class="lbl">怎麼付</div>
+      <div class="chips" id="pays"></div>
+    </div>
+    <div id="presetBox" class="hidden">
+      <div class="lbl">加碼（可略過，不確定就不用點）</div>
+      <div class="chips" id="presets"></div>
+    </div>
+    <div class="lbl">金額</div>
+    <input id="amt" class="amt" inputmode="numeric" pattern="[0-9]*" placeholder="$0" autocomplete="off">
+    <div class="err" id="amtErr"></div>
+    <div class="row2">
+      <div><div class="lbl">日期</div><input id="date" type="date"></div>
+    </div>
+    <div id="catBox">
+      <div class="lbl">分類（可略過）</div>
+      <div class="chips" id="cats"></div>
+    </div>
+    <div class="lbl">備註（可略過）</div>
+    <input id="note" placeholder="例如：全聯" maxlength="30">
+    <div class="chips" id="notes" style="margin-top:8px"></div>
+    <button class="btn main" id="add">加入這筆</button>
+  </div>
+
+  <div class="card hidden" id="listCard">
+    <div class="lbl" id="listTitle">待傳</div>
+    <div id="list"></div>
+    <div class="total"><span id="cnt"></span><span id="sum"></span></div>
+    <button class="btn line" id="sendLine"></button>
+    <button class="btn ghost" id="sendOther">其他方式傳送／複製</button>
+    <div class="warn hidden" id="sentAsk">傳出去了嗎？確認傳了再清空，避免漏記。
+      <button class="btn ghost" id="clear" style="margin-top:8px">已傳出，清空這幾筆</button>
+    </div>
+  </div>
+  <p class="foot">資料只存在這支手機，不會上傳到任何伺服器。</p>
+</div>
+</main>
+<script>
+(async function(){
+  var BASE = location.origin + location.pathname.replace(/[^\/]*$/, '');
+  var PAYS = ['實體卡','Apple Pay','LINE Pay','街口','全支付','悠遊付','icash Pay','台灣Pay','其他'];
+  function ls(k, v){ try{ if(v===undefined){ return localStorage.getItem(k); } if(v===null){ localStorage.removeItem(k); } else { localStorage.setItem(k, v); } }catch(e){ return null; } }
+  // 編碼：z＝deflate 壓縮＋base62（只用英數字，LINE 辨識連結不會斷）；y＝不壓縮 base62；其他＝舊版 base64url
+  var B62='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  function b62enc(u8){ var n=BigInt(1); var E=BigInt(8), K=BigInt(62); for(var i=0;i<u8.length;i++) n=(n<<E)|BigInt(u8[i]); var s=''; while(n>BigInt(0)){ s=B62[Number(n%K)]+s; n=n/K; } return s; }
+  function b62dec(s){ var n=BigInt(0), K=BigInt(62); for(var i=0;i<s.length;i++){ var k=B62.indexOf(s[i]); if(k<0) throw new Error('bad'); n=n*K+BigInt(k); } var out=[], F=BigInt(255), E=BigInt(8); while(n>BigInt(0)){ out.push(Number(n&F)); n=n>>E; } out.reverse(); if(out[0]!==1) throw new Error('bad'); return new Uint8Array(out.slice(1)); }
+  async function pipe(u8, stream){ var w=stream.writable.getWriter(); w.write(u8); w.close(); return new Uint8Array(await new Response(stream.readable).arrayBuffer()); }
+  function b64dec(s){ s=s.replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4) s+='='; var bin=atob(s); var u=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i); return new TextDecoder().decode(u); }
+  async function encodeData(obj){
+    var u = new TextEncoder().encode(JSON.stringify(obj));
+    if(window.CompressionStream){ try { return 'z' + b62enc(await pipe(u, new CompressionStream('deflate-raw'))); } catch(e){} }
+    return 'y' + b62enc(u);
+  }
+  async function decodeData(s){
+    if(!s) return null;
+    if(s[0]==='z') return JSON.parse(new TextDecoder().decode(await pipe(b62dec(s.slice(1)), new DecompressionStream('deflate-raw'))));
+    if(s[0]==='y') return JSON.parse(new TextDecoder().decode(b62dec(s.slice(1))));
+    return JSON.parse(b64dec(s));
+  }
+  function money(n){ return '$'+String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+  function today(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function md(s){ var p=s.split('-'); return (+p[1])+'/'+(+p[2]); }
+  function $(id){ return document.getElementById(id); }
+
+  // 設定：網址 # 後面（App 產生），沒有就用上次存在這支手機的
+  // 資料放在 ?d= 後面（LINE 開外部瀏覽器會丟掉 # 後面），舊連結的 # 也照讀
+  var cfg = null, raw = (new URLSearchParams(location.search).get('d')) || location.hash.slice(1);
+  try { if(raw){ cfg = await decodeData(raw); ls('fr_cfg', raw); } } catch(e){ cfg = null; }
+  if(!cfg){ try{ var saved = ls('fr_cfg'); if(saved) cfg = await decodeData(saved); }catch(e){ cfg=null; } }
+  if(!cfg || !cfg.c || !cfg.c.length){
+    $('nocfg').classList.remove('hidden');
+    if(raw){ $('nocfgMsg').textContent = '網址不完整，可能在傳送時被截斷了。'; }
+    $('diag').textContent = '（v3｜?後 ' + location.search.length + '｜#後 ' + location.hash.length + '｜資料 ' + raw.length + '）';
+    return;
+  }
+  $('app').classList.remove('hidden');
+
+  var to = cfg.to || '對方';
+  $('title').textContent = '報帳給' + to;
+  document.title = '報帳給' + to;
+  $('sendLine').textContent = '用 LINE 傳給' + to;
+
+  var cards = cfg.c.map(function(x){ return {id:x[0], name:x[1], cash:!!x[2], presets:(x[3]||[]).map(function(p){ return {id:p[0], name:p[1]}; })}; });
+  var cats = cfg.k || [];
+  var noteAll = cfg.n || [], notePer = cfg.cn || {};
+  var catsOpen = false;
+  var last = {}; try{ last = JSON.parse(ls('fr_last')||'{}'); }catch(e){ last={}; }
+  var sel = { card: cards.some(function(c){return c.id===last.card;}) ? last.card : cards[0].id,
+              pay: last.pays && last.pays[last.card] ? last.pays[last.card] : '實體卡', cat: '', preset: '' };
+  var items = []; try{ items = JSON.parse(ls('fr_items')||'[]'); }catch(e){ items=[]; }
+
+  var myName = ls('fr_name') || '';
+  $('myName').value = myName;
+  if(myName) $('nameCard').classList.add('hidden');
+  $('myName').addEventListener('input', function(){ myName = this.value.trim(); ls('fr_name', myName); rebuildMessage(); });
+  $('date').value = today();
+
+  function cardOf(id){ for(var i=0;i<cards.length;i++) if(cards[i].id===id) return cards[i]; return null; }
+  function chip(label, on, fn){ var b=document.createElement('button'); b.type='button'; b.className='chip'+(on?' on':''); b.textContent=label; b.onclick=fn; return b; }
+
+  function render(){
+    var cc = $('cards'); cc.innerHTML='';
+    cards.forEach(function(c){ cc.appendChild(chip(c.name, c.id===sel.card, function(){
+      sel.card=c.id; sel.preset=''; if(last.pays && last.pays[c.id]) sel.pay=last.pays[c.id]; render(); })); });
+    var cur = cardOf(sel.card)||{};
+    var isCash = cur.cash;
+    var ps = (!isCash && cur.presets) ? cur.presets : [];
+    $('presetBox').classList.toggle('hidden', ps.length===0);
+    var prc = $('presets'); prc.innerHTML='';
+    ps.forEach(function(p){ prc.appendChild(chip(p.name, p.id===sel.preset, function(){ sel.preset = (sel.preset===p.id?'':p.id); render(); })); });
+    $('payBox').classList.toggle('hidden', !!isCash);
+    var pc = $('pays'); pc.innerHTML='';
+    PAYS.forEach(function(p){ pc.appendChild(chip(p, p===sel.pay, function(){ sel.pay=p; render(); })); });
+    $('catBox').classList.toggle('hidden', cats.length===0);
+    var kc = $('cats'); kc.innerHTML='';
+    var showCats = (catsOpen || cats.length <= 12) ? cats : cats.slice(0, 11);
+    if(!catsOpen && sel.cat && showCats.indexOf(sel.cat) < 0) showCats = showCats.concat([sel.cat]);
+    showCats.forEach(function(k){ kc.appendChild(chip(k, k===sel.cat, function(){ sel.cat = (sel.cat===k?'':k); render(); })); });
+    if(cats.length > 12){ var more = chip(catsOpen ? '收起' : '更多…', false, function(){ catsOpen = !catsOpen; render(); }); more.style.color = 'var(--sub)'; kc.appendChild(more); }
+    // 備註：這張卡常打的在前，再補全部卡共用的
+    var nl = (notePer[sel.card] || []).slice();
+    noteAll.forEach(function(n){ if(nl.indexOf(n) < 0) nl.push(n); });
+    nl = nl.slice(0, 10);
+    var nc = $('notes'); nc.innerHTML='';
+    var cur = $('note').value.trim();
+    nl.forEach(function(n){ nc.appendChild(chip(n, n===cur, function(){ $('note').value = (cur===n ? '' : n); render(); })); });
+    renderList();
+  }
+
+  function renderList(){
+    $('listCard').classList.toggle('hidden', items.length===0);
+    var l = $('list'); l.innerHTML='';
+    var sum = 0;
+    items.forEach(function(it, i){
+      sum += it[1];
+      var c = cardOf(it[0]); var name = c ? c.name : '（已移除的卡）';
+      var row = document.createElement('div'); row.className='item';
+      var left = document.createElement('div');
+      var pn = ''; if(c && it[7]){ c.presets.forEach(function(p){ if(p.id===it[7]) pn = p.name; }); }
+      var t = document.createElement('div'); t.textContent = name + (c && c.cash ? '' : '・' + it[3]) + (pn ? '・' + pn : '');
+      var m = document.createElement('div'); m.className='m'; m.textContent = md(it[2]) + (it[4]?' '+it[4]:'') + (it[5]?' '+it[5]:'');
+      left.appendChild(t); left.appendChild(m);
+      var right = document.createElement('div'); right.style.display='flex'; right.style.alignItems='center';
+      var a = document.createElement('span'); a.textContent = money(it[1]);
+      var d = document.createElement('button'); d.className='del'; d.setAttribute('aria-label','刪除這筆'); d.textContent='×';
+      d.onclick = function(){ items.splice(i,1); save(); renderList(); };
+      right.appendChild(a); right.appendChild(d);
+      row.appendChild(left); row.appendChild(right); l.appendChild(row);
+    });
+    rebuildMessage();
+    $('cnt').textContent = items.length + ' 筆';
+    $('sum').textContent = money(sum);
+  }
+  function save(){ ls('fr_items', JSON.stringify(items)); }
+
+  $('note').addEventListener('input', function(){ render(); });
+  $('amt').addEventListener('input', function(){ this.value = this.value.replace(/[^0-9]/g,''); $('amtErr').textContent=''; });
+  $('add').onclick = function(){
+    var a = parseInt($('amt').value, 10);
+    if(!a || a<=0){ $('amtErr').textContent='請輸入金額'; $('amt').focus(); return; }
+    if(!myName){ $('nameCard').classList.remove('hidden'); $('myName').focus(); $('amtErr').textContent='先填你的名字（只要填一次）'; return; }
+    var c = cardOf(sel.card);
+    var id = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+    items.push([sel.card, a, $('date').value || today(), c && c.cash ? '' : sel.pay, sel.cat, $('note').value.trim(), id, c && c.cash ? '' : sel.preset]);
+    save();
+    last.card = sel.card; last.pays = last.pays || {}; if(!(c && c.cash)) last.pays[sel.card] = sel.pay;
+    ls('fr_last', JSON.stringify(last));
+    $('nameCard').classList.add('hidden');
+    $('amt').value=''; $('note').value=''; sel.cat=''; sel.preset=''; $('date').value = today();
+    $('sentAsk').classList.add('hidden');
+    render();
+    $('listCard').scrollIntoView({behavior:'smooth', block:'nearest'});
+  };
+
+  // 訊息先算好放著（壓縮是非同步的，按下傳送時直接用，iOS 才不會擋分享）
+  var cachedMsg = null;
+  async function rebuildMessage(){
+    var n = items.length;
+    var m = n ? await buildMessage() : null;
+    if(m) m.count = n;
+    cachedMsg = m;
+  }
+  async function buildMessage(){
+    var names = {}; items.forEach(function(it){ var c = cardOf(it[0]); if(c) names[it[0]] = [c.name, c.cash ? 1 : 0]; });
+    var payload = { v:1, by: myName || '家人', c: names, t: items };
+    var link = BASE + 'o.html?d=' + await encodeData(payload);
+    var sum = items.reduce(function(s,it){ return s+it[1]; }, 0);
+    var lines = [ (myName||'家人') + '報帳 ' + items.length + ' 筆，共 ' + money(sum) ];
+    items.forEach(function(it){
+      var c = cardOf(it[0]); var name = c ? c.name : '卡片';
+      var pn = ''; if(c && it[7]){ c.presets.forEach(function(p){ if(p.id===it[7]) pn = '（' + p.name + '）'; }); }
+      lines.push(md(it[2]) + ' ' + name + (c && c.cash ? '' : '・' + it[3]) + pn + ' ' + money(it[1]) + (it[4]?' '+it[4]:'') + (it[5]?' '+it[5]:''));
+    });
+    lines.push(''); lines.push('點這裡記帳：' + link);
+    return { text: lines.join('\n'), link: link };
+  }
+  function afterSend(){ $('sentAsk').classList.remove('hidden'); }
+
+  $('sendLine').onclick = function(){
+    if(!items.length || !cachedMsg || cachedMsg.count !== items.length) return;
+    var m = cachedMsg;
+    afterSend();
+    location.href = 'https://line.me/R/share?text=' + encodeURIComponent(m.text);
+  };
+  $('sendOther').onclick = function(){
+    if(!items.length || !cachedMsg || cachedMsg.count !== items.length) return;
+    var m = cachedMsg;
+    if(navigator.share){ navigator.share({ text: m.text }).then(afterSend).catch(function(){}); return; }
+    if(navigator.clipboard){ navigator.clipboard.writeText(m.text).then(function(){ afterSend(); alertBox('已複製，貼到對話裡傳出去'); }); }
+  };
+  function alertBox(msg){ var w=$('sentAsk'); w.firstChild.textContent = msg + '。傳出去了再清空，避免漏記。'; w.classList.remove('hidden'); }
+  $('clear').onclick = function(){ items=[]; save(); $('sentAsk').classList.add('hidden'); renderList(); window.scrollTo({top:0, behavior:'smooth'}); };
+
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-24T06:10:56.893Z",
+  "updated": "2026-10-25T06:31:15.738Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -46,8 +46,10 @@
       "since": "2026-10-18"
     },
     "feib1_easycard": {
-      "status": "ok",
-      "since": "2026-10-23"
+      "status": "unreachable",
+      "hit": "fetch failed",
+      "since": "2026-10-25",
+      "fails": 1
     },
     "fb1_pay3": {
       "status": "ok",
@@ -138,10 +140,6 @@
       "since": "2026-10-18"
     },
     "j3_jcb_themepark_oct": {
-      "status": "ok",
-      "since": "2026-10-18"
-    },
-    "j3_jcb_mitsui_jp_nov": {
       "status": "ok",
       "since": "2026-10-18"
     },

@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-24",
+ "updated": "2026-10-25",
  "items": [
   {
    "id": "ubot_delivery",
@@ -606,7 +606,10 @@
    "until": "2026-12-31",
    "how": "玉山Wallet「我的 > 玉山Unicard－我的方案」領取（領取期間 8/31 12:00～12/31 23:59）",
    "url": "https://event.esunbank.com.tw/credit/unicard/campaign.html",
-   "note": "每週三綁全支付或 PX Pay 於全聯／大全聯實體門市單筆滿 $1,000；每週三上限100點；PX GO!、線上購、小時達、外送不適用"
+   "note": "每週三綁全支付或 PX Pay 於全聯／大全聯實體門市單筆滿 $1,000；每週三上限100點；PX GO!、線上購、小時達、外送不適用",
+   "rids": [
+    "c7_wed_pxmart"
+   ]
   },
   {
    "id": "c7_upower",
@@ -858,7 +861,10 @@
    "quota": "限 100,000 名",
    "how": "永豐 MMA 活動登錄頁（Code=XI10），正卡人活動期間內登錄",
    "url": "https://mma.sinopac.com/SinoCard/Activity/Register?Code=XI10",
-   "note": "綁 LINE Pay 一般消費累積滿 $30,000；每戶最高 1,000 點 LINE POINTS；開放時間頁面未載明；同時取得第二重抽 iPhone 資格"
+   "note": "綁 LINE Pay 一般消費累積滿 $30,000；每戶最高 1,000 點 LINE POINTS；開放時間頁面未載明；同時取得第二重抽 iPhone 資格",
+   "rids": [
+    "daway1_lp_1000days"
+   ]
   },
   {
    "id": "hsbc_q4_installment",
@@ -1287,7 +1293,12 @@
    "quota": "每月限 1,350 名",
    "how": "聯邦信用卡官網「一般登錄活動專區」→「115XX指定卡別海外加碼」，消費當月登錄",
    "url": "https://activity.ubot.com.tw/aws_act/2026/20260607overseas/index.htm",
-   "note": "日本／美國／韓國／加拿大／泰國／墨西哥實體店，單月超過 $15,000 的部分加碼 3%，每月上限 1,000 元；開放時間未公布，7–9 月名額皆額滿"
+   "note": "日本／美國／韓國／加拿大／泰國／墨西哥實體店，單月超過 $15,000 的部分加碼 3%，每月上限 1,000 元；開放時間未公布，7–9 月名額皆額滿",
+   "rids": [
+    "c5_overseas6_q4",
+    "j2_overseas6_q4",
+    "ubot_m_overseas6_q4"
+   ]
   },
   {
    "id": "ubot_travel_q4",
@@ -1480,7 +1491,10 @@
    "until": "2026-12-31",
    "how": "第一銀行信用卡官網活動頁登錄",
    "url": "https://card.firstbank.com.tw/sites/Satellite?c=CreditCard&cid=1565690689020&d=Touch&pagename=FirstBankCard%2FCreditCard%2Fzh%2FCreditCardDetailView",
-   "note": "當月一般消費滿 $2,000；每戶每月上限 50 元（自動加值 $2,500）；一次或每月登錄未確認"
+   "note": "當月一般消費滿 $2,000；每戶每月上限 50 元（自動加值 $2,500）；一次或每月登錄未確認",
+   "rids": [
+    "fb1_icash_autoload"
+   ]
   },
   {
    "id": "orange1_shopfest",
@@ -1497,7 +1511,10 @@
    "quota": "每平台每月限 3,000 名",
    "how": "https://www.o-bank.com/egift/RegisterCampaign，三平台各自登錄、按月登錄（開放時間未公布）",
    "url": "https://www.o-bank.com/retail/event/event-compaign",
-   "note": "每月 10–12 日累積滿 $10,000 再送 888 元（每月限 300 名）；單平台每月最高 1,088 元"
+   "note": "每月 10–12 日累積滿 $10,000 再送 888 元（每月限 300 名）；單平台每月最高 1,088 元",
+   "rids": [
+    "orange1_shopping_fest"
+   ]
   }
  ]
 }

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-25T06:31:15.738Z",
+  "updated": "2026-10-26T06:41:17.479Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -46,10 +46,8 @@
       "since": "2026-10-18"
     },
     "feib1_easycard": {
-      "status": "unreachable",
-      "hit": "fetch failed",
-      "since": "2026-10-25",
-      "fails": 1
+      "status": "ok",
+      "since": "2026-10-26"
     },
     "fb1_pay3": {
       "status": "ok",

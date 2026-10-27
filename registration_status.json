@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-26T06:41:17.479Z",
+  "updated": "2026-10-27T06:35:23.633Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -146,10 +146,6 @@
       "since": "2026-10-18"
     },
     "j5_select7": {
-      "status": "ok",
-      "since": "2026-10-18"
-    },
-    "j5_mop_tainan_anniv": {
       "status": "ok",
       "since": "2026-10-18"
     },

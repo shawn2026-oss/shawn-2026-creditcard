@@ -1,6 +1,6 @@
 {
-  "news": "2.0.7上線：自建卡也能進智慧選卡；期間累計加碼可設活動起始日",
-  "latest_version": "2.0.7",
+  "news": "2.1.0上線：刷卡自動記帳、說一句就記帳",
+  "latest_version": "2.1.0",
   "min_version": "1.0.0",
   "force_update_message": "此版本已過舊，請更新至最新版本。"
 }

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-30T07:30:35.108Z",
+  "updated": "2026-10-31T07:17:30.279Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -246,10 +246,8 @@
       "since": "2026-10-18"
     },
     "c8_relax_reward": {
-      "status": "unreachable",
-      "hit": "fetch failed",
-      "since": "2026-10-30",
-      "fails": 1
+      "status": "ok",
+      "since": "2026-10-31"
     },
     "ubot_j2_ayataka": {
       "status": "ok",
@@ -285,9 +283,6 @@
     },
     "c10_icash_autoload": {
       "status": "ok",
-      "rewardFull": true,
-      "rewardMonth": "2026-10",
-      "rewardHit": "門推薦 ▲ 活動內容 登錄期間 我要登錄 查詢 【10月活動已額滿】uniopen聯名卡ic",
       "since": "2026-10-23"
     },
     "c10_books_weekend": {

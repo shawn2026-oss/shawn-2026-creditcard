@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-31T07:17:30.279Z",
+  "updated": "2026-11-01T07:50:14.368Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -121,10 +121,6 @@
       "status": "ok",
       "since": "2026-10-18"
     },
-    "c7_coffee_oct": {
-      "status": "ok",
-      "since": "2026-10-18"
-    },
     "c7_insurance": {
       "status": "ok",
       "since": "2026-10-18"
@@ -134,14 +130,6 @@
       "since": "2026-10-18"
     },
     "j3_jp_6pct": {
-      "status": "ok",
-      "since": "2026-10-18"
-    },
-    "j3_jcb_themepark_oct": {
-      "status": "ok",
-      "since": "2026-10-18"
-    },
-    "j3_nagoya": {
       "status": "ok",
       "since": "2026-10-18"
     },
@@ -229,15 +217,7 @@
       "status": "ok",
       "since": "2026-10-18"
     },
-    "c11_fx_task": {
-      "status": "ok",
-      "since": "2026-10-18"
-    },
     "c6_jko_billpay": {
-      "status": "ok",
-      "since": "2026-10-18"
-    },
-    "taishin_insurance_luggage": {
       "status": "ok",
       "since": "2026-10-18"
     },
@@ -262,14 +242,6 @@
       "since": "2026-10-18"
     },
     "ubot_sub_q4": {
-      "status": "ok",
-      "since": "2026-10-18"
-    },
-    "ubot_momo_oct_single": {
-      "status": "ok",
-      "since": "2026-10-18"
-    },
-    "ubot_momo_oct_inst": {
       "status": "ok",
       "since": "2026-10-18"
     },

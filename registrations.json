@@ -101,8 +101,12 @@
    ],
    "schedule": {
     "type": "monthly",
-    "day": 15,
-    "time": "10:00"
+    "day": 18,
+    "time": "10:00",
+    "overrides": {
+     "2026-11": 18
+    },
+    "baseDay": 15
    },
    "from": "2026-10-01",
    "until": "2027-03-31",

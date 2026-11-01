@@ -214,7 +214,8 @@
    ],
    "schedule": {
     "type": "monthly",
-    "day": 1
+    "day": 1,
+    "unknown": true
    },
    "until": "2026-12-31",
    "how": "凱基銀行官網「活動登錄」（每月登錄，開放時間以官網為準）",
@@ -1461,7 +1462,8 @@
    ],
    "schedule": {
     "type": "monthly",
-    "day": 1
+    "day": 1,
+    "unknown": true
    },
    "until": "2026-12-31",
    "quota": "每月限 300 名",

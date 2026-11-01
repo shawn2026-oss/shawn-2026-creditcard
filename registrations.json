@@ -123,8 +123,10 @@
    "schedule": {
     "type": "monthly",
     "day": 2,
-    "time": "12:00"
-   , "shift": "next"},
+    "time": "12:00",
+    "shift": "next",
+    "baseDay": 1
+   },
    "from": "2026-10-01",
    "until": "2026-12-31",
    "quota": "每月限 5,000 名",
@@ -144,8 +146,10 @@
    "schedule": {
     "type": "monthly",
     "day": 2,
-    "time": "12:00"
-   , "shift": "next"},
+    "time": "12:00",
+    "shift": "next",
+    "baseDay": 1
+   },
    "from": "2026-10-01",
    "until": "2026-12-31",
    "quota": "每月限 3,000 名",
@@ -165,8 +169,10 @@
    "schedule": {
     "type": "monthly",
     "day": 2,
-    "time": "12:00"
-   , "shift": "next"},
+    "time": "12:00",
+    "shift": "next",
+    "baseDay": 1
+   },
    "from": "2026-10-01",
    "until": "2026-12-31",
    "quota": "每月限 2,000 名",
@@ -186,8 +192,10 @@
    "schedule": {
     "type": "monthly",
     "day": 10,
-    "time": "12:00"
-   , "shift": "prev"},
+    "time": "12:00",
+    "shift": "prev",
+    "baseDay": 10
+   },
    "from": "2026-09-10",
    "until": "2026-12-31",
    "quota": "每月限 5,000 名",
@@ -877,8 +885,10 @@
    "schedule": {
     "type": "monthly",
     "day": 2,
-    "time": "15:00"
-   , "shift": "next"},
+    "time": "15:00",
+    "shift": "next",
+    "baseDay": 1
+   },
    "from": "2026-10-01",
    "until": "2026-12-31",
    "quota": "每月限 1,500 名",
@@ -935,8 +945,10 @@
    "schedule": {
     "type": "monthly",
     "day": 2,
-    "time": "15:00"
-   , "shift": "next"},
+    "time": "15:00",
+    "shift": "next",
+    "baseDay": 1
+   },
    "from": "2026-10-01",
    "until": "2026-12-31",
    "quota": "每月限 1,500 名",

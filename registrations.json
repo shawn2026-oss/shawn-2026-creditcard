@@ -1516,12 +1516,14 @@
    ],
    "schedule": {
     "type": "monthly",
-    "day": 1
+    "day": 2,
+    "shift": "next",
+    "baseDay": 1
    },
    "from": "2026-10-01",
    "until": "2026-12-31",
    "quota": "每平台每月限 3,000 名",
-   "how": "https://www.o-bank.com/egift/RegisterCampaign，三平台各自登錄、按月登錄（開放時間未公布）",
+   "how": "https://www.o-bank.com/egift/RegisterCampaign，三平台各自登錄、按月登錄。每月第一個營業日開放（官網未寫幾點）",
    "url": "https://www.o-bank.com/retail/event/event-compaign",
    "note": "每月 10–12 日累積滿 $10,000 再送 888 元（每月限 300 名）；單平台每月最高 1,088 元",
    "rids": [

@@ -30,8 +30,11 @@
       "since": "2026-10-18"
     },
     "orange1_dept": {
-      "status": "ok",
-      "since": "2026-10-18"
+      "status": "full",
+      "month": "2026-11",
+      "hit": "王道登錄頁 11/2 12:43 顯示已額滿",
+      "manual": true,
+      "since": "2026-11-02"
     },
     "orange1_insurance": {
       "status": "ok",

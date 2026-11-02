@@ -135,7 +135,7 @@
    ],
    "schedule": {
     "type": "monthly",
-    "day": 2,
+    "day": 1,
     "time": "12:00",
     "shift": "next",
     "baseDay": 1
@@ -159,7 +159,7 @@
    ],
    "schedule": {
     "type": "monthly",
-    "day": 2,
+    "day": 1,
     "time": "12:00",
     "shift": "next",
     "baseDay": 1
@@ -183,7 +183,7 @@
    ],
    "schedule": {
     "type": "monthly",
-    "day": 2,
+    "day": 1,
     "time": "12:00",
     "shift": "next",
     "baseDay": 1
@@ -940,7 +940,7 @@
    ],
    "schedule": {
     "type": "monthly",
-    "day": 2,
+    "day": 1,
     "time": "15:00",
     "shift": "next",
     "baseDay": 1
@@ -1006,7 +1006,7 @@
    ],
    "schedule": {
     "type": "monthly",
-    "day": 2,
+    "day": 1,
     "time": "15:00",
     "shift": "next",
     "baseDay": 1
@@ -1620,7 +1620,7 @@
    ],
    "schedule": {
     "type": "monthly",
-    "day": 2,
+    "day": 1,
     "time": "12:00",
     "shift": "next",
     "baseDay": 1

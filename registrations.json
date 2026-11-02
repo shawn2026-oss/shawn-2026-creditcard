@@ -21,6 +21,7 @@
    "quota": "每月限 6,000 名",
    "how": "聯邦官網「限時登錄活動專區」→ 其他平台",
    "url": "https://activity.ubot.com.tw/aws_act/2026/202607delivery/index.htm",
+   "regUrl": "https://cardweb.ubot.com.tw/register_extra",
    "note": "聯邦卡合計每月可刷 $6,667",
    "rids": [
     "c2_ubot_delivery",
@@ -47,6 +48,11 @@
    "quota": "每月限 6,000 名",
    "how": "玉山銀行官網活動頁登錄（限正卡）",
    "url": "https://www.esunbank.com/zh-tw/personal/credit-card/discount/shopInfo?sno=8023",
+   "regUrl": "https://card.esunbank.com.tw/EsunCreditweb/txnservice/identify?PRJCD=ALLACTIV#b",
+   "regUrlByMonth": {
+    "2026-11": "https://esun.co/IC2611",
+    "2026-12": "https://esun.co/IC2612"
+   },
    "note": "每月可刷 $3,333",
    "rids": [
     "ubear1_seven",
@@ -69,6 +75,7 @@
    "quota": "每月限 10,000 名",
    "how": "聯邦信用卡官網登錄頁（cardweb.ubot.com.tw/register_extra），當月消費須當月登錄",
    "url": "https://activity.ubot.com.tw/2026JiHoCard/index.htm",
+   "regUrl": "https://cardweb.ubot.com.tw/register_extra",
    "note": "日幣儲值 SUICA／ICOCA／PASMO",
    "rids": [
     "j2_transit_jp"
@@ -88,6 +95,7 @@
    "quota": "不限名額",
    "how": "聯邦信用卡官網活動登錄（cardweb.ubot.com.tw/register_extra），活動期間登錄一次；不溯及登錄前的月份",
    "url": "https://activity.ubot.com.tw/2026JiHoCard/index.htm",
+   "regUrl": "https://cardweb.ubot.com.tw/register_extra",
    "note": "日本實體店感應支付單筆滿 $100；不含網路、交通與 QUICPay；每月可刷 $40,000",
    "rids": [
     "j2_apple_jp"
@@ -113,6 +121,7 @@
    "quota": "每月限 20,000 名",
    "how": "聯邦信用卡官網線上活動登錄，每月分別登錄（15日10:00～月底23:59）",
    "url": "https://activity.ubot.com.tw/aws_act/2026/JiHoCard_Anniversary/index.htm",
+   "regUrl": "https://cardweb.ubot.com.tw/register_extra",
    "note": "當月國內消費累積滿 $20,000 才有，每月可刷 $30,000",
    "rids": [
     "j2_dom2"
@@ -136,6 +145,7 @@
    "quota": "每月限 5,000 名",
    "how": "王道銀行活動登錄頁（o-bank.com/egift/RegisterCampaign），每月 1 日 12:00，遇假日順延次一營業日（11 月為 11/2）",
    "url": "https://www.o-bank.com/retail/event/event-announce/debit_20261231_6",
+   "regUrl": "https://www.o-bank.com/egift/RegisterCampaign",
    "note": "Apple Pay／LINE Pay／街口／悠遊付／全盈+／iPASS MONEY／icash Pay／全支付，單筆滿 $300；每月可刷 $24,000；Uber Eats 內 LINE Pay 不算",
    "rids": [
     "orange1_reg_pay_q4"
@@ -159,6 +169,7 @@
    "quota": "每月限 3,000 名",
    "how": "https://www.o-bank.com/egift/RegisterCampaign，每月第一個營業日 12:00（10/1、11/2、12/1），須消費當月登錄",
    "url": "https://www.o-bank.com/retail/event/event-announce/debit_20261231_7",
+   "regUrl": "https://www.o-bank.com/egift/RegisterCampaign",
    "note": "海外實體／海外網購，不含綁行動支付、排除部分歐洲國家；每月可刷 $30,000",
    "rids": [
     "orange1_overseas"
@@ -182,6 +193,7 @@
    "quota": "每月限 2,000 名",
    "how": "https://www.o-bank.com/egift/RegisterCampaign，每月 1 日 12:00，假日順延次一營業日",
    "url": "https://www.o-bank.com/retail/event/event-compaign",
+   "regUrl": "https://www.o-bank.com/egift/RegisterCampaign",
    "note": "限實體卡、不適用綁行動支付；每月可刷 $10,000",
    "rids": [
     "orange1_fun_q4"
@@ -205,6 +217,7 @@
    "quota": "每月限 5,000 名",
    "how": "https://www.o-bank.com/egift/RegisterCampaign，每月 10 日 12:00，遇假日提前到前一營業日（10/08、11/10、12/10），扣繳當月月底前登錄",
    "url": "https://www.o-bank.com/retail/event/event-announce/debit_20261231_4",
+   "regUrl": "https://www.o-bank.com/egift/RegisterCampaign",
    "note": "當月保費累積滿 $3,000 才有；每月可刷 $84,400",
    "rids": [
     "orange1_insurance"
@@ -244,6 +257,7 @@
    "quota": "每月限 10,000 名",
    "how": "遠東商銀官網活動頁登錄（當月內登錄即可，不用搶時間）",
    "url": "https://www.feib.com.tw/activity?id=1980",
+   "regUrl": "https://ecard.feib.com.tw/ActivityPromotion/index.do",
    "note": "百貨／超市／網購／服飾／藥妝／LINE Pay；每月可刷 $6,000",
    "rids": [
     "feib1_channel_pay",
@@ -264,6 +278,7 @@
    "until": "2026-12-31",
    "how": "遠東商銀官網活動頁登錄（當月內登錄即可）",
    "url": "https://www.feib.com.tw/activity?id=1980",
+   "regUrl": "https://ecard.feib.com.tw/ActivityPromotion/index.do",
    "note": "每月可刷 $1,000",
    "rids": [
     "feib1_autoload"
@@ -283,6 +298,7 @@
    "how": "第一銀行信用卡官網活動頁登錄（活動期間登錄一次）",
    "note": "icash Pay（不含 7-11）／全支付／HGPAY／中油PAY／寶雅pay；每月可刷 $10,000",
    "url": "https://card.firstbank.com.tw/",
+   "regUrl": "https://ccard.firstbank.com.tw/cmsweb/act/actlist",
    "rids": [
     "fb1_mobilepay"
    ]
@@ -303,6 +319,7 @@
    "how": "中國信託 LINE Pay 卡活動頁登錄；沒搶到等下週二",
    "note": "一季登錄一次即可；每季可刷約 $20,000",
    "url": "https://www.ctbcbank.com/content/dam/minisite/long/creditcard/LINEPay/page_travel.html",
+   "regUrl": "https://www.ctbcbank.com/twrbo/zh_tw/onlinecounter_index/cc_service/cc_service_register.html",
    "rids": [
     "ctbc_lp_oversea_bonus_layer",
     "ctbc_lp_jcb_oversea_bonus_layer"
@@ -324,6 +341,7 @@
    "quota": "每通路每月限 8,000 名",
    "how": "中國信託 LINE Pay 卡活動頁逐通路登錄，所有 VISA 通路皆每月 6 日 10:00 開放；每季登錄一次即整季有效（10月登錄＝10–12月），沒搶到隔月 6 日再登",
    "url": "https://www.ctbcbank.com/content/dam/minisite/long/creditcard/LINEPay/store.html",
+   "regUrl": "https://www.ctbcbank.com/twrbo/zh_tw/onlinecounter_index/cc_service/cc_service_register.html",
    "note": "每通路每季可刷 $2,500",
    "rids": [
     "ctbc_lp_ubereats",
@@ -354,6 +372,7 @@
    "quota": "每通路每月限 5,000 名",
    "how": "中國信託 LINE Pay 卡活動頁逐通路登錄，每月 6 日 13:00 開放；每季登錄一次即整季有效",
    "url": "https://www.ctbcbank.com/content/dam/minisite/long/creditcard/LINEPay/store.html",
+   "regUrl": "https://www.ctbcbank.com/twrbo/zh_tw/onlinecounter_index/cc_service/cc_service_register.html",
    "note": "每通路每季可刷 $2,222；台灣虎航限國內消費",
    "rids": [
     "ctbc_lp_jcb_mos",
@@ -382,6 +401,7 @@
    "quota": "每月限 1,200 名",
    "how": "第一銀行信用卡官網活動頁登錄",
    "url": "https://card.firstbank.com.tw/sites/Satellite?c=CreditCard&cid=1565705058441&d=Touch&pagename=FirstBankCard%2FCreditCard%2Fzh%2FCardActivityDetailView",
+   "regUrl": "https://ccard.firstbank.com.tw/cmsweb/act/actlist",
    "note": "當月三通路累積滿 $5,000；每月可刷 $4,000"
   },
   {
@@ -420,6 +440,8 @@
    "how": "Fubon+ App「優惠 → 活動登錄」；一季內登錄成功一次就整季有效",
    "note": "單筆滿 $1,000；日韓每季可刷 $33,333、泰國 $20,000",
    "url": "https://cardpromote.taipeifubon.com.tw/promotion/Detail?sn=C000307",
+   "regUrl": "https://apps.apple.com/tw/app/id6479990131",
+   "regType": "app",
    "rids": [
     "j1_jpkr_physical",
     "j1_th_physical"
@@ -441,6 +463,8 @@
    "how": "Fubon+ App「優惠 → 活動登錄」；一季內登錄成功一次就整季有效",
    "note": "單筆儲值滿 $2,000；每季可刷 $2,857",
    "url": "https://www.fubon.com/banking/personal/credit_card/all_card/omiyage/omiyage.htm",
+   "regUrl": "https://apps.apple.com/tw/app/id6479990131",
+   "regType": "app",
    "rids": [
     "j1_suica"
    ]
@@ -480,6 +504,7 @@
    "quota": "不限名額",
    "how": "陽信銀行官網「信用卡活動登錄」，活動期間登錄一次",
    "url": "https://www.sunnybank.com.tw/portal/pt/pt01002/PT01002Index.xhtml",
+   "regUrl": "https://service.sunnybank.com.tw/portal/pt/pt01002/PT01002Index.xhtml",
    "note": "限實體卡、不含網購；正附卡合併可刷 $2,857",
    "rids": [
     "sunny1_jpdrug"
@@ -499,6 +524,8 @@
    "until": "2026-12-31",
    "how": "將來銀行 App 活動登錄，每月 1 日～月底內登錄即可，不可事後補登",
    "url": "https://www.nextbank.com.tw/announcement/45c1e31fa40000000285cadc56793797/event1186",
+   "regUrl": "https://apps.apple.com/tw/app/id1528472238",
+   "regType": "app",
    "note": "單筆滿 $1,000 每筆回 45 N點，每月最多算 5 筆；國外／旅遊交通／LINE Pay／街口／icash Pay／餐飲／外送／Apple・Google 數位",
    "rids": [
     "c4_life"
@@ -523,6 +550,11 @@
    "quota": "每月限 1,200 名",
    "how": "玉山銀行官網或玉山Wallet App登錄（限正卡），每月連結 esun.co/ICwf10、ICwf11、ICwf12，開放至當月最後一日 23:59:59",
    "url": "https://www.esunbank.com/zh-tw/personal/credit-card/discount/shopInfo?sno=8023",
+   "regUrl": "https://card.esunbank.com.tw/EsunCreditweb/txnservice/identify?PRJCD=ALLACTIV#b",
+   "regUrlByMonth": {
+    "2026-11": "https://esun.co/ICwf11",
+    "2026-12": "https://esun.co/ICwf12"
+   },
    "note": "僅每月10日後的週五至週日指定活動日；全玉山信用卡適用（須綁 icash Pay）；每月可刷 $3,000；萬家福線上商城與部分 Mia C'bon 門市不適用"
   },
   {
@@ -544,6 +576,11 @@
    "quota": "每月限 20,000 名",
    "how": "玉山銀行官網活動頁或玉山Wallet App登錄（限正卡），每月23日 12:00 起至當月最後一日 23:59",
    "url": "https://www.esunbank.com/zh-tw/personal/credit-card/discount/shopInfo?sno=7032",
+   "regUrl": "https://card.esunbank.com.tw/EsunCreditweb/txnservice/identify?PRJCD=ALLACTIV#b",
+   "regUrlByMonth": {
+    "2026-11": "https://esun.co/CPC2611",
+    "2026-12": "https://esun.co/CPC2612"
+   },
    "note": "當月綁中油Pay於台灣中油直營站加油累積滿 $3,000；加碼3% e point，每月每歸戶可刷 $3,333"
   },
   {
@@ -565,6 +602,7 @@
    "quota": "滿額禮每月限 1,600 名（總 4,800 名）；加碼禮總限 660 名",
    "how": "玉山官網活動頁登錄（限正卡）：滿額禮 10/23、11/23、12/23 17:00 三波（esun.co/DL032／DL033／DL034），每歸戶擇優領一份，任一波登錄成功即可；加碼禮 12/30 15:00（esun.co/DL035）",
    "url": "https://event.esunbank.com.tw/credit/travel-campaign/index.html",
+   "regUrl": "https://esun.co/DL033",
    "note": "10–12月累積滿 $30,000／$50,000／$90,000 送 500／1,000／2,000 點；滿 $200,000 另送 2,000 元好禮即享券（12/30 15:00 另登錄）；外幣結帳與第三方支付不適用"
   },
   {
@@ -585,6 +623,7 @@
    "quota": "限 30,000 名",
    "how": "玉山官網活動頁登錄（限正卡）",
    "url": "https://www.esunbank.com/zh-tw/personal/credit-card/discount/shopInfo?sno=8053",
+   "regUrl": "https://card.esunbank.com.tw/EsunCreditweb/txnservice/Activity/RegisterEvent?EventId=PP2644&mac=1c89ec9ab38eee5a3163a06436e4b2fafce9597049a0c488dc5679d67bc1ec0b&PRJCD=ACTIVITY",
    "note": "限 2026/10/1 前沒用玉山卡綁過全盈+PAY 的人；每歸戶 68 點"
   },
   {
@@ -603,6 +642,11 @@
    "quota": "每月限 15,000 名",
    "how": "玉山官網活動頁每月登錄（限正卡），當月登錄只算當月消費",
    "url": "https://www.esunbank.com/zh-tw/personal/credit-card/discount/shopInfo?sno=8053",
+   "regUrl": "https://card.esunbank.com.tw/EsunCreditweb/txnservice/identify?PRJCD=ALLACTIV#b",
+   "regUrlByMonth": {
+    "2026-11": "https://card.esunbank.com.tw/EsunCreditweb/txnservice/Activity/RegisterEvent?EventId=PP2611&mac=9a0f31dbb8e15074a8fcf2a593b822da2268ce92757b342600de799b70181ff9&PRJCD=ACTIVITY",
+    "2026-12": "https://card.esunbank.com.tw/EsunCreditweb/txnservice/Activity/RegisterEvent?EventId=PP2612&mac=31a9ec2915599651a7ea848953e9dcb882cbc80ef9a6acc55649242f010f0590&PRJCD=ACTIVITY"
+   },
    "note": "全家門市（含門市繳費、線上全家結帳）不限金額；每歸戶每月可刷 $1,000"
   },
   {
@@ -619,6 +663,8 @@
    "until": "2026-12-31",
    "how": "玉山Wallet「我的 > 玉山Unicard－我的方案」領取（領取期間 8/31 12:00～12/31 23:59）",
    "url": "https://event.esunbank.com.tw/credit/unicard/campaign.html",
+   "regUrl": "https://apps.apple.com/tw/app/id1174836717",
+   "regType": "app",
    "note": "每週三綁全支付或 PX Pay 於全聯／大全聯實體門市單筆滿 $1,000；每週三限送一次；PX GO!、線上購、小時達、外送不適用",
    "rids": [
     "c7_wed_pxmart"
@@ -638,6 +684,8 @@
    "until": "2026-12-31",
    "how": "玉山Wallet 領取（9/30 12:00 起開放），每月須在當月最後一天前完成領取",
    "url": "https://event.esunbank.com.tw/credit/unicard/campaign.html",
+   "regUrl": "https://apps.apple.com/tw/app/id1174836717",
+   "regType": "app",
    "note": "當月 U-POWER 消費滿3筆；每月每歸戶可刷 $10,000；每月開放日未公布，當月內領取即可"
   },
   {
@@ -670,6 +718,7 @@
    "quota": "不限名額",
    "how": "玉山官網活動頁登錄，須在信用卡結帳日前3日完成",
    "url": "https://event.esunbank.com.tw/credit/unicard/campaign.html",
+   "regUrl": "https://card.esunbank.com.tw/EsunCreditweb/txnservice/identify?PRJCD=ALLACTIV#b",
    "note": "含帳單e化＋臺幣帳戶自扣加碼；無上限；躉繳、三商美邦投資型保單、已辦保費分期不適用"
   },
   {
@@ -687,6 +736,7 @@
    "quota": "每月限 5,000 名",
    "how": "玉山官網活動頁登錄（esun.co/C1SGP），須先完成任務：首次綁定玉山 LINE 個人化通知，或首次以玉山卡綁 LINE Pay 並消費",
    "url": "https://event.esunbank.com.tw/credit/ubear/index.html",
+   "regUrl": "https://esun.co/C1SGP",
    "note": "開放時間未公布；每歸戶每月可刷 $10,000；限「首次綁定」者，老用戶多半不符資格"
   },
   {
@@ -703,6 +753,7 @@
    "quota": "不限名額",
    "how": "熊本熊卡日本優惠頁「立即登錄」（esun.co/Hppc9），活動期間登錄一次；2025 年登錄過的 2026 要重登",
    "url": "https://event.esunbank.com.tw/credit/kumamon-card/japan-discount.html",
+   "regUrl": "https://esun.co/Hppc9",
    "note": "疊日本一般消費 2.5% 合計 8.5%；加碼每歸戶每期帳單可刷 $8,333"
   },
   {
@@ -899,6 +950,10 @@
    "quota": "每月限 1,500 名",
    "how": "滙豐活動登錄頁（card.apply.hsbc.com.tw/event），每月一個登錄場次",
    "url": "https://shop.hsbc.com.tw/mipp/",
+   "regUrlByMonth": {
+    "2026-11": "https://card.apply.hsbc.com.tw/event/#/register/26Q4MIPP2611",
+    "2026-12": "https://card.apply.hsbc.com.tw/event/#/register/26Q4MIPP2612"
+   },
    "note": "11月場次為 11/2 15:00（非 11/1）；累積商店分期滿 66,000 送 1,500、滿 220,000 送 5,500、滿 550,000 送 15,000；指定百貨分期不計；不含公司卡、商務金/普卡、Visa 金融卡"
   },
   {
@@ -918,6 +973,7 @@
    "quota": "限 500 名",
    "how": "滙豐活動登錄頁（card.apply.hsbc.com.tw/event/#/register/26Q4MIPP1111）",
    "url": "https://shop.hsbc.com.tw/mipp/",
+   "regUrl": "https://card.apply.hsbc.com.tw/event/#/register/26Q4MIPP1111",
    "note": "當日新增商店分期滿 20,000 送 1,000 刷卡金；可與每月分期滿額重複參加；10/10 場已額滿"
   },
   {
@@ -937,6 +993,7 @@
    "quota": "限 500 名",
    "how": "滙豐活動登錄頁（card.apply.hsbc.com.tw/event/#/register/26Q4MIPP1212）",
    "url": "https://shop.hsbc.com.tw/mipp/",
+   "regUrl": "https://card.apply.hsbc.com.tw/event/#/register/26Q4MIPP1212",
    "note": "當日新增商店分期滿 20,000 送 1,000 刷卡金"
   },
   {
@@ -959,6 +1016,10 @@
    "quota": "每月限 1,500 名",
    "how": "滙豐活動登錄頁（card.apply.hsbc.com.tw/event，代碼 26Q4Fuel2610/2611/2612）",
    "url": "https://shop.hsbc.com.tw/mipp/",
+   "regUrlByMonth": {
+    "2026-11": "https://card.apply.hsbc.com.tw/event/#/register/26Q4Fuel2611",
+    "2026-12": "https://card.apply.hsbc.com.tw/event/#/register/26Q4Fuel2612"
+   },
    "note": "11月場次為 11/2 15:00；加油累積滿 6,500 送 100、滿 18,000 送 300、滿 50,000 送 1,000（roo.cash 誤寫 25,000，以官網為準）"
   },
   {
@@ -976,6 +1037,8 @@
    "until": "2026-12-31",
    "how": "星展 Card+ 信用卡數位服務登錄，當月登錄",
    "url": "https://www.dbs.com.tw/personal-zh/cards/offers/2026q3atl/index.html",
+   "regUrl": "https://apps.apple.com/tw/app/id1299625717",
+   "regType": "app",
    "note": "開放時間未公布；當月每集滿 5 筆單筆 NT$888 以上一般消費為一組，最高 2%，每月可刷 $25,000、活動期間可刷 $100,000（數字出自 Money101）"
   },
   {
@@ -994,6 +1057,8 @@
    "quota": "每月限 3,600 名（依當月合格餐飲總額排序）",
    "how": "星展 Card+ 登錄，當月登錄當月刷",
    "url": "https://www.dbs.com.tw/personal-zh/cards/offers/2026q4dining/index.html",
+   "regUrl": "https://apps.apple.com/tw/app/id1299625717",
+   "regType": "app",
    "note": "開放時間未公布；每月 3 筆國內餐飲、單筆 NT$888 以上；經濟日報稱限量回饋 1,400 刷卡金，Money101 上限數字前後不一"
   },
   {
@@ -1011,6 +1076,8 @@
    "quota": "各限 6,000 名（依合格餐飲總額排序）",
    "how": "星展 Card+ 登錄（免搶，但須完成登錄，三項分別登錄）",
    "url": "https://www.dbs.com.tw/personal-zh/cards/offers/2026500BOWL/index.html",
+   "regUrl": "https://apps.apple.com/tw/app/id1299625717",
+   "regType": "app",
    "note": "500碗 7/10 起、5 間累積滿 3,000，可刷 $10,000；500甜 8/25 起、4 間滿 5,000，可刷 $15,000；500盤 9/22 起、3 間滿 8,000，可刷 $20,000"
   },
   {
@@ -1029,6 +1096,8 @@
    "quota": "每月限 500 名",
    "how": "星展 Card+ 每月登錄",
    "url": "https://www.dbs.com.tw/personal-zh/cards/offers/domestictravel/index.html",
+   "regUrl": "https://apps.apple.com/tw/app/id1299625717",
+   "regType": "app",
    "note": "開放時間未公布；國內飯店、高鐵、國內航空、租車加油、Klook、KKday、樂園等單月累積滿 20,000，回饋 5%，每月可刷 $20,000、活動期間可刷 $80,000"
   },
   {
@@ -1047,6 +1116,8 @@
    "quota": "滿5萬檔每月 375 名、滿15萬檔每月 200 名、首次繳保費檔每月 375 名",
    "how": "星展 Card+ 月月登錄，先登錄再刷",
    "url": "https://www.dbs.com.tw/personal-zh/cards/offers/insurance2026Q4/index.html",
+   "regUrl": "https://apps.apple.com/tw/app/id1299625717",
+   "regType": "app",
    "note": "開放時間未公布；單月保費滿 5 萬送 400、滿 15 萬送 1,000；首次以星展卡繳保費滿 8,000 加贈 240；各月分開計算"
   },
   {
@@ -1064,6 +1135,8 @@
    "quota": "不限名額",
    "how": "星展 Card+ 登錄，活動期間登錄一次",
    "url": "https://www.dbs.com.tw/personal-zh/cards/offers/highinsurance2026Q3/index.html",
+   "regUrl": "https://apps.apple.com/tw/app/id1299625717",
+   "regType": "app",
    "note": "單筆台幣保費滿 50 萬，加碼萬事達卡 0.3%、其他星展卡 0.2%，無上限；不可與其他保費活動重複"
   },
   {
@@ -1082,6 +1155,8 @@
    "quota": "當月總回饋預算 50 萬，額滿為止",
    "how": "星展 Card+ 每月分別登錄",
    "url": "https://www.dbs.com.tw/personal-zh/cards/offers/20260912ovsdining/index.html",
+   "regUrl": "https://apps.apple.com/tw/app/id1299625717",
+   "regType": "app",
    "note": "開放時間未公布；海外實體餐廳，以當地交易日單筆最高餐飲計；經濟日報稱可刷約 $40,000，單日數字第三方說法不一"
   },
   {
@@ -1100,6 +1175,8 @@
    "quota": "行李箱每月 100 名、登機箱每月 15 名；萬事達加碼：漫遊吧每月 1,200、貴賓室每月 800、機場接送每月 500、15萬檔每月 200 名",
    "how": "星展 Card+ 登錄，當月消費達標後登錄",
    "url": "https://www.dbs.com.tw/personal-zh/cards/offers/20260912ovstravel/index.html",
+   "regUrl": "https://apps.apple.com/tw/app/id1299625717",
+   "regType": "app",
    "note": "指定航空／旅行社／訂房／海外實體當月滿 30 萬送 Samsonite、滿 80 萬送 RIMOWA；萬事達加碼滿 3/6/8/15 萬（限星展萬事達卡，eco 永續卡適用，傳說對決卡卡組織未確認）"
   },
   {
@@ -1136,6 +1213,7 @@
    "quota": "限 8,000 名",
    "how": "國泰世華官網 Apple 活動頁登錄，登錄期間 12/29 16:00～12/31 23:59",
    "url": "https://www.cathay-cube.com.tw/cathaybk/personal/event/overview/credit-card/shopping/202609/apple",
+   "regUrl": "https://www.cathaybk.com.tw/promotion/",
    "note": "條件同第一波，每正卡戶全活動擇優回饋一次"
   },
   {
@@ -1154,6 +1232,8 @@
    "quota": "每月限 10,000 名",
    "how": "Fubon+ App「優惠 → 活動登錄」（每月登錄）",
    "url": "https://www.fubon.com/banking/personal/credit_card/all_card/omiyage/omiyage.htm",
+   "regUrl": "https://apps.apple.com/tw/app/id6479990131",
+   "regType": "app",
    "note": "中國大陸、香港、澳門、新加坡、馬來西亞、越南當月實體消費合計滿 6,000 贈 300 即享券，每戶每月一張；登錄至當月底 23:59"
   },
   {
@@ -1171,6 +1251,8 @@
    "quota": "限 400 名",
    "how": "Fubon+ App「優惠 → 活動登錄」，登錄期間 11/1 14:00～11/30 23:59",
    "url": "https://www.fubon.com/banking/Personal/credit_card/all_card/OpenPossible/OpenPossible.htm",
+   "regUrl": "https://apps.apple.com/tw/app/id6479990131",
+   "regType": "app",
    "note": "myfone 網路門市單筆滿 1 萬（9/1–11/30 消費、12/15 前入帳），每戶一次，額滿不補登"
   },
   {
@@ -1188,6 +1270,8 @@
    "quota": "每月限 250,000 張",
    "how": "Richart Life App「優惠 → 優惠券 → Richart卡加碼」領 LINE Pay 券；須設定台新帳戶自扣卡費",
    "url": "https://www.taishinbank.com.tw/TSB/personal/credit/intro/overview/future/77509a62-84c5-11f0-b432-0050568c09e3",
+   "regUrl": "https://apps.apple.com/tw/app/id1185371908",
+   "regType": "app",
    "note": "官網領券時間為前一月最後一日 10:00（10月券 9/30、11月券 10/31、12月券官網誤植 11/31，應為 11/30）；每戶每月可刷 $33,334；逾期不補領"
   },
   {
@@ -1221,6 +1305,8 @@
    "quota": "每月限 55,000 名（注意事項另載 35,000 名，待確認）",
    "how": "街口 App「首頁 → 繳費」點領券圖示手動領取",
    "url": "https://www.taishinbank.com.tw/TSB/personal/credit/intro/overview/cg038/card001/",
+   "regUrl": "https://apps.apple.com/tw/app/id1020122239",
+   "regType": "app",
    "note": "開放時間未公布；當月街口 App 繳費滿 1,000，每月最多 20 元街口券"
   },
   {
@@ -1256,6 +1342,7 @@
    "quota": "每月限量 3,000 份",
    "how": "遠東商銀信用卡活動登錄（當期帳單須於次期結帳日 21:00 前完成登錄）",
    "url": "https://www.feib.com.tw/upload/creditcard/HappyCardRed/index.html",
+   "regUrl": "https://ecard.feib.com.tw/ActivityPromotion/index.do",
    "note": "登錄窗口依各人結帳日；一般消費滿 1.5 萬送 100（自扣 150）、滿 3 萬送 400（自扣 500），每戶每月一次；另一篇第三方寫 5,000/10,000/20,000 門檻，數字有出入"
   },
   {
@@ -1274,6 +1361,7 @@
    "quota": "刷卡金 400 元每月 200 組；佐登妮絲課程每月 200 組",
    "how": "遠東商銀官網限量登錄兌換（次月 5 日 09:00 起）",
    "url": "https://www.feib.com.tw/upload/creditcard/YACard/page6.html",
+   "regUrl": "https://ecard.feib.com.tw/ActivityPromotion/index.do",
    "note": "當月刷滿 26,000，次月登錄兌換二選一（刷卡金 400 或佐登妮絲美容課程）"
   },
   {
@@ -1291,6 +1379,7 @@
    "quota": "登錄不限名額（茶飲總量 10 萬瓶）",
    "how": "聯邦信用卡官網線上「活動登錄」，活動期間登錄一次",
    "url": "https://activity.ubot.com.tw/aws_act/2026/JiHoCard_Anniversary/index.htm",
+   "regUrl": "https://card.ubot.com.tw/eCard/activity_login/register_activity.aspx",
    "note": "2 筆單筆國內消費滿 $500；歸戶限 2 瓶。同頁另有單筆 $5,000 抽金鶴卡（抽獎，未列）"
   },
   {
@@ -1310,6 +1399,7 @@
    "quota": "每月限 1,350 名",
    "how": "聯邦信用卡官網「一般登錄活動專區」→「115XX指定卡別海外加碼」，消費當月登錄",
    "url": "https://activity.ubot.com.tw/aws_act/2026/20260607overseas/index.htm",
+   "regUrl": "https://card.ubot.com.tw/eCard/activity_login/register_activity.aspx",
    "note": "日本／美國／韓國／加拿大／泰國／墨西哥實體店，單月超過 $15,000 的部分加碼 3%，每月加碼部分可刷 $33,333；開放時間未公布，7–9 月名額皆額滿",
    "rids": [
     "c5_overseas6_q4",
@@ -1337,6 +1427,7 @@
    "quota": "每月限 12,000 名",
    "how": "聯邦 eCard「一般登錄活動專區」→ 當月「聯邦陪您輕鬆玩世界」，須消費當月登錄",
    "url": "https://activity.ubot.com.tw/aws_act/2026/202610travel/index.htm",
+   "regUrl": "https://card.ubot.com.tw/eCard/activity_login/register_activity.aspx",
    "note": "航空／旅行社／飯店／旅遊平台月累積滿 $20,000 送 300 起，最高 $200,000 送 5,000；分期另加碼，每戶每月上限 9,500 元"
   },
   {
@@ -1358,6 +1449,7 @@
    "quota": "總限 10,000 名（10月 5,000／11月 3,000／12月 2,000）",
    "how": "聯邦信用卡 eCard 或「智能好邦手」登錄；登錄一次後續月份免再登錄。10月沒搶到可在 11/20、12/20 15:00 再登",
    "url": "https://activity.ubot.com.tw/aws_act/2026/202610sub/index.htm",
+   "regUrl": "https://card.ubot.com.tw/eCard/activity_login/register_activity.aspx",
    "note": "Netflix／Disney+／YouTube／Spotify／ChatGPT／Claude／Gemini 等；基本 5% 與升級 10% 都是每月可刷 $2,000"
   },
   {
@@ -1421,6 +1513,7 @@
    "quota": "限 1,000 名",
    "how": "聯邦信用卡網站登錄（登錄期 10/28 15:00～11/3）",
    "url": "https://activity.ubot.com.tw/aws_act/2026/20261001momo/index.htm",
+   "regUrl": "https://cardweb.ubot.com.tw/register_extra",
    "note": "消費期間限 10/19–10/22"
   },
   {
@@ -1436,6 +1529,8 @@
    "until": "2026-12-31",
    "how": "iPASS MONEY App 登入 → 首頁右上「綠點專區」同意加入一卡通綠點回饋（加入一次）",
    "url": "https://activity.ubot.com.tw/2026GreenCard/index.htm",
+   "regUrl": "https://apps.apple.com/tw/app/id1664639200",
+   "regType": "app",
    "note": "每趟 5 點（1 點折 1 元），每卡每月最多 20 趟；新戶首趟 500 倍"
   },
   {
@@ -1491,6 +1586,8 @@
    "quota": "每月限 3,000 名",
    "how": "iLEO App 領券（每月 15 日 10:00；11 月提前為 11/13）",
    "url": "https://card.firstbank.com.tw/sites/card/zh_TW/1565707769555&openExternalBrowser=1",
+   "regUrl": "https://apps.apple.com/tw/app/id1446229166",
+   "regType": "app",
    "note": "當月 3 筆單筆滿 $1,000 且一銀帳戶自扣＋電子帳單；訂閱 5% 每月可刷 $4,000、momo／蝦皮／酷澎／Klook／KKday 3% 每月可刷 $6,667",
    "rids": [
     "ileo1_shopee_voucher"
@@ -1509,6 +1606,7 @@
    "until": "2026-12-31",
    "how": "第一銀行信用卡官網活動頁登錄",
    "url": "https://card.firstbank.com.tw/sites/Satellite?c=CreditCard&cid=1565690689020&d=Touch&pagename=FirstBankCard%2FCreditCard%2Fzh%2FCreditCardDetailView",
+   "regUrl": "https://ccard.firstbank.com.tw/cmsweb/act/actlist",
    "note": "當月一般消費滿 $2,000；每戶每月可加值 $2,500；一次或每月登錄未確認",
    "rids": [
     "fb1_icash_autoload"
@@ -1531,6 +1629,7 @@
    "quota": "每平台每月限 3,000 名",
    "how": "https://www.o-bank.com/egift/RegisterCampaign，三平台各自登錄、按月登錄。每月第一個營業日開放（官網未寫幾點）",
    "url": "https://www.o-bank.com/retail/event/event-compaign",
+   "regUrl": "https://www.o-bank.com/egift/RegisterCampaign",
    "note": "每月 10–12 日累積滿 $10,000 再送 888 元（每月限 300 名）；單平台每月最高 1,088 元",
    "rids": [
     "orange1_shopping_fest"

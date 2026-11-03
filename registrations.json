@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-25",
+ "updated": "2026-11-03",
  "items": [
   {
    "id": "ubot_delivery",
@@ -755,36 +755,6 @@
    "url": "https://event.esunbank.com.tw/credit/kumamon-card/japan-discount.html",
    "regUrl": "https://esun.co/Hppc9",
    "note": "疊日本一般消費 2.5% 合計 8.5%；加碼每歸戶每期帳單可刷 $8,333"
-  },
-  {
-   "id": "j3_jcb_themepark_oct",
-   "group": "network",
-   "network": "JCB",
-   "title": "JCB 日本環球影城（USJ）滿 ¥10,000 回 ¥2,000（20%）",
-   "cids": [
-    "c6",
-    "cube1",
-    "c11",
-    "j1",
-    "j2",
-    "j3",
-    "j5",
-    "c12",
-    "sunny1",
-    "fb1",
-    "miao1",
-    "feib1",
-    "ctbc_lp_jcb"
-   ],
-   "schedule": {
-    "type": "once"
-   },
-   "from": "2026-09-01",
-   "until": "2026-10-31",
-   "quota": "限 12,000 張卡，登錄額滿即截止",
-   "how": "JCB 官網 Now on JAPAN 活動頁登錄（需先用 email 建立 JCB 帳號；登錄截止日本時間 10/31 23:59＝台灣 22:59）",
-   "url": "https://www.specialoffers.jcb/zh-tw/campaign/detail/usj/93849/",
-   "note": "台灣發行 JCB 卡適用（限 JCB 版，同一張卡有 Visa／Mastercard 版的不適用）；10 月於 USJ 園區內實體店累積滿 ¥10,000；停車場、附設飯店、線上購票不算；登錄後的消費才算，每卡限回饋一次"
   },
   {
    "id": "j3_nagoya",
@@ -1635,6 +1605,36 @@
    "rids": [
     "orange1_shopping_fest"
    ]
+  },
+  {
+   "id": "jcb_jp_mitsukoshiisetan_202612",
+   "group": "network",
+   "network": "JCB",
+   "title": "JCB 日本三越伊勢丹百貨 滿 ¥50,000 回 ¥10,000（20%）",
+   "cids": [
+    "c6",
+    "cube1",
+    "c11",
+    "j1",
+    "j2",
+    "j3",
+    "j5",
+    "c12",
+    "sunny1",
+    "fb1",
+    "miao1",
+    "feib1",
+    "ctbc_lp_jcb"
+   ],
+   "schedule": {
+    "type": "once"
+   },
+   "from": "2026-11-02",
+   "until": "2026-12-31",
+   "quota": "限 12,000 張卡，登錄額滿即截止",
+   "how": "JCB 官網 Now on JAPAN 活動頁登錄（需先用 email 建立 JCB 帳號；登錄截止日本時間 12/31 23:59＝台灣 22:59）",
+   "url": "https://www.specialoffers.jcb/zh-tw/campaign/detail/mitsukoshiisetan/93855/",
+   "note": "台灣發行 JCB 卡適用（限 JCB 版，同一張卡有 Visa／Mastercard 版的不適用）；12/1～12/31 於日本指定三越伊勢丹百貨實體店累積滿 ¥50,000，回饋 ¥10,000，每卡上限 ¥10,000；限實體卡或綁 Apple Pay、QUICPay、Google Pay 刷卡，其他行動支付、第三方支付及線上消費不算，限日圓結帳；登錄後的消費才算"
   }
  ]
 }

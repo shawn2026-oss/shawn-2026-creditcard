@@ -1504,6 +1504,38 @@
    "note": "每趟 5 點（1 點折 1 元），每卡每月最多 20 趟；新戶首趟 500 倍"
   },
   {
+   "id": "ubot_ipass_green10",
+   "title": "聯邦卡綁 iPASS MONEY 付款 10% 一卡通綠點",
+   "cids": [
+    "c5",
+    "c2",
+    "j2",
+    "ubot_m",
+    "ubot_lb"
+   ],
+   "schedule": {
+    "type": "once"
+   },
+   "from": "2026-07-01",
+   "until": "2026-12-31",
+   "quota": "登錄不限名額，但每月總回饋 25 萬點、贈完即止（7–10 月皆已額滿）",
+   "how": "iPASS MONEY App 首頁「一卡通綠點」專區同意加入綠點（一次，最遲消費當月底前）；錢包帳戶 → 支付工具 → 綁定聯邦信用卡並設為預設付款",
+   "url": "https://activity.ubot.com.tw/aws_act/2026/2026ipassmoney/index.htm",
+   "regUrl": "https://apps.apple.com/tw/app/id1664639200",
+   "regType": "app",
+   "note": "單筆滿 $200；每人每月可刷 $500（五張聯邦卡合計、自然月），1 點折 1 元",
+   "promoIds": [
+    "ubot_ipassmoney"
+   ],
+   "rids": [
+    "c2_ipass10",
+    "c5_ipass10",
+    "j2_ipass10",
+    "ubot_m_ipass10",
+    "ubot_lb_ipass10"
+   ]
+  },
+  {
    "id": "c10_icash_autoload",
    "title": "中信UniOpen卡 icash2.0 自動加值 10% OPENPOINT",
    "cids": [

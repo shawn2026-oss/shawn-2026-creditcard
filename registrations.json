@@ -559,7 +559,7 @@
   },
   {
    "id": "esun_cpc_q4",
-   "title": "玉山卡 中油直營站綁中油Pay 加油滿 $3,000 加碼 3%",
+   "title": "玉山卡 中油直營站加油滿 $3,000 加碼 3%",
    "cids": [
     "c7",
     "j3",
@@ -581,7 +581,13 @@
     "2026-11": "https://esun.co/CPC2611",
     "2026-12": "https://esun.co/CPC2612"
    },
-   "note": "當月綁中油Pay於台灣中油直營站加油累積滿 $3,000；加碼3% e point，每月每歸戶可刷 $3,333"
+   "note": "當月於台灣中油直營站加油累積滿 $3,000；限實體卡或綁 Apple Pay／Google Pay／Samsung Pay／中油Pay，LINE Pay、街口等第三方支付不適用；加碼 3% e point，每月每歸戶上限 100 點",
+   "rids": [
+    "c7_cpc_q4",
+    "ubear1_cpc_q4",
+    "j3_cpc_q4",
+    "miao1_cpc_q4"
+   ]
   },
   {
    "id": "esun_travel_q4",

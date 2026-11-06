@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-03",
+ "updated": "2026-11-06",
  "items": [
   {
    "id": "ubot_delivery",
@@ -282,6 +282,28 @@
    "note": "每月可刷 $1,000",
    "rids": [
     "feib1_autoload"
+   ]
+  },
+  {
+   "id": "scsb_minions_applepay",
+   "title": "上海小小兵回饋卡 Apple Pay 日韓消費／指定交通 +5%",
+   "cids": [
+    "scsb_minions"
+   ],
+   "schedule": {
+    "type": "once"
+   },
+   "from": "2026-07-01",
+   "until": "2026-12-31",
+   "how": "上海商銀官網活動登錄頁，活動期間登錄一次；每月 25 日前登錄，月底結算上個月的消費",
+   "note": "日本／韓國 Apple Pay 消費每月可刷 $6,000；高鐵、臺鐵、捷運、Suica／ICOCA／PASMO 每月可刷 $4,000；小小兵分期卡、悠遊 Debit 卡不適用",
+   "url": "https://www.scsb.com.tw/content/card/hotPage/4604",
+   "regUrl": "https://ebank.scsb.com.tw/ternal/ofwbcv05/page#/ofwb/cv/05/01",
+   "rids": [
+    "scsb_minions_ap_jpkr",
+    "scsb_minions_ap_jpkr_suica",
+    "scsb_minions_ap_transit",
+    "scsb_minions_ap_transit_suica"
    ]
   },
   {

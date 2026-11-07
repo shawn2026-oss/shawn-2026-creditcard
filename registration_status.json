@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-06T08:15:32.682Z",
+  "updated": "2026-11-07T07:31:19.244Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -111,6 +111,18 @@
     "esun_travel_q4": {
       "status": "ok",
       "since": "2026-10-18"
+    },
+    "esun_coupang_nov": {
+      "status": "ok",
+      "since": "2026-11-07"
+    },
+    "esun_coupang_double11": {
+      "status": "ok",
+      "since": "2026-11-07"
+    },
+    "dbs_coupang_nov": {
+      "status": "ok",
+      "since": "2026-11-07"
     },
     "esun_pluspay_firstbind": {
       "status": "ok",

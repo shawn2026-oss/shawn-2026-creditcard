@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-07",
+ "updated": "2026-11-08",
  "items": [
   {
    "id": "ubot_delivery",
@@ -1814,6 +1814,63 @@
    "how": "JCB 官網 Now on JAPAN 活動頁登錄（需先用 email 建立 JCB 帳號；登錄截止日本時間 12/31 23:59＝台灣 22:59）",
    "url": "https://www.specialoffers.jcb/zh-tw/campaign/detail/mitsukoshiisetan/93855/",
    "note": "台灣發行 JCB 卡適用（限 JCB 版，同一張卡有 Visa／Mastercard 版的不適用）；12/1～12/31 於日本指定三越伊勢丹百貨實體店累積滿 ¥50,000，回饋 ¥10,000，每卡上限 ¥10,000；限實體卡或綁 Apple Pay、QUICPay、Google Pay 刷卡，其他行動支付、第三方支付及線上消費不算，限日圓結帳；登錄後的消費才算"
+  },
+  {
+   "id": "esun_pi_month",
+   "title": "玉山Pi拍錢包卡 月累積加碼 +0.8%／+2%",
+   "cids": [
+    "esun_pi"
+   ],
+   "schedule": {
+    "type": "once"
+   },
+   "from": "2026-09-01",
+   "until": "2027-02-28",
+   "quota": "不限名額",
+   "how": "玉山 Pi 拍錢包信用卡活動頁登錄，活動期間登錄一次（2026/2/28～8/31 已登錄者不用再登）",
+   "url": "https://event.esunbank.com.tw/credit/pi-card/index.html",
+   "note": "當月國內一般消費累積滿 $10,000 +0.8%、滿 $30,000 +2%；每月加碼上限 3,000 P幣（刷 $150,000）",
+   "rids": [
+    "esun_pi_month"
+   ]
+  },
+  {
+   "id": "esun_pi_wallet",
+   "title": "玉山Pi拍錢包卡 綁 Pi 拍錢包付款 +4%",
+   "cids": [
+    "esun_pi"
+   ],
+   "schedule": {
+    "type": "once"
+   },
+   "from": "2026-09-01",
+   "until": "2027-02-28",
+   "quota": "不限名額",
+   "how": "玉山 Pi 拍錢包信用卡活動頁登錄（一次、不溯及既往），並申辦玉山台幣帳戶自動扣繳卡費",
+   "url": "https://event.esunbank.com.tw/credit/pi-card/index.html",
+   "note": "Pi 拍錢包通路單筆滿 $499 +4%，每月可刷 $7,500",
+   "rids": [
+    "esun_pi_wallet"
+   ]
+  },
+  {
+   "id": "esun_poya_weekend",
+   "title": "玉山寶雅聯名卡 週末狂歡日 13%",
+   "cids": [
+    "esun_poya"
+   ],
+   "schedule": {
+    "type": "once"
+   },
+   "from": "2026-01-01",
+   "until": "2026-12-31",
+   "quota": "不限名額",
+   "how": "玉山寶雅悠遊聯名卡活動頁登錄，活動期間登錄一次；第一次登錄最晚在消費次月 1 日前完成",
+   "url": "https://event.esunbank.com.tw/credit/poya-card-b/index.html",
+   "note": "週六、日在寶雅門市或寶雅線上買單筆滿 $999 13%，每月可刷 $2,307",
+   "rids": [
+    "esun_poya_weekend"
+   ]
   }
  ]
 }

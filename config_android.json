@@ -1,6 +1,6 @@
 {
-  "news": "2.1.0上線：刷卡自動記帳、說一句就記帳",
-  "latest_version": "2.1.0",
+  "news": "2.2.1更新，新增玉山Pi拍錢包卡、玉山寶雅聯名卡，智慧選卡常用支付自動排前面",
+  "latest_version": "2.2.1",
   "min_version": "1.0.0",
   "force_update_message": "此版本已過舊，請更新至最新版本。"
 }

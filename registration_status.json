@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-07T07:31:19.244Z",
+  "updated": "2026-11-08T07:43:11.630Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -153,8 +153,10 @@
       "since": "2026-10-18"
     },
     "j5_select7": {
-      "status": "ok",
-      "since": "2026-10-18"
+      "status": "unreachable",
+      "hit": "fetch failed",
+      "since": "2026-11-08",
+      "fails": 1
     },
     "j5_mop_linkou_anniv": {
       "status": "ok",
@@ -301,6 +303,18 @@
     "jcb_jp_mitsukoshiisetan_202612": {
       "status": "ok",
       "since": "2026-11-03"
+    },
+    "esun_pi_month": {
+      "status": "ok",
+      "since": "2026-11-08"
+    },
+    "esun_pi_wallet": {
+      "status": "ok",
+      "since": "2026-11-08"
+    },
+    "esun_poya_weekend": {
+      "status": "ok",
+      "since": "2026-11-08"
     }
   }
 }

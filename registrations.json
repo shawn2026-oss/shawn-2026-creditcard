@@ -1579,7 +1579,9 @@
    "schedule": {
     "type": "monthly",
     "day": 1,
-    "time": "12:00"
+    "time": "12:00",
+    "shift": "next",
+    "baseDay": 1
    },
    "from": "2026-10-01",
    "until": "2026-12-31",

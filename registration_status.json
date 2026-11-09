@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-08T07:43:11.630Z",
+  "updated": "2026-11-09T08:23:47.686Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -153,14 +153,8 @@
       "since": "2026-10-18"
     },
     "j5_select7": {
-      "status": "unreachable",
-      "hit": "fetch failed",
-      "since": "2026-11-08",
-      "fails": 1
-    },
-    "j5_mop_linkou_anniv": {
       "status": "ok",
-      "since": "2026-10-18"
+      "since": "2026-11-09"
     },
     "c12_jkt_2027q1": {
       "status": "ok",
@@ -315,6 +309,196 @@
     "esun_poya_weekend": {
       "status": "ok",
       "since": "2026-11-08"
+    },
+    "esun_momo_nov6": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "esun_momo_1111": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "esun_momo_high": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "esun_momo_team": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "esun_momo_cat": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "esun_momo_peach": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "esun_shopee_nov": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "esun_shopee_1111": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "esun_shopee_high": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "esun_shopee_crazy": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "esun_pchome_1111": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "esun_pchome_high": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "esun_pchome_24": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "esun_pchome_cum": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "ubear1_pchome_game": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "esun_yahoo_nov": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "esun_autopay_5pct": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "cube_star_signs": {
+      "status": "unreachable",
+      "hit": "很抱歉，找不到此頁面 您要尋找的頁面不存在或已被移除 為協助您快速找到所需資訊，您可以先查看【常見問題】了解一般說明，或",
+      "since": "2026-11-09",
+      "fails": 1
+    },
+    "fubon_coupang_q4": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "fubon_taobao_q4": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "fubon_pchome_q4": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "j1_myjapan_hakata_sapporo": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "ubot_shopee_nov_inst": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "ubot_shopee_nov_single": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "ubot_shopee_nov_cum": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "ubot_shopee_nov_1825": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "ubot_coupang_nov_inst": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "ubot_coupang_nov_single": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "dbs_momo_nov": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "dbs_shopee_nov": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "dbs_pchome_nov": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "dbs_taobao_nov": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "dbs_dining_lottery": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "fb_shopee_nov_cum": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "fb_shopee_double11_inst": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "feib_shopee_1111day": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "feib_shopee_inst_month": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "sunny_shopee_nov_full": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "sunny_shopee_mon": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "sunny_shopee_inst": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "scsb_twpay5": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "scsb_cvs5": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "c7_dining_q4": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "j3_jcb_mitsui_jp_nov": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "esun_wallet_weekly_w2": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "esun_wallet_weekly_w3": {
+      "status": "ok",
+      "since": "2026-11-09"
+    },
+    "esun_wallet_weekly_w4": {
+      "status": "ok",
+      "since": "2026-11-09"
     }
   }
 }

@@ -1,6 +1,6 @@
 {
-  "news": "2.2.3更新，截圖報帳一個泡泡算一筆，還能點開截圖對照",
-  "latest_version": "2.2.3",
+  "news": "2.2.4更新，記帳頁紀錄只留日期時間，跟 iPhone 版一樣清爽",
+  "latest_version": "2.2.4",
   "min_version": "1.0.0",
   "force_update_message": "此版本已過舊，請更新至最新版本。"
 }

@@ -2719,6 +2719,75 @@
    "how": "JCB 活動頁事前線上登錄（日本時間 10/1 10:00～11/30 23:59）",
    "url": "https://event.esunbank.com.tw/credit/kumamon-card/campaign.html",
    "note": "11 月實體店累積滿 ¥80,000；名額頁面未載明；JCB 全球活動，各家 JCB 卡都適用"
+  },
+  {
+   "id": "esun_wallet_weekly_w2",
+   "title": "玉山Wallet 週週登錄拿點趣 第2週（消費 1 筆送 10 點）",
+   "cids": [
+    "c7",
+    "j3",
+    "ubear1",
+    "miao1",
+    "esun_pi",
+    "esun_poya"
+   ],
+   "schedule": {
+    "type": "once",
+    "day": 9,
+    "time": "10:00"
+   },
+   "from": "2026-11-09",
+   "until": "2026-11-15",
+   "quota": "每週限量 50,000 名",
+   "how": "玉山Wallet App「我的」>「活動登錄」，找當週那一檔；每週都要重新登錄",
+   "url": "https://www.esunbank.com/zh-tw/personal/credit-card/discount/shopInfo?sno=8068",
+   "note": "登錄成功＋活動期間用玉山信用卡消費 1 筆（不限金額）送 10 點 e point；任三週都登錄並消費再加贈 30 點，每歸戶最高 70 點；限正卡人；12 月底入帳"
+  },
+  {
+   "id": "esun_wallet_weekly_w3",
+   "title": "玉山Wallet 週週登錄拿點趣 第3週（消費 1 筆送 10 點）",
+   "cids": [
+    "c7",
+    "j3",
+    "ubear1",
+    "miao1",
+    "esun_pi",
+    "esun_poya"
+   ],
+   "schedule": {
+    "type": "once",
+    "day": 16,
+    "time": "10:00"
+   },
+   "from": "2026-11-16",
+   "until": "2026-11-22",
+   "quota": "每週限量 50,000 名",
+   "how": "玉山Wallet App「我的」>「活動登錄」，找當週那一檔；每週都要重新登錄",
+   "url": "https://www.esunbank.com/zh-tw/personal/credit-card/discount/shopInfo?sno=8068",
+   "note": "登錄成功＋活動期間用玉山信用卡消費 1 筆（不限金額）送 10 點 e point；任三週都登錄並消費再加贈 30 點，每歸戶最高 70 點；限正卡人；12 月底入帳"
+  },
+  {
+   "id": "esun_wallet_weekly_w4",
+   "title": "玉山Wallet 週週登錄拿點趣 第4週（消費 1 筆送 10 點）",
+   "cids": [
+    "c7",
+    "j3",
+    "ubear1",
+    "miao1",
+    "esun_pi",
+    "esun_poya"
+   ],
+   "schedule": {
+    "type": "once",
+    "day": 23,
+    "time": "10:00"
+   },
+   "from": "2026-11-23",
+   "until": "2026-11-29",
+   "quota": "每週限量 50,000 名",
+   "how": "玉山Wallet App「我的」>「活動登錄」，找當週那一檔；每週都要重新登錄",
+   "url": "https://www.esunbank.com/zh-tw/personal/credit-card/discount/shopInfo?sno=8068",
+   "note": "登錄成功＋活動期間用玉山信用卡消費 1 筆（不限金額）送 10 點 e point；任三週都登錄並消費再加贈 30 點，每歸戶最高 70 點；限正卡人；12 月底入帳"
   }
  ]
 }

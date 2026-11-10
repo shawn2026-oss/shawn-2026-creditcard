@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-09T08:23:47.686Z",
+  "updated": "2026-11-10T08:40:26.131Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -127,6 +127,10 @@
     "esun_pluspay_firstbind": {
       "status": "ok",
       "since": "2026-10-18"
+    },
+    "esun_pluspay6": {
+      "status": "ok",
+      "since": "2026-11-10"
     },
     "c7_family_pluspay": {
       "status": "ok",
@@ -379,10 +383,10 @@
       "since": "2026-11-09"
     },
     "cube_star_signs": {
-      "status": "unreachable",
+      "status": "gone",
       "hit": "很抱歉，找不到此頁面 您要尋找的頁面不存在或已被移除 為協助您快速找到所需資訊，您可以先查看【常見問題】了解一般說明，或",
-      "since": "2026-11-09",
-      "fails": 1
+      "since": "2026-11-10",
+      "fails": 2
     },
     "fubon_coupang_q4": {
       "status": "ok",

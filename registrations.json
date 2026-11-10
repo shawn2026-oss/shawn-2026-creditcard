@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-09",
+ "updated": "2026-11-10",
  "items": [
   {
    "id": "ubot_delivery",
@@ -750,6 +750,42 @@
    "url": "https://www.esunbank.com/zh-tw/personal/credit-card/discount/shopInfo?sno=8053",
    "regUrl": "https://card.esunbank.com.tw/EsunCreditweb/txnservice/Activity/RegisterEvent?EventId=PP2644&mac=1c89ec9ab38eee5a3163a06436e4b2fafce9597049a0c488dc5679d67bc1ec0b&PRJCD=ACTIVITY",
    "note": "限 2026/10/1 前沒用玉山卡綁過全盈+PAY 的人；每歸戶 68 點"
+  },
+  {
+   "id": "esun_pluspay6",
+   "title": "玉山卡 綁全盈+PAY 筆筆 6%",
+   "cids": [
+    "c7",
+    "j3",
+    "ubear1",
+    "miao1",
+    "esun_pi",
+    "esun_poya"
+   ],
+   "schedule": {
+    "type": "monthly",
+    "day": 1,
+    "time": "10:00"
+   },
+   "from": "2026-11-04",
+   "until": "2026-12-31",
+   "quota": "每月限 20,000 名",
+   "how": "玉山官網活動頁每月登錄（限正卡），當月登錄只算當月消費；11 月 11/4、12 月 12/1 10:00 開放",
+   "url": "https://www.esunbank.com/zh-tw/personal/credit-card/discount/shopInfo?sno=8053",
+   "regUrl": "https://card.esunbank.com.tw/EsunCreditweb/txnservice/identify?PRJCD=ALLACTIV#b",
+   "regUrlByMonth": {
+    "2026-11": "https://card.esunbank.com.tw/EsunCreditweb/txnservice/Activity/RegisterEvent?EventId=PP2613&mac=5f0afd1fa9013cf8a938d86f0eba22a5fb886731467d36a2cd50f08e3cb8f973&PRJCD=ACTIVITY",
+    "2026-12": "https://card.esunbank.com.tw/EsunCreditweb/txnservice/Activity/RegisterEvent?EventId=PP2614&mac=e95f6eaaf9f026087444ef2156a81867860ed81167e5bfb5d7a9e742bf633851&PRJCD=ACTIVITY"
+   },
+   "note": "全盈+PAY 適用通路都算（含全家、繳稅、水電瓦斯），不限金額、不限首綁；每歸戶每月 100 點（刷 $1,667）；簽帳金融卡不適用",
+   "rids": [
+    "c7_pluspay6",
+    "j3_pluspay6",
+    "ubear1_pluspay6",
+    "miao1_pluspay6",
+    "esun_pi_pluspay6",
+    "esun_poya_pluspay6"
+   ]
   },
   {
    "id": "c7_family_pluspay",

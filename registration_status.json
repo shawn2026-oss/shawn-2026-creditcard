@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-10T08:40:26.131Z",
+  "updated": "2026-11-11T08:00:16.609Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -386,7 +386,7 @@
       "status": "gone",
       "hit": "很抱歉，找不到此頁面 您要尋找的頁面不存在或已被移除 為協助您快速找到所需資訊，您可以先查看【常見問題】了解一般說明，或",
       "since": "2026-11-10",
-      "fails": 2
+      "fails": 3
     },
     "fubon_coupang_q4": {
       "status": "ok",

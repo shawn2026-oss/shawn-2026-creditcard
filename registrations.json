@@ -2832,6 +2832,23 @@
    "how": "玉山Wallet App「我的」>「活動登錄」，找當週那一檔；每週都要重新登錄",
    "url": "https://www.esunbank.com/zh-tw/personal/credit-card/discount/shopInfo?sno=8068",
    "note": "登錄成功＋活動期間用玉山信用卡消費 1 筆（不限金額）送 10 點 e point；任三週都登錄並消費再加贈 30 點，每歸戶最高 70 點；限正卡人；12 月底入帳"
+  },
+  {
+   "id": "easywallet_dining_weekly",
+   "title": "悠遊付 指定餐廳週週領券（最高 13%）",
+   "cids": [],
+   "wallet": "悠遊付",
+   "schedule": {
+    "type": "weekly",
+    "weekday": 5,
+    "time": "00:00"
+   },
+   "from": "2026-10-01",
+   "until": "2026-12-31",
+   "quota": "餐餐飽食券每週限用 3,500 張、聚餐狂歡券每週限用 200 張，先用先得",
+   "how": "每週四到悠遊付活動頁點當週的領券連結，兩種券各領 1 張；券用到隔週三 23:59",
+   "url": "https://easywallet.easycard.com.tw/benefit/content?id=1789526598",
+   "note": "指定餐廳用悠遊付付款：餐餐飽食券單筆滿 $100 回饋 8%（每張最多 $15）、聚餐狂歡券單筆滿 $1,000 回饋 8%（每張最多 $150）；週五再疊悠遊付週五會員日 2%、月級挑戰最高 3%。百貨、商場內的門市不適用。"
   }
  ]
 }

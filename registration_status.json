@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-11T08:00:16.609Z",
+  "updated": "2026-11-12T08:38:52.536Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -53,8 +53,10 @@
       "since": "2026-10-26"
     },
     "scsb_minions_applepay": {
-      "status": "ok",
-      "since": "2026-11-06"
+      "status": "unreachable",
+      "hit": "HTTP 500 / 213 字",
+      "since": "2026-11-12",
+      "fails": 1
     },
     "fb1_pay3": {
       "status": "ok",
@@ -177,10 +179,6 @@
       "since": "2026-10-18"
     },
     "hsbc_q4_installment": {
-      "status": "ok",
-      "since": "2026-10-18"
-    },
-    "hsbc_q4_double11": {
       "status": "ok",
       "since": "2026-10-18"
     },
@@ -386,7 +384,7 @@
       "status": "gone",
       "hit": "很抱歉，找不到此頁面 您要尋找的頁面不存在或已被移除 為協助您快速找到所需資訊，您可以先查看【常見問題】了解一般說明，或",
       "since": "2026-11-10",
-      "fails": 3
+      "fails": 4
     },
     "fubon_coupang_q4": {
       "status": "ok",
@@ -503,6 +501,10 @@
     "esun_wallet_weekly_w4": {
       "status": "ok",
       "since": "2026-11-09"
+    },
+    "easywallet_dining_weekly": {
+      "status": "ok",
+      "since": "2026-11-12"
     }
   }
 }

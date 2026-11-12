@@ -1,6 +1,6 @@
 {
-  "news": "2.3.0更新，自動記帳判斷更準確",
-  "latest_version": "2.3.0",
+  "news": "2.3.1更新，消費紀錄每筆都看得到回饋金額和回饋率",
+  "latest_version": "2.3.1",
   "min_version": "1.0.0",
   "force_update_message": "此版本已過舊，請更新至最新版本。"
 }

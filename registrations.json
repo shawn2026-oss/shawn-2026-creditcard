@@ -781,7 +781,7 @@
     "2026-11": "https://card.esunbank.com.tw/EsunCreditweb/txnservice/Activity/RegisterEvent?EventId=PP2613&mac=5f0afd1fa9013cf8a938d86f0eba22a5fb886731467d36a2cd50f08e3cb8f973&PRJCD=ACTIVITY",
     "2026-12": "https://card.esunbank.com.tw/EsunCreditweb/txnservice/Activity/RegisterEvent?EventId=PP2614&mac=e95f6eaaf9f026087444ef2156a81867860ed81167e5bfb5d7a9e742bf633851&PRJCD=ACTIVITY"
    },
-   "note": "全盈+PAY 適用通路都算（含全家、繳稅、水電瓦斯），不限金額、不限首綁；每歸戶每月 100 點（刷 $1,667）；簽帳金融卡不適用",
+   "note": "全盈+PAY 適用通路都算（含全家、繳稅、水電瓦斯），不限金額、不限首綁；全家和繳費只有這 6%，卡片原本的回饋沒有；每歸戶每月 100 點（刷 $1,667）；簽帳金融卡不適用",
    "rids": [
     "c7_pluspay6",
     "j3_pluspay6",

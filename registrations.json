@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-10",
+ "updated": "2026-11-13",
  "items": [
   {
    "id": "ubot_delivery",
@@ -696,7 +696,8 @@
    "title": "國泰卡 酷澎 11 月單筆滿 $5,000 送 150 點／分期滿 $22,000 送 1,200 點",
    "cids": [
     "cube1",
-    "cathay_am"
+    "cathay_am",
+    "cathay_shopee"
    ],
    "schedule": {
     "type": "once",
@@ -710,6 +711,153 @@
    "note": "11/1–11/30 在酷澎刷國泰世華信用卡：單筆滿 $5,000 送 150 點；單筆分期且分期前金額滿 $22,000 送 1,200 點；每月擇優一次，且與同月其他刷卡活動擇優；LINE Pay、街口等第三方支付不適用；分期消費不適用 CUBE 卡玩數位回饋。免登錄：11/1–11/11 分期前滿 $10,000 現折 $888（每日 250 名）、滿 $36,000 現折 $3,000（每日 78 名）；11/9–11/11 超品日指定品牌滿 $3,000 折 5%（上限 $200）；分期優惠不適用 Apple Pay",
    "shops": [
     "酷澎"
+   ]
+  },
+  {
+   "id": "cathay_shopee_shopee_app",
+   "title": "國泰蝦皮聯名卡 蝦皮直營 +1%／超級品牌日 +6%",
+   "cids": [
+    "cathay_shopee"
+   ],
+   "schedule": {
+    "type": "once"
+   },
+   "from": "2026-10-01",
+   "until": "2026-12-31",
+   "quota": "不限名額",
+   "how": "蝦皮 App 聯名卡活動頁登錄，一季一次（10～12 月登一次）；當月的消費要在當月底前登錄",
+   "url": "https://shopee.tw/m/ShopeeCUBcobrandcard",
+   "note": "蝦皮直營 +1%（無上限）；超級品牌日／超級名店日 +6%，每月可刷 $16,667；今日旗艦店不算",
+   "rids": [
+    "cathay_shopee_super"
+   ],
+   "shops": [
+    "蝦皮"
+   ]
+  },
+  {
+   "id": "cathay_shopee_sp_202611",
+   "title": "國泰蝦皮聯名卡 11 月蝦皮滿額送蝦幣",
+   "cids": [
+    "cathay_shopee"
+   ],
+   "schedule": {
+    "type": "once",
+    "time": "16:00"
+   },
+   "from": "2026-11-20",
+   "until": "2026-11-20",
+   "quota": "限 1,500 名",
+   "how": "國泰世華官網登錄專區或國泰優惠 App，11/20 16:00～23:59（限正卡人資料）",
+   "url": "https://www.cathay-cube.com.tw/cathaybk/personal/event/overview/credit-card/online-shopping/202410/sp-permonth",
+   "note": "11/1～11/30 在蝦皮刷這張卡：單筆滿 $6,500 送 650 蝦幣；單筆分期（3／6／24 期）滿 $20,000 送 3,600 蝦幣；每戶一次，跟國泰全卡友蝦皮活動擇優；LINE Pay、街口不算",
+   "shops": [
+    "蝦皮"
+   ]
+  },
+  {
+   "id": "cathay_shopee_1212",
+   "title": "國泰蝦皮聯名卡 雙12 促刷檔期 +6%",
+   "cids": [
+    "cathay_shopee"
+   ],
+   "schedule": {
+    "type": "once"
+   },
+   "from": "2026-12-12",
+   "until": "2026-12-12",
+   "quota": "不限名額",
+   "how": "國泰世華官網登錄專區或國泰優惠 App，12/12 當天登錄（開放時間未公布）",
+   "url": "https://www.cathay-cube.com.tw/cathaybk/personal/event/overview/credit-card/online-shopping/202411/sp-campaign",
+   "note": "12/12 當天在蝦皮全站刷這張卡 +6% 蝦幣，每戶可刷 $33,334；跟超級品牌日擇優",
+   "shops": [
+    "蝦皮"
+   ]
+  },
+  {
+   "id": "cathay_shopee_travel_w2",
+   "title": "國泰蝦皮聯名卡 指定外送／交通／旅遊 +6.5%（第二波）",
+   "cids": [
+    "cathay_shopee"
+   ],
+   "schedule": {
+    "type": "once",
+    "time": "16:00"
+   },
+   "from": "2026-12-22",
+   "until": "2026-12-24",
+   "quota": "限 10,000 名",
+   "how": "國泰世華官網登錄專區或國泰優惠 App，12/22 16:00～12/24 23:59（限正卡人資料）",
+   "url": "https://www.cathay-cube.com.tw/cathaybk/personal/event/overview/credit-card/online-shopping/202506/sp-travel",
+   "note": "10/1～12/31 在 Uber Eats、foodpanda、高鐵、台鐵、台灣大車隊、LINE GO、Uber、iRent、航空公司官網、旅行社、KKday、Klook、昇恆昌、采盟刷這張卡共 7%，每波可刷 $46,154",
+   "rids": [
+    "cathay_shopee_travel"
+   ]
+  },
+  {
+   "id": "cathay_shopee_202611_1111",
+   "title": "國泰世華信用卡 蝦皮雙11強檔 單筆滿 $30,000 送 $3,000",
+   "cids": [
+    "cube1",
+    "cathay_am",
+    "cathay_shopee"
+   ],
+   "schedule": {
+    "type": "once",
+    "time": "16:00"
+   },
+   "from": "2026-11-12",
+   "until": "2026-11-30",
+   "quota": "限 1,000 名",
+   "how": "國泰世華官網登錄專區或國泰優惠 CUBE Rewards App，11/12 16:00～11/30 23:59（限正卡人資料）",
+   "url": "https://www.cathay-cube.com.tw/cathaybk/personal/event/overview/credit-card/online-shopping/202611/shopee202611_3",
+   "note": "11/9～11/12 在蝦皮單筆滿 $30,000（含分期）送 $3,000；國泰CUBE卡給小樹點；跟同月其他國泰蝦皮活動、蝦皮聯名卡 11 月滿額擇優一次；LINE Pay、街口不算",
+   "shops": [
+    "蝦皮"
+   ]
+  },
+  {
+   "id": "cathay_shopee_202611_carnival",
+   "title": "國泰世華信用卡 蝦皮 11 月購物嘉年華 滿 $5,000 送 $250",
+   "cids": [
+    "cube1",
+    "cathay_am",
+    "cathay_shopee"
+   ],
+   "schedule": {
+    "type": "once",
+    "time": "16:00"
+   },
+   "from": "2026-11-19",
+   "until": "2026-11-30",
+   "quota": "兩個門檻合計限 3,000 名",
+   "how": "國泰世華官網登錄專區或國泰優惠 CUBE Rewards App，11/19 16:00～11/30 23:59（限正卡人資料）",
+   "url": "https://www.cathay-cube.com.tw/cathaybk/personal/event/overview/credit-card/online-shopping/202611/shopee202611_1",
+   "note": "11/1～11/15 在蝦皮單筆滿 $5,000 送 $250；單筆分期（3／6／24 期）滿 $20,000 送 $1,500；國泰CUBE卡給小樹點；跟同月其他國泰蝦皮活動、蝦皮聯名卡 11 月滿額擇優一次；LINE Pay、街口不算",
+   "shops": [
+    "蝦皮"
+   ]
+  },
+  {
+   "id": "cathay_shopee_202611_frenzy",
+   "title": "國泰世華信用卡 蝦皮 11 月狂購盛典 滿 $5,000 送 $200",
+   "cids": [
+    "cube1",
+    "cathay_am",
+    "cathay_shopee"
+   ],
+   "schedule": {
+    "type": "once",
+    "time": "16:00"
+   },
+   "from": "2026-11-24",
+   "until": "2026-11-30",
+   "quota": "兩個門檻合計限 3,000 名",
+   "how": "國泰世華官網登錄專區或國泰優惠 CUBE Rewards App，11/24 16:00～11/30 23:59（限正卡人資料）",
+   "url": "https://www.cathay-cube.com.tw/cathaybk/personal/event/overview/credit-card/online-shopping/202611/shopee202611_2",
+   "note": "11/16～11/30 在蝦皮單筆滿 $5,000 送 $200；單筆分期（3／6／24 期）滿 $20,000 送 $1,500；國泰CUBE卡給小樹點；跟同月其他國泰蝦皮活動、蝦皮聯名卡 11 月滿額擇優一次；LINE Pay、街口不算",
+   "shops": [
+    "蝦皮"
    ]
   },
   {
@@ -1258,7 +1406,8 @@
    "title": "國泰世華信用卡 Apple 購機分期送刷卡金（第二波）",
    "cids": [
     "cube1",
-    "cathay_am"
+    "cathay_am",
+    "cathay_shopee"
    ],
    "schedule": {
     "type": "once",

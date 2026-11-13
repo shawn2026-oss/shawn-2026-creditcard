@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-12T08:38:52.536Z",
+  "updated": "2026-11-13T08:28:33.721Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -49,14 +49,16 @@
       "since": "2026-10-18"
     },
     "feib1_easycard": {
-      "status": "ok",
-      "since": "2026-10-26"
+      "status": "unreachable",
+      "hit": "fetch failed",
+      "since": "2026-11-13",
+      "fails": 1
     },
     "scsb_minions_applepay": {
       "status": "unreachable",
       "hit": "HTTP 500 / 213 字",
       "since": "2026-11-12",
-      "fails": 1
+      "fails": 2
     },
     "fb1_pay3": {
       "status": "ok",
@@ -277,7 +279,7 @@
       "status": "ok",
       "rewardFull": true,
       "rewardMonth": "2026-11",
-      "rewardHit": "門推薦 ▲ 活動內容 登錄期間 我要登錄 查詢 【11月活動已額滿】uniopen聯名卡ic",
+      "rewardHit": "中信 UniOpen 卡 自動加值 10% 11 月名額已滿",
       "since": "2026-10-23"
     },
     "c10_books_weekend": {
@@ -384,7 +386,7 @@
       "status": "gone",
       "hit": "很抱歉，找不到此頁面 您要尋找的頁面不存在或已被移除 為協助您快速找到所需資訊，您可以先查看【常見問題】了解一般說明，或",
       "since": "2026-11-10",
-      "fails": 4
+      "fails": 5
     },
     "fubon_coupang_q4": {
       "status": "ok",
@@ -479,8 +481,10 @@
       "since": "2026-11-09"
     },
     "scsb_cvs5": {
-      "status": "ok",
-      "since": "2026-11-09"
+      "status": "unreachable",
+      "hit": "HTTP 500 / 213 字",
+      "since": "2026-11-13",
+      "fails": 1
     },
     "c7_dining_q4": {
       "status": "ok",

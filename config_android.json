@@ -1,6 +1,6 @@
 {
-  "news": "2.3.3更新，優化系統運算邏輯",
-  "latest_version": "2.3.3",
+  "news": "2.3.4更新，報帳辨識優化",
+  "latest_version": "2.3.4",
   "min_version": "1.0.0",
   "force_update_message": "此版本已過舊，請更新至最新版本。"
 }

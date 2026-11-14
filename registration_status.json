@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-13T08:28:33.721Z",
+  "updated": "2026-11-14T07:49:43.858Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -49,16 +49,12 @@
       "since": "2026-10-18"
     },
     "feib1_easycard": {
-      "status": "unreachable",
-      "hit": "fetch failed",
-      "since": "2026-11-13",
-      "fails": 1
+      "status": "ok",
+      "since": "2026-11-14"
     },
     "scsb_minions_applepay": {
-      "status": "unreachable",
-      "hit": "HTTP 500 / 213 字",
-      "since": "2026-11-12",
-      "fails": 2
+      "status": "ok",
+      "since": "2026-11-14"
     },
     "fb1_pay3": {
       "status": "ok",
@@ -241,8 +237,10 @@
       "since": "2026-10-18"
     },
     "feib1_monthly_spend": {
-      "status": "ok",
-      "since": "2026-10-18"
+      "status": "unreachable",
+      "hit": "fetch failed",
+      "since": "2026-11-14",
+      "fails": 1
     },
     "c8_relax_reward": {
       "status": "ok",
@@ -382,12 +380,6 @@
       "status": "ok",
       "since": "2026-11-09"
     },
-    "cube_star_signs": {
-      "status": "gone",
-      "hit": "很抱歉，找不到此頁面 您要尋找的頁面不存在或已被移除 為協助您快速找到所需資訊，您可以先查看【常見問題】了解一般說明，或",
-      "since": "2026-11-10",
-      "fails": 5
-    },
     "fubon_coupang_q4": {
       "status": "ok",
       "since": "2026-11-09"
@@ -481,10 +473,8 @@
       "since": "2026-11-09"
     },
     "scsb_cvs5": {
-      "status": "unreachable",
-      "hit": "HTTP 500 / 213 字",
-      "since": "2026-11-13",
-      "fails": 1
+      "status": "ok",
+      "since": "2026-11-14"
     },
     "c7_dining_q4": {
       "status": "ok",

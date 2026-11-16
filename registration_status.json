@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-15T08:08:54.406Z",
+  "updated": "2026-11-16T08:17:40.184Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -479,10 +479,6 @@
       "since": "2026-11-09"
     },
     "j3_jcb_mitsui_jp_nov": {
-      "status": "ok",
-      "since": "2026-11-09"
-    },
-    "esun_wallet_weekly_w2": {
       "status": "ok",
       "since": "2026-11-09"
     },

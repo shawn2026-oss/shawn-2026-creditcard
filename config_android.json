@@ -1,6 +1,6 @@
 {
-  "news": "2.3.5更新，新增國泰蝦皮聯名卡",
-  "latest_version": "2.3.5",
+  "news": "2.3.6更新，外幣刷卡通知也能自動記帳",
+  "latest_version": "2.3.6",
   "min_version": "1.0.0",
   "force_update_message": "此版本已過舊，請更新至最新版本。"
 }

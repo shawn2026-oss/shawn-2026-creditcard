@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-19T09:06:35.431Z",
+  "updated": "2026-11-20T08:52:07.613Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -49,8 +49,10 @@
       "since": "2026-10-18"
     },
     "feib1_easycard": {
-      "status": "ok",
-      "since": "2026-11-14"
+      "status": "unreachable",
+      "hit": "fetch failed",
+      "since": "2026-11-20",
+      "fails": 1
     },
     "scsb_minions_applepay": {
       "status": "ok",

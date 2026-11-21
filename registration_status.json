@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-20T08:52:07.613Z",
+  "updated": "2026-11-21T08:33:27.661Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -49,10 +49,8 @@
       "since": "2026-10-18"
     },
     "feib1_easycard": {
-      "status": "unreachable",
-      "hit": "fetch failed",
-      "since": "2026-11-20",
-      "fails": 1
+      "status": "ok",
+      "since": "2026-11-21"
     },
     "scsb_minions_applepay": {
       "status": "ok",
@@ -491,6 +489,214 @@
     "easywallet_dining_weekly": {
       "status": "ok",
       "since": "2026-11-12"
+    },
+    "esun_momo_motor": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "esun_pchome_outdoor": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "ubear1_pchome_apple": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "esun_yahoo_nov_extra": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "esun_taobao_nov": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "esun_taobao_1111": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "esun_fpcc_pay_firstbind": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "c7_mercuries_insurance": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "fubon_shopee_q4": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "fubon_home_inst_q4": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "sinopac_momo_nov_full": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "sinopac_momo_nov_d11": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "sinopac_momo_nov_1930": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "sinopac_pchome_nov_full": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "sinopac_pchome_nov_d11": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "sinopac_pchome_nov_1624": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "sinopac_yahoo_nov_full": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "sinopac_yahoo_nov_d11": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "sinopac_yahoo_nov_2430": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "sinopac_shopee_nov_full": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "sinopac_shopee_nov_d11": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "sinopac_shopee_nov_1825": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "sinopac_coupang_nov_full": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "sinopac_coupang_nov_d11": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "sinopac_select_nov_full": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "sinopac_select_nov_d11": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "sinopac_travel_q4": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "sinopac_overseas_q4": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "sinopac_furniture_q4": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "ubot_momo_nov_inst50k": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "ubot_momo_nov_d11": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "ubot_momo_nov_single": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "ubot_momo_nov_1922": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "ubot_pchome_nov_inst": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "ubot_pchome_nov_cum": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "ubot_taobao_nov_cum": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "ubot_taobao_nov_single": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "dbs_yahoo_nov": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "dbs_ce_q4_monthly": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "hsbc_mrt_q4": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "fb_pchome_3pct": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "fb_pchome_inst2": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "fb_yahoo_3pct": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "fb_yahoo_inst2": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "fb_shopee_inst2": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "fb_momo_nov_cum": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "fb_momo_nov_inst2": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "fb_momo_1113_inst": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "fb_coupang_nov_cum": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "fb_coupang_nov_inst2": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "fb_coupang_1113_inst": {
+      "status": "ok",
+      "since": "2026-11-21"
+    },
+    "orange1_youth": {
+      "status": "ok",
+      "since": "2026-11-21"
     }
   }
 }

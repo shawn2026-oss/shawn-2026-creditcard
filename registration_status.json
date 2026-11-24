@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-23T09:27:50.152Z",
+  "updated": "2026-11-24T11:22:40.859Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -49,10 +49,8 @@
       "since": "2026-10-18"
     },
     "feib1_easycard": {
-      "status": "unreachable",
-      "hit": "fetch failed",
-      "since": "2026-11-23",
-      "fails": 1
+      "status": "ok",
+      "since": "2026-11-24"
     },
     "scsb_minions_applepay": {
       "status": "ok",
@@ -396,10 +394,6 @@
       "status": "ok",
       "since": "2026-11-09"
     },
-    "ubot_shopee_nov_single": {
-      "status": "ok",
-      "since": "2026-11-09"
-    },
     "ubot_shopee_nov_cum": {
       "status": "ok",
       "since": "2026-11-09"
@@ -409,10 +403,6 @@
       "since": "2026-11-09"
     },
     "ubot_coupang_nov_inst": {
-      "status": "ok",
-      "since": "2026-11-09"
-    },
-    "ubot_coupang_nov_single": {
       "status": "ok",
       "since": "2026-11-09"
     },
@@ -608,15 +598,7 @@
       "status": "ok",
       "since": "2026-11-21"
     },
-    "ubot_momo_nov_single": {
-      "status": "ok",
-      "since": "2026-11-21"
-    },
     "ubot_momo_nov_1922": {
-      "status": "ok",
-      "since": "2026-11-21"
-    },
-    "ubot_pchome_nov_inst": {
       "status": "ok",
       "since": "2026-11-21"
     },
@@ -625,10 +607,6 @@
       "since": "2026-11-21"
     },
     "ubot_taobao_nov_cum": {
-      "status": "ok",
-      "since": "2026-11-21"
-    },
-    "ubot_taobao_nov_single": {
       "status": "ok",
       "since": "2026-11-21"
     },

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-24T11:22:40.859Z",
+  "updated": "2026-11-25T10:08:16.001Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -394,15 +394,7 @@
       "status": "ok",
       "since": "2026-11-09"
     },
-    "ubot_shopee_nov_cum": {
-      "status": "ok",
-      "since": "2026-11-09"
-    },
     "ubot_shopee_nov_1825": {
-      "status": "ok",
-      "since": "2026-11-09"
-    },
-    "ubot_coupang_nov_inst": {
       "status": "ok",
       "since": "2026-11-09"
     },
@@ -590,23 +582,11 @@
       "status": "ok",
       "since": "2026-11-21"
     },
-    "ubot_momo_nov_inst50k": {
-      "status": "ok",
-      "since": "2026-11-21"
-    },
     "ubot_momo_nov_d11": {
       "status": "ok",
       "since": "2026-11-21"
     },
     "ubot_momo_nov_1922": {
-      "status": "ok",
-      "since": "2026-11-21"
-    },
-    "ubot_pchome_nov_cum": {
-      "status": "ok",
-      "since": "2026-11-21"
-    },
-    "ubot_taobao_nov_cum": {
       "status": "ok",
       "since": "2026-11-21"
     },

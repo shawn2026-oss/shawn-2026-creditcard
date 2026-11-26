@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-25T10:08:16.001Z",
+  "updated": "2026-11-26T09:50:23.318Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -579,10 +579,6 @@
       "since": "2026-11-21"
     },
     "sinopac_furniture_q4": {
-      "status": "ok",
-      "since": "2026-11-21"
-    },
-    "ubot_momo_nov_d11": {
       "status": "ok",
       "since": "2026-11-21"
     },

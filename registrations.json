@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-20",
+ "updated": "2026-11-27",
  "items": [
   {
    "id": "ubot_delivery",
@@ -309,6 +309,42 @@
     "scsb_minions_ap_transit",
     "scsb_minions_ap_transit_suica"
    ]
+  },
+  {
+   "id": "yuanta_applepay20",
+   "title": "元大信用卡 綁 Apple Pay 筆筆 20%",
+   "cids": [
+    "yuanta_d"
+   ],
+   "schedule": {
+    "type": "once",
+    "time": "14:00"
+   },
+   "from": "2026-08-18",
+   "until": "2026-12-31",
+   "quota": "限 40,000 名（依達成條件先後）",
+   "how": "元大銀行官網信用卡優惠活動頁登錄，2026/8/18 14:00～12/31 23:59，活動期間登錄一次",
+   "url": "https://www.yuantabank.com.tw/bank/creditCard/promotionActivity/in.do?id=6ae9eccdb90000053f09",
+   "note": "限 Visa／Mastercard 首次綁 Apple Pay；每筆一般消費 20% 刷卡金，每戶整個活動上限 200 元（刷 $1,000）；App Store、iCloud 要在 Apple 帳號付款方式選 Wallet 裡的元大卡；刷卡金約 2027/2 底前入帳",
+   "rids": [
+    "yuanta_d_applepay20"
+   ]
+  },
+  {
+   "id": "yuanta_applepay_mc2000",
+   "title": "元大萬事達卡 綁 Apple Pay 累積滿 $2,000 送 200 元刷卡金",
+   "cids": [
+    "yuanta_d"
+   ],
+   "schedule": {
+    "type": "once"
+   },
+   "from": "2026-08-18",
+   "until": "2026-12-31",
+   "quota": "限 15,000 名",
+   "how": "元大銀行 Apple Pay 活動頁登錄，活動期間登錄一次",
+   "url": "https://www.yuantabank.com.tw/bankwebIMG/event/Bank_Act2026/Apple0818/index.html",
+   "note": "限 Mastercard 綁 Apple Pay，一般消費累積滿 $2,000；每人回饋一次；可跟筆筆 20% 同時參加"
   },
   {
    "id": "fb1_pay3",

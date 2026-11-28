@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-27T09:55:19.957Z",
+  "updated": "2026-11-28T09:09:30.827Z",
   "items": {
     "ubot_delivery": {
       "status": "ok",
@@ -55,6 +55,14 @@
     "scsb_minions_applepay": {
       "status": "ok",
       "since": "2026-11-14"
+    },
+    "yuanta_applepay20": {
+      "status": "ok",
+      "since": "2026-11-28"
+    },
+    "yuanta_applepay_mc2000": {
+      "status": "ok",
+      "since": "2026-11-28"
     },
     "fb1_pay3": {
       "status": "ok",
@@ -293,10 +301,6 @@
     "orange1_shopfest": {
       "status": "ok",
       "since": "2026-10-18"
-    },
-    "jcb_jp_mitsukoshiisetan_202612": {
-      "status": "ok",
-      "since": "2026-11-03"
     },
     "esun_pi_month": {
       "status": "ok",
